@@ -8661,6 +8661,20 @@ ${ty.variants.map(
     toppedOut: t.bool().name("topped_out")
   });
 
+  // src/module_bindings/opponent_farm_board_compact_v_2_table.ts
+  var opponent_farm_board_compact_v_2_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    displayName: t.string().name("display_name"),
+    cells: t.string(),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    score: t.u32(),
+    linesCleared: t.u32().name("lines_cleared"),
+    toppedOut: t.bool().name("topped_out")
+  });
+
   // src/module_bindings/opponent_farm_piece_table.ts
   var opponent_farm_piece_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -8764,6 +8778,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, opponent_farm_board_compact_table_default),
+    opponentFarmBoardCompactV2: table({
+      name: "opponent_farm_board_compact_v2",
+      indexes: [],
+      constraints: []
+    }, opponent_farm_board_compact_v_2_table_default),
     opponentFarmPiece: table({
       name: "opponent_farm_piece",
       indexes: [],
@@ -8828,6 +8847,7 @@ ${ty.variants.map(
     "my_skills": "mySkills",
     "opponent_farm_board": "opponentFarmBoard",
     "opponent_farm_board_compact": "opponentFarmBoardCompact",
+    "opponent_farm_board_compact_v2": "opponentFarmBoardCompactV2",
     "opponent_farm_piece": "opponentFarmPiece",
     "opponent_farm_piece_compact": "opponentFarmPieceCompact"
   };
@@ -8988,6 +9008,14 @@ ${ty.variants.map(
     if (state.inactiveForMs < AFK_DISCONNECT_MS) return false;
     if (state.clientScreen === "farm" && !state.documentHidden) return false;
     return true;
+  }
+
+  // src/farm_transport_patch.ts
+  function farmBoardDomainPatch(opponentBoard) {
+    return {
+      opponentFarmBoard: opponentBoard ?? null,
+      opponentFarmPiece: null
+    };
   }
 
   // src/index.ts
@@ -9379,7 +9407,7 @@ ${ty.variants.map(
       data.farmPvpSession = rows(activeConnection.db.myFarmPvpSession)[0] ?? null;
     }
     if (domains.has("farmBoard")) {
-      data.opponentFarmBoard = rows(activeConnection.db.opponentFarmBoardCompact)[0] ?? null;
+      Object.assign(data, farmBoardDomainPatch(rows(activeConnection.db.opponentFarmBoardCompactV2)[0]));
     }
     if (domains.has("farmPiece")) {
       data.opponentFarmPiece = rows(activeConnection.db.opponentFarmPieceCompact)[0] ?? null;
@@ -9444,7 +9472,7 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.myFarmMatchmaking, "farmSession");
     observe(activeConnection, activeConnection.db.myFarmMatch, "farmSession");
     observe(activeConnection, activeConnection.db.myFarmPvpSession, "farmSession");
-    observe(activeConnection, activeConnection.db.opponentFarmBoardCompact, "farmBoard");
+    observe(activeConnection, activeConnection.db.opponentFarmBoardCompactV2, "farmBoard");
     observe(activeConnection, activeConnection.db.opponentFarmPieceCompact, "farmPiece");
     observe(activeConnection, activeConnection.db.myFarmPvpAttacks, "farmAttacks");
     farmSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
@@ -9457,7 +9485,7 @@ ${ty.variants.map(
       tables.myFarmMatchmaking,
       tables.myFarmMatch,
       tables.myFarmPvpSession,
-      tables.opponentFarmBoardCompact,
+      tables.opponentFarmBoardCompactV2,
       tables.opponentFarmPieceCompact,
       tables.myFarmPvpAttacks
     ]);
