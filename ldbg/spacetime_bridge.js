@@ -8396,6 +8396,15 @@ ${ty.variants.map(
     sequence: t.u32()
   };
 
+  // src/module_bindings/publish_farm_piece_reducer.ts
+  var publish_farm_piece_reducer_default = {
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    sequence: t.u32()
+  };
+
   // src/module_bindings/ready_farm_pvp_round_reducer.ts
   var ready_farm_pvp_round_reducer_default = {};
 
@@ -8493,6 +8502,18 @@ ${ty.variants.map(
   var my_farm_matchmaking_table_default = t.row({
     owner: t.identity().primaryKey(),
     queuedAt: t.timestamp().name("queued_at")
+  });
+
+  // src/module_bindings/my_farm_piece_table.ts
+  var my_farm_piece_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    matchId: t.string().name("match_id"),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    sequence: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
   });
 
   // src/module_bindings/my_farm_pvp_attacks_table.ts
@@ -8599,6 +8620,18 @@ ${ty.variants.map(
     updatedAt: t.timestamp().name("updated_at")
   });
 
+  // src/module_bindings/opponent_farm_piece_table.ts
+  var opponent_farm_piece_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    matchId: t.string().name("match_id"),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    sequence: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
   // src/module_bindings/index.ts
   var tablesSchema = schema({
     myActiveRun: table({
@@ -8626,6 +8659,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_farm_matchmaking_table_default),
+    myFarmPiece: table({
+      name: "my_farm_piece",
+      indexes: [],
+      constraints: []
+    }, my_farm_piece_table_default),
     myFarmPvpAttacks: table({
       name: "my_farm_pvp_attacks",
       indexes: [],
@@ -8670,7 +8708,12 @@ ${ty.variants.map(
       name: "opponent_farm_board",
       indexes: [],
       constraints: []
-    }, opponent_farm_board_table_default)
+    }, opponent_farm_board_table_default),
+    opponentFarmPiece: table({
+      name: "opponent_farm_piece",
+      indexes: [],
+      constraints: []
+    }, opponent_farm_piece_table_default)
   });
   var reducersSchema = reducers(
     reducerSchema("abandon_run", abandon_run_reducer_default),
@@ -8686,6 +8729,7 @@ ${ty.variants.map(
     reducerSchema("learn_skill", learn_skill_reducer_default),
     reducerSchema("leave_farm_match", leave_farm_match_reducer_default),
     reducerSchema("publish_farm_board", publish_farm_board_reducer_default),
+    reducerSchema("publish_farm_piece", publish_farm_piece_reducer_default),
     reducerSchema("ready_farm_pvp_round", ready_farm_pvp_round_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
     reducerSchema("report_farm_pvp_top_out", report_farm_pvp_top_out_reducer_default),
@@ -8710,6 +8754,7 @@ ${ty.variants.map(
     "my_farm_board": "myFarmBoard",
     "my_farm_match": "myFarmMatch",
     "my_farm_matchmaking": "myFarmMatchmaking",
+    "my_farm_piece": "myFarmPiece",
     "my_farm_pvp_attacks": "myFarmPvpAttacks",
     "my_farm_pvp_session": "myFarmPvpSession",
     "my_inventory": "myInventory",
@@ -8718,7 +8763,8 @@ ${ty.variants.map(
     "my_profile_preferences": "myProfilePreferences",
     "my_run_history": "myRunHistory",
     "my_skills": "mySkills",
-    "opponent_farm_board": "opponentFarmBoard"
+    "opponent_farm_board": "opponentFarmBoard",
+    "opponent_farm_piece": "opponentFarmPiece"
   };
   function __withTableAccessorAliases(target, freeze = false) {
     const out = Object.create(Object.getPrototypeOf(target));
@@ -8869,6 +8915,16 @@ ${ty.variants.map(
     };
   }
 
+  // src/connection_lifecycle.ts
+  var AFK_DISCONNECT_MS = 10 * 60 * 1e3;
+  var AFK_CHECK_INTERVAL_MS = 30 * 1e3;
+  function shouldEnterAfkIdle(state) {
+    if (!state.connected || !state.accountAuthenticated || state.authBusy) return false;
+    if (state.inactiveForMs < AFK_DISCONNECT_MS) return false;
+    if (state.clientScreen === "farm" && !state.documentHidden) return false;
+    return true;
+  }
+
   // src/index.ts
   var AUTH_PENDING_KEY = "ldbg.auth.pending.v1";
   var AUTH_PENDING_MAX_AGE_MS = 10 * 60 * 1e3;
@@ -8878,6 +8934,11 @@ ${ty.variants.map(
   var POPUP_FEATURES = "popup=yes,width=560,height=760,resizable=yes,scrollbars=yes";
   var connection = null;
   var connectionEpoch = 0;
+  var coreSubscription = null;
+  var farmSubscription = null;
+  var coreSubscriptionReady = false;
+  var connectionOpening = false;
+  var resumeNeeded = false;
   var lastBackendRequest = null;
   var accountToken = "";
   var accountClaims = null;
@@ -8890,6 +8951,12 @@ ${ty.variants.map(
   var sessionResetPopup = null;
   var sessionResetPopupMonitor = null;
   var authCallbackHandling = false;
+  var clientScreen = "title";
+  var lastUserActivityAt = Date.now();
+  var pendingReducerCalls = [];
+  var dirtySnapshotDomains = /* @__PURE__ */ new Set();
+  var snapshotFlushScheduled = false;
+  var observedHandles = /* @__PURE__ */ new WeakSet();
   var pendingEvents = [];
   var authConfig = resolveAuthConfig(window.LDBGAuthConfig);
   var backendConfigOverrides = window.LDBGBackendConfig;
@@ -9130,6 +9197,8 @@ ${ty.variants.map(
     }
     await authInitialization;
     disconnectBackend();
+    resumeNeeded = false;
+    pendingReducerCalls.length = 0;
     accountToken = "";
     accountClaims = null;
     authMode = "guest";
@@ -9194,6 +9263,12 @@ ${ty.variants.map(
   function disconnectBackend() {
     const previousConnection = connection;
     connection = null;
+    coreSubscription = null;
+    farmSubscription = null;
+    coreSubscriptionReady = false;
+    connectionOpening = false;
+    dirtySnapshotDomains.clear();
+    snapshotFlushScheduled = false;
     connectionEpoch += 1;
     if (previousConnection && typeof previousConnection.disconnect === "function") previousConnection.disconnect();
   }
@@ -9213,37 +9288,125 @@ ${ty.variants.map(
         farmMatch: null,
         myFarmBoard: null,
         opponentFarmBoard: null,
+        myFarmPiece: null,
+        opponentFarmPiece: null,
         farmPvpSession: null,
         farmPvpAttacks: []
       }
     };
   }
-  function publishSnapshot(activeConnection) {
+  function snapshotPatch(activeConnection, domains) {
+    const data = {};
+    if (domains.has("profile")) {
+      data.profile = rows(activeConnection.db.myProfile)[0] ?? null;
+      data.profilePreferences = rows(activeConnection.db.myProfilePreferences)[0] ?? null;
+    }
+    if (domains.has("inventory")) {
+      data.inventory = rows(activeConnection.db.myInventory);
+      data.inventoryOrder = rows(activeConnection.db.myInventoryOrder);
+      data.equipment = rows(activeConnection.db.myEquipment);
+      data.skills = rows(activeConnection.db.mySkills);
+    }
+    if (domains.has("run")) data.activeRun = rows(activeConnection.db.myActiveRun)[0] ?? null;
+    if (domains.has("farmSession")) {
+      data.farmMatchmaking = rows(activeConnection.db.myFarmMatchmaking)[0] ?? null;
+      data.farmMatch = rows(activeConnection.db.myFarmMatch)[0] ?? null;
+      data.farmPvpSession = rows(activeConnection.db.myFarmPvpSession)[0] ?? null;
+    }
+    if (domains.has("farmBoard")) {
+      data.myFarmBoard = rows(activeConnection.db.myFarmBoard)[0] ?? null;
+      data.opponentFarmBoard = rows(activeConnection.db.opponentFarmBoard)[0] ?? null;
+    }
+    if (domains.has("farmPiece")) {
+      data.myFarmPiece = rows(activeConnection.db.myFarmPiece)[0] ?? null;
+      data.opponentFarmPiece = rows(activeConnection.db.opponentFarmPiece)[0] ?? null;
+    }
+    if (domains.has("farmAttacks")) data.farmPvpAttacks = rows(activeConnection.db.myFarmPvpAttacks);
+    return { type: "snapshot", data };
+  }
+  function publishDomains(activeConnection, domains) {
     if (!activeConnection || connection !== activeConnection) return;
+    const requested = new Set(domains);
+    if (requested.size > 0) emit(snapshotPatch(activeConnection, requested));
+  }
+  function scheduleDomain(activeConnection, domain) {
+    if (!activeConnection || connection !== activeConnection) return;
+    dirtySnapshotDomains.add(domain);
+    if (snapshotFlushScheduled) return;
+    snapshotFlushScheduled = true;
+    queueMicrotask(() => {
+      snapshotFlushScheduled = false;
+      if (!activeConnection || connection !== activeConnection) {
+        dirtySnapshotDomains.clear();
+        return;
+      }
+      const domains = new Set(dirtySnapshotDomains);
+      dirtySnapshotDomains.clear();
+      publishDomains(activeConnection, domains);
+    });
+  }
+  function observe(activeConnection, handle, domain) {
+    if (!handle || typeof handle === "object" && observedHandles.has(handle)) return;
+    if (typeof handle === "object") observedHandles.add(handle);
+    handle.onInsert(() => scheduleDomain(activeConnection, domain));
+    handle.onDelete(() => scheduleDomain(activeConnection, domain));
+    if (typeof handle.onUpdate === "function") handle.onUpdate(() => scheduleDomain(activeConnection, domain));
+  }
+  function clearFarmProjection() {
     emit({
       type: "snapshot",
       data: {
-        profile: rows(activeConnection.db.myProfile)[0] ?? null,
-        profilePreferences: rows(activeConnection.db.myProfilePreferences)[0] ?? null,
-        inventory: rows(activeConnection.db.myInventory),
-        inventoryOrder: rows(activeConnection.db.myInventoryOrder),
-        equipment: rows(activeConnection.db.myEquipment),
-        skills: rows(activeConnection.db.mySkills),
-        activeRun: rows(activeConnection.db.myActiveRun)[0] ?? null,
-        runHistory: rows(activeConnection.db.myRunHistory),
-        farmMatchmaking: rows(activeConnection.db.myFarmMatchmaking)[0] ?? null,
-        farmMatch: rows(activeConnection.db.myFarmMatch)[0] ?? null,
-        myFarmBoard: rows(activeConnection.db.myFarmBoard)[0] ?? null,
-        opponentFarmBoard: rows(activeConnection.db.opponentFarmBoard)[0] ?? null,
-        farmPvpSession: rows(activeConnection.db.myFarmPvpSession)[0] ?? null,
-        farmPvpAttacks: rows(activeConnection.db.myFarmPvpAttacks)
+        farmMatchmaking: null,
+        farmMatch: null,
+        myFarmBoard: null,
+        opponentFarmBoard: null,
+        myFarmPiece: null,
+        opponentFarmPiece: null,
+        farmPvpSession: null,
+        farmPvpAttacks: []
       }
     });
   }
-  function observe(activeConnection, handle) {
-    handle.onInsert(() => publishSnapshot(activeConnection));
-    handle.onDelete(() => publishSnapshot(activeConnection));
-    if (typeof handle.onUpdate === "function") handle.onUpdate(() => publishSnapshot(activeConnection));
+  function farmScopeWanted() {
+    return clientScreen === "farm";
+  }
+  function stopFarmSubscription() {
+    const previous = farmSubscription;
+    farmSubscription = null;
+    if (previous && typeof previous.unsubscribe === "function") previous.unsubscribe();
+    clearFarmProjection();
+  }
+  function ensureFarmSubscription(activeConnection) {
+    if (!coreSubscriptionReady || connection !== activeConnection || !farmScopeWanted() || farmSubscription) return;
+    observe(activeConnection, activeConnection.db.myFarmMatchmaking, "farmSession");
+    observe(activeConnection, activeConnection.db.myFarmMatch, "farmSession");
+    observe(activeConnection, activeConnection.db.myFarmPvpSession, "farmSession");
+    observe(activeConnection, activeConnection.db.myFarmBoard, "farmBoard");
+    observe(activeConnection, activeConnection.db.opponentFarmBoard, "farmBoard");
+    observe(activeConnection, activeConnection.db.myFarmPiece, "farmPiece");
+    observe(activeConnection, activeConnection.db.opponentFarmPiece, "farmPiece");
+    observe(activeConnection, activeConnection.db.myFarmPvpAttacks, "farmAttacks");
+    farmSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (connection !== activeConnection || !farmSubscription || !farmScopeWanted()) return;
+      publishDomains(activeConnection, ["farmSession", "farmBoard", "farmPiece", "farmAttacks"]);
+      emit({ type: "subscription_scope_ready", scope: "farm" });
+    }).onError((_ctx, error) => {
+      if (connection === activeConnection) emit({ type: "error", command: "subscribeFarm", message: String(error) });
+    }).subscribe([
+      tables.myFarmMatchmaking,
+      tables.myFarmMatch,
+      tables.myFarmPvpSession,
+      tables.myFarmBoard,
+      tables.opponentFarmBoard,
+      tables.myFarmPiece,
+      tables.opponentFarmPiece,
+      tables.myFarmPvpAttacks
+    ]);
+  }
+  function flushPendingReducerCalls() {
+    if (!connection || !coreSubscriptionReady) return;
+    const queued = pendingReducerCalls.splice(0, pendingReducerCalls.length);
+    for (const item of queued) void callReducer(item.name, item.argumentsJson);
   }
   async function openBackendConnection(request) {
     const config = resolveBackendConfig(backendConfigOverrides, request);
@@ -9251,10 +9414,14 @@ ${ty.variants.map(
     disconnectBackend();
     const epoch = connectionEpoch;
     if (!token) {
+      resumeNeeded = false;
+      pendingReducerCalls.length = 0;
       emit({ type: "guest_demo" });
       return;
     }
     const connectionAuthMode = "account";
+    connectionOpening = true;
+    resumeNeeded = false;
     emit({
       type: "connecting",
       authMode: connectionAuthMode,
@@ -9268,24 +9435,21 @@ ${ty.variants.map(
       }
       connection = conn;
       emit({ type: "connected", identity: identity.toHexString(), authMode: connectionAuthMode });
-      conn.subscriptionBuilder().onApplied(() => {
+      observe(conn, conn.db.myProfile, "profile");
+      observe(conn, conn.db.myProfilePreferences, "profile");
+      observe(conn, conn.db.myInventory, "inventory");
+      observe(conn, conn.db.myInventoryOrder, "inventory");
+      observe(conn, conn.db.myEquipment, "inventory");
+      observe(conn, conn.db.mySkills, "inventory");
+      observe(conn, conn.db.myActiveRun, "run");
+      coreSubscription = conn.subscriptionBuilder().onApplied(() => {
         if (epoch !== connectionEpoch || connection !== conn) return;
-        observe(conn, conn.db.myProfile);
-        observe(conn, conn.db.myProfilePreferences);
-        observe(conn, conn.db.myInventory);
-        observe(conn, conn.db.myInventoryOrder);
-        observe(conn, conn.db.myEquipment);
-        observe(conn, conn.db.mySkills);
-        observe(conn, conn.db.myActiveRun);
-        observe(conn, conn.db.myRunHistory);
-        observe(conn, conn.db.myFarmMatchmaking);
-        observe(conn, conn.db.myFarmMatch);
-        observe(conn, conn.db.myFarmBoard);
-        observe(conn, conn.db.opponentFarmBoard);
-        observe(conn, conn.db.myFarmPvpSession);
-        observe(conn, conn.db.myFarmPvpAttacks);
-        publishSnapshot(conn);
+        coreSubscriptionReady = true;
+        connectionOpening = false;
+        publishDomains(conn, ["profile", "inventory", "run"]);
         emit({ type: "subscribed" });
+        ensureFarmSubscription(conn);
+        flushPendingReducerCalls();
       }).onError((_ctx, error) => {
         if (epoch === connectionEpoch) emit({ type: "error", command: "subscribe", message: String(error) });
       }).subscribe([
@@ -9295,21 +9459,21 @@ ${ty.variants.map(
         tables.myInventoryOrder,
         tables.myEquipment,
         tables.mySkills,
-        tables.myActiveRun,
-        tables.myRunHistory,
-        tables.myFarmMatchmaking,
-        tables.myFarmMatch,
-        tables.myFarmBoard,
-        tables.opponentFarmBoard,
-        tables.myFarmPvpSession,
-        tables.myFarmPvpAttacks
+        tables.myActiveRun
       ]);
     }).onDisconnect((_ctx, error) => {
       if (epoch !== connectionEpoch) return;
       connection = null;
+      coreSubscriptionReady = false;
+      connectionOpening = false;
+      resumeNeeded = authMode === "account";
       emit({ type: "disconnected", message: error ? String(error) : "" });
     }).onConnectError((_ctx, error) => {
-      if (epoch === connectionEpoch) emit({ type: "error", command: "connect", message: String(error) });
+      if (epoch === connectionEpoch) {
+        connectionOpening = false;
+        resumeNeeded = authMode === "account";
+        emit({ type: "error", command: "connect", message: String(error) });
+      }
     });
     builder = builder.withToken(token);
     builder.build();
@@ -9317,11 +9481,56 @@ ${ty.variants.map(
   async function reconnectBackendForCurrentAuth() {
     if (lastBackendRequest) await openBackendConnection(lastBackendRequest);
   }
+  function resumeBackend() {
+    if (connection || connectionOpening || authMode !== "account" || !accountToken || !lastBackendRequest) return;
+    resumeNeeded = false;
+    void openBackendConnection(lastBackendRequest);
+  }
+  function noteUserActivity() {
+    lastUserActivityAt = Date.now();
+    if (resumeNeeded) resumeBackend();
+  }
+  function enterAfkIdle() {
+    if (!connection || authMode !== "account" || authBusy) return;
+    if (clientScreen === "farm" && !document.hidden) return;
+    resumeNeeded = true;
+    disconnectBackend();
+    resumeNeeded = true;
+    emit({ type: "idle_disconnected" });
+  }
+  function checkAfkIdle() {
+    if (shouldEnterAfkIdle({
+      connected: Boolean(connection),
+      accountAuthenticated: authMode === "account",
+      authBusy,
+      clientScreen,
+      documentHidden: document.hidden,
+      inactiveForMs: Date.now() - lastUserActivityAt
+    })) enterAfkIdle();
+  }
+  function setClientContext(contextJson) {
+    try {
+      const context = JSON.parse(contextJson);
+      const nextScreen = typeof context.screen === "string" ? context.screen : "title";
+      if (nextScreen === clientScreen) {
+        noteUserActivity();
+        return;
+      }
+      clientScreen = nextScreen;
+      noteUserActivity();
+      if (!connection || !coreSubscriptionReady) return;
+      if (farmScopeWanted()) ensureFarmSubscription(connection);
+      else if (farmSubscription) stopFarmSubscription();
+    } catch (error) {
+      emit({ type: "error", command: "setClientContext", message: String(error) });
+    }
+  }
   async function connectBackend(configJson) {
     try {
       await authInitialization;
       const request = JSON.parse(configJson);
       lastBackendRequest = request;
+      noteUserActivity();
       await openBackendConnection(request);
     } catch (error) {
       emit({ type: "error", command: "connect", message: String(error) });
@@ -9329,7 +9538,15 @@ ${ty.variants.map(
   }
   async function callReducer(name, argumentsJson) {
     try {
-      if (!connection) throw new Error("SpacetimeDB is not connected.");
+      noteUserActivity();
+      if (!connection || !coreSubscriptionReady) {
+        if (authMode === "account" && lastBackendRequest && (resumeNeeded || connectionOpening)) {
+          pendingReducerCalls.push({ name, argumentsJson });
+          resumeBackend();
+          return;
+        }
+        throw new Error("SpacetimeDB is not connected.");
+      }
       const reducer = connection.reducers[name];
       if (typeof reducer !== "function") throw new Error(`Unknown reducer '${name}'.`);
       await reducer.call(connection.reducers, JSON.parse(argumentsJson));
@@ -9350,12 +9567,20 @@ ${ty.variants.map(
     if (!callbackUrl || new URL(callbackUrl).origin !== window.location.origin) return;
     void processAuthorizationCallback(callbackUrl, false);
   });
+  for (const eventName of ["pointerdown", "keydown", "touchstart", "focus"]) {
+    window.addEventListener(eventName, noteUserActivity, { passive: true });
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) noteUserActivity();
+  });
+  window.setInterval(checkAfkIdle, AFK_CHECK_INTERVAL_MS);
   var authInitialization = initializeAuthentication();
   window.LDBGSpacetime = {
     beginLogin,
     beginLogout,
     resetAuthSession,
     connectBackend,
+    setClientContext,
     callReducer,
     getAuthStatus,
     drainEvents
