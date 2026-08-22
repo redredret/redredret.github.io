@@ -8449,6 +8449,17 @@ ${ty.variants.map(
     clearGroups: t.string()
   };
 
+  // src/module_bindings/submit_farm_run_result_v_2_reducer.ts
+  var submit_farm_run_result_v_2_reducer_default = {
+    runId: t.string(),
+    score: t.u32(),
+    linesCleared: t.u32(),
+    enemiesDefeated: t.u32(),
+    completed: t.bool(),
+    clearGroups: t.string(),
+    garbageBlocksCleared: t.u32()
+  };
+
   // src/module_bindings/submit_run_result_reducer.ts
   var submit_run_result_reducer_default = {
     runId: t.string(),
@@ -8456,6 +8467,16 @@ ${ty.variants.map(
     linesCleared: t.u32(),
     enemiesDefeated: t.u32(),
     completed: t.bool()
+  };
+
+  // src/module_bindings/submit_run_result_v_2_reducer.ts
+  var submit_run_result_v_2_reducer_default = {
+    runId: t.string(),
+    score: t.u32(),
+    linesCleared: t.u32(),
+    enemiesDefeated: t.u32(),
+    completed: t.bool(),
+    garbageBlocksCleared: t.u32()
   };
 
   // src/module_bindings/unequip_inventory_item_reducer.ts
@@ -8747,7 +8768,9 @@ ${ty.variants.map(
     reducerSchema("set_display_name", set_display_name_reducer_default),
     reducerSchema("start_run", start_run_reducer_default),
     reducerSchema("submit_farm_run_result", submit_farm_run_result_reducer_default),
+    reducerSchema("submit_farm_run_result_v_2", submit_farm_run_result_v_2_reducer_default),
     reducerSchema("submit_run_result", submit_run_result_reducer_default),
+    reducerSchema("submit_run_result_v_2", submit_run_result_v_2_reducer_default),
     reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default)
   );
   var proceduresSchema = procedures();
