@@ -8439,6 +8439,16 @@ ${ty.variants.map(
     seed: t.u32()
   };
 
+  // src/module_bindings/submit_farm_run_result_reducer.ts
+  var submit_farm_run_result_reducer_default = {
+    runId: t.string(),
+    score: t.u32(),
+    linesCleared: t.u32(),
+    enemiesDefeated: t.u32(),
+    completed: t.bool(),
+    clearGroups: t.string()
+  };
+
   // src/module_bindings/submit_run_result_reducer.ts
   var submit_run_result_reducer_default = {
     runId: t.string(),
@@ -8736,6 +8746,7 @@ ${ty.variants.map(
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
     reducerSchema("set_display_name", set_display_name_reducer_default),
     reducerSchema("start_run", start_run_reducer_default),
+    reducerSchema("submit_farm_run_result", submit_farm_run_result_reducer_default),
     reducerSchema("submit_run_result", submit_run_result_reducer_default),
     reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default)
   );
