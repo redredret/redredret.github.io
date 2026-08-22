@@ -8347,6 +8347,12 @@ ${ty.variants.map(
     quantity: t.u32()
   };
 
+  // src/module_bindings/craft_item_reducer.ts
+  var craft_item_reducer_default = {
+    recipeId: t.string(),
+    quantity: t.u32()
+  };
+
   // src/module_bindings/create_farm_private_reducer.ts
   var create_farm_private_reducer_default = {};
 
@@ -8798,6 +8804,7 @@ ${ty.variants.map(
     reducerSchema("abandon_run", abandon_run_reducer_default),
     reducerSchema("acknowledge_farm_pvp_attack", acknowledge_farm_pvp_attack_reducer_default),
     reducerSchema("consume_item", consume_item_reducer_default),
+    reducerSchema("craft_item", craft_item_reducer_default),
     reducerSchema("create_farm_private", create_farm_private_reducer_default),
     reducerSchema("delete_my_data", delete_my_data_reducer_default),
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
