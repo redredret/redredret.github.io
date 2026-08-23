@@ -9114,8 +9114,15 @@ ${ty.variants.map(
   var pendingEvents = [];
   var authConfig = resolveAuthConfig(window.LDBGAuthConfig);
   var backendConfigOverrides = window.LDBGBackendConfig;
+  var MAX_PENDING_EVENTS = 512;
   function emit(event) {
     pendingEvents.push(event);
+    if (pendingEvents.length <= MAX_PENDING_EVENTS) return;
+    const overflow = pendingEvents.length - MAX_PENDING_EVENTS;
+    for (let removed = 0; removed < overflow; removed += 1) {
+      const index = pendingEvents.findIndex((pending) => pending.type !== "snapshot");
+      pendingEvents.splice(index === -1 ? 0 : index, 1);
+    }
   }
   function jsonSafe(value) {
     return JSON.parse(JSON.stringify(
