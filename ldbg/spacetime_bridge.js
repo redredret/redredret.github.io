@@ -8453,6 +8453,12 @@ ${ty.variants.map(
     garbageBlocksCleared: t.u32()
   };
 
+  // src/module_bindings/submit_farm_run_result_v_3_reducer.ts
+  var submit_farm_run_result_v_3_reducer_default = {
+    runId: t.string(),
+    trace: t.string()
+  };
+
   // src/module_bindings/submit_run_result_v_2_reducer.ts
   var submit_run_result_v_2_reducer_default = {
     runId: t.string(),
@@ -8701,6 +8707,7 @@ ${ty.variants.map(
     reducerSchema("set_display_name", set_display_name_reducer_default),
     reducerSchema("start_run", start_run_reducer_default),
     reducerSchema("submit_farm_run_result_v_2", submit_farm_run_result_v_2_reducer_default),
+    reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
     reducerSchema("submit_run_result_v_2", submit_run_result_v_2_reducer_default),
     reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default)
   );
