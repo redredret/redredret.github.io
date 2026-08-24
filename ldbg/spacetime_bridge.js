@@ -8420,6 +8420,12 @@ ${ty.variants.map(
   // src/module_bindings/report_farm_pvp_top_out_reducer.ts
   var report_farm_pvp_top_out_reducer_default = {};
 
+  // src/module_bindings/sell_item_reducer.ts
+  var sell_item_reducer_default = {
+    itemId: t.string(),
+    quantity: t.u32()
+  };
+
   // src/module_bindings/send_farm_pvp_attack_reducer.ts
   var send_farm_pvp_attack_reducer_default = {
     lines: t.u32(),
@@ -8434,6 +8440,12 @@ ${ty.variants.map(
   // src/module_bindings/set_display_name_reducer.ts
   var set_display_name_reducer_default = {
     displayName: t.string()
+  };
+
+  // src/module_bindings/set_hair_reducer.ts
+  var set_hair_reducer_default = {
+    hairStyle: t.u32(),
+    hairColor: t.u32()
   };
 
   // src/module_bindings/set_skin_tone_reducer.ts
@@ -8552,7 +8564,9 @@ ${ty.variants.map(
     nameChosen: t.bool().name("name_chosen"),
     createdAt: t.timestamp().name("created_at"),
     lastSeenAt: t.timestamp().name("last_seen_at"),
-    skinTone: t.u32().name("skin_tone")
+    skinTone: t.u32().name("skin_tone"),
+    hairStyle: t.u32().name("hair_style"),
+    hairColor: t.u32().name("hair_color")
   });
 
   // src/module_bindings/my_run_history_table.ts
@@ -8691,8 +8705,10 @@ ${ty.variants.map(
     reducerSchema("ready_farm_pvp_round", ready_farm_pvp_round_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
     reducerSchema("report_farm_pvp_top_out", report_farm_pvp_top_out_reducer_default),
+    reducerSchema("sell_item", sell_item_reducer_default),
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
     reducerSchema("set_display_name", set_display_name_reducer_default),
+    reducerSchema("set_hair", set_hair_reducer_default),
     reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
     reducerSchema("start_run", start_run_reducer_default),
     reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
