@@ -8483,7 +8483,9 @@ ${ty.variants.map(
     currentFloor: t.u32().name("current_floor"),
     score: t.u32(),
     linesCleared: t.u32().name("lines_cleared"),
-    startedAt: t.timestamp().name("started_at")
+    startedAt: t.timestamp().name("started_at"),
+    rivalPressure: t.bool().name("rival_pressure"),
+    pvpBagSeed: t.u32().name("pvp_bag_seed")
   });
 
   // src/module_bindings/my_equipment_table.ts
@@ -8501,7 +8503,8 @@ ${ty.variants.map(
     sender: t.identity(),
     lines: t.u32(),
     hole: t.u32(),
-    createdAt: t.timestamp().name("created_at")
+    createdAt: t.timestamp().name("created_at"),
+    ordinal: t.u32()
   });
 
   // src/module_bindings/my_farm_pvp_member_v_2_table.ts
