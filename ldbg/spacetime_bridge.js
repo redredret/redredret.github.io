@@ -8436,6 +8436,11 @@ ${ty.variants.map(
     displayName: t.string()
   };
 
+  // src/module_bindings/set_skin_tone_reducer.ts
+  var set_skin_tone_reducer_default = {
+    skinTone: t.u32()
+  };
+
   // src/module_bindings/start_run_reducer.ts
   var start_run_reducer_default = {
     dungeonId: t.string(),
@@ -8546,7 +8551,8 @@ ${ty.variants.map(
     identity: t.identity().primaryKey(),
     nameChosen: t.bool().name("name_chosen"),
     createdAt: t.timestamp().name("created_at"),
-    lastSeenAt: t.timestamp().name("last_seen_at")
+    lastSeenAt: t.timestamp().name("last_seen_at"),
+    skinTone: t.u32().name("skin_tone")
   });
 
   // src/module_bindings/my_run_history_table.ts
@@ -8687,6 +8693,7 @@ ${ty.variants.map(
     reducerSchema("report_farm_pvp_top_out", report_farm_pvp_top_out_reducer_default),
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
     reducerSchema("set_display_name", set_display_name_reducer_default),
+    reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
     reducerSchema("start_run", start_run_reducer_default),
     reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
     reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default)
