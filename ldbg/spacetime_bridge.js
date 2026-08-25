@@ -8610,6 +8610,24 @@ ${ty.variants.map(
     toppedOut: t.bool().name("topped_out")
   });
 
+  // src/module_bindings/opponent_farm_boards_compact_v_4_table.ts
+  var opponent_farm_boards_compact_v_4_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    slot: t.u32(),
+    alive: t.bool(),
+    placement: t.u32(),
+    ready: t.bool(),
+    displayName: t.string().name("display_name"),
+    cells: t.string(),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    score: t.u32(),
+    linesCleared: t.u32().name("lines_cleared"),
+    toppedOut: t.bool().name("topped_out")
+  });
+
   // src/module_bindings/opponent_farm_pieces_compact_v_3_table.ts
   var opponent_farm_pieces_compact_v_3_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -8681,6 +8699,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, opponent_farm_boards_compact_v_3_table_default),
+    opponentFarmBoardsCompactV4: table({
+      name: "opponent_farm_boards_compact_v4",
+      indexes: [],
+      constraints: []
+    }, opponent_farm_boards_compact_v_4_table_default),
     opponentFarmPiecesCompactV3: table({
       name: "opponent_farm_pieces_compact_v3",
       indexes: [],
@@ -8736,6 +8759,7 @@ ${ty.variants.map(
     "my_run_history": "myRunHistory",
     "my_skills": "mySkills",
     "opponent_farm_boards_compact_v3": "opponentFarmBoardsCompactV3",
+    "opponent_farm_boards_compact_v4": "opponentFarmBoardsCompactV4",
     "opponent_farm_pieces_compact_v3": "opponentFarmPiecesCompactV3"
   };
   function __withTableAccessorAliases(target, freeze = false) {
@@ -9301,7 +9325,7 @@ ${ty.variants.map(
       data.farmPvpMember = rows(activeConnection.db.myFarmPvpMemberV2)[0] ?? null;
     }
     if (domains.has("farmBoard")) {
-      const opponents = rows(activeConnection.db.opponentFarmBoardsCompactV3);
+      const opponents = rows(activeConnection.db.opponentFarmBoardsCompactV4);
       data.farmOpponents = opponents;
       data.farmOpponentPieces = [];
       Object.assign(data, farmBoardDomainPatch(opponents[0]));
@@ -9371,7 +9395,7 @@ ${ty.variants.map(
     if (!coreSubscriptionReady || connection !== activeConnection || !farmScopeWanted() || farmSubscription) return;
     observe(activeConnection, activeConnection.db.myFarmPvpSession, "farmSession");
     observe(activeConnection, activeConnection.db.myFarmPvpMemberV2, "farmSession");
-    observe(activeConnection, activeConnection.db.opponentFarmBoardsCompactV3, "farmBoard");
+    observe(activeConnection, activeConnection.db.opponentFarmBoardsCompactV4, "farmBoard");
     observe(activeConnection, activeConnection.db.opponentFarmPiecesCompactV3, "farmPiece");
     observe(activeConnection, activeConnection.db.myFarmPvpAttacks, "farmAttacks");
     farmSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
@@ -9383,7 +9407,7 @@ ${ty.variants.map(
     }).subscribe([
       tables.myFarmPvpSession,
       tables.myFarmPvpMemberV2,
-      tables.opponentFarmBoardsCompactV3,
+      tables.opponentFarmBoardsCompactV4,
       tables.opponentFarmPiecesCompactV3,
       tables.myFarmPvpAttacks
     ]);
