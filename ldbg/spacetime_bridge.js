@@ -8593,6 +8593,31 @@ ${ty.variants.map(
     equippedSlot: t.option(t.u32()).name("equipped_slot")
   });
 
+  // src/module_bindings/my_upgrade_progress_table.ts
+  var my_upgrade_progress_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    level: t.u32(),
+    combatEarned: t.u32().name("combat_earned"),
+    combatSpent: t.u32().name("combat_spent"),
+    combatAvailable: t.u32().name("combat_available"),
+    skillsEarned: t.u32().name("skills_earned"),
+    skillsSpent: t.u32().name("skills_spent"),
+    skillsAvailable: t.u32().name("skills_available"),
+    buildEarned: t.u32().name("build_earned"),
+    buildSpent: t.u32().name("build_spent"),
+    buildAvailable: t.u32().name("build_available")
+  });
+
+  // src/module_bindings/my_upgrade_unlocks_table.ts
+  var my_upgrade_unlocks_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    tree: t.string(),
+    upgradeId: t.string().name("upgrade_id"),
+    rank: t.u32(),
+    pointCost: t.u32().name("point_cost")
+  });
+
   // src/module_bindings/opponent_farm_boards_compact_v_3_table.ts
   var opponent_farm_boards_compact_v_3_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -8694,6 +8719,16 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_skills_table_default),
+    myUpgradeProgress: table({
+      name: "my_upgrade_progress",
+      indexes: [],
+      constraints: []
+    }, my_upgrade_progress_table_default),
+    myUpgradeUnlocks: table({
+      name: "my_upgrade_unlocks",
+      indexes: [],
+      constraints: []
+    }, my_upgrade_unlocks_table_default),
     opponentFarmBoardsCompactV3: table({
       name: "opponent_farm_boards_compact_v3",
       indexes: [],
@@ -8758,6 +8793,8 @@ ${ty.variants.map(
     "my_profile_preferences": "myProfilePreferences",
     "my_run_history": "myRunHistory",
     "my_skills": "mySkills",
+    "my_upgrade_progress": "myUpgradeProgress",
+    "my_upgrade_unlocks": "myUpgradeUnlocks",
     "opponent_farm_boards_compact_v3": "opponentFarmBoardsCompactV3",
     "opponent_farm_boards_compact_v4": "opponentFarmBoardsCompactV4",
     "opponent_farm_pieces_compact_v3": "opponentFarmPiecesCompactV3"
@@ -9301,6 +9338,8 @@ ${ty.variants.map(
         inventoryOrder: [],
         equipment: [],
         skills: [],
+        upgradeProgress: null,
+        upgradeUnlocks: [],
         activeRun: null,
         runHistory: [],
         farmPvpMember: null,
@@ -9326,6 +9365,10 @@ ${ty.variants.map(
       data.inventoryOrder = rows(activeConnection.db.myInventoryOrder);
       data.equipment = rows(activeConnection.db.myEquipment);
       data.skills = rows(activeConnection.db.mySkills);
+    }
+    if (domains.has("upgrades")) {
+      data.upgradeProgress = rows(activeConnection.db.myUpgradeProgress)[0] ?? null;
+      data.upgradeUnlocks = rows(activeConnection.db.myUpgradeUnlocks);
     }
     if (domains.has("run")) data.activeRun = rows(activeConnection.db.myActiveRun)[0] ?? null;
     if (domains.has("farmSession")) {
@@ -9458,13 +9501,15 @@ ${ty.variants.map(
       observe(conn, conn.db.myInventoryOrder, "inventory");
       observe(conn, conn.db.myEquipment, "inventory");
       observe(conn, conn.db.mySkills, "inventory");
+      observe(conn, conn.db.myUpgradeProgress, "upgrades");
+      observe(conn, conn.db.myUpgradeUnlocks, "upgrades");
       observe(conn, conn.db.myActiveRun, "run");
       coreSubscription = conn.subscriptionBuilder().onApplied(() => {
         if (epoch !== connectionEpoch || connection !== conn) return;
         coreSubscriptionReady = true;
         connectionOpening = false;
         reconnectAttempt = 0;
-        publishDomains(conn, ["profile", "inventory", "run"]);
+        publishDomains(conn, ["profile", "inventory", "upgrades", "run"]);
         emit({ type: "subscribed" });
         ensureFarmSubscription(conn);
         flushPendingReducerCalls();
@@ -9477,6 +9522,8 @@ ${ty.variants.map(
         tables.myInventoryOrder,
         tables.myEquipment,
         tables.mySkills,
+        tables.myUpgradeProgress,
+        tables.myUpgradeUnlocks,
         tables.myActiveRun
       ]);
     }).onDisconnect((_ctx, error) => {
