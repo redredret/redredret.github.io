@@ -8917,8 +8917,12 @@ ${ty.variants.map(
   function shouldEnterAfkIdle(state) {
     if (!state.connected || !state.accountAuthenticated || state.authBusy) return false;
     if (state.inactiveForMs < AFK_DISCONNECT_MS) return false;
-    if (state.clientScreen === "farm" && !state.documentHidden) return false;
+    if (state.clientScreen === "farm") return false;
     return true;
+  }
+  function shouldAutoResumeConnection(state) {
+    if (!state.accountAuthenticated || state.authBusy) return false;
+    return state.clientScreen === "farm" || !state.documentHidden;
   }
 
   // src/farm_transport_patch.ts
@@ -8957,6 +8961,8 @@ ${ty.variants.map(
   var authCallbackHandling = false;
   var clientScreen = "title";
   var lastUserActivityAt = Date.now();
+  var reconnectTimer = null;
+  var reconnectAttempt = 0;
   var pendingReducerCalls = [];
   var dirtySnapshotDomains = /* @__PURE__ */ new Set();
   var snapshotFlushScheduled = false;
@@ -9272,6 +9278,8 @@ ${ty.variants.map(
     }
   }
   function disconnectBackend() {
+    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
+    reconnectTimer = null;
     const previousConnection = connection;
     connection = null;
     coreSubscription = null;
@@ -9455,6 +9463,7 @@ ${ty.variants.map(
         if (epoch !== connectionEpoch || connection !== conn) return;
         coreSubscriptionReady = true;
         connectionOpening = false;
+        reconnectAttempt = 0;
         publishDomains(conn, ["profile", "inventory", "run"]);
         emit({ type: "subscribed" });
         ensureFarmSubscription(conn);
@@ -9477,11 +9486,13 @@ ${ty.variants.map(
       connectionOpening = false;
       resumeNeeded = authMode === "account";
       emit({ type: "disconnected", message: error ? String(error) : "" });
+      scheduleBackendResume();
     }).onConnectError((_ctx, error) => {
       if (epoch === connectionEpoch) {
         connectionOpening = false;
         resumeNeeded = authMode === "account";
         emit({ type: "error", command: "connect", message: String(error) });
+        scheduleBackendResume();
       }
     });
     builder = builder.withToken(token);
@@ -9492,8 +9503,25 @@ ${ty.variants.map(
   }
   function resumeBackend() {
     if (connection || connectionOpening || authMode !== "account" || !accountToken || !lastBackendRequest) return;
+    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
+    reconnectTimer = null;
     resumeNeeded = false;
     void openBackendConnection(lastBackendRequest);
+  }
+  function scheduleBackendResume() {
+    if (!resumeNeeded || connection || connectionOpening || reconnectTimer !== null) return;
+    if (!shouldAutoResumeConnection({
+      accountAuthenticated: authMode === "account",
+      authBusy,
+      clientScreen,
+      documentHidden: document.hidden
+    })) return;
+    const delay = Math.min(500 * 2 ** reconnectAttempt, 5e3);
+    reconnectAttempt += 1;
+    reconnectTimer = window.setTimeout(() => {
+      reconnectTimer = null;
+      resumeBackend();
+    }, delay);
   }
   function noteUserActivity() {
     lastUserActivityAt = Date.now();
@@ -9501,7 +9529,7 @@ ${ty.variants.map(
   }
   function enterAfkIdle() {
     if (!connection || authMode !== "account" || authBusy) return;
-    if (clientScreen === "farm" && !document.hidden) return;
+    if (clientScreen === "farm") return;
     resumeNeeded = true;
     disconnectBackend();
     resumeNeeded = true;
@@ -9590,6 +9618,7 @@ ${ty.variants.map(
     resetAuthSession,
     connectBackend,
     setClientContext,
+    noteUserActivity,
     callReducer,
     getAuthStatus,
     drainEvents
