@@ -8408,6 +8408,11 @@ ${ty.variants.map(
     sequence: t.u32()
   };
 
+  // src/module_bindings/purchase_build_upgrade_reducer.ts
+  var purchase_build_upgrade_reducer_default = {
+    upgradeId: t.string()
+  };
+
   // src/module_bindings/ready_farm_pvp_round_reducer.ts
   var ready_farm_pvp_round_reducer_default = {};
 
@@ -8760,6 +8765,7 @@ ${ty.variants.map(
     reducerSchema("leave_farm_match", leave_farm_match_reducer_default),
     reducerSchema("publish_farm_board", publish_farm_board_reducer_default),
     reducerSchema("publish_farm_piece", publish_farm_piece_reducer_default),
+    reducerSchema("purchase_build_upgrade", purchase_build_upgrade_reducer_default),
     reducerSchema("ready_farm_pvp_round", ready_farm_pvp_round_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
     reducerSchema("report_farm_pvp_top_out", report_farm_pvp_top_out_reducer_default),
