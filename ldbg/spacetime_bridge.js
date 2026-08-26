@@ -8965,7 +8965,7 @@ ${ty.variants.map(
   }
   function shouldAutoResumeConnection(state) {
     if (!state.accountAuthenticated || state.authBusy) return false;
-    return state.clientScreen === "farm" || !state.documentHidden;
+    return state.clientScreen.startsWith("farm") || !state.documentHidden;
   }
 
   // src/farm_transport_patch.ts
@@ -9440,7 +9440,7 @@ ${ty.variants.map(
     });
   }
   function farmScopeWanted() {
-    return clientScreen === "farm";
+    return clientScreen === "farm" || clientScreen === "farm_round_end";
   }
   function stopFarmSubscription() {
     const previous = farmSubscription;
@@ -9583,10 +9583,11 @@ ${ty.variants.map(
   function enterAfkIdle() {
     if (!connection || authMode !== "account" || authBusy) return;
     if (clientScreen === "farm") return;
-    resumeNeeded = true;
+    const requiresRefresh = clientScreen === "farm_round_end";
+    resumeNeeded = !requiresRefresh;
     disconnectBackend();
-    resumeNeeded = true;
-    emit({ type: "idle_disconnected" });
+    resumeNeeded = !requiresRefresh;
+    emit({ type: "idle_disconnected", requiresRefresh });
   }
   function checkAfkIdle() {
     if (shouldEnterAfkIdle({
