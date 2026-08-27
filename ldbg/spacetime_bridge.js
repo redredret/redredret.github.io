@@ -9635,7 +9635,6 @@ ${ty.variants.map(
     if (!connection || authMode !== "account" || authBusy) return;
     if (clientScreen === "farm") return;
     const requiresRefresh = clientScreen === "farm_round_end";
-    resumeNeeded = !requiresRefresh;
     disconnectBackend();
     resumeNeeded = !requiresRefresh;
     emit({ type: "idle_disconnected", requiresRefresh });
