@@ -8967,6 +8967,24 @@ ${ty.variants.map(
     if (!state.accountAuthenticated || state.authBusy) return false;
     return state.clientScreen.startsWith("farm") || !state.documentHidden;
   }
+  var TOKEN_EXPIRY_SKEW_SECONDS = 60;
+  function isAccountTokenExpired(expiresAtSeconds, nowSeconds = Math.floor(Date.now() / 1e3)) {
+    if (typeof expiresAtSeconds !== "number" || !Number.isFinite(expiresAtSeconds)) return false;
+    return expiresAtSeconds <= nowSeconds - TOKEN_EXPIRY_SKEW_SECONDS;
+  }
+  var EXPIRED_SESSION_MESSAGE = "Your sign-in expired. Open Account and sign in again to keep playing.";
+  var SUPERSEDABLE_CALLS = ["publishFarmBoard", "publishFarmPiece"];
+  var MAX_PENDING_CALLS = 64;
+  function collapsePendingCalls(queued, maximum = MAX_PENDING_CALLS) {
+    const lastSupersedable = /* @__PURE__ */ new Map();
+    queued.forEach((call, index) => {
+      if (SUPERSEDABLE_CALLS.includes(call.name)) lastSupersedable.set(call.name, index);
+    });
+    const kept = queued.filter(
+      (call, index) => !SUPERSEDABLE_CALLS.includes(call.name) || lastSupersedable.get(call.name) === index
+    );
+    return kept.length <= maximum ? kept : kept.slice(kept.length - maximum);
+  }
 
   // src/farm_transport_patch.ts
   function farmBoardDomainPatch(opponentBoard) {
@@ -9024,10 +9042,21 @@ ${ty.variants.map(
     }
   }
   function jsonSafe(value) {
-    return JSON.parse(JSON.stringify(
-      value,
-      (_key, item) => typeof item === "bigint" ? item.toString() : item
-    ));
+    return convertBigInts(value);
+  }
+  function convertBigInts(value) {
+    if (typeof value === "bigint") return value.toString();
+    if (value === null || typeof value !== "object") return value;
+    const custom = value.toJSON;
+    if (typeof custom === "function") {
+      return convertBigInts(custom.call(value));
+    }
+    if (Array.isArray(value)) return value.map(convertBigInts);
+    const result = {};
+    for (const key of Object.keys(value)) {
+      result[key] = convertBigInts(value[key]);
+    }
+    return result;
   }
   function rows(handle) {
     return Array.from(handle.iter()).map(jsonSafe);
@@ -9471,7 +9500,7 @@ ${ty.variants.map(
   }
   function flushPendingReducerCalls() {
     if (!connection || !coreSubscriptionReady) return;
-    const queued = pendingReducerCalls.splice(0, pendingReducerCalls.length);
+    const queued = collapsePendingCalls(pendingReducerCalls.splice(0, pendingReducerCalls.length));
     for (const item of queued) void callReducer(item.name, item.argumentsJson);
   }
   async function openBackendConnection(request) {
@@ -9554,7 +9583,25 @@ ${ty.variants.map(
   async function reconnectBackendForCurrentAuth() {
     if (lastBackendRequest) await openBackendConnection(lastBackendRequest);
   }
+  function accountSessionExpired() {
+    return authMode === "account" && isAccountTokenExpired(accountClaims?.exp);
+  }
+  function reportExpiredSession() {
+    resumeNeeded = false;
+    pendingReducerCalls.length = 0;
+    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+    authBusy = false;
+    if (authError === EXPIRED_SESSION_MESSAGE) return;
+    authError = EXPIRED_SESSION_MESSAGE;
+    publishAuthStatus();
+    emit({ type: "auth_error", message: authError });
+  }
   function resumeBackend() {
+    if (accountSessionExpired()) {
+      reportExpiredSession();
+      return;
+    }
     if (connection || connectionOpening || authMode !== "account" || !accountToken || !lastBackendRequest) return;
     if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
     reconnectTimer = null;
@@ -9562,6 +9609,10 @@ ${ty.variants.map(
     void openBackendConnection(lastBackendRequest);
   }
   function scheduleBackendResume() {
+    if (accountSessionExpired()) {
+      reportExpiredSession();
+      return;
+    }
     if (!resumeNeeded || connection || connectionOpening || reconnectTimer !== null) return;
     if (!shouldAutoResumeConnection({
       accountAuthenticated: authMode === "account",
@@ -9633,6 +9684,9 @@ ${ty.variants.map(
       if (!connection || !coreSubscriptionReady) {
         if (authMode === "account" && lastBackendRequest && (resumeNeeded || connectionOpening)) {
           pendingReducerCalls.push({ name, argumentsJson });
+          const collapsed = collapsePendingCalls(pendingReducerCalls);
+          pendingReducerCalls.length = 0;
+          pendingReducerCalls.push(...collapsed);
           resumeBackend();
           return;
         }
