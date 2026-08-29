@@ -8336,6 +8336,11 @@ ${ty.variants.map(
     runId: t.string()
   };
 
+  // src/module_bindings/claim_play_session_reducer.ts
+  var claim_play_session_reducer_default = {
+    force: t.bool()
+  };
+
   // src/module_bindings/consume_item_reducer.ts
   var consume_item_reducer_default = {
     itemId: t.string(),
@@ -8421,6 +8426,9 @@ ${ty.variants.map(
 
   // src/module_bindings/ready_farm_pvp_round_reducer.ts
   var ready_farm_pvp_round_reducer_default = {};
+
+  // src/module_bindings/renew_play_session_reducer.ts
+  var renew_play_session_reducer_default = {};
 
   // src/module_bindings/reorder_inventory_item_reducer.ts
   var reorder_inventory_item_reducer_default = {
@@ -8736,6 +8744,7 @@ ${ty.variants.map(
   });
   var reducersSchema = reducers(
     reducerSchema("abandon_run", abandon_run_reducer_default),
+    reducerSchema("claim_play_session", claim_play_session_reducer_default),
     reducerSchema("consume_item", consume_item_reducer_default),
     reducerSchema("craft_item", craft_item_reducer_default),
     reducerSchema("create_farm_dark_private", create_farm_dark_private_reducer_default),
@@ -8753,6 +8762,7 @@ ${ty.variants.map(
     reducerSchema("publish_farm_piece", publish_farm_piece_reducer_default),
     reducerSchema("purchase_build_upgrade", purchase_build_upgrade_reducer_default),
     reducerSchema("ready_farm_pvp_round", ready_farm_pvp_round_reducer_default),
+    reducerSchema("renew_play_session", renew_play_session_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
     reducerSchema("report_farm_pvp_top_out", report_farm_pvp_top_out_reducer_default),
     reducerSchema("sell_item", sell_item_reducer_default),
