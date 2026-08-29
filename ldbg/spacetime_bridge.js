@@ -8348,6 +8348,9 @@ ${ty.variants.map(
     quantity: t.u32()
   };
 
+  // src/module_bindings/create_farm_dark_private_reducer.ts
+  var create_farm_dark_private_reducer_default = {};
+
   // src/module_bindings/create_farm_private_reducer.ts
   var create_farm_private_reducer_default = {};
 
@@ -8364,6 +8367,14 @@ ${ty.variants.map(
     skillId: t.string(),
     slot: t.u32()
   };
+
+  // src/module_bindings/join_farm_dark_private_reducer.ts
+  var join_farm_dark_private_reducer_default = {
+    code: t.string()
+  };
+
+  // src/module_bindings/join_farm_dark_public_reducer.ts
+  var join_farm_dark_public_reducer_default = {};
 
   // src/module_bindings/join_farm_private_reducer.ts
   var join_farm_private_reducer_default = {
@@ -8481,7 +8492,9 @@ ${ty.variants.map(
     linesCleared: t.u32().name("lines_cleared"),
     startedAt: t.timestamp().name("started_at"),
     rivalPressure: t.bool().name("rival_pressure"),
-    pvpBagSeed: t.u32().name("pvp_bag_seed")
+    pvpBagSeed: t.u32().name("pvp_bag_seed"),
+    darkMatchId: t.string().name("dark_match_id"),
+    darkRound: t.u32().name("dark_round")
   });
 
   // src/module_bindings/my_equipment_table.ts
@@ -8490,6 +8503,17 @@ ${ty.variants.map(
     owner: t.identity(),
     slot: t.string(),
     itemId: t.string().name("item_id")
+  });
+
+  // src/module_bindings/my_farm_dark_haul_table.ts
+  var my_farm_dark_haul_table_default = t.row({
+    haulId: t.string().primaryKey().name("haul_id"),
+    winner: t.identity(),
+    round: t.u32(),
+    fromName: t.string().name("from_name"),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32(),
+    createdAt: t.timestamp().name("created_at")
   });
 
   // src/module_bindings/my_farm_pvp_attacks_table.ts
@@ -8644,6 +8668,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_equipment_table_default),
+    myFarmDarkHaul: table({
+      name: "my_farm_dark_haul",
+      indexes: [],
+      constraints: []
+    }, my_farm_dark_haul_table_default),
     myFarmPvpAttacks: table({
       name: "my_farm_pvp_attacks",
       indexes: [],
@@ -8709,10 +8738,13 @@ ${ty.variants.map(
     reducerSchema("abandon_run", abandon_run_reducer_default),
     reducerSchema("consume_item", consume_item_reducer_default),
     reducerSchema("craft_item", craft_item_reducer_default),
+    reducerSchema("create_farm_dark_private", create_farm_dark_private_reducer_default),
     reducerSchema("create_farm_private", create_farm_private_reducer_default),
     reducerSchema("delete_my_data", delete_my_data_reducer_default),
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
     reducerSchema("equip_skill", equip_skill_reducer_default),
+    reducerSchema("join_farm_dark_private", join_farm_dark_private_reducer_default),
+    reducerSchema("join_farm_dark_public", join_farm_dark_public_reducer_default),
     reducerSchema("join_farm_private", join_farm_private_reducer_default),
     reducerSchema("join_farm_public", join_farm_public_reducer_default),
     reducerSchema("learn_skill", learn_skill_reducer_default),
@@ -8744,6 +8776,7 @@ ${ty.variants.map(
   var tableAccessorAliases = {
     "my_active_run": "myActiveRun",
     "my_equipment": "myEquipment",
+    "my_farm_dark_haul": "myFarmDarkHaul",
     "my_farm_pvp_attacks": "myFarmPvpAttacks",
     "my_farm_pvp_member_v2": "myFarmPvpMemberV2",
     "my_farm_pvp_session": "myFarmPvpSession",
@@ -9337,7 +9370,8 @@ ${ty.variants.map(
         opponentFarmPiece: null,
         farmOpponentPieces: [],
         farmPvpSession: null,
-        farmPvpAttacks: []
+        farmPvpAttacks: [],
+        farmDarkHaul: []
       }
     };
   }
@@ -9374,6 +9408,7 @@ ${ty.variants.map(
       data.opponentFarmPiece = pieces[0] ?? null;
     }
     if (domains.has("farmAttacks")) data.farmPvpAttacks = rows(activeConnection.db.myFarmPvpAttacks);
+    if (domains.has("farmDarkHaul")) data.farmDarkHaul = rows(activeConnection.db.myFarmDarkHaul);
     return { type: "snapshot", data };
   }
   function publishDomains(activeConnection, domains) {
@@ -9416,7 +9451,8 @@ ${ty.variants.map(
         opponentFarmPiece: null,
         farmOpponentPieces: [],
         farmPvpSession: null,
-        farmPvpAttacks: []
+        farmPvpAttacks: [],
+        farmDarkHaul: []
       }
     });
   }
@@ -9436,9 +9472,10 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.opponentFarmBoardsCompactV4, "farmBoard");
     observe(activeConnection, activeConnection.db.opponentFarmPiecesCompactV3, "farmPiece");
     observe(activeConnection, activeConnection.db.myFarmPvpAttacks, "farmAttacks");
+    observe(activeConnection, activeConnection.db.myFarmDarkHaul, "farmDarkHaul");
     farmSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection !== activeConnection || !farmSubscription || !farmScopeWanted()) return;
-      publishDomains(activeConnection, ["farmSession", "farmBoard", "farmPiece", "farmAttacks"]);
+      publishDomains(activeConnection, ["farmSession", "farmBoard", "farmPiece", "farmAttacks", "farmDarkHaul"]);
       emit({ type: "subscription_scope_ready", scope: "farm" });
     }).onError((_ctx, error) => {
       if (connection === activeConnection) emit({ type: "error", command: "subscribeFarm", message: String(error) });
@@ -9447,7 +9484,8 @@ ${ty.variants.map(
       tables.myFarmPvpMemberV2,
       tables.opponentFarmBoardsCompactV4,
       tables.opponentFarmPiecesCompactV3,
-      tables.myFarmPvpAttacks
+      tables.myFarmPvpAttacks,
+      tables.myFarmDarkHaul
     ]);
   }
   function flushPendingReducerCalls() {
