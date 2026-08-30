@@ -8970,6 +8970,10 @@ ${ty.variants.map(
   var EXPIRED_SESSION_MESSAGE = "Your sign-in expired. Open Account and sign in again to keep playing.";
   var SUPERSEDABLE_CALLS = ["publishFarmBoard", "publishFarmPiece"];
   var MAX_PENDING_CALLS = 64;
+  var BACKGROUND_CALLS = ["claimPlaySession", "renewPlaySession"];
+  function isBackgroundCall(name) {
+    return BACKGROUND_CALLS.includes(name);
+  }
   function collapsePendingCalls(queued, maximum = MAX_PENDING_CALLS) {
     const lastSupersedable = /* @__PURE__ */ new Map();
     queued.forEach((call, index) => {
@@ -9679,9 +9683,10 @@ ${ty.variants.map(
   }
   async function callReducer(name, argumentsJson) {
     try {
-      noteUserActivity();
+      const background = isBackgroundCall(name);
+      if (!background) noteUserActivity();
       if (!connection || !coreSubscriptionReady) {
-        if (authMode === "account" && lastBackendRequest && (resumeNeeded || connectionOpening)) {
+        if (!background && authMode === "account" && lastBackendRequest && (resumeNeeded || connectionOpening)) {
           pendingReducerCalls.push({ name, argumentsJson });
           const collapsed = collapsePendingCalls(pendingReducerCalls);
           pendingReducerCalls.length = 0;
