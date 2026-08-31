@@ -8478,6 +8478,12 @@ ${ty.variants.map(
     seed: t.u32()
   };
 
+  // src/module_bindings/submit_dungeon_run_result_v_1_reducer.ts
+  var submit_dungeon_run_result_v_1_reducer_default = {
+    runId: t.string(),
+    trace: t.string()
+  };
+
   // src/module_bindings/submit_farm_run_result_v_3_reducer.ts
   var submit_farm_run_result_v_3_reducer_default = {
     runId: t.string(),
@@ -8502,7 +8508,18 @@ ${ty.variants.map(
     rivalPressure: t.bool().name("rival_pressure"),
     pvpBagSeed: t.u32().name("pvp_bag_seed"),
     darkMatchId: t.string().name("dark_match_id"),
-    darkRound: t.u32().name("dark_round")
+    darkRound: t.u32().name("dark_round"),
+    combatStatsJson: t.string().name("combat_stats_json"),
+    combatWeaponType: t.string().name("combat_weapon_type")
+  });
+
+  // src/module_bindings/my_dungeon_progress_table.ts
+  var my_dungeon_progress_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    dungeonId: t.string().name("dungeon_id"),
+    storyCompleted: t.bool().name("story_completed"),
+    completedAt: t.timestamp().name("completed_at")
   });
 
   // src/module_bindings/my_equipment_table.ts
@@ -8671,6 +8688,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_active_run_table_default),
+    myDungeonProgress: table({
+      name: "my_dungeon_progress",
+      indexes: [],
+      constraints: []
+    }, my_dungeon_progress_table_default),
     myEquipment: table({
       name: "my_equipment",
       indexes: [],
@@ -8771,6 +8793,7 @@ ${ty.variants.map(
     reducerSchema("set_hair", set_hair_reducer_default),
     reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
     reducerSchema("start_run", start_run_reducer_default),
+    reducerSchema("submit_dungeon_run_result_v_1", submit_dungeon_run_result_v_1_reducer_default),
     reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
     reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default)
   );
@@ -8785,6 +8808,7 @@ ${ty.variants.map(
   };
   var tableAccessorAliases = {
     "my_active_run": "myActiveRun",
+    "my_dungeon_progress": "myDungeonProgress",
     "my_equipment": "myEquipment",
     "my_farm_dark_haul": "myFarmDarkHaul",
     "my_farm_pvp_attacks": "myFarmPvpAttacks",
@@ -9375,6 +9399,7 @@ ${ty.variants.map(
         upgradeProgress: null,
         upgradeUnlocks: [],
         activeRun: null,
+        dungeonProgress: [],
         runHistory: [],
         farmPvpMember: null,
         myFarmBoard: null,
@@ -9406,6 +9431,9 @@ ${ty.variants.map(
       data.upgradeUnlocks = rows(activeConnection.db.myUpgradeUnlocks);
     }
     if (domains.has("run")) data.activeRun = rows(activeConnection.db.myActiveRun)[0] ?? null;
+    if (domains.has("dungeonProgress")) {
+      data.dungeonProgress = rows(activeConnection.db.myDungeonProgress);
+    }
     if (domains.has("farmSession")) {
       data.farmPvpSession = rows(activeConnection.db.myFarmPvpSession)[0] ?? null;
       data.farmPvpMember = rows(activeConnection.db.myFarmPvpMemberV2)[0] ?? null;
@@ -9543,12 +9571,13 @@ ${ty.variants.map(
       observe(conn, conn.db.myUpgradeProgress, "upgrades");
       observe(conn, conn.db.myUpgradeUnlocks, "upgrades");
       observe(conn, conn.db.myActiveRun, "run");
+      observe(conn, conn.db.myDungeonProgress, "dungeonProgress");
       coreSubscription = conn.subscriptionBuilder().onApplied(() => {
         if (epoch !== connectionEpoch || connection !== conn) return;
         coreSubscriptionReady = true;
         connectionOpening = false;
         reconnectAttempt = 0;
-        publishDomains(conn, ["profile", "inventory", "upgrades", "run"]);
+        publishDomains(conn, ["profile", "inventory", "upgrades", "run", "dungeonProgress"]);
         emit({ type: "subscribed" });
         ensureFarmSubscription(conn);
         flushPendingReducerCalls();
@@ -9563,7 +9592,8 @@ ${ty.variants.map(
         tables.mySkills,
         tables.myUpgradeProgress,
         tables.myUpgradeUnlocks,
-        tables.myActiveRun
+        tables.myActiveRun,
+        tables.myDungeonProgress
       ]);
     }).onDisconnect((_ctx, error) => {
       if (epoch !== connectionEpoch) return;
