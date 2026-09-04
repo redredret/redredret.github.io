@@ -8510,7 +8510,8 @@ ${ty.variants.map(
     darkMatchId: t.string().name("dark_match_id"),
     darkRound: t.u32().name("dark_round"),
     combatStatsJson: t.string().name("combat_stats_json"),
-    combatWeaponType: t.string().name("combat_weapon_type")
+    combatWeaponType: t.string().name("combat_weapon_type"),
+    combatSkillsJson: t.string().name("combat_skills_json")
   });
 
   // src/module_bindings/my_dungeon_progress_table.ts
