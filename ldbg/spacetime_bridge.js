@@ -8336,6 +8336,13 @@ ${ty.variants.map(
     runId: t.string()
   };
 
+  // src/module_bindings/buy_shop_item_reducer.ts
+  var buy_shop_item_reducer_default = {
+    shopId: t.string(),
+    itemId: t.string(),
+    quantity: t.u32()
+  };
+
   // src/module_bindings/claim_play_session_reducer.ts
   var claim_play_session_reducer_default = {
     force: t.bool()
@@ -8767,6 +8774,7 @@ ${ty.variants.map(
   });
   var reducersSchema = reducers(
     reducerSchema("abandon_run", abandon_run_reducer_default),
+    reducerSchema("buy_shop_item", buy_shop_item_reducer_default),
     reducerSchema("claim_play_session", claim_play_session_reducer_default),
     reducerSchema("consume_item", consume_item_reducer_default),
     reducerSchema("craft_item", craft_item_reducer_default),
