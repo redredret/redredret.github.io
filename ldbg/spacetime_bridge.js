@@ -8336,11 +8336,22 @@ ${ty.variants.map(
     runId: t.string()
   };
 
+  // src/module_bindings/buy_market_listing_reducer.ts
+  var buy_market_listing_reducer_default = {
+    listingId: t.string(),
+    quantity: t.u32()
+  };
+
   // src/module_bindings/buy_shop_item_reducer.ts
   var buy_shop_item_reducer_default = {
     shopId: t.string(),
     itemId: t.string(),
     quantity: t.u32()
+  };
+
+  // src/module_bindings/cancel_market_listing_reducer.ts
+  var cancel_market_listing_reducer_default = {
+    listingId: t.string()
   };
 
   // src/module_bindings/claim_play_session_reducer.ts
@@ -8365,6 +8376,13 @@ ${ty.variants.map(
 
   // src/module_bindings/create_farm_private_reducer.ts
   var create_farm_private_reducer_default = {};
+
+  // src/module_bindings/create_market_listing_reducer.ts
+  var create_market_listing_reducer_default = {
+    itemId: t.string(),
+    quantity: t.u32(),
+    pricePer: t.u32()
+  };
 
   // src/module_bindings/delete_my_data_reducer.ts
   var delete_my_data_reducer_default = {};
@@ -8501,6 +8519,17 @@ ${ty.variants.map(
   var unequip_inventory_item_reducer_default = {
     slot: t.string()
   };
+
+  // src/module_bindings/market_listings_table.ts
+  var market_listings_table_default = t.row({
+    listingId: t.string().primaryKey().name("listing_id"),
+    sellerName: t.string().name("seller_name"),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32(),
+    pricePer: t.u32().name("price_per"),
+    createdAt: t.timestamp().name("created_at"),
+    isMine: t.bool().name("is_mine")
+  });
 
   // src/module_bindings/my_active_run_table.ts
   var my_active_run_table_default = t.row({
@@ -8691,6 +8720,11 @@ ${ty.variants.map(
 
   // src/module_bindings/index.ts
   var tablesSchema = schema({
+    marketListings: table({
+      name: "market_listings",
+      indexes: [],
+      constraints: []
+    }, market_listings_table_default),
     myActiveRun: table({
       name: "my_active_run",
       indexes: [],
@@ -8774,12 +8808,15 @@ ${ty.variants.map(
   });
   var reducersSchema = reducers(
     reducerSchema("abandon_run", abandon_run_reducer_default),
+    reducerSchema("buy_market_listing", buy_market_listing_reducer_default),
     reducerSchema("buy_shop_item", buy_shop_item_reducer_default),
+    reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
     reducerSchema("claim_play_session", claim_play_session_reducer_default),
     reducerSchema("consume_item", consume_item_reducer_default),
     reducerSchema("craft_item", craft_item_reducer_default),
     reducerSchema("create_farm_dark_private", create_farm_dark_private_reducer_default),
     reducerSchema("create_farm_private", create_farm_private_reducer_default),
+    reducerSchema("create_market_listing", create_market_listing_reducer_default),
     reducerSchema("delete_my_data", delete_my_data_reducer_default),
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
     reducerSchema("equip_skill", equip_skill_reducer_default),
@@ -8816,6 +8853,7 @@ ${ty.variants.map(
     ...proceduresSchema
   };
   var tableAccessorAliases = {
+    "market_listings": "marketListings",
     "my_active_run": "myActiveRun",
     "my_dungeon_progress": "myDungeonProgress",
     "my_equipment": "myEquipment",
@@ -9037,6 +9075,7 @@ ${ty.variants.map(
   var connectionEpoch = 0;
   var coreSubscription = null;
   var farmSubscription = null;
+  var marketSubscription = null;
   var coreSubscriptionReady = false;
   var connectionOpening = false;
   var resumeNeeded = false;
@@ -9388,6 +9427,7 @@ ${ty.variants.map(
     connection = null;
     coreSubscription = null;
     farmSubscription = null;
+    marketSubscription = null;
     coreSubscriptionReady = false;
     connectionOpening = false;
     dirtySnapshotDomains.clear();
@@ -9419,7 +9459,8 @@ ${ty.variants.map(
         farmOpponentPieces: [],
         farmPvpSession: null,
         farmPvpAttacks: [],
-        farmDarkHaul: []
+        farmDarkHaul: [],
+        marketListings: []
       }
     };
   }
@@ -9460,6 +9501,7 @@ ${ty.variants.map(
     }
     if (domains.has("farmAttacks")) data.farmPvpAttacks = rows(activeConnection.db.myFarmPvpAttacks);
     if (domains.has("farmDarkHaul")) data.farmDarkHaul = rows(activeConnection.db.myFarmDarkHaul);
+    if (domains.has("market")) data.marketListings = rows(activeConnection.db.marketListings);
     return { type: "snapshot", data };
   }
   function publishDomains(activeConnection, domains) {
@@ -9539,6 +9581,29 @@ ${ty.variants.map(
       tables.myFarmDarkHaul
     ]);
   }
+  function marketScopeWanted() {
+    return clientScreen === "store";
+  }
+  function clearMarketProjection() {
+    emit({ type: "snapshot", data: { marketListings: [] } });
+  }
+  function stopMarketSubscription() {
+    const previous = marketSubscription;
+    marketSubscription = null;
+    if (previous && typeof previous.unsubscribe === "function") previous.unsubscribe();
+    clearMarketProjection();
+  }
+  function ensureMarketSubscription(activeConnection) {
+    if (!coreSubscriptionReady || connection !== activeConnection || !marketScopeWanted() || marketSubscription) return;
+    observe(activeConnection, activeConnection.db.marketListings, "market");
+    marketSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (connection !== activeConnection || !marketSubscription || !marketScopeWanted()) return;
+      publishDomains(activeConnection, ["market"]);
+      emit({ type: "subscription_scope_ready", scope: "market" });
+    }).onError((_ctx, error) => {
+      if (connection === activeConnection) emit({ type: "error", command: "subscribeMarket", message: String(error) });
+    }).subscribe([tables.marketListings]);
+  }
   function flushPendingReducerCalls() {
     if (!connection || !coreSubscriptionReady) return;
     const queued = collapsePendingCalls(pendingReducerCalls.splice(0, pendingReducerCalls.length));
@@ -9589,6 +9654,7 @@ ${ty.variants.map(
         publishDomains(conn, ["profile", "inventory", "upgrades", "run", "dungeonProgress"]);
         emit({ type: "subscribed" });
         ensureFarmSubscription(conn);
+        ensureMarketSubscription(conn);
         flushPendingReducerCalls();
       }).onError((_ctx, error) => {
         if (epoch === connectionEpoch) emit({ type: "error", command: "subscribe", message: String(error) });
@@ -9705,6 +9771,8 @@ ${ty.variants.map(
       if (!connection || !coreSubscriptionReady) return;
       if (farmScopeWanted()) ensureFarmSubscription(connection);
       else if (farmSubscription) stopFarmSubscription();
+      if (marketScopeWanted()) ensureMarketSubscription(connection);
+      else if (marketSubscription) stopMarketSubscription();
     } catch (error) {
       emit({ type: "error", command: "setClientContext", message: String(error) });
     }
