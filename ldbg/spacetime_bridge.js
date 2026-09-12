@@ -8633,6 +8633,19 @@ ${ty.variants.map(
     position: t.u32()
   });
 
+  // src/module_bindings/my_market_transactions_table.ts
+  var my_market_transactions_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    kind: t.string(),
+    counterpartyName: t.string().name("counterparty_name"),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32(),
+    pricePer: t.u32().name("price_per"),
+    gold: t.u32(),
+    at: t.timestamp()
+  });
+
   // src/module_bindings/my_profile_table.ts
   var my_profile_table_default = t.row({
     identity: t.identity().primaryKey(),
@@ -8771,6 +8784,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_inventory_order_table_default),
+    myMarketTransactions: table({
+      name: "my_market_transactions",
+      indexes: [],
+      constraints: []
+    }, my_market_transactions_table_default),
     myProfile: table({
       name: "my_profile",
       indexes: [],
@@ -8864,6 +8882,7 @@ ${ty.variants.map(
     "my_farm_pvp_session": "myFarmPvpSession",
     "my_inventory": "myInventory",
     "my_inventory_order": "myInventoryOrder",
+    "my_market_transactions": "myMarketTransactions",
     "my_profile": "myProfile",
     "my_profile_preferences": "myProfilePreferences",
     "my_skills": "mySkills",
@@ -9461,7 +9480,8 @@ ${ty.variants.map(
         farmPvpSession: null,
         farmPvpAttacks: [],
         farmDarkHaul: [],
-        marketListings: []
+        marketListings: [],
+        marketTransactions: []
       }
     };
   }
@@ -9502,7 +9522,10 @@ ${ty.variants.map(
     }
     if (domains.has("farmAttacks")) data.farmPvpAttacks = rows(activeConnection.db.myFarmPvpAttacks);
     if (domains.has("farmDarkHaul")) data.farmDarkHaul = rows(activeConnection.db.myFarmDarkHaul);
-    if (domains.has("market")) data.marketListings = rows(activeConnection.db.marketListings);
+    if (domains.has("market")) {
+      data.marketListings = rows(activeConnection.db.marketListings);
+      data.marketTransactions = rows(activeConnection.db.myMarketTransactions);
+    }
     return { type: "snapshot", data };
   }
   function publishDomains(activeConnection, domains) {
@@ -9586,7 +9609,7 @@ ${ty.variants.map(
     return clientScreen === "store";
   }
   function clearMarketProjection() {
-    emit({ type: "snapshot", data: { marketListings: [] } });
+    emit({ type: "snapshot", data: { marketListings: [], marketTransactions: [] } });
   }
   function stopMarketSubscription() {
     const previous = marketSubscription;
@@ -9597,13 +9620,14 @@ ${ty.variants.map(
   function ensureMarketSubscription(activeConnection) {
     if (!coreSubscriptionReady || connection !== activeConnection || !marketScopeWanted() || marketSubscription) return;
     observe(activeConnection, activeConnection.db.marketListings, "market");
+    observe(activeConnection, activeConnection.db.myMarketTransactions, "market");
     marketSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection !== activeConnection || !marketSubscription || !marketScopeWanted()) return;
       publishDomains(activeConnection, ["market"]);
       emit({ type: "subscription_scope_ready", scope: "market" });
     }).onError((_ctx, error) => {
       if (connection === activeConnection) emit({ type: "error", command: "subscribeMarket", message: String(error) });
-    }).subscribe([tables.marketListings]);
+    }).subscribe([tables.marketListings, tables.myMarketTransactions]);
   }
   function flushPendingReducerCalls() {
     if (!connection || !coreSubscriptionReady) return;
