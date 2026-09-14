@@ -8515,6 +8515,12 @@ ${ty.variants.map(
     trace: t.string()
   };
 
+  // src/module_bindings/submit_farm_waiting_run_result_reducer.ts
+  var submit_farm_waiting_run_result_reducer_default = {
+    runId: t.string(),
+    trace: t.string()
+  };
+
   // src/module_bindings/unequip_inventory_item_reducer.ts
   var unequip_inventory_item_reducer_default = {
     slot: t.string()
@@ -8860,6 +8866,7 @@ ${ty.variants.map(
     reducerSchema("start_run", start_run_reducer_default),
     reducerSchema("submit_dungeon_run_result_v_1", submit_dungeon_run_result_v_1_reducer_default),
     reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
+    reducerSchema("submit_farm_waiting_run_result", submit_farm_waiting_run_result_reducer_default),
     reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default)
   );
   var proceduresSchema = procedures();
