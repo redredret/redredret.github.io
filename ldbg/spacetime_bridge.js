@@ -8392,6 +8392,12 @@ ${ty.variants.map(
   // src/module_bindings/delete_my_data_reducer.ts
   var delete_my_data_reducer_default = {};
 
+  // src/module_bindings/enter_dark_duel_reducer.ts
+  var enter_dark_duel_reducer_default = {
+    duelId: t.string(),
+    health: t.u32()
+  };
+
   // src/module_bindings/equip_inventory_item_reducer.ts
   var equip_inventory_item_reducer_default = {
     itemId: t.string()
@@ -8457,6 +8463,13 @@ ${ty.variants.map(
   // src/module_bindings/ready_farm_pvp_round_reducer.ts
   var ready_farm_pvp_round_reducer_default = {};
 
+  // src/module_bindings/refresh_dark_presence_reducer.ts
+  var refresh_dark_presence_reducer_default = {
+    runId: t.string(),
+    encountersCleared: t.u32(),
+    health: t.u32()
+  };
+
   // src/module_bindings/renew_play_session_reducer.ts
   var renew_play_session_reducer_default = {};
 
@@ -8482,6 +8495,17 @@ ${ty.variants.map(
   var sell_item_reducer_default = {
     itemId: t.string(),
     quantity: t.u32()
+  };
+
+  // src/module_bindings/send_dark_duel_blow_reducer.ts
+  var send_dark_duel_blow_reducer_default = {
+    duelId: t.string(),
+    lines: t.u32(),
+    spinType: t.string(),
+    combo: t.u32(),
+    backToBack: t.bool(),
+    perfectClear: t.bool(),
+    sequence: t.u32()
   };
 
   // src/module_bindings/send_farm_pvp_attack_reducer.ts
@@ -8540,6 +8564,12 @@ ${ty.variants.map(
     slot: t.string()
   };
 
+  // src/module_bindings/yield_dark_duel_reducer.ts
+  var yield_dark_duel_reducer_default = {
+    duelId: t.string(),
+    reason: t.string()
+  };
+
   // src/module_bindings/farm_player_counts_table.ts
   var farm_player_counts_table_default = t.row({
     mode: t.string(),
@@ -8575,6 +8605,72 @@ ${ty.variants.map(
     combatWeaponType: t.string().name("combat_weapon_type"),
     combatSkillsJson: t.string().name("combat_skills_json"),
     dungeonStoryVersion: t.u32().name("dungeon_story_version")
+  });
+
+  // src/module_bindings/my_dark_duel_table.ts
+  var my_dark_duel_table_default = t.row({
+    duelId: t.string().primaryKey().name("duel_id"),
+    playerOne: t.identity().name("player_one"),
+    playerTwo: t.identity().name("player_two"),
+    oneName: t.string().name("one_name"),
+    twoName: t.string().name("two_name"),
+    oneLevel: t.u32().name("one_level"),
+    twoLevel: t.u32().name("two_level"),
+    oneAtEncounter: t.u32().name("one_at_encounter"),
+    twoAtEncounter: t.u32().name("two_at_encounter"),
+    oneHealth: t.u32().name("one_health"),
+    twoHealth: t.u32().name("two_health"),
+    oneEntered: t.bool().name("one_entered"),
+    twoEntered: t.bool().name("two_entered"),
+    oneDamageSent: t.u32().name("one_damage_sent"),
+    twoDamageSent: t.u32().name("two_damage_sent"),
+    state: t.string(),
+    winner: t.identity(),
+    winnerName: t.string().name("winner_name"),
+    outcome: t.string(),
+    matchedAt: t.timestamp().name("matched_at"),
+    startedAt: t.timestamp().name("started_at"),
+    decidedAt: t.timestamp().name("decided_at")
+  });
+
+  // src/module_bindings/my_dark_duel_blows_table.ts
+  var my_dark_duel_blows_table_default = t.row({
+    blowId: t.string().primaryKey().name("blow_id"),
+    duelId: t.string().name("duel_id"),
+    sender: t.identity(),
+    recipient: t.identity(),
+    damage: t.u32(),
+    remainingHealth: t.u32().name("remaining_health"),
+    lines: t.u32(),
+    spinType: t.string().name("spin_type"),
+    combo: t.u32(),
+    backToBack: t.bool().name("back_to_back"),
+    perfectClear: t.bool().name("perfect_clear"),
+    ordinal: t.u32(),
+    createdAt: t.timestamp().name("created_at")
+  });
+
+  // src/module_bindings/my_dark_duel_haul_table.ts
+  var my_dark_duel_haul_table_default = t.row({
+    haulId: t.string().primaryKey().name("haul_id"),
+    winner: t.identity(),
+    duelId: t.string().name("duel_id"),
+    fromName: t.string().name("from_name"),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32(),
+    worn: t.bool(),
+    createdAt: t.timestamp().name("created_at")
+  });
+
+  // src/module_bindings/my_dark_presence_table.ts
+  var my_dark_presence_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    runId: t.string().name("run_id"),
+    displayName: t.string().name("display_name"),
+    level: t.u32(),
+    health: t.u32(),
+    encountersCleared: t.u32().name("encounters_cleared"),
+    queuedAt: t.timestamp().name("queued_at")
   });
 
   // src/module_bindings/my_dungeon_progress_table.ts
@@ -8791,6 +8887,26 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_active_run_table_default),
+    myDarkDuel: table({
+      name: "my_dark_duel",
+      indexes: [],
+      constraints: []
+    }, my_dark_duel_table_default),
+    myDarkDuelBlows: table({
+      name: "my_dark_duel_blows",
+      indexes: [],
+      constraints: []
+    }, my_dark_duel_blows_table_default),
+    myDarkDuelHaul: table({
+      name: "my_dark_duel_haul",
+      indexes: [],
+      constraints: []
+    }, my_dark_duel_haul_table_default),
+    myDarkPresence: table({
+      name: "my_dark_presence",
+      indexes: [],
+      constraints: []
+    }, my_dark_presence_table_default),
     myDungeonProgress: table({
       name: "my_dungeon_progress",
       indexes: [],
@@ -8895,6 +9011,7 @@ ${ty.variants.map(
     reducerSchema("create_farm_private", create_farm_private_reducer_default),
     reducerSchema("create_market_listing", create_market_listing_reducer_default),
     reducerSchema("delete_my_data", delete_my_data_reducer_default),
+    reducerSchema("enter_dark_duel", enter_dark_duel_reducer_default),
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
     reducerSchema("equip_skill", equip_skill_reducer_default),
     reducerSchema("join_farm_dark_private", join_farm_dark_private_reducer_default),
@@ -8907,11 +9024,13 @@ ${ty.variants.map(
     reducerSchema("publish_farm_piece", publish_farm_piece_reducer_default),
     reducerSchema("purchase_build_upgrade", purchase_build_upgrade_reducer_default),
     reducerSchema("ready_farm_pvp_round", ready_farm_pvp_round_reducer_default),
+    reducerSchema("refresh_dark_presence", refresh_dark_presence_reducer_default),
     reducerSchema("renew_play_session", renew_play_session_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
     reducerSchema("report_farm_pvp_top_out", report_farm_pvp_top_out_reducer_default),
     reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
     reducerSchema("sell_item", sell_item_reducer_default),
+    reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
     reducerSchema("set_display_name", set_display_name_reducer_default),
     reducerSchema("set_hair", set_hair_reducer_default),
@@ -8920,7 +9039,8 @@ ${ty.variants.map(
     reducerSchema("submit_dungeon_run_result_v_1", submit_dungeon_run_result_v_1_reducer_default),
     reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
     reducerSchema("submit_farm_waiting_run_result", submit_farm_waiting_run_result_reducer_default),
-    reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default)
+    reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default),
+    reducerSchema("yield_dark_duel", yield_dark_duel_reducer_default)
   );
   var proceduresSchema = procedures();
   var REMOTE_MODULE = {
@@ -8935,6 +9055,10 @@ ${ty.variants.map(
     "farm_player_counts": "farmPlayerCounts",
     "market_listings": "marketListings",
     "my_active_run": "myActiveRun",
+    "my_dark_duel": "myDarkDuel",
+    "my_dark_duel_blows": "myDarkDuelBlows",
+    "my_dark_duel_haul": "myDarkDuelHaul",
+    "my_dark_presence": "myDarkPresence",
     "my_dungeon_progress": "myDungeonProgress",
     "my_endless_records": "myEndlessRecords",
     "my_equipment": "myEquipment",
@@ -9148,7 +9272,11 @@ ${ty.variants.map(
     "renewPlaySession",
     // Sent on the client's own schedule, not because the player did anything.
     "reportRunSubmissionProblem",
-    "acknowledgeMarketSales"
+    "acknowledgeMarketSales",
+    // A Dark run announces itself between encounters and swings on every clear.
+    "refreshDarkPresence",
+    "sendDarkDuelBlow",
+    "enterDarkDuel"
   ];
   function isBackgroundCall(name) {
     return BACKGROUND_CALLS.includes(name);
@@ -9185,6 +9313,7 @@ ${ty.variants.map(
   var farmSubscription = null;
   var marketSubscription = null;
   var marketHistorySubscription = null;
+  var darkDuelSubscription = null;
   var playerCountsSubscription = null;
   var coreSubscriptionReady = false;
   var connectionOpening = false;
@@ -9606,6 +9735,7 @@ ${ty.variants.map(
     farmSubscription = null;
     marketSubscription = null;
     marketHistorySubscription = null;
+    darkDuelSubscription = null;
     playerCountsSubscription = null;
     coreSubscriptionReady = false;
     connectionOpening = false;
@@ -9687,6 +9817,12 @@ ${ty.variants.map(
     if (domains.has("marketHistory")) {
       data.marketTransactions = rows(activeConnection.db.myMarketTransactions);
       data.marketSaleNotice = rows(activeConnection.db.myMarketSaleNotice);
+    }
+    if (domains.has("darkDuel")) {
+      data.darkDuel = rows(activeConnection.db.myDarkDuel);
+      data.darkDuelBlows = rows(activeConnection.db.myDarkDuelBlows);
+      data.darkDuelHaul = rows(activeConnection.db.myDarkDuelHaul);
+      data.darkPresence = rows(activeConnection.db.myDarkPresence);
     }
     return { type: "snapshot", data };
   }
@@ -9800,6 +9936,25 @@ ${ty.variants.map(
       if (connection === activeConnection) emit({ type: "error", command: "subscribeMarketHistory", message: String(error) });
     }).subscribe([tables.myMarketTransactions, tables.myMarketSaleNotice]);
   }
+  function ensureDarkDuelSubscription(activeConnection) {
+    if (!coreSubscriptionReady || connection !== activeConnection || darkDuelSubscription) return;
+    observe(activeConnection, activeConnection.db.myDarkDuel, "darkDuel");
+    observe(activeConnection, activeConnection.db.myDarkDuelBlows, "darkDuel");
+    observe(activeConnection, activeConnection.db.myDarkDuelHaul, "darkDuel");
+    observe(activeConnection, activeConnection.db.myDarkPresence, "darkDuel");
+    darkDuelSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (connection === activeConnection) publishDomains(activeConnection, ["darkDuel"]);
+    }).onError((_ctx, error) => {
+      if (connection === activeConnection) {
+        emit({ type: "error", command: "subscribeDarkDuel", message: String(error) });
+      }
+    }).subscribe([
+      tables.myDarkDuel,
+      tables.myDarkDuelBlows,
+      tables.myDarkDuelHaul,
+      tables.myDarkPresence
+    ]);
+  }
   function ensurePlayerCountsSubscription(activeConnection) {
     if (!coreSubscriptionReady || connection !== activeConnection || playerCountsSubscription) return;
     observe(activeConnection, activeConnection.db.farmPlayerCounts, "playerCounts");
@@ -9862,6 +10017,7 @@ ${ty.variants.map(
         ensureFarmSubscription(conn);
         ensureMarketSubscription(conn);
         ensureMarketHistorySubscription(conn);
+        ensureDarkDuelSubscription(conn);
         ensurePlayerCountsSubscription(conn);
         flushPendingReducerCalls();
       }).onError((_ctx, error) => {
