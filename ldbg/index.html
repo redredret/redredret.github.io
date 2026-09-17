@@ -4,7 +4,31 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<title>LDBG</title>
+		<!--
+		LDBG's browser shell: Godot's default web shell with its loading overlay
+		replaced by the game's own -- the wordmark, with the five main-menu icons
+		bursting out of it. Set as html/custom_html_shell in export_presets.cfg.
+		The art lives in web/loading/ (tools/build_loading_screen_art.py) and is
+		copied beside the export by tools/export_web.ps1.
+
+		The overlay stays up after the engine has started, until the game says its
+		first screen is ready (window.LDBGLoading.done(), called by Main), so the
+		boot splash and the frames spent building the hub are never seen.
+		-->
 		<style>
+:root {
+	--ink: #f4f1e8;
+	--muted: #9aa5a3;
+	--gold: #e6c888;
+	--gold-deep: #b98c4c;
+	--night: #0b1316;
+	--slate: #182226;
+	--logo-w: min(50vw, 440px);
+	--icon: clamp(44px, calc(var(--logo-w) * 0.23), 100px);
+	--rx: calc(var(--logo-w) * 0.78);
+	--ry: calc(var(--logo-w) * 0.42);
+}
+
 html, body, #canvas {
 	margin: 0;
 	padding: 0;
@@ -12,8 +36,8 @@ html, body, #canvas {
 }
 
 body {
-	color: white;
-	background-color: black;
+	color: var(--ink);
+	background-color: var(--night);
 	overflow: hidden;
 	touch-action: none;
 }
@@ -26,70 +50,203 @@ body {
 	outline: none;
 }
 
-#status, #status-splash, #status-progress {
-	position: absolute;
-	left: 0;
-	right: 0;
-}
-
-#status, #status-splash {
-	top: 0;
-	bottom: 0;
-}
-
 #status {
-	background-color: #242424;
+	position: absolute;
+	inset: 0;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	background:
+		radial-gradient(ellipse at 50% 46%, rgba(230, 200, 136, 0.10), transparent 55%),
+		radial-gradient(ellipse at 50% 50%, var(--slate), var(--night) 75%);
+	font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 	visibility: hidden;
+	transition: opacity 420ms ease;
+	z-index: 10;
 }
 
-#status-splash {
-	max-height: 100%;
-	max-width: 100%;
-	margin: auto;
+#status.leaving {
+	opacity: 0;
+	pointer-events: none;
 }
 
-#status-splash.show-image--false {
-	display: none;
+/* The logo sits at the centre of a zero-size stage; everything else is placed
+   around that point. */
+#stage {
+	position: relative;
+	width: 0;
+	height: 0;
+	/* Up by half the loader's height, so the whole group -- top icon to loading
+	   bar -- is what sits in the middle of the screen. */
+	top: calc(var(--icon) * -0.1 - 24px);
 }
 
-#status-splash.fullsize--true {
-	height: 100%;
+#logo {
+	position: absolute;
+	width: var(--logo-w);
+	left: calc(var(--logo-w) / -2);
+	top: calc(var(--logo-w) * -0.159);
+	z-index: 2;
+	animation: logo-in 620ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+	filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.55));
+}
+
+#shockwave {
+	position: absolute;
+	width: calc(var(--logo-w) * 0.5);
+	height: calc(var(--logo-w) * 0.5);
+	left: calc(var(--logo-w) * -0.25);
+	top: calc(var(--logo-w) * -0.25);
+	border-radius: 50%;
+	border: 3px solid var(--gold);
+	opacity: 0;
+	z-index: 1;
+	animation: shockwave 700ms ease-out 480ms both;
+}
+
+.burst {
+	position: absolute;
+	width: var(--icon);
+	height: var(--icon);
+	left: calc(var(--icon) / -2);
+	top: calc(var(--icon) / -2);
+	z-index: 1;
+	animation: burst 760ms cubic-bezier(0.22, 1.5, 0.5, 1) both;
+	animation-delay: calc(520ms + var(--i) * 70ms);
+}
+
+.burst img {
+	display: block;
 	width: 100%;
-	object-fit: contain;
+	height: 100%;
+	filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
+	animation: bob 2.6s ease-in-out infinite;
+	animation-delay: calc(1300ms + var(--i) * 260ms);
 }
 
-#status-splash.use-filter--false {
-	image-rendering: pixelated;
-}
-
-#status-progress, #status-notice {
-	display: none;
+#loader {
+	position: absolute;
+	width: min(60vw, 280px);
+	left: calc(min(60vw, 280px) / -2);
+	top: calc(var(--ry) + var(--icon) * 0.7 + 28px);
+	text-align: center;
+	animation: fade-in 500ms ease 900ms both;
 }
 
 #status-progress {
-	bottom: 10%;
-	width: 50%;
-	margin: 0 auto;
+	position: relative;
+	height: 6px;
+	border-radius: 3px;
+	background: rgba(244, 241, 232, 0.12);
+	overflow: hidden;
+}
+
+#status-progress-fill {
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: 0;
+	border-radius: 3px;
+	background: linear-gradient(90deg, var(--gold-deep), var(--gold));
+	transition: width 200ms ease;
+}
+
+#status-progress.indeterminate #status-progress-fill {
+	width: 35%;
+	animation: sweep 1.2s ease-in-out infinite;
+}
+
+#status-label {
+	margin-top: 10px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.24em;
+	color: var(--muted);
 }
 
 #status-notice {
+	display: none;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 8%;
 	background-color: #5b3943;
 	border-radius: 0.5rem;
 	border: 1px solid #9b3943;
 	color: #e0e0e0;
-	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
 	line-height: 1.3;
-	margin: 0 2rem;
+	margin: 0 1rem;
 	overflow: hidden;
 	padding: 1rem;
 	text-align: center;
-	z-index: 1;
+	z-index: 3;
+}
+
+@keyframes logo-in {
+	0% { transform: scale(0.4); opacity: 0; }
+	60% { opacity: 1; }
+	100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shockwave {
+	0% { transform: scale(0.3); opacity: 0.9; }
+	100% { transform: scale(3.2); opacity: 0; }
+}
+
+@keyframes burst {
+	0% {
+		transform: translate(0, 0) scale(0.2) rotate(calc(var(--spin) * 3));
+		opacity: 0;
+	}
+	25% { opacity: 1; }
+	100% {
+		transform: translate(calc(var(--x) * var(--rx)), calc(var(--y) * var(--ry))) scale(1) rotate(var(--spin));
+		opacity: 1;
+	}
+}
+
+@keyframes bob {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-6px); }
+}
+
+@keyframes fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes sweep {
+	0% { transform: translateX(-100%); }
+	100% { transform: translateX(290%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#logo, .burst, .burst img, #shockwave, #loader {
+		animation-duration: 1ms !important;
+		animation-delay: 0ms !important;
+		animation-iteration-count: 1 !important;
+	}
 }
 		</style>
+		<script>
+// The tab shows the player's own head once the game has drawn it (see
+// src/main/favicon_portrait.gd), and keeps it across visits, so the icon is the
+// player's before the engine has even loaded.
+(function () {
+	try {
+		const saved = window.localStorage.getItem('ldbg.favicon');
+		if (saved && saved.indexOf('data:image/png;base64,') === 0) {
+			document.addEventListener('DOMContentLoaded', function () {
+				document.querySelectorAll("link[rel~='icon']").forEach(function (link) {
+					link.href = saved;
+				});
+			});
+		}
+	} catch (err) {
+		// Storage can be blocked; the default icon stands.
+	}
+}());
+		</script>
 		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
 <script src="auth_config.js?v=4d42354259e7"></script><script src="spacetime_bridge.js?v=a2160e3e8874"></script>
@@ -104,36 +261,76 @@ body {
 		</noscript>
 
 		<div id="status">
-			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="index.png" alt="">
-			<progress id="status-progress"></progress>
+			<div id="stage">
+				<div id="shockwave"></div>
+				<div class="burst" style="--i: 0; --x: 0; --y: -1; --spin: -6deg"><img src="loading/play.png" alt=""></div>
+				<div class="burst" style="--i: 1; --x: 0.951; --y: -0.309; --spin: 8deg"><img src="loading/inventory.png" alt=""></div>
+				<div class="burst" style="--i: 2; --x: 0.588; --y: 0.809; --spin: -8deg"><img src="loading/crafting.png" alt=""></div>
+				<div class="burst" style="--i: 3; --x: -0.588; --y: 0.809; --spin: 7deg"><img src="loading/upgrades.png" alt=""></div>
+				<div class="burst" style="--i: 4; --x: -0.951; --y: -0.309; --spin: -7deg"><img src="loading/market.png" alt=""></div>
+				<img id="logo" src="loading/ldbg_wordmark.svg" alt="LDBG">
+				<div id="loader">
+					<div id="status-progress" class="indeterminate"><div id="status-progress-fill"></div></div>
+					<div id="status-label">LOADING</div>
+				</div>
+			</div>
 			<div id="status-notice"></div>
 		</div>
 
-		<script src="index.js?v=5da36b80b91e"></script>
+		<script src="index.js?v=8b95de040552"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index-5da36b80b91e","experimentalVK":false,"fileSizes":{"index-5da36b80b91e.pck":81399136,"index-5da36b80b91e.wasm":37695054},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index-8b95de040552","experimentalVK":false,"fileSizes":{"index-8b95de040552.pck":81534756,"index-8b95de040552.wasm":37695054},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
 (function () {
 	const statusOverlay = document.getElementById('status');
 	const statusProgress = document.getElementById('status-progress');
+	const statusFill = document.getElementById('status-progress-fill');
+	const statusLabel = document.getElementById('status-label');
 	const statusNotice = document.getElementById('status-notice');
+	const loader = document.getElementById('loader');
+
+	// How long the overlay waits for the game to say it is ready once the engine
+	// is running. Only a safety net: a build that never calls done() still
+	// uncovers itself.
+	const READY_TIMEOUT_MS = 20000;
 
 	let initializing = true;
 	let statusMode = '';
+	let engineStarted = false;
+	let gameReady = false;
+
+	function reveal() {
+		if (!initializing) {
+			return;
+		}
+		initializing = false;
+		statusOverlay.classList.add('leaving');
+		setTimeout(function () {
+			statusOverlay.remove();
+		}, 450);
+	}
+
+	function maybeReveal() {
+		if (engineStarted && gameReady) {
+			reveal();
+		}
+	}
+
+	window.LDBGLoading = {
+		done: function () {
+			gameReady = true;
+			maybeReveal();
+		},
+	};
 
 	function setStatusMode(mode) {
 		if (statusMode === mode || !initializing) {
 			return;
 		}
-		if (mode === 'hidden') {
-			statusOverlay.remove();
-			initializing = false;
-			return;
-		}
 		statusOverlay.style.visibility = 'visible';
-		statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
+		loader.style.display = mode === 'progress' ? 'block' : 'none';
 		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
 		statusMode = mode;
 	}
@@ -202,15 +399,20 @@ const engine = new Engine(GODOT_CONFIG);
 		engine.startGame({
 			'onProgress': function (current, total) {
 				if (current > 0 && total > 0) {
-					statusProgress.value = current;
-					statusProgress.max = total;
+					statusProgress.classList.remove('indeterminate');
+					statusFill.style.width = Math.min(100, (100 * current) / total) + '%';
 				} else {
-					statusProgress.removeAttribute('value');
-					statusProgress.removeAttribute('max');
+					statusProgress.classList.add('indeterminate');
+					statusFill.style.width = '';
 				}
 			},
 		}).then(() => {
-			setStatusMode('hidden');
+			engineStarted = true;
+			statusProgress.classList.remove('indeterminate');
+			statusFill.style.width = '100%';
+			statusLabel.textContent = 'STARTING';
+			setTimeout(reveal, READY_TIMEOUT_MS);
+			maybeReveal();
 		}, displayFailureNotice);
 	}
 }());
