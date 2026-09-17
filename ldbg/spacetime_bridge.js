@@ -8526,6 +8526,12 @@ ${ty.variants.map(
     slot: t.string()
   };
 
+  // src/module_bindings/farm_player_counts_table.ts
+  var farm_player_counts_table_default = t.row({
+    mode: t.string(),
+    players: t.u32()
+  });
+
   // src/module_bindings/market_listings_table.ts
   var market_listings_table_default = t.row({
     listingId: t.string().primaryKey().name("listing_id"),
@@ -8740,6 +8746,11 @@ ${ty.variants.map(
 
   // src/module_bindings/index.ts
   var tablesSchema = schema({
+    farmPlayerCounts: table({
+      name: "farm_player_counts",
+      indexes: [],
+      constraints: []
+    }, farm_player_counts_table_default),
     marketListings: table({
       name: "market_listings",
       indexes: [],
@@ -8879,6 +8890,7 @@ ${ty.variants.map(
     ...proceduresSchema
   };
   var tableAccessorAliases = {
+    "farm_player_counts": "farmPlayerCounts",
     "market_listings": "marketListings",
     "my_active_run": "myActiveRun",
     "my_dungeon_progress": "myDungeonProgress",
@@ -8953,7 +8965,10 @@ ${ty.variants.map(
     tokenEndpoint: "https://auth.spacetimedb.com/oidc/token",
     endSessionEndpoint: "https://auth.spacetimedb.com/oidc/session/end",
     issuer: "https://auth.spacetimedb.com/oidc",
-    scopes: "openid profile email"
+    // offline_access asks for a refresh token. The identity token lasts only a
+    // short while and every reconnect presents it again, so without one a player
+    // whose connection drops after it has lapsed is signed out mid-match.
+    scopes: "openid profile email offline_access"
   };
   function resolveAuthConfig(overrides) {
     return { ...DEFAULT_AUTH_CONFIG, ...overrides ?? {} };
@@ -9030,6 +9045,22 @@ ${ty.variants.map(
     if (typeof claims.exp !== "number" || claims.exp <= nowSeconds - 60) return "The identity token has expired.";
     return null;
   }
+  function validateRefreshedIdTokenClaims(claims, previous, config, nowSeconds = Math.floor(Date.now() / 1e3)) {
+    if (!claims.sub || typeof claims.sub !== "string") return "The identity token has no subject.";
+    if (!previous || claims.sub !== previous.sub) return "The renewed sign-in belongs to a different account.";
+    if (claims.iss !== config.issuer) return "The identity token issuer is not trusted.";
+    const audiences = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
+    if (!audiences.includes(config.clientId)) return "The identity token was issued for another client.";
+    if (typeof claims.exp !== "number" || claims.exp <= nowSeconds - 60) return "The identity token has expired.";
+    return null;
+  }
+  var TOKEN_REFRESH_LEAD_SECONDS = 5 * 60;
+  var TOKEN_REFRESH_MIN_DELAY_MS = 15 * 1e3;
+  function tokenRefreshDelayMs(expiresAtSeconds, nowMs = Date.now()) {
+    if (typeof expiresAtSeconds !== "number" || !Number.isFinite(expiresAtSeconds)) return null;
+    const due = (expiresAtSeconds - TOKEN_REFRESH_LEAD_SECONDS) * 1e3 - nowMs;
+    return Math.max(TOKEN_REFRESH_MIN_DELAY_MS, due);
+  }
   function accountLabel(claims) {
     if (!claims) return "SpacetimeAuth account";
     for (const key of ["preferred_username", "name", "email"]) {
@@ -9103,12 +9134,16 @@ ${ty.variants.map(
   var coreSubscription = null;
   var farmSubscription = null;
   var marketSubscription = null;
+  var playerCountsSubscription = null;
   var coreSubscriptionReady = false;
   var connectionOpening = false;
   var resumeNeeded = false;
   var lastBackendRequest = null;
   var accountToken = "";
   var accountClaims = null;
+  var accountRefreshToken = "";
+  var tokenRefreshTimer = null;
+  var tokenRefreshInFlight = null;
   var authMode = "guest";
   var authBusy = true;
   var authError = "";
@@ -9291,7 +9326,70 @@ ${ty.variants.map(
     if (claimsError) throw new Error(claimsError);
     accountToken = tokenResponse.id_token;
     accountClaims = claims;
+    accountRefreshToken = typeof tokenResponse.refresh_token === "string" ? tokenResponse.refresh_token : "";
     authMode = "account";
+    if (!accountRefreshToken) console.info("LDBG: sign-in returned no refresh token; it cannot be renewed.");
+    scheduleTokenRefresh();
+  }
+  function clearTokenRefresh() {
+    if (tokenRefreshTimer !== null) window.clearTimeout(tokenRefreshTimer);
+    tokenRefreshTimer = null;
+    accountRefreshToken = "";
+  }
+  function scheduleTokenRefresh(delayMs = tokenRefreshDelayMs(accountClaims?.exp)) {
+    if (tokenRefreshTimer !== null) window.clearTimeout(tokenRefreshTimer);
+    tokenRefreshTimer = null;
+    if (authMode !== "account" || !accountRefreshToken || delayMs === null) return;
+    tokenRefreshTimer = window.setTimeout(() => {
+      tokenRefreshTimer = null;
+      void refreshAccountToken().then((renewed) => {
+        if (!renewed && accountRefreshToken) scheduleTokenRefresh(60 * 1e3);
+      });
+    }, delayMs);
+  }
+  function refreshAccountToken() {
+    if (tokenRefreshInFlight) return tokenRefreshInFlight;
+    tokenRefreshInFlight = (async () => {
+      const refreshToken = accountRefreshToken;
+      if (authMode !== "account" || !refreshToken) return false;
+      try {
+        const response = await fetch(authConfig.tokenEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            grant_type: "refresh_token",
+            client_id: authConfig.clientId,
+            refresh_token: refreshToken
+          })
+        });
+        const tokenResponse = await response.json().catch(() => ({}));
+        if (authMode !== "account" || accountRefreshToken !== refreshToken) return false;
+        if (!response.ok || typeof tokenResponse.id_token !== "string" || !tokenResponse.id_token) {
+          if (response.status === 400 || response.status === 401) accountRefreshToken = "";
+          console.warn("LDBG: renewing the sign-in failed:", tokenResponse.error ?? response.status);
+          return false;
+        }
+        const claims = decodeJwtClaims(tokenResponse.id_token);
+        const claimsError = validateRefreshedIdTokenClaims(claims, accountClaims, authConfig);
+        if (claimsError) {
+          console.warn("LDBG: renewed sign-in rejected:", claimsError);
+          return false;
+        }
+        accountToken = tokenResponse.id_token;
+        accountClaims = claims;
+        if (typeof tokenResponse.refresh_token === "string" && tokenResponse.refresh_token) {
+          accountRefreshToken = tokenResponse.refresh_token;
+        }
+        scheduleTokenRefresh();
+        return true;
+      } catch (error) {
+        console.warn("LDBG: renewing the sign-in failed:", error);
+        return false;
+      }
+    })().finally(() => {
+      tokenRefreshInFlight = null;
+    });
+    return tokenRefreshInFlight;
   }
   async function processAuthorizationCallback(callbackUrl, cleanCurrentPage) {
     authCallbackHandling = true;
@@ -9388,6 +9486,7 @@ ${ty.variants.map(
     pendingReducerCalls.length = 0;
     accountToken = "";
     accountClaims = null;
+    clearTokenRefresh();
     authMode = "guest";
     authBusy = false;
     authError = "";
@@ -9455,6 +9554,7 @@ ${ty.variants.map(
     coreSubscription = null;
     farmSubscription = null;
     marketSubscription = null;
+    playerCountsSubscription = null;
     coreSubscriptionReady = false;
     connectionOpening = false;
     dirtySnapshotDomains.clear();
@@ -9529,6 +9629,7 @@ ${ty.variants.map(
     }
     if (domains.has("farmAttacks")) data.farmPvpAttacks = rows(activeConnection.db.myFarmPvpAttacks);
     if (domains.has("farmDarkHaul")) data.farmDarkHaul = rows(activeConnection.db.myFarmDarkHaul);
+    if (domains.has("playerCounts")) data.farmPlayerCounts = rows(activeConnection.db.farmPlayerCounts);
     if (domains.has("market")) {
       data.marketListings = rows(activeConnection.db.marketListings);
       data.marketTransactions = rows(activeConnection.db.myMarketTransactions);
@@ -9636,6 +9737,15 @@ ${ty.variants.map(
       if (connection === activeConnection) emit({ type: "error", command: "subscribeMarket", message: String(error) });
     }).subscribe([tables.marketListings, tables.myMarketTransactions]);
   }
+  function ensurePlayerCountsSubscription(activeConnection) {
+    if (!coreSubscriptionReady || connection !== activeConnection || playerCountsSubscription) return;
+    observe(activeConnection, activeConnection.db.farmPlayerCounts, "playerCounts");
+    playerCountsSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (connection === activeConnection) publishDomains(activeConnection, ["playerCounts"]);
+    }).onError((_ctx, error) => {
+      console.warn("LDBG: player counts are unavailable:", error);
+    }).subscribe([tables.farmPlayerCounts]);
+  }
   function flushPendingReducerCalls() {
     if (!connection || !coreSubscriptionReady) return;
     const queued = collapsePendingCalls(pendingReducerCalls.splice(0, pendingReducerCalls.length));
@@ -9687,6 +9797,7 @@ ${ty.variants.map(
         emit({ type: "subscribed" });
         ensureFarmSubscription(conn);
         ensureMarketSubscription(conn);
+        ensurePlayerCountsSubscription(conn);
         flushPendingReducerCalls();
       }).onError((_ctx, error) => {
         if (epoch === connectionEpoch) emit({ type: "error", command: "subscribe", message: String(error) });
@@ -9727,6 +9838,20 @@ ${ty.variants.map(
   function accountSessionExpired() {
     return authMode === "account" && isAccountTokenExpired(accountClaims?.exp);
   }
+  function renewThenResume() {
+    if (!accountRefreshToken) {
+      reportExpiredSession();
+      return;
+    }
+    void refreshAccountToken().then((renewed) => {
+      if (!renewed) {
+        if (accountSessionExpired()) reportExpiredSession();
+        return;
+      }
+      resumeNeeded = true;
+      resumeBackend();
+    });
+  }
   function reportExpiredSession() {
     resumeNeeded = false;
     pendingReducerCalls.length = 0;
@@ -9740,7 +9865,7 @@ ${ty.variants.map(
   }
   function resumeBackend() {
     if (accountSessionExpired()) {
-      reportExpiredSession();
+      renewThenResume();
       return;
     }
     if (connection || connectionOpening || authMode !== "account" || !accountToken || !lastBackendRequest) return;
@@ -9751,7 +9876,7 @@ ${ty.variants.map(
   }
   function scheduleBackendResume() {
     if (accountSessionExpired()) {
-      reportExpiredSession();
+      renewThenResume();
       return;
     }
     if (!resumeNeeded || connection || connectionOpening || reconnectTimer !== null) return;

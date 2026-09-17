@@ -6,7 +6,7 @@ window.LDBGAuthConfig = {
   tokenEndpoint: "https://auth.spacetimedb.com/oidc/token",
   endSessionEndpoint: "https://auth.spacetimedb.com/oidc/session/end",
   issuer: "https://auth.spacetimedb.com/oidc",
-  scopes: "openid profile email",
+  scopes: "openid profile email offline_access",
 
   // Leave blank to use the exact page URL (without query parameters or hash).
   // If set, this value must exactly match an allowed redirect URI in SpacetimeAuth.
