@@ -8572,6 +8572,16 @@ ${ty.variants.map(
     completedAt: t.timestamp().name("completed_at")
   });
 
+  // src/module_bindings/my_endless_records_table.ts
+  var my_endless_records_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    dungeonId: t.string().name("dungeon_id"),
+    bestEncounter: t.u32().name("best_encounter"),
+    bestRound: t.u32().name("best_round"),
+    reachedAt: t.timestamp().name("reached_at")
+  });
+
   // src/module_bindings/my_equipment_table.ts
   var my_equipment_table_default = t.row({
     id: t.u64().primaryKey(),
@@ -8766,6 +8776,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_dungeon_progress_table_default),
+    myEndlessRecords: table({
+      name: "my_endless_records",
+      indexes: [],
+      constraints: []
+    }, my_endless_records_table_default),
     myEquipment: table({
       name: "my_equipment",
       indexes: [],
@@ -8894,6 +8909,7 @@ ${ty.variants.map(
     "market_listings": "marketListings",
     "my_active_run": "myActiveRun",
     "my_dungeon_progress": "myDungeonProgress",
+    "my_endless_records": "myEndlessRecords",
     "my_equipment": "myEquipment",
     "my_farm_dark_haul": "myFarmDarkHaul",
     "my_farm_pvp_attacks": "myFarmPvpAttacks",
@@ -9611,6 +9627,7 @@ ${ty.variants.map(
     if (domains.has("run")) data.activeRun = rows(activeConnection.db.myActiveRun)[0] ?? null;
     if (domains.has("dungeonProgress")) {
       data.dungeonProgress = rows(activeConnection.db.myDungeonProgress);
+      data.endlessRecords = rows(activeConnection.db.myEndlessRecords);
     }
     if (domains.has("farmSession")) {
       data.farmPvpSession = rows(activeConnection.db.myFarmPvpSession)[0] ?? null;
@@ -9788,6 +9805,7 @@ ${ty.variants.map(
       observe(conn, conn.db.myUpgradeUnlocks, "upgrades");
       observe(conn, conn.db.myActiveRun, "run");
       observe(conn, conn.db.myDungeonProgress, "dungeonProgress");
+      observe(conn, conn.db.myEndlessRecords, "dungeonProgress");
       coreSubscription = conn.subscriptionBuilder().onApplied(() => {
         if (epoch !== connectionEpoch || connection !== conn) return;
         coreSubscriptionReady = true;
@@ -9811,7 +9829,8 @@ ${ty.variants.map(
         tables.myUpgradeProgress,
         tables.myUpgradeUnlocks,
         tables.myActiveRun,
-        tables.myDungeonProgress
+        tables.myDungeonProgress,
+        tables.myEndlessRecords
       ]);
     }).onDisconnect((_ctx, error) => {
       if (epoch !== connectionEpoch) return;
