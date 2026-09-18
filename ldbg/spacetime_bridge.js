@@ -8638,7 +8638,10 @@ ${ty.variants.map(
     startedAt: t.timestamp().name("started_at"),
     decidedAt: t.timestamp().name("decided_at"),
     oneRunSeed: t.u32().name("one_run_seed"),
-    twoRunSeed: t.u32().name("two_run_seed")
+    twoRunSeed: t.u32().name("two_run_seed"),
+    oneLook: t.string().name("one_look"),
+    twoLook: t.string().name("two_look"),
+    friendly: t.bool()
   });
 
   // src/module_bindings/my_dark_duel_blows_table.ts
@@ -8678,7 +8681,8 @@ ${ty.variants.map(
     level: t.u32(),
     health: t.u32(),
     encountersCleared: t.u32().name("encounters_cleared"),
-    queuedAt: t.timestamp().name("queued_at")
+    queuedAt: t.timestamp().name("queued_at"),
+    ground: t.string()
   });
 
   // src/module_bindings/my_dungeon_progress_table.ts
