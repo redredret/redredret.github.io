@@ -9318,6 +9318,27 @@ ${ty.variants.map(
     };
   }
 
+  // src/row_json.ts
+  function jsonSafe(value) {
+    return convertBigInts(value);
+  }
+  function convertBigInts(value) {
+    if (typeof value === "bigint") return value.toString();
+    if (value === null || typeof value !== "object") return value;
+    const hex = value.toHexString;
+    if (typeof hex === "function") return hex.call(value);
+    const custom = value.toJSON;
+    if (typeof custom === "function") {
+      return convertBigInts(custom.call(value));
+    }
+    if (Array.isArray(value)) return value.map(convertBigInts);
+    const result = {};
+    for (const key of Object.keys(value)) {
+      result[key] = convertBigInts(value[key]);
+    }
+    return result;
+  }
+
   // src/index.ts
   var AUTH_PENDING_KEY = "ldbg.auth.pending.v1";
   var AUTH_PENDING_MAX_AGE_MS = 10 * 60 * 1e3;
@@ -9371,23 +9392,6 @@ ${ty.variants.map(
       const index = pendingEvents.findIndex((pending) => pending.type !== "snapshot");
       pendingEvents.splice(index === -1 ? 0 : index, 1);
     }
-  }
-  function jsonSafe(value) {
-    return convertBigInts(value);
-  }
-  function convertBigInts(value) {
-    if (typeof value === "bigint") return value.toString();
-    if (value === null || typeof value !== "object") return value;
-    const custom = value.toJSON;
-    if (typeof custom === "function") {
-      return convertBigInts(custom.call(value));
-    }
-    if (Array.isArray(value)) return value.map(convertBigInts);
-    const result = {};
-    for (const key of Object.keys(value)) {
-      result[key] = convertBigInts(value[key]);
-    }
-    return result;
   }
   function rows(handle) {
     return Array.from(handle.iter()).map(jsonSafe);
