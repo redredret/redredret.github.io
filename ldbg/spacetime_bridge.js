@@ -8359,6 +8359,11 @@ ${ty.variants.map(
     listingId: t.string()
   };
 
+  // src/module_bindings/challenge_duel_listing_reducer.ts
+  var challenge_duel_listing_reducer_default = {
+    listingId: t.string()
+  };
+
   // src/module_bindings/claim_play_session_reducer.ts
   var claim_play_session_reducer_default = {
     force: t.bool()
@@ -8430,8 +8435,16 @@ ${ty.variants.map(
     skillId: t.string()
   };
 
+  // src/module_bindings/leave_duel_listing_reducer.ts
+  var leave_duel_listing_reducer_default = {};
+
   // src/module_bindings/leave_farm_match_reducer.ts
   var leave_farm_match_reducer_default = {};
+
+  // src/module_bindings/post_duel_listing_reducer.ts
+  var post_duel_listing_reducer_default = {
+    stake: t.string()
+  };
 
   // src/module_bindings/publish_duel_board_reducer.ts
   var publish_duel_board_reducer_default = {
@@ -8535,6 +8548,11 @@ ${ty.variants.map(
     displayName: t.string()
   };
 
+  // src/module_bindings/set_duel_ready_reducer.ts
+  var set_duel_ready_reducer_default = {
+    ready: t.bool()
+  };
+
   // src/module_bindings/set_hair_reducer.ts
   var set_hair_reducer_default = {
     hairStyle: t.u32(),
@@ -8585,6 +8603,20 @@ ${ty.variants.map(
   var dark_player_count_table_default = t.row({
     mode: t.string(),
     players: t.u32()
+  });
+
+  // src/module_bindings/duel_listings_table.ts
+  var duel_listings_table_default = t.row({
+    listingId: t.string().primaryKey().name("listing_id"),
+    displayName: t.string().name("display_name"),
+    level: t.u32(),
+    stake: t.string(),
+    look: t.string(),
+    wins: t.u32(),
+    losses: t.u32(),
+    state: t.string(),
+    postedAt: t.timestamp().name("posted_at"),
+    isMine: t.bool().name("is_mine")
   });
 
   // src/module_bindings/farm_player_counts_table.ts
@@ -8652,7 +8684,8 @@ ${ty.variants.map(
     twoRunSeed: t.u32().name("two_run_seed"),
     oneLook: t.string().name("one_look"),
     twoLook: t.string().name("two_look"),
-    friendly: t.bool()
+    friendly: t.bool(),
+    ground: t.string()
   });
 
   // src/module_bindings/my_dark_duel_blows_table.ts
@@ -8699,6 +8732,29 @@ ${ty.variants.map(
     ground: t.string()
   });
 
+  // src/module_bindings/my_duel_lobby_table.ts
+  var my_duel_lobby_table_default = t.row({
+    listingId: t.string().primaryKey().name("listing_id"),
+    owner: t.identity(),
+    displayName: t.string().name("display_name"),
+    level: t.u32(),
+    stake: t.string(),
+    look: t.string(),
+    wins: t.u32(),
+    losses: t.u32(),
+    challenger: t.identity(),
+    challengerName: t.string().name("challenger_name"),
+    challengerLevel: t.u32().name("challenger_level"),
+    challengerLook: t.string().name("challenger_look"),
+    challengerWins: t.u32().name("challenger_wins"),
+    challengerLosses: t.u32().name("challenger_losses"),
+    ownerReady: t.bool().name("owner_ready"),
+    challengerReady: t.bool().name("challenger_ready"),
+    state: t.string(),
+    postedAt: t.timestamp().name("posted_at"),
+    matchedAt: t.timestamp().name("matched_at")
+  });
+
   // src/module_bindings/my_duel_opponent_board_table.ts
   var my_duel_opponent_board_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -8709,6 +8765,14 @@ ${ty.variants.map(
     activeY: t.i32().name("active_y"),
     activeRotation: t.u32().name("active_rotation"),
     sequence: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_duel_record_table.ts
+  var my_duel_record_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    wins: t.u32(),
+    losses: t.u32(),
     updatedAt: t.timestamp().name("updated_at")
   });
 
@@ -8786,6 +8850,16 @@ ${ty.variants.map(
     joinedAt: t.timestamp().name("joined_at"),
     relayCount: t.u32().name("relay_count"),
     claimedAttackTotal: t.u32().name("claimed_attack_total")
+  });
+
+  // src/module_bindings/my_farm_records_table.ts
+  var my_farm_records_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    mode: t.string(),
+    bestLines: t.u32().name("best_lines"),
+    bestLevel: t.u32().name("best_level"),
+    reachedAt: t.timestamp().name("reached_at")
   });
 
   // src/module_bindings/my_inventory_table.ts
@@ -8916,6 +8990,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, dark_player_count_table_default),
+    duelListings: table({
+      name: "duel_listings",
+      indexes: [],
+      constraints: []
+    }, duel_listings_table_default),
     farmPlayerCounts: table({
       name: "farm_player_counts",
       indexes: [],
@@ -8951,11 +9030,21 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_dark_presence_table_default),
+    myDuelLobby: table({
+      name: "my_duel_lobby",
+      indexes: [],
+      constraints: []
+    }, my_duel_lobby_table_default),
     myDuelOpponentBoard: table({
       name: "my_duel_opponent_board",
       indexes: [],
       constraints: []
     }, my_duel_opponent_board_table_default),
+    myDuelRecord: table({
+      name: "my_duel_record",
+      indexes: [],
+      constraints: []
+    }, my_duel_record_table_default),
     myDungeonProgress: table({
       name: "my_dungeon_progress",
       indexes: [],
@@ -8991,6 +9080,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_farm_pvp_session_table_default),
+    myFarmRecords: table({
+      name: "my_farm_records",
+      indexes: [],
+      constraints: []
+    }, my_farm_records_table_default),
     myInventory: table({
       name: "my_inventory",
       indexes: [],
@@ -9053,6 +9147,7 @@ ${ty.variants.map(
     reducerSchema("buy_market_listing", buy_market_listing_reducer_default),
     reducerSchema("buy_shop_item", buy_shop_item_reducer_default),
     reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
+    reducerSchema("challenge_duel_listing", challenge_duel_listing_reducer_default),
     reducerSchema("claim_play_session", claim_play_session_reducer_default),
     reducerSchema("consume_item", consume_item_reducer_default),
     reducerSchema("craft_item", craft_item_reducer_default),
@@ -9068,7 +9163,9 @@ ${ty.variants.map(
     reducerSchema("join_farm_private", join_farm_private_reducer_default),
     reducerSchema("join_farm_public", join_farm_public_reducer_default),
     reducerSchema("learn_skill", learn_skill_reducer_default),
+    reducerSchema("leave_duel_listing", leave_duel_listing_reducer_default),
     reducerSchema("leave_farm_match", leave_farm_match_reducer_default),
+    reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
     reducerSchema("publish_duel_board", publish_duel_board_reducer_default),
     reducerSchema("publish_farm_board", publish_farm_board_reducer_default),
     reducerSchema("publish_farm_piece", publish_farm_piece_reducer_default),
@@ -9083,6 +9180,7 @@ ${ty.variants.map(
     reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
     reducerSchema("set_display_name", set_display_name_reducer_default),
+    reducerSchema("set_duel_ready", set_duel_ready_reducer_default),
     reducerSchema("set_hair", set_hair_reducer_default),
     reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
     reducerSchema("start_run", start_run_reducer_default),
@@ -9103,6 +9201,7 @@ ${ty.variants.map(
   };
   var tableAccessorAliases = {
     "dark_player_count": "darkPlayerCount",
+    "duel_listings": "duelListings",
     "farm_player_counts": "farmPlayerCounts",
     "market_listings": "marketListings",
     "my_active_run": "myActiveRun",
@@ -9110,7 +9209,9 @@ ${ty.variants.map(
     "my_dark_duel_blows": "myDarkDuelBlows",
     "my_dark_duel_haul": "myDarkDuelHaul",
     "my_dark_presence": "myDarkPresence",
+    "my_duel_lobby": "myDuelLobby",
     "my_duel_opponent_board": "myDuelOpponentBoard",
+    "my_duel_record": "myDuelRecord",
     "my_dungeon_progress": "myDungeonProgress",
     "my_endless_records": "myEndlessRecords",
     "my_equipment": "myEquipment",
@@ -9118,6 +9219,7 @@ ${ty.variants.map(
     "my_farm_pvp_attacks": "myFarmPvpAttacks",
     "my_farm_pvp_member_v2": "myFarmPvpMemberV2",
     "my_farm_pvp_session": "myFarmPvpSession",
+    "my_farm_records": "myFarmRecords",
     "my_inventory": "myInventory",
     "my_inventory_order": "myInventoryOrder",
     "my_market_sale_notice": "myMarketSaleNotice",
@@ -9319,6 +9421,15 @@ ${ty.variants.map(
   var EXPIRED_SESSION_MESSAGE = "Your sign-in expired. Open Account and sign in again to keep playing.";
   var SUPERSEDABLE_CALLS = ["publishFarmBoard", "publishFarmPiece"];
   var MAX_PENDING_CALLS = 64;
+  var HELD_CALL_TIMEOUT_MS = 2e4;
+  function partitionExpiredCalls(queued, now, timeoutMs = HELD_CALL_TIMEOUT_MS) {
+    const kept = [];
+    const expired = [];
+    for (const call of queued) {
+      (now - call.queuedAt >= timeoutMs ? expired : kept).push(call);
+    }
+    return { kept, expired };
+  }
   var BACKGROUND_CALLS = [
     "claimPlaySession",
     "renewPlaySession",
@@ -9387,6 +9498,7 @@ ${ty.variants.map(
   var marketSubscription = null;
   var marketHistorySubscription = null;
   var darkDuelSubscription = null;
+  var duelBoardSubscription = null;
   var playerCountsSubscription = null;
   var coreSubscriptionReady = false;
   var connectionOpening = false;
@@ -9411,6 +9523,7 @@ ${ty.variants.map(
   var reconnectTimer = null;
   var reconnectAttempt = 0;
   var pendingReducerCalls = [];
+  var pendingCallTimer = null;
   var dirtySnapshotDomains = /* @__PURE__ */ new Set();
   var snapshotFlushScheduled = false;
   var observedHandles = /* @__PURE__ */ new WeakSet();
@@ -9792,6 +9905,7 @@ ${ty.variants.map(
     marketSubscription = null;
     marketHistorySubscription = null;
     darkDuelSubscription = null;
+    duelBoardSubscription = null;
     playerCountsSubscription = null;
     coreSubscriptionReady = false;
     connectionOpening = false;
@@ -9826,7 +9940,10 @@ ${ty.variants.map(
         farmPvpAttacks: [],
         farmDarkHaul: [],
         marketListings: [],
-        marketTransactions: []
+        marketTransactions: [],
+        duelListings: [],
+        duelLobby: null,
+        duelRecord: null
       }
     };
   }
@@ -9850,7 +9967,13 @@ ${ty.variants.map(
     if (domains.has("dungeonProgress")) {
       data.dungeonProgress = rows(activeConnection.db.myDungeonProgress);
       data.endlessRecords = rows(activeConnection.db.myEndlessRecords);
+      data.farmRecords = rows(activeConnection.db.myFarmRecords);
     }
+    if (domains.has("arenaDuels")) {
+      data.duelLobby = rows(activeConnection.db.myDuelLobby)[0] ?? null;
+      data.duelRecord = rows(activeConnection.db.myDuelRecord)[0] ?? null;
+    }
+    if (domains.has("duelBoard")) data.duelListings = rows(activeConnection.db.duelListings);
     if (domains.has("farmSession")) {
       data.farmPvpSession = rows(activeConnection.db.myFarmPvpSession)[0] ?? null;
       data.farmPvpMember = rows(activeConnection.db.myFarmPvpMemberV2)[0] ?? null;
@@ -9966,6 +10089,32 @@ ${ty.variants.map(
   function marketScopeWanted() {
     return clientScreen === "store";
   }
+  function duelBoardScopeWanted() {
+    return clientScreen === "duels";
+  }
+  function clearDuelBoardProjection() {
+    emit({ type: "snapshot", data: { duelListings: [] } });
+  }
+  function stopDuelBoardSubscription() {
+    const previous = duelBoardSubscription;
+    duelBoardSubscription = null;
+    if (previous && typeof previous.unsubscribe === "function") previous.unsubscribe();
+    clearDuelBoardProjection();
+  }
+  function ensureDuelBoardSubscription(activeConnection) {
+    if (!coreSubscriptionReady || connection !== activeConnection) return;
+    if (!duelBoardScopeWanted() || duelBoardSubscription) return;
+    observe(activeConnection, activeConnection.db.duelListings, "duelBoard");
+    duelBoardSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (connection !== activeConnection || !duelBoardSubscription || !duelBoardScopeWanted()) return;
+      publishDomains(activeConnection, ["duelBoard"]);
+      emit({ type: "subscription_scope_ready", scope: "duelBoard" });
+    }).onError((_ctx, error) => {
+      if (connection === activeConnection) {
+        emit({ type: "error", command: "subscribeDuelBoard", message: String(error) });
+      }
+    }).subscribe([tables.duelListings]);
+  }
   function clearMarketProjection() {
     emit({ type: "snapshot", data: { marketListings: [] } });
   }
@@ -10003,8 +10152,10 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.myDarkDuelHaul, "darkDuel");
     observe(activeConnection, activeConnection.db.myDarkPresence, "darkDuel");
     observe(activeConnection, activeConnection.db.myDuelOpponentBoard, "darkDuel");
+    observe(activeConnection, activeConnection.db.myDuelLobby, "arenaDuels");
+    observe(activeConnection, activeConnection.db.myDuelRecord, "arenaDuels");
     darkDuelSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (connection === activeConnection) publishDomains(activeConnection, ["darkDuel"]);
+      if (connection === activeConnection) publishDomains(activeConnection, ["darkDuel", "arenaDuels"]);
     }).onError((_ctx, error) => {
       if (connection === activeConnection) {
         emit({ type: "error", command: "subscribeDarkDuel", message: String(error) });
@@ -10014,7 +10165,9 @@ ${ty.variants.map(
       tables.myDarkDuelBlows,
       tables.myDarkDuelHaul,
       tables.myDarkPresence,
-      tables.myDuelOpponentBoard
+      tables.myDuelOpponentBoard,
+      tables.myDuelLobby,
+      tables.myDuelRecord
     ]);
   }
   function ensurePlayerCountsSubscription(activeConnection) {
@@ -10029,8 +10182,36 @@ ${ty.variants.map(
   }
   function flushPendingReducerCalls() {
     if (!connection || !coreSubscriptionReady) return;
+    clearPendingCallTimer();
     const queued = collapsePendingCalls(pendingReducerCalls.splice(0, pendingReducerCalls.length));
     for (const item of queued) void callReducer(item.name, item.argumentsJson);
+  }
+  function clearPendingCallTimer() {
+    if (pendingCallTimer !== null) window.clearTimeout(pendingCallTimer);
+    pendingCallTimer = null;
+  }
+  function expireHeldCalls() {
+    pendingCallTimer = null;
+    const { kept, expired } = partitionExpiredCalls(pendingReducerCalls, Date.now());
+    pendingReducerCalls.length = 0;
+    pendingReducerCalls.push(...kept);
+    for (const call of expired) {
+      emit({
+        type: "error",
+        command: call.name,
+        message: "The server did not answer. Check your connection, or reload the page, and try again."
+      });
+    }
+    armPendingCallTimer();
+  }
+  function armPendingCallTimer() {
+    if (pendingCallTimer !== null || pendingReducerCalls.length === 0) return;
+    const oldest = pendingReducerCalls.reduce(
+      (at, call) => Math.min(at, call.queuedAt),
+      Number.POSITIVE_INFINITY
+    );
+    const remaining = Math.max(0, HELD_CALL_TIMEOUT_MS - (Date.now() - oldest));
+    pendingCallTimer = window.setTimeout(expireHeldCalls, remaining);
   }
   async function openBackendConnection(request) {
     const config = resolveBackendConfig(backendConfigOverrides, request);
@@ -10070,6 +10251,7 @@ ${ty.variants.map(
       observe(conn, conn.db.myActiveRun, "run");
       observe(conn, conn.db.myDungeonProgress, "dungeonProgress");
       observe(conn, conn.db.myEndlessRecords, "dungeonProgress");
+      observe(conn, conn.db.myFarmRecords, "dungeonProgress");
       coreSubscription = conn.subscriptionBuilder().onApplied(() => {
         if (epoch !== connectionEpoch || connection !== conn) return;
         coreSubscriptionReady = true;
@@ -10081,6 +10263,7 @@ ${ty.variants.map(
         ensureMarketSubscription(conn);
         ensureMarketHistorySubscription(conn);
         ensureDarkDuelSubscription(conn);
+        ensureDuelBoardSubscription(conn);
         ensurePlayerCountsSubscription(conn);
         flushPendingReducerCalls();
       }).onError((_ctx, error) => {
@@ -10096,7 +10279,8 @@ ${ty.variants.map(
         tables.myUpgradeUnlocks,
         tables.myActiveRun,
         tables.myDungeonProgress,
-        tables.myEndlessRecords
+        tables.myEndlessRecords,
+        tables.myFarmRecords
       ]);
     }).onDisconnect((_ctx, error) => {
       if (epoch !== connectionEpoch) return;
@@ -10215,6 +10399,8 @@ ${ty.variants.map(
       else if (farmSubscription) stopFarmSubscription();
       if (marketScopeWanted()) ensureMarketSubscription(connection);
       else if (marketSubscription) stopMarketSubscription();
+      if (duelBoardScopeWanted()) ensureDuelBoardSubscription(connection);
+      else if (duelBoardSubscription) stopDuelBoardSubscription();
     } catch (error) {
       emit({ type: "error", command: "setClientContext", message: String(error) });
     }
@@ -10236,10 +10422,11 @@ ${ty.variants.map(
       if (!background) noteUserActivity();
       if (!connection || !coreSubscriptionReady) {
         if (!background && authMode === "account" && lastBackendRequest && (resumeNeeded || connectionOpening)) {
-          pendingReducerCalls.push({ name, argumentsJson });
+          pendingReducerCalls.push({ name, argumentsJson, queuedAt: Date.now() });
           const collapsed = collapsePendingCalls(pendingReducerCalls);
           pendingReducerCalls.length = 0;
           pendingReducerCalls.push(...collapsed);
+          armPendingCallTimer();
           resumeBackend();
           return;
         }
