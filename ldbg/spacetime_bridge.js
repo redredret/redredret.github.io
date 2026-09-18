@@ -8570,6 +8570,12 @@ ${ty.variants.map(
     reason: t.string()
   };
 
+  // src/module_bindings/dark_player_count_table.ts
+  var dark_player_count_table_default = t.row({
+    mode: t.string(),
+    players: t.u32()
+  });
+
   // src/module_bindings/farm_player_counts_table.ts
   var farm_player_counts_table_default = t.row({
     mode: t.string(),
@@ -8630,7 +8636,9 @@ ${ty.variants.map(
     outcome: t.string(),
     matchedAt: t.timestamp().name("matched_at"),
     startedAt: t.timestamp().name("started_at"),
-    decidedAt: t.timestamp().name("decided_at")
+    decidedAt: t.timestamp().name("decided_at"),
+    oneRunSeed: t.u32().name("one_run_seed"),
+    twoRunSeed: t.u32().name("two_run_seed")
   });
 
   // src/module_bindings/my_dark_duel_blows_table.ts
@@ -8872,6 +8880,11 @@ ${ty.variants.map(
 
   // src/module_bindings/index.ts
   var tablesSchema = schema({
+    darkPlayerCount: table({
+      name: "dark_player_count",
+      indexes: [],
+      constraints: []
+    }, dark_player_count_table_default),
     farmPlayerCounts: table({
       name: "farm_player_counts",
       indexes: [],
@@ -9052,6 +9065,7 @@ ${ty.variants.map(
     ...proceduresSchema
   };
   var tableAccessorAliases = {
+    "dark_player_count": "darkPlayerCount",
     "farm_player_counts": "farmPlayerCounts",
     "market_listings": "marketListings",
     "my_active_run": "myActiveRun",
@@ -9812,7 +9826,10 @@ ${ty.variants.map(
     }
     if (domains.has("farmAttacks")) data.farmPvpAttacks = rows(activeConnection.db.myFarmPvpAttacks);
     if (domains.has("farmDarkHaul")) data.farmDarkHaul = rows(activeConnection.db.myFarmDarkHaul);
-    if (domains.has("playerCounts")) data.farmPlayerCounts = rows(activeConnection.db.farmPlayerCounts);
+    if (domains.has("playerCounts")) {
+      data.farmPlayerCounts = rows(activeConnection.db.farmPlayerCounts);
+      data.darkPlayerCount = rows(activeConnection.db.darkPlayerCount);
+    }
     if (domains.has("market")) data.marketListings = rows(activeConnection.db.marketListings);
     if (domains.has("marketHistory")) {
       data.marketTransactions = rows(activeConnection.db.myMarketTransactions);
@@ -9958,11 +9975,12 @@ ${ty.variants.map(
   function ensurePlayerCountsSubscription(activeConnection) {
     if (!coreSubscriptionReady || connection !== activeConnection || playerCountsSubscription) return;
     observe(activeConnection, activeConnection.db.farmPlayerCounts, "playerCounts");
+    observe(activeConnection, activeConnection.db.darkPlayerCount, "playerCounts");
     playerCountsSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection === activeConnection) publishDomains(activeConnection, ["playerCounts"]);
     }).onError((_ctx, error) => {
       console.warn("LDBG: player counts are unavailable:", error);
-    }).subscribe([tables.farmPlayerCounts]);
+    }).subscribe([tables.farmPlayerCounts, tables.darkPlayerCount]);
   }
   function flushPendingReducerCalls() {
     if (!connection || !coreSubscriptionReady) return;
