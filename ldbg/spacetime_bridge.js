@@ -8433,6 +8433,17 @@ ${ty.variants.map(
   // src/module_bindings/leave_farm_match_reducer.ts
   var leave_farm_match_reducer_default = {};
 
+  // src/module_bindings/publish_duel_board_reducer.ts
+  var publish_duel_board_reducer_default = {
+    duelId: t.string(),
+    cells: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    sequence: t.u32()
+  };
+
   // src/module_bindings/publish_farm_board_reducer.ts
   var publish_farm_board_reducer_default = {
     cells: t.string(),
@@ -8685,6 +8696,19 @@ ${ty.variants.map(
     ground: t.string()
   });
 
+  // src/module_bindings/my_duel_opponent_board_table.ts
+  var my_duel_opponent_board_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    duelId: t.string().name("duel_id"),
+    cells: t.string(),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    sequence: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
   // src/module_bindings/my_dungeon_progress_table.ts
   var my_dungeon_progress_table_default = t.row({
     id: t.u64().primaryKey(),
@@ -8924,6 +8948,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_dark_presence_table_default),
+    myDuelOpponentBoard: table({
+      name: "my_duel_opponent_board",
+      indexes: [],
+      constraints: []
+    }, my_duel_opponent_board_table_default),
     myDungeonProgress: table({
       name: "my_dungeon_progress",
       indexes: [],
@@ -9037,6 +9066,7 @@ ${ty.variants.map(
     reducerSchema("join_farm_public", join_farm_public_reducer_default),
     reducerSchema("learn_skill", learn_skill_reducer_default),
     reducerSchema("leave_farm_match", leave_farm_match_reducer_default),
+    reducerSchema("publish_duel_board", publish_duel_board_reducer_default),
     reducerSchema("publish_farm_board", publish_farm_board_reducer_default),
     reducerSchema("publish_farm_piece", publish_farm_piece_reducer_default),
     reducerSchema("purchase_build_upgrade", purchase_build_upgrade_reducer_default),
@@ -9077,6 +9107,7 @@ ${ty.variants.map(
     "my_dark_duel_blows": "myDarkDuelBlows",
     "my_dark_duel_haul": "myDarkDuelHaul",
     "my_dark_presence": "myDarkPresence",
+    "my_duel_opponent_board": "myDuelOpponentBoard",
     "my_dungeon_progress": "myDungeonProgress",
     "my_endless_records": "myEndlessRecords",
     "my_equipment": "myEquipment",
@@ -9848,6 +9879,7 @@ ${ty.variants.map(
       data.darkDuelBlows = rows(activeConnection.db.myDarkDuelBlows);
       data.darkDuelHaul = rows(activeConnection.db.myDarkDuelHaul);
       data.darkPresence = rows(activeConnection.db.myDarkPresence);
+      data.duelOpponentBoard = rows(activeConnection.db.myDuelOpponentBoard);
     }
     return { type: "snapshot", data };
   }
@@ -9967,6 +9999,7 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.myDarkDuelBlows, "darkDuel");
     observe(activeConnection, activeConnection.db.myDarkDuelHaul, "darkDuel");
     observe(activeConnection, activeConnection.db.myDarkPresence, "darkDuel");
+    observe(activeConnection, activeConnection.db.myDuelOpponentBoard, "darkDuel");
     darkDuelSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection === activeConnection) publishDomains(activeConnection, ["darkDuel"]);
     }).onError((_ctx, error) => {
@@ -9977,7 +10010,8 @@ ${ty.variants.map(
       tables.myDarkDuel,
       tables.myDarkDuelBlows,
       tables.myDarkDuelHaul,
-      tables.myDarkPresence
+      tables.myDarkPresence,
+      tables.myDuelOpponentBoard
     ]);
   }
   function ensurePlayerCountsSubscription(activeConnection) {
