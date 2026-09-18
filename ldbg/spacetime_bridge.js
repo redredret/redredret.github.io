@@ -8669,7 +8669,10 @@ ${ty.variants.map(
     backToBack: t.bool().name("back_to_back"),
     perfectClear: t.bool().name("perfect_clear"),
     ordinal: t.u32(),
-    createdAt: t.timestamp().name("created_at")
+    createdAt: t.timestamp().name("created_at"),
+    effectBehavior: t.string().name("effect_behavior"),
+    effectCells: t.u32().name("effect_cells"),
+    effectSeed: t.u32().name("effect_seed")
   });
 
   // src/module_bindings/my_dark_duel_haul_table.ts
