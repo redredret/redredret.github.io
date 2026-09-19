@@ -9454,6 +9454,13 @@ ${ty.variants.map(
     );
     return kept.length <= maximum ? kept : kept.slice(kept.length - maximum);
   }
+  function buildPatchPart(domain, build, report) {
+    try {
+      build();
+    } catch (error) {
+      report(domain, String(error));
+    }
+  }
 
   // src/farm_transport_patch.ts
   function farmBoardDomainPatch(opponentBoard) {
@@ -9947,66 +9954,86 @@ ${ty.variants.map(
       }
     };
   }
+  function buildDomain(domain, build) {
+    buildPatchPart(domain, build, (failed, message) => emit({
+      type: "error",
+      command: `snapshot:${failed}`,
+      message: `The ${failed} patch could not be built: ${message}`
+    }));
+  }
   function snapshotPatch(activeConnection, domains) {
     const data = {};
-    if (domains.has("profile")) {
+    const part = (domain, build) => {
+      if (domains.has(domain)) buildDomain(domain, build);
+    };
+    part("profile", () => {
       data.profile = rows(activeConnection.db.myProfile)[0] ?? null;
       data.profilePreferences = rows(activeConnection.db.myProfilePreferences)[0] ?? null;
-    }
-    if (domains.has("inventory")) {
+    });
+    part("inventory", () => {
       data.inventory = rows(activeConnection.db.myInventory);
       data.inventoryOrder = rows(activeConnection.db.myInventoryOrder);
       data.equipment = rows(activeConnection.db.myEquipment);
       data.skills = rows(activeConnection.db.mySkills);
-    }
-    if (domains.has("upgrades")) {
+    });
+    part("upgrades", () => {
       data.upgradeProgress = rows(activeConnection.db.myUpgradeProgress)[0] ?? null;
       data.upgradeUnlocks = rows(activeConnection.db.myUpgradeUnlocks);
-    }
-    if (domains.has("run")) data.activeRun = rows(activeConnection.db.myActiveRun)[0] ?? null;
-    if (domains.has("dungeonProgress")) {
+    });
+    part("run", () => {
+      data.activeRun = rows(activeConnection.db.myActiveRun)[0] ?? null;
+    });
+    part("dungeonProgress", () => {
       data.dungeonProgress = rows(activeConnection.db.myDungeonProgress);
       data.endlessRecords = rows(activeConnection.db.myEndlessRecords);
       data.farmRecords = rows(activeConnection.db.myFarmRecords);
-    }
-    if (domains.has("arenaDuels")) {
+    });
+    part("arenaDuels", () => {
       data.duelLobby = rows(activeConnection.db.myDuelLobby)[0] ?? null;
       data.duelRecord = rows(activeConnection.db.myDuelRecord)[0] ?? null;
-    }
-    if (domains.has("duelBoard")) data.duelListings = rows(activeConnection.db.duelListings);
-    if (domains.has("farmSession")) {
+    });
+    part("duelBoard", () => {
+      data.duelListings = rows(activeConnection.db.duelListings);
+    });
+    part("farmSession", () => {
       data.farmPvpSession = rows(activeConnection.db.myFarmPvpSession)[0] ?? null;
       data.farmPvpMember = rows(activeConnection.db.myFarmPvpMemberV2)[0] ?? null;
-    }
-    if (domains.has("farmBoard")) {
+    });
+    part("farmBoard", () => {
       const opponents = rows(activeConnection.db.opponentFarmBoardsCompactV4);
       data.farmOpponents = opponents;
       data.farmOpponentPieces = [];
       Object.assign(data, farmBoardDomainPatch(opponents[0]));
-    }
-    if (domains.has("farmPiece")) {
+    });
+    part("farmPiece", () => {
       const pieces = rows(activeConnection.db.opponentFarmPiecesCompactV3);
       data.farmOpponentPieces = pieces;
       data.opponentFarmPiece = pieces[0] ?? null;
-    }
-    if (domains.has("farmAttacks")) data.farmPvpAttacks = rows(activeConnection.db.myFarmPvpAttacks);
-    if (domains.has("farmDarkHaul")) data.farmDarkHaul = rows(activeConnection.db.myFarmDarkHaul);
-    if (domains.has("playerCounts")) {
+    });
+    part("farmAttacks", () => {
+      data.farmPvpAttacks = rows(activeConnection.db.myFarmPvpAttacks);
+    });
+    part("farmDarkHaul", () => {
+      data.farmDarkHaul = rows(activeConnection.db.myFarmDarkHaul);
+    });
+    part("playerCounts", () => {
       data.farmPlayerCounts = rows(activeConnection.db.farmPlayerCounts);
       data.darkPlayerCount = rows(activeConnection.db.darkPlayerCount);
-    }
-    if (domains.has("market")) data.marketListings = rows(activeConnection.db.marketListings);
-    if (domains.has("marketHistory")) {
+    });
+    part("market", () => {
+      data.marketListings = rows(activeConnection.db.marketListings);
+    });
+    part("marketHistory", () => {
       data.marketTransactions = rows(activeConnection.db.myMarketTransactions);
       data.marketSaleNotice = rows(activeConnection.db.myMarketSaleNotice);
-    }
-    if (domains.has("darkDuel")) {
+    });
+    part("darkDuel", () => {
       data.darkDuel = rows(activeConnection.db.myDarkDuel);
       data.darkDuelBlows = rows(activeConnection.db.myDarkDuelBlows);
       data.darkDuelHaul = rows(activeConnection.db.myDarkDuelHaul);
       data.darkPresence = rows(activeConnection.db.myDarkPresence);
       data.duelOpponentBoard = rows(activeConnection.db.myDuelOpponentBoard);
-    }
+    });
     return { type: "snapshot", data };
   }
   function publishDomains(activeConnection, domains) {
