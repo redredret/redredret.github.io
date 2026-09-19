@@ -8653,7 +8653,8 @@ ${ty.variants.map(
     combatStatsJson: t.string().name("combat_stats_json"),
     combatWeaponType: t.string().name("combat_weapon_type"),
     combatSkillsJson: t.string().name("combat_skills_json"),
-    dungeonStoryVersion: t.u32().name("dungeon_story_version")
+    dungeonStoryVersion: t.u32().name("dungeon_story_version"),
+    combatWeaponId: t.string().name("combat_weapon_id")
   });
 
   // src/module_bindings/my_dark_duel_table.ts
