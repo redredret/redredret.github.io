@@ -10370,6 +10370,12 @@ ${ty.variants.map(
     resumeNeeded = false;
     void openBackendConnection(lastBackendRequest);
   }
+  function reconnectBackend() {
+    if (authMode !== "account" || !lastBackendRequest) return;
+    disconnectBackend();
+    resumeNeeded = true;
+    resumeBackend();
+  }
   function scheduleBackendResume() {
     if (accountSessionExpired()) {
       renewThenResume();
@@ -10470,6 +10476,39 @@ ${ty.variants.map(
   function getAuthStatus() {
     return JSON.stringify(authStatus());
   }
+  var DIAGNOSTIC_TABLES = [
+    "myProfile",
+    "myActiveRun",
+    "myInventory",
+    "myEquipment",
+    "myDungeonProgress",
+    "myEndlessRecords",
+    "myFarmRecords",
+    "myDarkDuel",
+    "myDuelLobby",
+    "myDuelRecord"
+  ];
+  function snapshotDiagnostics() {
+    const counts = {};
+    for (const name of DIAGNOSTIC_TABLES) {
+      try {
+        const handle = connection?.db?.[name];
+        counts[name] = handle ? Array.from(handle.iter()).length : -1;
+      } catch {
+        counts[name] = -2;
+      }
+    }
+    return JSON.stringify({
+      connected: !!connection,
+      coreReady: coreSubscriptionReady,
+      opening: connectionOpening,
+      resumeNeeded,
+      screen: clientScreen,
+      held: pendingReducerCalls.map((call) => call.name),
+      dirty: Array.from(dirtySnapshotDomains),
+      counts
+    });
+  }
   function drainEvents() {
     return JSON.stringify(pendingEvents.splice(0, pendingEvents.length));
   }
@@ -10496,6 +10535,8 @@ ${ty.variants.map(
     noteUserActivity,
     callReducer,
     getAuthStatus,
+    snapshotDiagnostics,
+    reconnectBackend,
     drainEvents
   };
 })();
