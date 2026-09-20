@@ -8636,6 +8636,13 @@ ${ty.variants.map(
     isMine: t.bool().name("is_mine")
   });
 
+  // src/module_bindings/market_price_guide_table.ts
+  var market_price_guide_table_default = t.row({
+    itemId: t.string().name("item_id"),
+    averagePrice: t.u32().name("average_price"),
+    sampleCount: t.u32().name("sample_count")
+  });
+
   // src/module_bindings/my_active_run_table.ts
   var my_active_run_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -9006,6 +9013,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, market_listings_table_default),
+    marketPriceGuide: table({
+      name: "market_price_guide",
+      indexes: [],
+      constraints: []
+    }, market_price_guide_table_default),
     myActiveRun: table({
       name: "my_active_run",
       indexes: [],
@@ -9205,6 +9217,7 @@ ${ty.variants.map(
     "duel_listings": "duelListings",
     "farm_player_counts": "farmPlayerCounts",
     "market_listings": "marketListings",
+    "market_price_guide": "marketPriceGuide",
     "my_active_run": "myActiveRun",
     "my_dark_duel": "myDarkDuel",
     "my_dark_duel_blows": "myDarkDuelBlows",
@@ -9504,6 +9517,7 @@ ${ty.variants.map(
   var coreSubscription = null;
   var farmSubscription = null;
   var marketSubscription = null;
+  var marketPriceSubscription = null;
   var marketHistorySubscription = null;
   var darkDuelSubscription = null;
   var duelBoardSubscription = null;
@@ -9911,6 +9925,7 @@ ${ty.variants.map(
     coreSubscription = null;
     farmSubscription = null;
     marketSubscription = null;
+    marketPriceSubscription = null;
     marketHistorySubscription = null;
     darkDuelSubscription = null;
     duelBoardSubscription = null;
@@ -9948,6 +9963,7 @@ ${ty.variants.map(
         farmPvpAttacks: [],
         farmDarkHaul: [],
         marketListings: [],
+        marketPrices: [],
         marketTransactions: [],
         duelListings: [],
         duelLobby: null,
@@ -10023,6 +10039,9 @@ ${ty.variants.map(
     });
     part("market", () => {
       data.marketListings = rows(activeConnection.db.marketListings);
+    });
+    part("marketPrices", () => {
+      data.marketPrices = rows(activeConnection.db.marketPriceGuide);
     });
     part("marketHistory", () => {
       data.marketTransactions = rows(activeConnection.db.myMarketTransactions);
@@ -10163,6 +10182,17 @@ ${ty.variants.map(
       if (connection === activeConnection) emit({ type: "error", command: "subscribeMarket", message: String(error) });
     }).subscribe([tables.marketListings]);
   }
+  function ensureMarketPriceSubscription(activeConnection) {
+    if (!coreSubscriptionReady || connection !== activeConnection || marketPriceSubscription) return;
+    observe(activeConnection, activeConnection.db.marketPriceGuide, "marketPrices");
+    marketPriceSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (connection === activeConnection) publishDomains(activeConnection, ["marketPrices"]);
+    }).onError((_ctx, error) => {
+      if (connection === activeConnection) {
+        emit({ type: "error", command: "subscribeMarketPrices", message: String(error) });
+      }
+    }).subscribe([tables.marketPriceGuide]);
+  }
   function ensureMarketHistorySubscription(activeConnection) {
     if (!coreSubscriptionReady || connection !== activeConnection || marketHistorySubscription) return;
     observe(activeConnection, activeConnection.db.myMarketTransactions, "marketHistory");
@@ -10289,6 +10319,7 @@ ${ty.variants.map(
         emit({ type: "subscribed" });
         ensureFarmSubscription(conn);
         ensureMarketSubscription(conn);
+        ensureMarketPriceSubscription(conn);
         ensureMarketHistorySubscription(conn);
         ensureDarkDuelSubscription(conn);
         ensureDuelBoardSubscription(conn);
