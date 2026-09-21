@@ -9456,7 +9456,29 @@ ${ty.variants.map(
     return expiresAtSeconds <= nowSeconds - TOKEN_EXPIRY_SKEW_SECONDS;
   }
   var EXPIRED_SESSION_MESSAGE = "Your sign-in expired. Open Account and sign in again to keep playing.";
-  var SUPERSEDABLE_CALLS = ["publishFarmBoard", "publishFarmPiece"];
+  var SUPERSEDABLE_CALLS = ["publishFarmBoard", "publishFarmPiece", "publishDuelBoard"];
+  var QUIET_SUCCESS_CALLS = ["publishFarmBoard", "publishFarmPiece", "publishDuelBoard"];
+  function reportsSuccess(name) {
+    return !QUIET_SUCCESS_CALLS.includes(name);
+  }
+  function mergeSnapshotRuns(events) {
+    const merged = [];
+    for (const event of events) {
+      const previous = merged[merged.length - 1];
+      if (event.type === "snapshot" && previous && previous.type === "snapshot") {
+        merged[merged.length - 1] = {
+          ...previous,
+          data: {
+            ...previous.data ?? {},
+            ...event.data ?? {}
+          }
+        };
+        continue;
+      }
+      merged.push(event);
+    }
+    return merged;
+  }
   var MAX_PENDING_CALLS = 64;
   var HELD_CALL_TIMEOUT_MS = 2e4;
   function partitionExpiredCalls(queued, now, timeoutMs = HELD_CALL_TIMEOUT_MS) {
@@ -9474,9 +9496,13 @@ ${ty.variants.map(
     "reportRunSubmissionProblem",
     "acknowledgeMarketSales",
     // A Dark run announces itself between encounters and swings on every clear.
+    // `enterDarkDuelV2` is the name the client has sent since the walk-in was
+    // reworked; only the old name was listed, so walking into a duel counted as
+    // the player being at the keyboard.
     "refreshDarkPresence",
     "sendDarkDuelBlow",
-    "enterDarkDuel"
+    "enterDarkDuel",
+    "enterDarkDuelV2"
   ];
   function isBackgroundCall(name) {
     return BACKGROUND_CALLS.includes(name);
@@ -10075,6 +10101,8 @@ ${ty.variants.map(
       data.darkDuelBlows = rows(activeConnection.db.myDarkDuelBlows);
       data.darkDuelHaul = rows(activeConnection.db.myDarkDuelHaul);
       data.darkPresence = rows(activeConnection.db.myDarkPresence);
+    });
+    part("duelOpponentBoard", () => {
       data.duelOpponentBoard = rows(activeConnection.db.myDuelOpponentBoard);
     });
     return { type: "snapshot", data };
@@ -10232,11 +10260,13 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.myDarkDuelBlows, "darkDuel");
     observe(activeConnection, activeConnection.db.myDarkDuelHaul, "darkDuel");
     observe(activeConnection, activeConnection.db.myDarkPresence, "darkDuel");
-    observe(activeConnection, activeConnection.db.myDuelOpponentBoard, "darkDuel");
+    observe(activeConnection, activeConnection.db.myDuelOpponentBoard, "duelOpponentBoard");
     observe(activeConnection, activeConnection.db.myDuelLobby, "arenaDuels");
     observe(activeConnection, activeConnection.db.myDuelRecord, "arenaDuels");
     darkDuelSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (connection === activeConnection) publishDomains(activeConnection, ["darkDuel", "arenaDuels"]);
+      if (connection === activeConnection) {
+        publishDomains(activeConnection, ["darkDuel", "duelOpponentBoard", "arenaDuels"]);
+      }
     }).onError((_ctx, error) => {
       if (connection === activeConnection) {
         emit({ type: "error", command: "subscribeDarkDuel", message: String(error) });
@@ -10523,7 +10553,7 @@ ${ty.variants.map(
       const reducer = connection.reducers[name];
       if (typeof reducer !== "function") throw new Error(`Unknown reducer '${name}'.`);
       await reducer.call(connection.reducers, JSON.parse(argumentsJson));
-      emit({ type: "command_succeeded", command: name });
+      if (reportsSuccess(name)) emit({ type: "command_succeeded", command: name });
     } catch (error) {
       emit({ type: "error", command: name, message: String(error) });
     }
@@ -10565,7 +10595,8 @@ ${ty.variants.map(
     });
   }
   function drainEvents() {
-    return JSON.stringify(pendingEvents.splice(0, pendingEvents.length));
+    if (pendingEvents.length === 0) return "";
+    return JSON.stringify(mergeSnapshotRuns(pendingEvents.splice(0, pendingEvents.length)));
   }
   window.addEventListener("message", (event) => {
     if (event.origin !== window.location.origin || !loginPopup || event.source !== loginPopup) return;
