@@ -8503,6 +8503,12 @@ ${ty.variants.map(
     targetIndex: t.u32()
   };
 
+  // src/module_bindings/report_duel_board_break_reducer.ts
+  var report_duel_board_break_reducer_default = {
+    duelId: t.string(),
+    emptyCells: t.u32()
+  };
+
   // src/module_bindings/report_farm_pvp_top_out_reducer.ts
   var report_farm_pvp_top_out_reducer_default = {};
 
@@ -8693,7 +8699,15 @@ ${ty.variants.map(
     oneLook: t.string().name("one_look"),
     twoLook: t.string().name("two_look"),
     friendly: t.bool(),
-    ground: t.string()
+    ground: t.string(),
+    oneRunId: t.string().name("one_run_id"),
+    twoRunId: t.string().name("two_run_id"),
+    oneBlows: t.u32().name("one_blows"),
+    twoBlows: t.u32().name("two_blows"),
+    oneBoardBreaks: t.u32().name("one_board_breaks"),
+    twoBoardBreaks: t.u32().name("two_board_breaks"),
+    oneEntryHealth: t.u32().name("one_entry_health"),
+    twoEntryHealth: t.u32().name("two_entry_health")
   });
 
   // src/module_bindings/my_dark_duel_blows_table.ts
@@ -9187,6 +9201,7 @@ ${ty.variants.map(
     reducerSchema("refresh_dark_presence", refresh_dark_presence_reducer_default),
     reducerSchema("renew_play_session", renew_play_session_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
+    reducerSchema("report_duel_board_break", report_duel_board_break_reducer_default),
     reducerSchema("report_farm_pvp_top_out", report_farm_pvp_top_out_reducer_default),
     reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
     reducerSchema("sell_item", sell_item_reducer_default),
