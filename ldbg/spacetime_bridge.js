@@ -8403,6 +8403,13 @@ ${ty.variants.map(
     health: t.u32()
   };
 
+  // src/module_bindings/enter_dark_duel_v_2_reducer.ts
+  var enter_dark_duel_v_2_reducer_default = {
+    duelId: t.string(),
+    health: t.u32(),
+    encountersCleared: t.u32()
+  };
+
   // src/module_bindings/equip_inventory_item_reducer.ts
   var equip_inventory_item_reducer_default = {
     itemId: t.string()
@@ -9183,6 +9190,7 @@ ${ty.variants.map(
     reducerSchema("create_market_listing", create_market_listing_reducer_default),
     reducerSchema("delete_my_data", delete_my_data_reducer_default),
     reducerSchema("enter_dark_duel", enter_dark_duel_reducer_default),
+    reducerSchema("enter_dark_duel_v_2", enter_dark_duel_v_2_reducer_default),
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
     reducerSchema("equip_skill", equip_skill_reducer_default),
     reducerSchema("join_farm_dark_private", join_farm_dark_private_reducer_default),
