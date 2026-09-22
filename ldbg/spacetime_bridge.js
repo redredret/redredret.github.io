@@ -9455,7 +9455,7 @@ ${ty.variants.map(
     if (typeof expiresAtSeconds !== "number" || !Number.isFinite(expiresAtSeconds)) return false;
     return expiresAtSeconds <= nowSeconds - TOKEN_EXPIRY_SKEW_SECONDS;
   }
-  var EXPIRED_SESSION_MESSAGE = "Your sign-in expired. Open Account and sign in again to keep playing.";
+  var EXPIRED_SESSION_MESSAGE = "Your login expired. Open Account and log in again to keep playing.";
   var SUPERSEDABLE_CALLS = ["publishFarmBoard", "publishFarmPiece", "publishDuelBoard"];
   var QUIET_SUCCESS_CALLS = ["publishFarmBoard", "publishFarmPiece", "publishDuelBoard"];
   function reportsSuccess(name) {
@@ -9662,7 +9662,7 @@ ${ty.variants.map(
     try {
       sessionStorage.setItem(AUTH_PENDING_KEY, JSON.stringify(pending));
     } catch {
-      throw new Error("This browser blocked temporary sign-in storage. Allow session storage and try again.");
+      throw new Error("Your browser is blocking the storage that logging in needs. Allow site data for this page and try again.");
     }
   }
   function clearPendingLogin() {
@@ -9690,7 +9690,7 @@ ${ty.variants.map(
     stopLoginPopupMonitoring();
     clearPendingLogin();
     authBusy = false;
-    authError = "Sign-in was cancelled. Open Account to try again.";
+    authError = "Login was cancelled. Open Account to try again.";
     publishAuthStatus();
     emit({ type: "auth_error", message: authError });
   }
@@ -9739,7 +9739,7 @@ ${ty.variants.map(
       throw new Error(`SpacetimeAuth rejected the sign-in callback: ${String(detail)}`);
     }
     if (typeof tokenResponse.id_token !== "string" || !tokenResponse.id_token) {
-      throw new Error("SpacetimeAuth did not return an identity token.");
+      throw new Error("The login server did not send your account details. Try logging in again.");
     }
     const claims = decodeJwtClaims(tokenResponse.id_token);
     const claimsError = validateIdTokenClaims(claims, authConfig, pending.nonce);
@@ -9819,23 +9819,23 @@ ${ty.variants.map(
     publishAuthStatus();
     let authenticated = false;
     try {
-      if (!authAvailable()) throw new Error("SpacetimeAuth is not configured for this build.");
+      if (!authAvailable()) throw new Error("Logging in is not available in this version of the game.");
       const pending = readPendingLogin();
-      if (!pending) throw new Error("The temporary sign-in request was missing or unreadable.");
+      if (!pending) throw new Error("The login request was lost. Try logging in again.");
       if (!authCallbackTargetsRedirect(callbackUrl, pending.redirectUri)) {
-        throw new Error("The sign-in response returned to an unexpected page.");
+        throw new Error("The login came back to the wrong page. Try logging in again.");
       }
       if (Date.now() - pending.createdAt > AUTH_PENDING_MAX_AGE_MS) {
-        throw new Error("The sign-in request expired. Please try again.");
+        throw new Error("The login took too long and expired. Try again.");
       }
       const parameters = new URL(callbackUrl).searchParams;
       const callbackError = parameters.get("error");
       if (callbackError) throw new Error(parameters.get("error_description") || callbackError);
       if (parameters.get("state") !== pending.state) {
-        throw new Error("The sign-in response did not match this browser session.");
+        throw new Error("That login was started somewhere else. Try logging in again from this tab.");
       }
       const code = parameters.get("code");
-      if (!code) throw new Error("SpacetimeAuth returned no authorization code.");
+      if (!code) throw new Error("The login server did not finish logging you in. Try again.");
       await exchangeAuthorizationCode(code, pending);
       authenticated = true;
     } catch (error) {
@@ -9868,7 +9868,7 @@ ${ty.variants.map(
         return;
       }
       popup = window.open("about:blank", LOGIN_POPUP_NAME, POPUP_FEATURES);
-      if (!popup) throw new Error("The browser blocked the sign-in window. Allow popups for this game and try again.");
+      if (!popup) throw new Error("Your browser blocked the login window. Allow pop-ups for this site and try again.");
       loginPopup = popup;
       monitorLoginPopup(popup);
       await authInitialization;
@@ -9943,14 +9943,14 @@ ${ty.variants.map(
         return;
       }
       popup = window.open("about:blank", SESSION_RESET_POPUP_NAME, POPUP_FEATURES);
-      if (!popup) throw new Error("The browser blocked the session-reset window. Allow popups and try again.");
+      if (!popup) throw new Error("Your browser blocked the window that clears your saved login. Allow pop-ups for this site and try again.");
       sessionResetPopup = popup;
       monitorSessionResetPopup(popup);
       await authInitialization;
       if (!authAvailable() || !authConfig.endSessionEndpoint) {
-        throw new Error("SpacetimeAuth session reset is not configured for this build.");
+        throw new Error("Clearing the saved login is not available in this version of the game.");
       }
-      if (authMode === "account") throw new Error("Use Sign Out while an account is connected.");
+      if (authMode === "account") throw new Error("Log out first, then try again.");
       clearPendingLogin();
       authBusy = true;
       authError = "";
@@ -10310,7 +10310,7 @@ ${ty.variants.map(
       emit({
         type: "error",
         command: call.name,
-        message: "The server did not answer. Check your connection, or reload the page, and try again."
+        message: "The server didn't answer. Check your connection or reload the page, then try again."
       });
     }
     armPendingCallTimer();

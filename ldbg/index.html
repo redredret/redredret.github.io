@@ -266,7 +266,7 @@ body {
 		</script>
 		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
-<script src="auth_config.js?v=c99e9044942b"></script><script src="spacetime_bridge.js?v=4e7db205ca78"></script>
+<script src="auth_config.js?v=c99e9044942b"></script><script src="spacetime_bridge.js?v=c5513a00f9c8"></script>
 	</head>
 	<body>
 		<canvas id="canvas">
@@ -294,9 +294,9 @@ body {
 			<div id="status-notice"></div>
 		</div>
 
-		<script src="index.js?v=00977adece4f"></script>
+		<script src="index.js?v=bc9c317bad53"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index-00977adece4f","experimentalVK":false,"fileSizes":{"index-00977adece4f.pck":25534832,"index-00977adece4f.wasm":37695054},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index-bc9c317bad53","experimentalVK":false,"fileSizes":{"index-bc9c317bad53.pck":25536048,"index-bc9c317bad53.wasm":37695054},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
@@ -370,7 +370,7 @@ const engine = new Engine(GODOT_CONFIG);
 		} else if (typeof err === 'string') {
 			setStatusNotice(err);
 		} else {
-			setStatusNotice('An unknown error occurred.');
+			setStatusNotice('Something went wrong while loading. Reload the page to try again.');
 		}
 		setStatusMode('notice');
 		initializing = false;
@@ -408,7 +408,7 @@ const engine = new Engine(GODOT_CONFIG);
 			});
 		} else {
 			// Display the message as usual
-			const missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
+			const missingMsg = 'This browser can\'t run the game. It is missing:\n';
 			displayFailureNotice(missingMsg + missing.join('\n'));
 		}
 	} else {
