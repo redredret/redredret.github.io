@@ -9610,6 +9610,7 @@ ${ty.variants.map(
   var marketPriceSubscription = null;
   var marketHistorySubscription = null;
   var darkDuelSubscription = null;
+  var scopedSubscriptionConnection = null;
   var duelBoardSubscription = null;
   var playerCountsSubscription = null;
   var coreSubscriptionReady = false;
@@ -10007,12 +10008,8 @@ ${ty.variants.map(
       emit({ type: "auth_error", message: authError });
     }
   }
-  function disconnectBackend() {
-    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
-    reconnectTimer = null;
-    const previousConnection = connection;
-    connection = null;
-    coreSubscription = null;
+  function releaseScopedSubscriptions() {
+    scopedSubscriptionConnection = null;
     farmSubscription = null;
     marketSubscription = null;
     marketPriceSubscription = null;
@@ -10020,6 +10017,19 @@ ${ty.variants.map(
     darkDuelSubscription = null;
     duelBoardSubscription = null;
     playerCountsSubscription = null;
+  }
+  function adoptScopedSubscriptions(activeConnection) {
+    if (scopedSubscriptionConnection === activeConnection) return;
+    releaseScopedSubscriptions();
+    scopedSubscriptionConnection = activeConnection;
+  }
+  function disconnectBackend() {
+    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+    const previousConnection = connection;
+    connection = null;
+    coreSubscription = null;
+    releaseScopedSubscriptions();
     coreSubscriptionReady = false;
     connectionOpening = false;
     dirtySnapshotDomains.clear();
@@ -10210,7 +10220,9 @@ ${ty.variants.map(
     clearFarmProjection();
   }
   function ensureFarmSubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection || !farmScopeWanted() || farmSubscription) return;
+    if (!coreSubscriptionReady || connection !== activeConnection) return;
+    adoptScopedSubscriptions(activeConnection);
+    if (!farmScopeWanted() || farmSubscription) return;
     observe(activeConnection, activeConnection.db.myFarmPvpSession, "farmSession");
     observe(activeConnection, activeConnection.db.myFarmPvpMemberV2, "farmSession");
     observe(activeConnection, activeConnection.db.opponentFarmBoardsCompactV4, "farmBoard");
@@ -10251,6 +10263,7 @@ ${ty.variants.map(
   }
   function ensureDuelBoardSubscription(activeConnection) {
     if (!coreSubscriptionReady || connection !== activeConnection) return;
+    adoptScopedSubscriptions(activeConnection);
     if (!duelBoardScopeWanted() || duelBoardSubscription) return;
     observe(activeConnection, activeConnection.db.duelListings, "duelBoard");
     duelBoardSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
@@ -10273,7 +10286,9 @@ ${ty.variants.map(
     clearMarketProjection();
   }
   function ensureMarketSubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection || !marketScopeWanted() || marketSubscription) return;
+    if (!coreSubscriptionReady || connection !== activeConnection) return;
+    adoptScopedSubscriptions(activeConnection);
+    if (!marketScopeWanted() || marketSubscription) return;
     observe(activeConnection, activeConnection.db.marketListings, "market");
     marketSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection !== activeConnection || !marketSubscription || !marketScopeWanted()) return;
@@ -10284,7 +10299,9 @@ ${ty.variants.map(
     }).subscribe([tables.marketListings]);
   }
   function ensureMarketPriceSubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection || marketPriceSubscription) return;
+    if (!coreSubscriptionReady || connection !== activeConnection) return;
+    adoptScopedSubscriptions(activeConnection);
+    if (marketPriceSubscription) return;
     observe(activeConnection, activeConnection.db.marketPriceGuide, "marketPrices");
     marketPriceSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection === activeConnection) publishDomains(activeConnection, ["marketPrices"]);
@@ -10295,7 +10312,9 @@ ${ty.variants.map(
     }).subscribe([tables.marketPriceGuide]);
   }
   function ensureMarketHistorySubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection || marketHistorySubscription) return;
+    if (!coreSubscriptionReady || connection !== activeConnection) return;
+    adoptScopedSubscriptions(activeConnection);
+    if (marketHistorySubscription) return;
     observe(activeConnection, activeConnection.db.myMarketTransactions, "marketHistory");
     observe(activeConnection, activeConnection.db.myMarketSaleNotice, "marketHistory");
     marketHistorySubscription = activeConnection.subscriptionBuilder().onApplied(() => {
@@ -10305,7 +10324,9 @@ ${ty.variants.map(
     }).subscribe([tables.myMarketTransactions, tables.myMarketSaleNotice]);
   }
   function ensureDarkDuelSubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection || darkDuelSubscription) return;
+    if (!coreSubscriptionReady || connection !== activeConnection) return;
+    adoptScopedSubscriptions(activeConnection);
+    if (darkDuelSubscription) return;
     observe(activeConnection, activeConnection.db.myDarkDuel, "darkDuel");
     observe(activeConnection, activeConnection.db.myDarkDuelBlows, "darkDuel");
     observe(activeConnection, activeConnection.db.myDarkDuelHaul, "darkDuel");
@@ -10334,7 +10355,9 @@ ${ty.variants.map(
     ]);
   }
   function ensurePlayerCountsSubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection || playerCountsSubscription) return;
+    if (!coreSubscriptionReady || connection !== activeConnection) return;
+    adoptScopedSubscriptions(activeConnection);
+    if (playerCountsSubscription) return;
     observe(activeConnection, activeConnection.db.farmPlayerCounts, "playerCounts");
     observe(activeConnection, activeConnection.db.darkPlayerCount, "playerCounts");
     playerCountsSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
@@ -10451,12 +10474,14 @@ ${ty.variants.map(
       connection = null;
       coreSubscriptionReady = false;
       connectionOpening = false;
+      releaseScopedSubscriptions();
       resumeNeeded = authMode === "account";
       emit({ type: "disconnected", message: error ? String(error) : "" });
       scheduleBackendResume();
     }).onConnectError((_ctx, error) => {
       if (epoch === connectionEpoch) {
         connectionOpening = false;
+        releaseScopedSubscriptions();
         resumeNeeded = authMode === "account";
         emit({ type: "error", command: "connect", message: String(error) });
         scheduleBackendResume();
