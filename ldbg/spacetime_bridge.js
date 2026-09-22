@@ -8968,6 +8968,17 @@ ${ty.variants.map(
     hairColor: t.u32().name("hair_color")
   });
 
+  // src/module_bindings/my_sent_farm_pvp_attacks_table.ts
+  var my_sent_farm_pvp_attacks_table_default = t.row({
+    attackId: t.string().primaryKey().name("attack_id"),
+    recipient: t.identity(),
+    sender: t.identity(),
+    lines: t.u32(),
+    hole: t.u32(),
+    createdAt: t.timestamp().name("created_at"),
+    ordinal: t.u32()
+  });
+
   // src/module_bindings/my_skills_table.ts
   var my_skills_table_default = t.row({
     id: t.u64().primaryKey(),
@@ -9171,6 +9182,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_profile_preferences_table_default),
+    mySentFarmPvpAttacks: table({
+      name: "my_sent_farm_pvp_attacks",
+      indexes: [],
+      constraints: []
+    }, my_sent_farm_pvp_attacks_table_default),
     mySkills: table({
       name: "my_skills",
       indexes: [],
@@ -9287,6 +9303,7 @@ ${ty.variants.map(
     "my_market_transactions": "myMarketTransactions",
     "my_profile": "myProfile",
     "my_profile_preferences": "myProfilePreferences",
+    "my_sent_farm_pvp_attacks": "mySentFarmPvpAttacks",
     "my_skills": "mySkills",
     "my_upgrade_progress": "myUpgradeProgress",
     "my_upgrade_unlocks": "myUpgradeUnlocks",
@@ -10034,6 +10051,7 @@ ${ty.variants.map(
         farmOpponentPieces: [],
         farmPvpSession: null,
         farmPvpAttacks: [],
+        farmPvpSentAttacks: [],
         farmDarkHaul: [],
         marketListings: [],
         marketPrices: [],
@@ -10103,6 +10121,7 @@ ${ty.variants.map(
     });
     part("farmAttacks", () => {
       data.farmPvpAttacks = rows(activeConnection.db.myFarmPvpAttacks);
+      data.farmPvpSentAttacks = rows(activeConnection.db.mySentFarmPvpAttacks);
     });
     part("farmDarkHaul", () => {
       data.farmDarkHaul = rows(activeConnection.db.myFarmDarkHaul);
@@ -10176,6 +10195,7 @@ ${ty.variants.map(
         farmOpponentPieces: [],
         farmPvpSession: null,
         farmPvpAttacks: [],
+        farmPvpSentAttacks: [],
         farmDarkHaul: []
       }
     });
@@ -10196,6 +10216,7 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.opponentFarmBoardsCompactV4, "farmBoard");
     observe(activeConnection, activeConnection.db.opponentFarmPiecesCompactV3, "farmPiece");
     observe(activeConnection, activeConnection.db.myFarmPvpAttacks, "farmAttacks");
+    observe(activeConnection, activeConnection.db.mySentFarmPvpAttacks, "farmAttacks");
     observe(activeConnection, activeConnection.db.myFarmDarkHaul, "farmDarkHaul");
     farmSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection !== activeConnection || !farmSubscription || !farmScopeWanted()) return;
@@ -10209,6 +10230,7 @@ ${ty.variants.map(
       tables.opponentFarmBoardsCompactV4,
       tables.opponentFarmPiecesCompactV3,
       tables.myFarmPvpAttacks,
+      tables.mySentFarmPvpAttacks,
       tables.myFarmDarkHaul
     ]);
   }
