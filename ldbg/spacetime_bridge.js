@@ -8448,6 +8448,12 @@ ${ty.variants.map(
   // src/module_bindings/leave_farm_match_reducer.ts
   var leave_farm_match_reducer_default = {};
 
+  // src/module_bindings/open_dark_chest_reducer.ts
+  var open_dark_chest_reducer_default = {
+    runId: t.string(),
+    chestIndex: t.u32()
+  };
+
   // src/module_bindings/post_duel_listing_reducer.ts
   var post_duel_listing_reducer_default = {
     stake: t.string()
@@ -8675,6 +8681,17 @@ ${ty.variants.map(
     combatSkillsJson: t.string().name("combat_skills_json"),
     dungeonStoryVersion: t.u32().name("dungeon_story_version"),
     combatWeaponId: t.string().name("combat_weapon_id")
+  });
+
+  // src/module_bindings/my_dark_chest_claims_table.ts
+  var my_dark_chest_claims_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    runId: t.string().name("run_id"),
+    chestIndex: t.u32().name("chest_index"),
+    source: t.string(),
+    rowsJson: t.string().name("rows_json"),
+    claimedAt: t.timestamp().name("claimed_at")
   });
 
   // src/module_bindings/my_dark_duel_table.ts
@@ -9044,6 +9061,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_active_run_table_default),
+    myDarkChestClaims: table({
+      name: "my_dark_chest_claims",
+      indexes: [],
+      constraints: []
+    }, my_dark_chest_claims_table_default),
     myDarkDuel: table({
       name: "my_dark_duel",
       indexes: [],
@@ -9200,6 +9222,7 @@ ${ty.variants.map(
     reducerSchema("learn_skill", learn_skill_reducer_default),
     reducerSchema("leave_duel_listing", leave_duel_listing_reducer_default),
     reducerSchema("leave_farm_match", leave_farm_match_reducer_default),
+    reducerSchema("open_dark_chest", open_dark_chest_reducer_default),
     reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
     reducerSchema("publish_duel_board", publish_duel_board_reducer_default),
     reducerSchema("publish_farm_board", publish_farm_board_reducer_default),
@@ -9242,6 +9265,7 @@ ${ty.variants.map(
     "market_listings": "marketListings",
     "market_price_guide": "marketPriceGuide",
     "my_active_run": "myActiveRun",
+    "my_dark_chest_claims": "myDarkChestClaims",
     "my_dark_duel": "myDarkDuel",
     "my_dark_duel_blows": "myDarkDuelBlows",
     "my_dark_duel_haul": "myDarkDuelHaul",
@@ -10016,7 +10040,8 @@ ${ty.variants.map(
         marketTransactions: [],
         duelListings: [],
         duelLobby: null,
-        duelRecord: null
+        duelRecord: null,
+        darkChestClaims: []
       }
     };
   }
@@ -10101,6 +10126,9 @@ ${ty.variants.map(
       data.darkDuelBlows = rows(activeConnection.db.myDarkDuelBlows);
       data.darkDuelHaul = rows(activeConnection.db.myDarkDuelHaul);
       data.darkPresence = rows(activeConnection.db.myDarkPresence);
+    });
+    part("darkChests", () => {
+      data.darkChestClaims = rows(activeConnection.db.myDarkChestClaims);
     });
     part("duelOpponentBoard", () => {
       data.duelOpponentBoard = rows(activeConnection.db.myDuelOpponentBoard);
@@ -10263,9 +10291,10 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.myDuelOpponentBoard, "duelOpponentBoard");
     observe(activeConnection, activeConnection.db.myDuelLobby, "arenaDuels");
     observe(activeConnection, activeConnection.db.myDuelRecord, "arenaDuels");
+    observe(activeConnection, activeConnection.db.myDarkChestClaims, "darkChests");
     darkDuelSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection === activeConnection) {
-        publishDomains(activeConnection, ["darkDuel", "duelOpponentBoard", "arenaDuels"]);
+        publishDomains(activeConnection, ["darkDuel", "duelOpponentBoard", "arenaDuels", "darkChests"]);
       }
     }).onError((_ctx, error) => {
       if (connection === activeConnection) {
@@ -10278,7 +10307,8 @@ ${ty.variants.map(
       tables.myDarkPresence,
       tables.myDuelOpponentBoard,
       tables.myDuelLobby,
-      tables.myDuelRecord
+      tables.myDuelRecord,
+      tables.myDarkChestClaims
     ]);
   }
   function ensurePlayerCountsSubscription(activeConnection) {
@@ -10571,7 +10601,8 @@ ${ty.variants.map(
     "myFarmRecords",
     "myDarkDuel",
     "myDuelLobby",
-    "myDuelRecord"
+    "myDuelRecord",
+    "myDarkChestClaims"
   ];
   function snapshotDiagnostics() {
     const counts = {};
