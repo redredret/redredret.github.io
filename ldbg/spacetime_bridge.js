@@ -8341,6 +8341,11 @@ ${ty.variants.map(
     throughId: t.string()
   };
 
+  // src/module_bindings/acknowledge_task_chest_reducer.ts
+  var acknowledge_task_chest_reducer_default = {
+    chestId: t.string()
+  };
+
   // src/module_bindings/buy_market_listing_reducer.ts
   var buy_market_listing_reducer_default = {
     listingId: t.string(),
@@ -8367,6 +8372,16 @@ ${ty.variants.map(
   // src/module_bindings/claim_play_session_reducer.ts
   var claim_play_session_reducer_default = {
     force: t.bool()
+  };
+
+  // src/module_bindings/claim_quest_reducer.ts
+  var claim_quest_reducer_default = {
+    questId: t.string()
+  };
+
+  // src/module_bindings/claim_task_reducer.ts
+  var claim_task_reducer_default = {
+    taskRowId: t.string()
   };
 
   // src/module_bindings/consume_item_reducer.ts
@@ -8534,6 +8549,9 @@ ${ty.variants.map(
     encountersCleared: t.u32(),
     health: t.u32()
   };
+
+  // src/module_bindings/refresh_my_tasks_reducer.ts
+  var refresh_my_tasks_reducer_default = {};
 
   // src/module_bindings/renew_play_session_reducer.ts
   var renew_play_session_reducer_default = {};
@@ -9017,6 +9035,14 @@ ${ty.variants.map(
     hairColor: t.u32().name("hair_color")
   });
 
+  // src/module_bindings/my_quests_table.ts
+  var my_quests_table_default = t.row({
+    questId: t.string().name("quest_id"),
+    progress: t.u32(),
+    target: t.u32(),
+    state: t.string()
+  });
+
   // src/module_bindings/my_sent_farm_pvp_attacks_table.ts
   var my_sent_farm_pvp_attacks_table_default = t.row({
     attackId: t.string().primaryKey().name("attack_id"),
@@ -9035,6 +9061,31 @@ ${ty.variants.map(
     skillId: t.string().name("skill_id"),
     level: t.u32(),
     equippedSlot: t.option(t.u32()).name("equipped_slot")
+  });
+
+  // src/module_bindings/my_task_chests_table.ts
+  var my_task_chests_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    cadence: t.string(),
+    taskId: t.string().name("task_id"),
+    tier: t.u32(),
+    rowsJson: t.string().name("rows_json"),
+    openedAt: t.timestamp().name("opened_at")
+  });
+
+  // src/module_bindings/my_tasks_table.ts
+  var my_tasks_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    cadence: t.string(),
+    period: t.u32(),
+    slot: t.u32(),
+    taskId: t.string().name("task_id"),
+    progress: t.u32(),
+    target: t.u32(),
+    claimed: t.bool(),
+    assignedAt: t.timestamp().name("assigned_at")
   });
 
   // src/module_bindings/my_upgrade_progress_table.ts
@@ -9087,6 +9138,21 @@ ${ty.variants.map(
     activeX: t.i32().name("active_x"),
     activeY: t.i32().name("active_y"),
     activeRotation: t.u32().name("active_rotation")
+  });
+
+  // src/module_bindings/quest_catalog_table.ts
+  var quest_catalog_table_default = t.row({
+    kind: t.string(),
+    id: t.string(),
+    parent: t.string(),
+    category: t.string(),
+    sortOrder: t.u32().name("sort_order"),
+    title: t.string(),
+    description: t.string(),
+    line: t.string(),
+    level: t.u32(),
+    target: t.u32(),
+    rewardsJson: t.string().name("rewards_json")
   });
 
   // src/module_bindings/index.ts
@@ -9236,6 +9302,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_profile_preferences_table_default),
+    myQuests: table({
+      name: "my_quests",
+      indexes: [],
+      constraints: []
+    }, my_quests_table_default),
     mySentFarmPvpAttacks: table({
       name: "my_sent_farm_pvp_attacks",
       indexes: [],
@@ -9246,6 +9317,16 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_skills_table_default),
+    myTaskChests: table({
+      name: "my_task_chests",
+      indexes: [],
+      constraints: []
+    }, my_task_chests_table_default),
+    myTasks: table({
+      name: "my_tasks",
+      indexes: [],
+      constraints: []
+    }, my_tasks_table_default),
     myUpgradeProgress: table({
       name: "my_upgrade_progress",
       indexes: [],
@@ -9265,16 +9346,24 @@ ${ty.variants.map(
       name: "opponent_farm_pieces_compact_v3",
       indexes: [],
       constraints: []
-    }, opponent_farm_pieces_compact_v_3_table_default)
+    }, opponent_farm_pieces_compact_v_3_table_default),
+    questCatalog: table({
+      name: "quest_catalog",
+      indexes: [],
+      constraints: []
+    }, quest_catalog_table_default)
   });
   var reducersSchema = reducers(
     reducerSchema("abandon_run", abandon_run_reducer_default),
     reducerSchema("acknowledge_market_sales", acknowledge_market_sales_reducer_default),
+    reducerSchema("acknowledge_task_chest", acknowledge_task_chest_reducer_default),
     reducerSchema("buy_market_listing", buy_market_listing_reducer_default),
     reducerSchema("buy_shop_item", buy_shop_item_reducer_default),
     reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
     reducerSchema("challenge_duel_listing", challenge_duel_listing_reducer_default),
     reducerSchema("claim_play_session", claim_play_session_reducer_default),
+    reducerSchema("claim_quest", claim_quest_reducer_default),
+    reducerSchema("claim_task", claim_task_reducer_default),
     reducerSchema("consume_item", consume_item_reducer_default),
     reducerSchema("craft_item", craft_item_reducer_default),
     reducerSchema("create_farm_dark_private", create_farm_dark_private_reducer_default),
@@ -9304,6 +9393,7 @@ ${ty.variants.map(
     reducerSchema("purchase_build_upgrade", purchase_build_upgrade_reducer_default),
     reducerSchema("ready_farm_pvp_round", ready_farm_pvp_round_reducer_default),
     reducerSchema("refresh_dark_presence", refresh_dark_presence_reducer_default),
+    reducerSchema("refresh_my_tasks", refresh_my_tasks_reducer_default),
     reducerSchema("renew_play_session", renew_play_session_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
     reducerSchema("report_duel_board_break", report_duel_board_break_reducer_default),
@@ -9363,12 +9453,16 @@ ${ty.variants.map(
     "my_market_transactions": "myMarketTransactions",
     "my_profile": "myProfile",
     "my_profile_preferences": "myProfilePreferences",
+    "my_quests": "myQuests",
     "my_sent_farm_pvp_attacks": "mySentFarmPvpAttacks",
     "my_skills": "mySkills",
+    "my_task_chests": "myTaskChests",
+    "my_tasks": "myTasks",
     "my_upgrade_progress": "myUpgradeProgress",
     "my_upgrade_unlocks": "myUpgradeUnlocks",
     "opponent_farm_boards_compact_v4": "opponentFarmBoardsCompactV4",
-    "opponent_farm_pieces_compact_v3": "opponentFarmPiecesCompactV3"
+    "opponent_farm_pieces_compact_v3": "opponentFarmPiecesCompactV3",
+    "quest_catalog": "questCatalog"
   };
   function __withTableAccessorAliases(target, freeze = false) {
     const out = Object.create(Object.getPrototypeOf(target));
@@ -9606,7 +9700,11 @@ ${ty.variants.map(
     "enterDarkDuel",
     "enterDarkDuelV2",
     "enterDarkDuelV3",
-    "enterDarkDuelV4"
+    "enterDarkDuelV4",
+    // The client deals its tasks on connect and at each reset, and dismisses a
+    // chest's reveal when it closes: neither is the player doing anything.
+    "refreshMyTasks",
+    "acknowledgeTaskChest"
   ];
   function isBackgroundCall(name) {
     return BACKGROUND_CALLS.includes(name);
@@ -9676,6 +9774,7 @@ ${ty.variants.map(
   var scopedSubscriptionConnection = null;
   var duelBoardSubscription = null;
   var playerCountsSubscription = null;
+  var questSubscription = null;
   var coreSubscriptionReady = false;
   var connectionOpening = false;
   var resumeNeeded = false;
@@ -10080,6 +10179,7 @@ ${ty.variants.map(
     darkDuelSubscription = null;
     duelBoardSubscription = null;
     playerCountsSubscription = null;
+    questSubscription = null;
   }
   function adoptScopedSubscriptions(activeConnection) {
     if (scopedSubscriptionConnection === activeConnection) return;
@@ -10133,7 +10233,11 @@ ${ty.variants.map(
         duelListings: [],
         duelLobby: null,
         duelRecord: null,
-        darkChestClaims: []
+        darkChestClaims: [],
+        questCatalog: [],
+        tasks: [],
+        taskChests: [],
+        questProgress: []
       }
     };
   }
@@ -10226,6 +10330,12 @@ ${ty.variants.map(
     });
     part("duelOpponentBoard", () => {
       data.duelOpponentBoard = rows(activeConnection.db.myDuelOpponentBoard);
+    });
+    part("quests", () => {
+      data.questCatalog = rows(activeConnection.db.questCatalog);
+      data.tasks = rows(activeConnection.db.myTasks);
+      data.taskChests = rows(activeConnection.db.myTaskChests);
+      data.questProgress = rows(activeConnection.db.myQuests);
     });
     return { type: "snapshot", data };
   }
@@ -10431,6 +10541,23 @@ ${ty.variants.map(
       console.warn("LDBG: player counts are unavailable:", error);
     }).subscribe([tables.farmPlayerCounts, tables.darkPlayerCount]);
   }
+  function ensureQuestSubscription(activeConnection) {
+    if (!coreSubscriptionReady || connection !== activeConnection) return;
+    adoptScopedSubscriptions(activeConnection);
+    if (questSubscription) return;
+    observe(activeConnection, activeConnection.db.questCatalog, "quests");
+    observe(activeConnection, activeConnection.db.myTasks, "quests");
+    observe(activeConnection, activeConnection.db.myTaskChests, "quests");
+    observe(activeConnection, activeConnection.db.myQuests, "quests");
+    questSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (connection === activeConnection) {
+        publishDomains(activeConnection, ["quests"]);
+        emit({ type: "subscription_scope_ready", scope: "quests" });
+      }
+    }).onError((_ctx, error) => {
+      if (connection === activeConnection) emit({ type: "error", command: "subscribeQuests", message: String(error) });
+    }).subscribe([tables.questCatalog, tables.myTasks, tables.myTaskChests, tables.myQuests]);
+  }
   function flushPendingReducerCalls() {
     if (!connection || !coreSubscriptionReady) return;
     clearPendingCallTimer();
@@ -10518,6 +10645,7 @@ ${ty.variants.map(
         ensureDarkDuelSubscription(conn);
         ensureDuelBoardSubscription(conn);
         ensurePlayerCountsSubscription(conn);
+        ensureQuestSubscription(conn);
         flushPendingReducerCalls();
       }).onError((_ctx, error) => {
         if (epoch === connectionEpoch) emit({ type: "error", command: "subscribe", message: String(error) });
