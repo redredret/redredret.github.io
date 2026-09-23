@@ -8516,6 +8516,16 @@ ${ty.variants.map(
     sequence: t.u32()
   };
 
+  // src/module_bindings/publish_duel_piece_reducer.ts
+  var publish_duel_piece_reducer_default = {
+    duelId: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    sequence: t.u32()
+  };
+
   // src/module_bindings/publish_farm_board_reducer.ts
   var publish_farm_board_reducer_default = {
     cells: t.string(),
@@ -8882,6 +8892,18 @@ ${ty.variants.map(
     updatedAt: t.timestamp().name("updated_at")
   });
 
+  // src/module_bindings/my_duel_opponent_piece_table.ts
+  var my_duel_opponent_piece_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    duelId: t.string().name("duel_id"),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    sequence: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
   // src/module_bindings/my_duel_record_table.ts
   var my_duel_record_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -9240,6 +9262,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_duel_opponent_board_table_default),
+    myDuelOpponentPiece: table({
+      name: "my_duel_opponent_piece",
+      indexes: [],
+      constraints: []
+    }, my_duel_opponent_piece_table_default),
     myDuelRecord: table({
       name: "my_duel_record",
       indexes: [],
@@ -9412,6 +9439,7 @@ ${ty.variants.map(
     reducerSchema("open_dark_chest", open_dark_chest_reducer_default),
     reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
     reducerSchema("publish_duel_board", publish_duel_board_reducer_default),
+    reducerSchema("publish_duel_piece", publish_duel_piece_reducer_default),
     reducerSchema("publish_farm_board", publish_farm_board_reducer_default),
     reducerSchema("publish_farm_piece", publish_farm_piece_reducer_default),
     reducerSchema("purchase_build_upgrade", purchase_build_upgrade_reducer_default),
@@ -9462,6 +9490,7 @@ ${ty.variants.map(
     "my_dark_presence": "myDarkPresence",
     "my_duel_lobby": "myDuelLobby",
     "my_duel_opponent_board": "myDuelOpponentBoard",
+    "my_duel_opponent_piece": "myDuelOpponentPiece",
     "my_duel_record": "myDuelRecord",
     "my_dungeon_progress": "myDungeonProgress",
     "my_endless_records": "myEndlessRecords",
@@ -9677,11 +9706,12 @@ ${ty.variants.map(
     return expiresAtSeconds <= nowSeconds - TOKEN_EXPIRY_SKEW_SECONDS;
   }
   var EXPIRED_SESSION_MESSAGE = "Your login expired. Open Account and log in again to keep playing.";
-  var SUPERSEDABLE_CALLS = ["publishFarmBoard", "publishFarmPiece", "publishDuelBoard"];
+  var SUPERSEDABLE_CALLS = ["publishFarmBoard", "publishFarmPiece", "publishDuelBoard", "publishDuelPiece"];
   var QUIET_SUCCESS_CALLS = [
     "publishFarmBoard",
     "publishFarmPiece",
     "publishDuelBoard",
+    "publishDuelPiece",
     "sendFarmPvpAttack",
     "sendDarkDuelBlow",
     "refreshDarkPresence"
@@ -10404,6 +10434,9 @@ ${ty.variants.map(
     part("duelOpponentBoard", () => {
       data.duelOpponentBoard = rows(activeConnection.db.myDuelOpponentBoard);
     });
+    part("duelOpponentPiece", () => {
+      data.duelOpponentPiece = rows(activeConnection.db.myDuelOpponentPiece);
+    });
     part("quests", () => {
       data.questCatalog = rows(activeConnection.db.questCatalog);
       data.tasks = rows(activeConnection.db.myTasks);
@@ -10582,12 +10615,20 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.myDarkDuelHaul, "darkDuel");
     observe(activeConnection, activeConnection.db.myDarkPresence, "darkPresence");
     observe(activeConnection, activeConnection.db.myDuelOpponentBoard, "duelOpponentBoard");
+    observe(activeConnection, activeConnection.db.myDuelOpponentPiece, "duelOpponentPiece");
     observe(activeConnection, activeConnection.db.myDuelLobby, "arenaDuels");
     observe(activeConnection, activeConnection.db.myDuelRecord, "arenaDuels");
     observe(activeConnection, activeConnection.db.myDarkChestClaims, "darkChests");
     darkDuelSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection === activeConnection) {
-        publishDomains(activeConnection, ["darkDuel", "darkPresence", "duelOpponentBoard", "arenaDuels", "darkChests"]);
+        publishDomains(activeConnection, [
+          "darkDuel",
+          "darkPresence",
+          "duelOpponentBoard",
+          "duelOpponentPiece",
+          "arenaDuels",
+          "darkChests"
+        ]);
       }
     }).onError((_ctx, error) => {
       if (connection === activeConnection) {
@@ -10599,6 +10640,7 @@ ${ty.variants.map(
       tables.myDarkDuelHaul,
       tables.myDarkPresence,
       tables.myDuelOpponentBoard,
+      tables.myDuelOpponentPiece,
       tables.myDuelLobby,
       tables.myDuelRecord,
       tables.myDarkChestClaims
