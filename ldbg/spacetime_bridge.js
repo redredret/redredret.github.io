@@ -9678,7 +9678,14 @@ ${ty.variants.map(
   }
   var EXPIRED_SESSION_MESSAGE = "Your login expired. Open Account and log in again to keep playing.";
   var SUPERSEDABLE_CALLS = ["publishFarmBoard", "publishFarmPiece", "publishDuelBoard"];
-  var QUIET_SUCCESS_CALLS = ["publishFarmBoard", "publishFarmPiece", "publishDuelBoard"];
+  var QUIET_SUCCESS_CALLS = [
+    "publishFarmBoard",
+    "publishFarmPiece",
+    "publishDuelBoard",
+    "sendFarmPvpAttack",
+    "sendDarkDuelBlow",
+    "refreshDarkPresence"
+  ];
   function reportsSuccess(name) {
     return !QUIET_SUCCESS_CALLS.includes(name);
   }
@@ -9762,6 +9769,36 @@ ${ty.variants.map(
       opponentFarmPiece: null
     };
   }
+  function boardSignature(row) {
+    return [
+      row.cells,
+      row.score,
+      row.linesCleared,
+      row.toppedOut,
+      row.activeKind,
+      row.activeX,
+      row.activeY,
+      row.activeRotation,
+      row.alive,
+      row.placement,
+      row.ready
+    ].join("|");
+  }
+  function posesSurvivingBoardPatch(seen, boards, pieces) {
+    const unchanged = /* @__PURE__ */ new Set();
+    const present = /* @__PURE__ */ new Set();
+    for (const board of boards) {
+      const owner = String(board.owner ?? "");
+      present.add(owner);
+      const signature = boardSignature(board);
+      if (seen.get(owner) === signature) unchanged.add(owner);
+      seen.set(owner, signature);
+    }
+    for (const owner of Array.from(seen.keys())) {
+      if (!present.has(owner)) seen.delete(owner);
+    }
+    return pieces.filter((piece) => unchanged.has(String(piece.owner ?? "")));
+  }
 
   // src/row_json.ts
   function jsonSafe(value) {
@@ -9795,6 +9832,7 @@ ${ty.variants.map(
   var connectionEpoch = 0;
   var coreSubscription = null;
   var farmSubscription = null;
+  var farmBoardsSeen = /* @__PURE__ */ new Map();
   var marketSubscription = null;
   var marketPriceSubscription = null;
   var marketHistorySubscription = null;
@@ -10319,7 +10357,11 @@ ${ty.variants.map(
     part("farmBoard", () => {
       const opponents = rows(activeConnection.db.opponentFarmBoardsCompactV4);
       data.farmOpponents = opponents;
-      data.farmOpponentPieces = [];
+      data.farmOpponentPieces = posesSurvivingBoardPatch(
+        farmBoardsSeen,
+        opponents,
+        rows(activeConnection.db.opponentFarmPiecesCompactV3)
+      );
       Object.assign(data, farmBoardDomainPatch(opponents[0]));
     });
     part("farmPiece", () => {
@@ -10352,6 +10394,8 @@ ${ty.variants.map(
       data.darkDuel = rows(activeConnection.db.myDarkDuel);
       data.darkDuelBlows = rows(activeConnection.db.myDarkDuelBlows);
       data.darkDuelHaul = rows(activeConnection.db.myDarkDuelHaul);
+    });
+    part("darkPresence", () => {
       data.darkPresence = rows(activeConnection.db.myDarkPresence);
     });
     part("darkChests", () => {
@@ -10421,6 +10465,7 @@ ${ty.variants.map(
   function stopFarmSubscription() {
     const previous = farmSubscription;
     farmSubscription = null;
+    farmBoardsSeen.clear();
     if (previous && typeof previous.unsubscribe === "function") previous.unsubscribe();
     clearFarmProjection();
   }
@@ -10535,14 +10580,14 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.myDarkDuel, "darkDuel");
     observe(activeConnection, activeConnection.db.myDarkDuelBlows, "darkDuel");
     observe(activeConnection, activeConnection.db.myDarkDuelHaul, "darkDuel");
-    observe(activeConnection, activeConnection.db.myDarkPresence, "darkDuel");
+    observe(activeConnection, activeConnection.db.myDarkPresence, "darkPresence");
     observe(activeConnection, activeConnection.db.myDuelOpponentBoard, "duelOpponentBoard");
     observe(activeConnection, activeConnection.db.myDuelLobby, "arenaDuels");
     observe(activeConnection, activeConnection.db.myDuelRecord, "arenaDuels");
     observe(activeConnection, activeConnection.db.myDarkChestClaims, "darkChests");
     darkDuelSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection === activeConnection) {
-        publishDomains(activeConnection, ["darkDuel", "duelOpponentBoard", "arenaDuels", "darkChests"]);
+        publishDomains(activeConnection, ["darkDuel", "darkPresence", "duelOpponentBoard", "arenaDuels", "darkChests"]);
       }
     }).onError((_ctx, error) => {
       if (connection === activeConnection) {
