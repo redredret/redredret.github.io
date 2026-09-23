@@ -8491,6 +8491,9 @@ ${ty.variants.map(
   // src/module_bindings/leave_farm_match_reducer.ts
   var leave_farm_match_reducer_default = {};
 
+  // src/module_bindings/mark_tasks_seen_reducer.ts
+  var mark_tasks_seen_reducer_default = {};
+
   // src/module_bindings/open_dark_chest_reducer.ts
   var open_dark_chest_reducer_default = {
     runId: t.string(),
@@ -8578,6 +8581,11 @@ ${ty.variants.map(
     command: t.string(),
     message: t.string(),
     detailsJson: t.string()
+  };
+
+  // src/module_bindings/reroll_task_reducer.ts
+  var reroll_task_reducer_default = {
+    taskRowId: t.string()
   };
 
   // src/module_bindings/sell_item_reducer.ts
@@ -9074,6 +9082,16 @@ ${ty.variants.map(
     openedAt: t.timestamp().name("opened_at")
   });
 
+  // src/module_bindings/my_task_state_table.ts
+  var my_task_state_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    dailySeen: t.u32().name("daily_seen"),
+    weeklySeen: t.u32().name("weekly_seen"),
+    dailyReroll: t.u32().name("daily_reroll"),
+    weeklyReroll: t.u32().name("weekly_reroll"),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
   // src/module_bindings/my_tasks_table.ts
   var my_tasks_table_default = t.row({
     id: t.u64().primaryKey(),
@@ -9322,6 +9340,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_task_chests_table_default),
+    myTaskState: table({
+      name: "my_task_state",
+      indexes: [],
+      constraints: []
+    }, my_task_state_table_default),
     myTasks: table({
       name: "my_tasks",
       indexes: [],
@@ -9385,6 +9408,7 @@ ${ty.variants.map(
     reducerSchema("learn_skill", learn_skill_reducer_default),
     reducerSchema("leave_duel_listing", leave_duel_listing_reducer_default),
     reducerSchema("leave_farm_match", leave_farm_match_reducer_default),
+    reducerSchema("mark_tasks_seen", mark_tasks_seen_reducer_default),
     reducerSchema("open_dark_chest", open_dark_chest_reducer_default),
     reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
     reducerSchema("publish_duel_board", publish_duel_board_reducer_default),
@@ -9399,6 +9423,7 @@ ${ty.variants.map(
     reducerSchema("report_duel_board_break", report_duel_board_break_reducer_default),
     reducerSchema("report_farm_pvp_top_out", report_farm_pvp_top_out_reducer_default),
     reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
+    reducerSchema("reroll_task", reroll_task_reducer_default),
     reducerSchema("sell_item", sell_item_reducer_default),
     reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
@@ -9457,6 +9482,7 @@ ${ty.variants.map(
     "my_sent_farm_pvp_attacks": "mySentFarmPvpAttacks",
     "my_skills": "mySkills",
     "my_task_chests": "myTaskChests",
+    "my_task_state": "myTaskState",
     "my_tasks": "myTasks",
     "my_upgrade_progress": "myUpgradeProgress",
     "my_upgrade_unlocks": "myUpgradeUnlocks",
@@ -9701,10 +9727,12 @@ ${ty.variants.map(
     "enterDarkDuelV2",
     "enterDarkDuelV3",
     "enterDarkDuelV4",
-    // The client deals its tasks on connect and at each reset, and dismisses a
-    // chest's reveal when it closes: neither is the player doing anything.
+    // The client deals its tasks on connect and at each reset, dismisses a chest's
+    // reveal when it closes, and marks tasks seen when the view shows them: none
+    // of it is the player doing anything.
     "refreshMyTasks",
-    "acknowledgeTaskChest"
+    "acknowledgeTaskChest",
+    "markTasksSeen"
   ];
   function isBackgroundCall(name) {
     return BACKGROUND_CALLS.includes(name);
@@ -10237,7 +10265,8 @@ ${ty.variants.map(
         questCatalog: [],
         tasks: [],
         taskChests: [],
-        questProgress: []
+        questProgress: [],
+        taskState: null
       }
     };
   }
@@ -10336,6 +10365,7 @@ ${ty.variants.map(
       data.tasks = rows(activeConnection.db.myTasks);
       data.taskChests = rows(activeConnection.db.myTaskChests);
       data.questProgress = rows(activeConnection.db.myQuests);
+      data.taskState = rows(activeConnection.db.myTaskState)[0] ?? null;
     });
     return { type: "snapshot", data };
   }
@@ -10549,6 +10579,7 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.myTasks, "quests");
     observe(activeConnection, activeConnection.db.myTaskChests, "quests");
     observe(activeConnection, activeConnection.db.myQuests, "quests");
+    observe(activeConnection, activeConnection.db.myTaskState, "quests");
     questSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection === activeConnection) {
         publishDomains(activeConnection, ["quests"]);
@@ -10556,7 +10587,13 @@ ${ty.variants.map(
       }
     }).onError((_ctx, error) => {
       if (connection === activeConnection) emit({ type: "error", command: "subscribeQuests", message: String(error) });
-    }).subscribe([tables.questCatalog, tables.myTasks, tables.myTaskChests, tables.myQuests]);
+    }).subscribe([
+      tables.questCatalog,
+      tables.myTasks,
+      tables.myTaskChests,
+      tables.myQuests,
+      tables.myTaskState
+    ]);
   }
   function flushPendingReducerCalls() {
     if (!connection || !coreSubscriptionReady) return;
