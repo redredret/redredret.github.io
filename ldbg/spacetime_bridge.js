@@ -8418,6 +8418,15 @@ ${ty.variants.map(
     potions: t.u32()
   };
 
+  // src/module_bindings/enter_dark_duel_v_4_reducer.ts
+  var enter_dark_duel_v_4_reducer_default = {
+    duelId: t.string(),
+    health: t.u32(),
+    encountersCleared: t.u32(),
+    potions: t.u32(),
+    necklace: t.u32()
+  };
+
   // src/module_bindings/equip_food_reducer.ts
   var equip_food_reducer_default = {
     itemId: t.string()
@@ -8704,7 +8713,8 @@ ${ty.variants.map(
     dungeonStoryVersion: t.u32().name("dungeon_story_version"),
     combatWeaponId: t.string().name("combat_weapon_id"),
     foodItemId: t.string().name("food_item_id"),
-    foodQuantity: t.u32().name("food_quantity")
+    foodQuantity: t.u32().name("food_quantity"),
+    necklaceItemId: t.string().name("necklace_item_id")
   });
 
   // src/module_bindings/my_dark_chest_claims_table.ts
@@ -8759,7 +8769,11 @@ ${ty.variants.map(
     onePotions: t.u32().name("one_potions"),
     twoPotions: t.u32().name("two_potions"),
     oneEntryPotions: t.u32().name("one_entry_potions"),
-    twoEntryPotions: t.u32().name("two_entry_potions")
+    twoEntryPotions: t.u32().name("two_entry_potions"),
+    oneNecklace: t.u32().name("one_necklace"),
+    twoNecklace: t.u32().name("two_necklace"),
+    oneEntryNecklace: t.u32().name("one_entry_necklace"),
+    twoEntryNecklace: t.u32().name("two_entry_necklace")
   });
 
   // src/module_bindings/my_dark_duel_blows_table.ts
@@ -9270,6 +9284,7 @@ ${ty.variants.map(
     reducerSchema("enter_dark_duel", enter_dark_duel_reducer_default),
     reducerSchema("enter_dark_duel_v_2", enter_dark_duel_v_2_reducer_default),
     reducerSchema("enter_dark_duel_v_3", enter_dark_duel_v_3_reducer_default),
+    reducerSchema("enter_dark_duel_v_4", enter_dark_duel_v_4_reducer_default),
     reducerSchema("equip_food", equip_food_reducer_default),
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
     reducerSchema("equip_inventory_item_to_slot", equip_inventory_item_to_slot_reducer_default),
@@ -9582,13 +9597,16 @@ ${ty.variants.map(
     "reportRunSubmissionProblem",
     "acknowledgeMarketSales",
     // A Dark run announces itself between encounters and swings on every clear.
-    // `enterDarkDuelV2` is the name the client has sent since the walk-in was
-    // reworked; only the old name was listed, so walking into a duel counted as
-    // the player being at the keyboard.
+    // Every name the walk-in has had. Only the old one was listed once, so
+    // walking into a duel counted as the player being at the keyboard -- and then
+    // V3 (the food slot) went out unlisted and did it again. A new walk-in name
+    // goes on this list the day it is sent.
     "refreshDarkPresence",
     "sendDarkDuelBlow",
     "enterDarkDuel",
-    "enterDarkDuelV2"
+    "enterDarkDuelV2",
+    "enterDarkDuelV3",
+    "enterDarkDuelV4"
   ];
   function isBackgroundCall(name) {
     return BACKGROUND_CALLS.includes(name);
