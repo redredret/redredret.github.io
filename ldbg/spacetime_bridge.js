@@ -8410,9 +8410,28 @@ ${ty.variants.map(
     encountersCleared: t.u32()
   };
 
+  // src/module_bindings/enter_dark_duel_v_3_reducer.ts
+  var enter_dark_duel_v_3_reducer_default = {
+    duelId: t.string(),
+    health: t.u32(),
+    encountersCleared: t.u32(),
+    potions: t.u32()
+  };
+
+  // src/module_bindings/equip_food_reducer.ts
+  var equip_food_reducer_default = {
+    itemId: t.string()
+  };
+
   // src/module_bindings/equip_inventory_item_reducer.ts
   var equip_inventory_item_reducer_default = {
     itemId: t.string()
+  };
+
+  // src/module_bindings/equip_inventory_item_to_slot_reducer.ts
+  var equip_inventory_item_to_slot_reducer_default = {
+    itemId: t.string(),
+    slot: t.string()
   };
 
   // src/module_bindings/equip_skill_reducer.ts
@@ -8607,6 +8626,9 @@ ${ty.variants.map(
     trace: t.string()
   };
 
+  // src/module_bindings/unequip_food_reducer.ts
+  var unequip_food_reducer_default = {};
+
   // src/module_bindings/unequip_inventory_item_reducer.ts
   var unequip_inventory_item_reducer_default = {
     slot: t.string()
@@ -8680,7 +8702,9 @@ ${ty.variants.map(
     combatWeaponType: t.string().name("combat_weapon_type"),
     combatSkillsJson: t.string().name("combat_skills_json"),
     dungeonStoryVersion: t.u32().name("dungeon_story_version"),
-    combatWeaponId: t.string().name("combat_weapon_id")
+    combatWeaponId: t.string().name("combat_weapon_id"),
+    foodItemId: t.string().name("food_item_id"),
+    foodQuantity: t.u32().name("food_quantity")
   });
 
   // src/module_bindings/my_dark_chest_claims_table.ts
@@ -8731,7 +8755,11 @@ ${ty.variants.map(
     oneBoardBreaks: t.u32().name("one_board_breaks"),
     twoBoardBreaks: t.u32().name("two_board_breaks"),
     oneEntryHealth: t.u32().name("one_entry_health"),
-    twoEntryHealth: t.u32().name("two_entry_health")
+    twoEntryHealth: t.u32().name("two_entry_health"),
+    onePotions: t.u32().name("one_potions"),
+    twoPotions: t.u32().name("two_potions"),
+    oneEntryPotions: t.u32().name("one_entry_potions"),
+    twoEntryPotions: t.u32().name("two_entry_potions")
   });
 
   // src/module_bindings/my_dark_duel_blows_table.ts
@@ -8847,6 +8875,13 @@ ${ty.variants.map(
     owner: t.identity(),
     slot: t.string(),
     itemId: t.string().name("item_id")
+  });
+
+  // src/module_bindings/my_equipped_food_table.ts
+  var my_equipped_food_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32()
   });
 
   // src/module_bindings/my_farm_dark_haul_table.ts
@@ -9127,6 +9162,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_equipment_table_default),
+    myEquippedFood: table({
+      name: "my_equipped_food",
+      indexes: [],
+      constraints: []
+    }, my_equipped_food_table_default),
     myFarmDarkHaul: table({
       name: "my_farm_dark_haul",
       indexes: [],
@@ -9229,7 +9269,10 @@ ${ty.variants.map(
     reducerSchema("delete_my_data", delete_my_data_reducer_default),
     reducerSchema("enter_dark_duel", enter_dark_duel_reducer_default),
     reducerSchema("enter_dark_duel_v_2", enter_dark_duel_v_2_reducer_default),
+    reducerSchema("enter_dark_duel_v_3", enter_dark_duel_v_3_reducer_default),
+    reducerSchema("equip_food", equip_food_reducer_default),
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
+    reducerSchema("equip_inventory_item_to_slot", equip_inventory_item_to_slot_reducer_default),
     reducerSchema("equip_skill", equip_skill_reducer_default),
     reducerSchema("join_farm_dark_private", join_farm_dark_private_reducer_default),
     reducerSchema("join_farm_dark_public", join_farm_dark_public_reducer_default),
@@ -9262,6 +9305,7 @@ ${ty.variants.map(
     reducerSchema("submit_dungeon_run_result_v_1", submit_dungeon_run_result_v_1_reducer_default),
     reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
     reducerSchema("submit_farm_waiting_run_result", submit_farm_waiting_run_result_reducer_default),
+    reducerSchema("unequip_food", unequip_food_reducer_default),
     reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default),
     reducerSchema("yield_dark_duel", yield_dark_duel_reducer_default)
   );
@@ -9292,6 +9336,7 @@ ${ty.variants.map(
     "my_dungeon_progress": "myDungeonProgress",
     "my_endless_records": "myEndlessRecords",
     "my_equipment": "myEquipment",
+    "my_equipped_food": "myEquippedFood",
     "my_farm_dark_haul": "myFarmDarkHaul",
     "my_farm_pvp_attacks": "myFarmPvpAttacks",
     "my_farm_pvp_member_v2": "myFarmPvpMemberV2",
@@ -10046,6 +10091,7 @@ ${ty.variants.map(
         inventory: [],
         inventoryOrder: [],
         equipment: [],
+        equippedFood: [],
         skills: [],
         upgradeProgress: null,
         upgradeUnlocks: [],
@@ -10093,6 +10139,7 @@ ${ty.variants.map(
       data.inventory = rows(activeConnection.db.myInventory);
       data.inventoryOrder = rows(activeConnection.db.myInventoryOrder);
       data.equipment = rows(activeConnection.db.myEquipment);
+      data.equippedFood = rows(activeConnection.db.myEquippedFood);
       data.skills = rows(activeConnection.db.mySkills);
     });
     part("upgrades", () => {
@@ -10431,6 +10478,7 @@ ${ty.variants.map(
       observe(conn, conn.db.myInventory, "inventory");
       observe(conn, conn.db.myInventoryOrder, "inventory");
       observe(conn, conn.db.myEquipment, "inventory");
+      observe(conn, conn.db.myEquippedFood, "inventory");
       observe(conn, conn.db.mySkills, "inventory");
       observe(conn, conn.db.myUpgradeProgress, "upgrades");
       observe(conn, conn.db.myUpgradeUnlocks, "upgrades");
@@ -10461,6 +10509,7 @@ ${ty.variants.map(
         tables.myInventory,
         tables.myInventoryOrder,
         tables.myEquipment,
+        tables.myEquippedFood,
         tables.mySkills,
         tables.myUpgradeProgress,
         tables.myUpgradeUnlocks,
@@ -10643,6 +10692,7 @@ ${ty.variants.map(
     "myActiveRun",
     "myInventory",
     "myEquipment",
+    "myEquippedFood",
     "myDungeonProgress",
     "myEndlessRecords",
     "myFarmRecords",
