@@ -9065,6 +9065,23 @@ ${ty.variants.map(
     hairColor: t.u32().name("hair_color")
   });
 
+  // src/module_bindings/my_quest_claims_table.ts
+  var my_quest_claims_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    questId: t.string().name("quest_id"),
+    claimedAt: t.timestamp().name("claimed_at")
+  });
+
+  // src/module_bindings/my_quest_stats_table.ts
+  var my_quest_stats_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    key: t.string(),
+    value: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
   // src/module_bindings/my_quests_table.ts
   var my_quests_table_default = t.row({
     questId: t.string().name("quest_id"),
@@ -9193,6 +9210,13 @@ ${ty.variants.map(
     level: t.u32(),
     target: t.u32(),
     rewardsJson: t.string().name("rewards_json")
+  });
+
+  // src/module_bindings/quest_details_table.ts
+  var quest_details_table_default = t.row({
+    kind: t.string(),
+    id: t.string(),
+    detailJson: t.string().name("detail_json")
   });
 
   // src/module_bindings/index.ts
@@ -9347,6 +9371,16 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_profile_preferences_table_default),
+    myQuestClaims: table({
+      name: "my_quest_claims",
+      indexes: [],
+      constraints: []
+    }, my_quest_claims_table_default),
+    myQuestStats: table({
+      name: "my_quest_stats",
+      indexes: [],
+      constraints: []
+    }, my_quest_stats_table_default),
     myQuests: table({
       name: "my_quests",
       indexes: [],
@@ -9401,7 +9435,12 @@ ${ty.variants.map(
       name: "quest_catalog",
       indexes: [],
       constraints: []
-    }, quest_catalog_table_default)
+    }, quest_catalog_table_default),
+    questDetails: table({
+      name: "quest_details",
+      indexes: [],
+      constraints: []
+    }, quest_details_table_default)
   });
   var reducersSchema = reducers(
     reducerSchema("abandon_run", abandon_run_reducer_default),
@@ -9507,6 +9546,8 @@ ${ty.variants.map(
     "my_market_transactions": "myMarketTransactions",
     "my_profile": "myProfile",
     "my_profile_preferences": "myProfilePreferences",
+    "my_quest_claims": "myQuestClaims",
+    "my_quest_stats": "myQuestStats",
     "my_quests": "myQuests",
     "my_sent_farm_pvp_attacks": "mySentFarmPvpAttacks",
     "my_skills": "mySkills",
@@ -9517,7 +9558,8 @@ ${ty.variants.map(
     "my_upgrade_unlocks": "myUpgradeUnlocks",
     "opponent_farm_boards_compact_v4": "opponentFarmBoardsCompactV4",
     "opponent_farm_pieces_compact_v3": "opponentFarmPiecesCompactV3",
-    "quest_catalog": "questCatalog"
+    "quest_catalog": "questCatalog",
+    "quest_details": "questDetails"
   };
   function __withTableAccessorAliases(target, freeze = false) {
     const out = Object.create(Object.getPrototypeOf(target));
@@ -10334,7 +10376,10 @@ ${ty.variants.map(
         tasks: [],
         taskChests: [],
         questProgress: [],
-        taskState: null
+        taskState: null,
+        questDetails: [],
+        questClaims: [],
+        questStats: []
       }
     };
   }
@@ -10443,6 +10488,9 @@ ${ty.variants.map(
       data.taskChests = rows(activeConnection.db.myTaskChests);
       data.questProgress = rows(activeConnection.db.myQuests);
       data.taskState = rows(activeConnection.db.myTaskState)[0] ?? null;
+      data.questDetails = rows(activeConnection.db.questDetails);
+      data.questClaims = rows(activeConnection.db.myQuestClaims);
+      data.questStats = rows(activeConnection.db.myQuestStats);
     });
     return { type: "snapshot", data };
   }
@@ -10667,6 +10715,9 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.myTaskChests, "quests");
     observe(activeConnection, activeConnection.db.myQuests, "quests");
     observe(activeConnection, activeConnection.db.myTaskState, "quests");
+    observe(activeConnection, activeConnection.db.questDetails, "quests");
+    observe(activeConnection, activeConnection.db.myQuestClaims, "quests");
+    observe(activeConnection, activeConnection.db.myQuestStats, "quests");
     questSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection === activeConnection) {
         publishDomains(activeConnection, ["quests"]);
@@ -10679,7 +10730,10 @@ ${ty.variants.map(
       tables.myTasks,
       tables.myTaskChests,
       tables.myQuests,
-      tables.myTaskState
+      tables.myTaskState,
+      tables.questDetails,
+      tables.myQuestClaims,
+      tables.myQuestStats
     ]);
   }
   function flushPendingReducerCalls() {
