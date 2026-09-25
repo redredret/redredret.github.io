@@ -9756,7 +9756,14 @@ ${ty.variants.map(
     "publishDuelPiece",
     "sendFarmPvpAttack",
     "sendDarkDuelBlow",
-    "refreshDarkPresence"
+    "refreshDarkPresence",
+    // Nothing in Godot waits on these succeeding; their answer is the rows they
+    // write. A failure is still reported.
+    "openDarkChest",
+    "refreshMyTasks",
+    "markTasksSeen",
+    "acknowledgeTaskChest",
+    "reportDuelBoardBreak"
   ];
   function reportsSuccess(name) {
     return !QUIET_SUCCESS_CALLS.includes(name);
@@ -10446,6 +10453,8 @@ ${ty.variants.map(
     });
     part("farmAttacks", () => {
       data.farmPvpAttacks = rows(activeConnection.db.myFarmPvpAttacks);
+    });
+    part("farmSentAttacks", () => {
       data.farmPvpSentAttacks = rows(activeConnection.db.mySentFarmPvpAttacks);
     });
     part("farmDarkHaul", () => {
@@ -10483,14 +10492,16 @@ ${ty.variants.map(
       data.duelOpponentPiece = rows(activeConnection.db.myDuelOpponentPiece);
     });
     part("quests", () => {
-      data.questCatalog = rows(activeConnection.db.questCatalog);
       data.tasks = rows(activeConnection.db.myTasks);
       data.taskChests = rows(activeConnection.db.myTaskChests);
       data.questProgress = rows(activeConnection.db.myQuests);
       data.taskState = rows(activeConnection.db.myTaskState)[0] ?? null;
-      data.questDetails = rows(activeConnection.db.questDetails);
       data.questClaims = rows(activeConnection.db.myQuestClaims);
       data.questStats = rows(activeConnection.db.myQuestStats);
+    });
+    part("questCatalog", () => {
+      data.questCatalog = rows(activeConnection.db.questCatalog);
+      data.questDetails = rows(activeConnection.db.questDetails);
     });
     return { type: "snapshot", data };
   }
@@ -10559,11 +10570,11 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.opponentFarmBoardsCompactV4, "farmBoard");
     observe(activeConnection, activeConnection.db.opponentFarmPiecesCompactV3, "farmPiece");
     observe(activeConnection, activeConnection.db.myFarmPvpAttacks, "farmAttacks");
-    observe(activeConnection, activeConnection.db.mySentFarmPvpAttacks, "farmAttacks");
+    observe(activeConnection, activeConnection.db.mySentFarmPvpAttacks, "farmSentAttacks");
     observe(activeConnection, activeConnection.db.myFarmDarkHaul, "farmDarkHaul");
     farmSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection !== activeConnection || !farmSubscription || !farmScopeWanted()) return;
-      publishDomains(activeConnection, ["farmSession", "farmBoard", "farmPiece", "farmAttacks", "farmDarkHaul"]);
+      publishDomains(activeConnection, ["farmSession", "farmBoard", "farmPiece", "farmAttacks", "farmSentAttacks", "farmDarkHaul"]);
       emit({ type: "subscription_scope_ready", scope: "farm" });
     }).onError((_ctx, error) => {
       if (connection === activeConnection) emit({ type: "error", command: "subscribeFarm", message: String(error) });
@@ -10710,17 +10721,17 @@ ${ty.variants.map(
     if (!coreSubscriptionReady || connection !== activeConnection) return;
     adoptScopedSubscriptions(activeConnection);
     if (questSubscription) return;
-    observe(activeConnection, activeConnection.db.questCatalog, "quests");
+    observe(activeConnection, activeConnection.db.questCatalog, "questCatalog");
     observe(activeConnection, activeConnection.db.myTasks, "quests");
     observe(activeConnection, activeConnection.db.myTaskChests, "quests");
     observe(activeConnection, activeConnection.db.myQuests, "quests");
     observe(activeConnection, activeConnection.db.myTaskState, "quests");
-    observe(activeConnection, activeConnection.db.questDetails, "quests");
+    observe(activeConnection, activeConnection.db.questDetails, "questCatalog");
     observe(activeConnection, activeConnection.db.myQuestClaims, "quests");
     observe(activeConnection, activeConnection.db.myQuestStats, "quests");
     questSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection === activeConnection) {
-        publishDomains(activeConnection, ["quests"]);
+        publishDomains(activeConnection, ["quests", "questCatalog"]);
         emit({ type: "subscription_scope_ready", scope: "quests" });
       }
     }).onError((_ctx, error) => {
