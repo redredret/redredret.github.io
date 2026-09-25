@@ -9142,7 +9142,11 @@ ${ty.variants.map(
     stepCount: t.u32().name("step_count"),
     createdAt: t.timestamp().name("created_at"),
     startedAt: t.timestamp().name("started_at"),
-    updatedAt: t.timestamp().name("updated_at")
+    updatedAt: t.timestamp().name("updated_at"),
+    attackDueMicros: t.u64().name("attack_due_micros"),
+    attackSetMicros: t.u64().name("attack_set_micros"),
+    attackNumber: t.u32().name("attack_number"),
+    enemyShielded: t.bool().name("enemy_shielded")
   });
 
   // src/module_bindings/my_party_members_table.ts
@@ -9164,7 +9168,8 @@ ${ty.variants.map(
     damageSent: t.u64().name("damage_sent"),
     necklaceUsed: t.bool().name("necklace_used"),
     disconnectedMicros: t.u64().name("disconnected_micros"),
-    joinedAt: t.timestamp().name("joined_at")
+    joinedAt: t.timestamp().name("joined_at"),
+    snapArmed: t.bool().name("snap_armed")
   });
 
   // src/module_bindings/my_party_partner_boards_table.ts
@@ -9213,7 +9218,9 @@ ${ty.variants.map(
     killCombo: t.u32().name("kill_combo"),
     scaled: t.bool(),
     damageJson: t.string().name("damage_json"),
-    at: t.timestamp()
+    at: t.timestamp(),
+    attackNumber: t.u32().name("attack_number"),
+    snapShotMask: t.u32().name("snap_shot_mask")
   });
 
   // src/module_bindings/my_profile_table.ts
