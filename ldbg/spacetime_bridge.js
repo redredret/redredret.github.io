@@ -8409,6 +8409,11 @@ ${ty.variants.map(
     pricePer: t.u32()
   };
 
+  // src/module_bindings/create_party_room_reducer.ts
+  var create_party_room_reducer_default = {
+    dungeonId: t.string()
+  };
+
   // src/module_bindings/delete_my_data_reducer.ts
   var delete_my_data_reducer_default = {};
 
@@ -8480,6 +8485,16 @@ ${ty.variants.map(
   // src/module_bindings/join_farm_public_reducer.ts
   var join_farm_public_reducer_default = {};
 
+  // src/module_bindings/join_party_queue_reducer.ts
+  var join_party_queue_reducer_default = {
+    dungeonId: t.string()
+  };
+
+  // src/module_bindings/join_party_room_reducer.ts
+  var join_party_room_reducer_default = {
+    code: t.string()
+  };
+
   // src/module_bindings/learn_skill_reducer.ts
   var learn_skill_reducer_default = {
     skillId: t.string()
@@ -8491,12 +8506,24 @@ ${ty.variants.map(
   // src/module_bindings/leave_farm_match_reducer.ts
   var leave_farm_match_reducer_default = {};
 
+  // src/module_bindings/leave_party_reducer.ts
+  var leave_party_reducer_default = {};
+
+  // src/module_bindings/leave_party_queue_reducer.ts
+  var leave_party_queue_reducer_default = {};
+
   // src/module_bindings/mark_tasks_seen_reducer.ts
   var mark_tasks_seen_reducer_default = {};
 
   // src/module_bindings/open_dark_chest_reducer.ts
   var open_dark_chest_reducer_default = {
     runId: t.string(),
+    chestIndex: t.u32()
+  };
+
+  // src/module_bindings/open_party_chest_reducer.ts
+  var open_party_chest_reducer_default = {
+    partyId: t.string(),
     chestIndex: t.u32()
   };
 
@@ -8548,6 +8575,27 @@ ${ty.variants.map(
     sequence: t.u32()
   };
 
+  // src/module_bindings/publish_party_board_reducer.ts
+  var publish_party_board_reducer_default = {
+    partyId: t.string(),
+    cells: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    sequence: t.u32()
+  };
+
+  // src/module_bindings/publish_party_piece_reducer.ts
+  var publish_party_piece_reducer_default = {
+    partyId: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    sequence: t.u32()
+  };
+
   // src/module_bindings/purchase_build_upgrade_reducer.ts
   var purchase_build_upgrade_reducer_default = {
     upgradeId: t.string()
@@ -8583,6 +8631,24 @@ ${ty.variants.map(
 
   // src/module_bindings/report_farm_pvp_top_out_reducer.ts
   var report_farm_pvp_top_out_reducer_default = {};
+
+  // src/module_bindings/report_party_down_reducer.ts
+  var report_party_down_reducer_default = {
+    partyId: t.string()
+  };
+
+  // src/module_bindings/report_party_enemy_heal_reducer.ts
+  var report_party_enemy_heal_reducer_default = {
+    partyId: t.string(),
+    encounterIndex: t.u32(),
+    amount: t.u32()
+  };
+
+  // src/module_bindings/report_party_health_reducer.ts
+  var report_party_health_reducer_default = {
+    partyId: t.string(),
+    health: t.u32()
+  };
 
   // src/module_bindings/report_run_submission_problem_reducer.ts
   var report_run_submission_problem_reducer_default = {
@@ -8626,6 +8692,19 @@ ${ty.variants.map(
     sequence: t.u32()
   };
 
+  // src/module_bindings/send_party_blow_reducer.ts
+  var send_party_blow_reducer_default = {
+    partyId: t.string(),
+    encounterIndex: t.u32(),
+    damage: t.u32(),
+    lines: t.u32(),
+    spinType: t.string(),
+    combo: t.u32(),
+    backToBack: t.bool(),
+    perfectClear: t.bool(),
+    necklace: t.bool()
+  };
+
   // src/module_bindings/set_display_name_reducer.ts
   var set_display_name_reducer_default = {
     displayName: t.string()
@@ -8640,6 +8719,11 @@ ${ty.variants.map(
   var set_hair_reducer_default = {
     hairStyle: t.u32(),
     hairColor: t.u32()
+  };
+
+  // src/module_bindings/set_party_ready_reducer.ts
+  var set_party_ready_reducer_default = {
+    ready: t.bool()
   };
 
   // src/module_bindings/set_skin_tone_reducer.ts
@@ -8750,7 +8834,8 @@ ${ty.variants.map(
     combatWeaponId: t.string().name("combat_weapon_id"),
     foodItemId: t.string().name("food_item_id"),
     foodQuantity: t.u32().name("food_quantity"),
-    necklaceItemId: t.string().name("necklace_item_id")
+    necklaceItemId: t.string().name("necklace_item_id"),
+    partyId: t.string().name("party_id")
   });
 
   // src/module_bindings/my_dark_chest_claims_table.ts
@@ -9037,6 +9122,97 @@ ${ty.variants.map(
     quantity: t.u32(),
     pricePer: t.u32().name("price_per"),
     gold: t.u32(),
+    at: t.timestamp()
+  });
+
+  // src/module_bindings/my_party_table.ts
+  var my_party_table_default = t.row({
+    partyId: t.string().primaryKey().name("party_id"),
+    mode: t.string(),
+    dungeonId: t.string().name("dungeon_id"),
+    code: t.string(),
+    state: t.string(),
+    seed: t.u32(),
+    encounterIndex: t.u32().name("encounter_index"),
+    enemyHealth: t.u32().name("enemy_health"),
+    enemyMaxHealth: t.u32().name("enemy_max_health"),
+    phase: t.string(),
+    chestIndex: t.u32().name("chest_index"),
+    soloFromEncounter: t.u32().name("solo_from_encounter"),
+    stepCount: t.u32().name("step_count"),
+    createdAt: t.timestamp().name("created_at"),
+    startedAt: t.timestamp().name("started_at"),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_party_members_table.ts
+  var my_party_members_table_default = t.row({
+    memberId: t.string().primaryKey().name("member_id"),
+    partyId: t.string().name("party_id"),
+    owner: t.identity(),
+    slot: t.u32(),
+    state: t.string(),
+    ready: t.bool(),
+    runId: t.string().name("run_id"),
+    name: t.string(),
+    level: t.u32(),
+    armor: t.u32(),
+    look: t.string(),
+    health: t.u32(),
+    blows: t.u32(),
+    lastBlowDamage: t.u32().name("last_blow_damage"),
+    damageSent: t.u64().name("damage_sent"),
+    necklaceUsed: t.bool().name("necklace_used"),
+    disconnectedMicros: t.u64().name("disconnected_micros"),
+    joinedAt: t.timestamp().name("joined_at")
+  });
+
+  // src/module_bindings/my_party_partner_boards_table.ts
+  var my_party_partner_boards_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    partyId: t.string().name("party_id"),
+    cells: t.string(),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    sequence: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_party_partner_pieces_table.ts
+  var my_party_partner_pieces_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    partyId: t.string().name("party_id"),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    sequence: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_party_queue_table.ts
+  var my_party_queue_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    dungeonId: t.string().name("dungeon_id"),
+    level: t.u32(),
+    armor: t.u32(),
+    queuedAt: t.timestamp().name("queued_at")
+  });
+
+  // src/module_bindings/my_party_steps_table.ts
+  var my_party_steps_table_default = t.row({
+    stepId: t.string().primaryKey().name("step_id"),
+    partyId: t.string().name("party_id"),
+    index: t.u32(),
+    kind: t.string(),
+    encounterIndex: t.u32().name("encounter_index"),
+    chestIndex: t.u32().name("chest_index"),
+    killerSlot: t.u32().name("killer_slot"),
+    killCombo: t.u32().name("kill_combo"),
+    scaled: t.bool(),
+    damageJson: t.string().name("damage_json"),
     at: t.timestamp()
   });
 
@@ -9361,6 +9537,36 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_market_transactions_table_default),
+    myParty: table({
+      name: "my_party",
+      indexes: [],
+      constraints: []
+    }, my_party_table_default),
+    myPartyMembers: table({
+      name: "my_party_members",
+      indexes: [],
+      constraints: []
+    }, my_party_members_table_default),
+    myPartyPartnerBoards: table({
+      name: "my_party_partner_boards",
+      indexes: [],
+      constraints: []
+    }, my_party_partner_boards_table_default),
+    myPartyPartnerPieces: table({
+      name: "my_party_partner_pieces",
+      indexes: [],
+      constraints: []
+    }, my_party_partner_pieces_table_default),
+    myPartyQueue: table({
+      name: "my_party_queue",
+      indexes: [],
+      constraints: []
+    }, my_party_queue_table_default),
+    myPartySteps: table({
+      name: "my_party_steps",
+      indexes: [],
+      constraints: []
+    }, my_party_steps_table_default),
     myProfile: table({
       name: "my_profile",
       indexes: [],
@@ -9458,6 +9664,7 @@ ${ty.variants.map(
     reducerSchema("create_farm_dark_private", create_farm_dark_private_reducer_default),
     reducerSchema("create_farm_private", create_farm_private_reducer_default),
     reducerSchema("create_market_listing", create_market_listing_reducer_default),
+    reducerSchema("create_party_room", create_party_room_reducer_default),
     reducerSchema("delete_my_data", delete_my_data_reducer_default),
     reducerSchema("enter_dark_duel", enter_dark_duel_reducer_default),
     reducerSchema("enter_dark_duel_v_2", enter_dark_duel_v_2_reducer_default),
@@ -9471,16 +9678,23 @@ ${ty.variants.map(
     reducerSchema("join_farm_dark_public", join_farm_dark_public_reducer_default),
     reducerSchema("join_farm_private", join_farm_private_reducer_default),
     reducerSchema("join_farm_public", join_farm_public_reducer_default),
+    reducerSchema("join_party_queue", join_party_queue_reducer_default),
+    reducerSchema("join_party_room", join_party_room_reducer_default),
     reducerSchema("learn_skill", learn_skill_reducer_default),
     reducerSchema("leave_duel_listing", leave_duel_listing_reducer_default),
     reducerSchema("leave_farm_match", leave_farm_match_reducer_default),
+    reducerSchema("leave_party", leave_party_reducer_default),
+    reducerSchema("leave_party_queue", leave_party_queue_reducer_default),
     reducerSchema("mark_tasks_seen", mark_tasks_seen_reducer_default),
     reducerSchema("open_dark_chest", open_dark_chest_reducer_default),
+    reducerSchema("open_party_chest", open_party_chest_reducer_default),
     reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
     reducerSchema("publish_duel_board", publish_duel_board_reducer_default),
     reducerSchema("publish_duel_piece", publish_duel_piece_reducer_default),
     reducerSchema("publish_farm_board", publish_farm_board_reducer_default),
     reducerSchema("publish_farm_piece", publish_farm_piece_reducer_default),
+    reducerSchema("publish_party_board", publish_party_board_reducer_default),
+    reducerSchema("publish_party_piece", publish_party_piece_reducer_default),
     reducerSchema("purchase_build_upgrade", purchase_build_upgrade_reducer_default),
     reducerSchema("ready_farm_pvp_round", ready_farm_pvp_round_reducer_default),
     reducerSchema("refresh_dark_presence", refresh_dark_presence_reducer_default),
@@ -9489,14 +9703,19 @@ ${ty.variants.map(
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
     reducerSchema("report_duel_board_break", report_duel_board_break_reducer_default),
     reducerSchema("report_farm_pvp_top_out", report_farm_pvp_top_out_reducer_default),
+    reducerSchema("report_party_down", report_party_down_reducer_default),
+    reducerSchema("report_party_enemy_heal", report_party_enemy_heal_reducer_default),
+    reducerSchema("report_party_health", report_party_health_reducer_default),
     reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
     reducerSchema("reroll_task", reroll_task_reducer_default),
     reducerSchema("sell_item", sell_item_reducer_default),
     reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
+    reducerSchema("send_party_blow", send_party_blow_reducer_default),
     reducerSchema("set_display_name", set_display_name_reducer_default),
     reducerSchema("set_duel_ready", set_duel_ready_reducer_default),
     reducerSchema("set_hair", set_hair_reducer_default),
+    reducerSchema("set_party_ready", set_party_ready_reducer_default),
     reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
     reducerSchema("start_run", start_run_reducer_default),
     reducerSchema("submit_dungeon_run_result_v_1", submit_dungeon_run_result_v_1_reducer_default),
@@ -9544,6 +9763,12 @@ ${ty.variants.map(
     "my_inventory_order": "myInventoryOrder",
     "my_market_sale_notice": "myMarketSaleNotice",
     "my_market_transactions": "myMarketTransactions",
+    "my_party": "myParty",
+    "my_party_members": "myPartyMembers",
+    "my_party_partner_boards": "myPartyPartnerBoards",
+    "my_party_partner_pieces": "myPartyPartnerPieces",
+    "my_party_queue": "myPartyQueue",
+    "my_party_steps": "myPartySteps",
     "my_profile": "myProfile",
     "my_profile_preferences": "myProfilePreferences",
     "my_quest_claims": "myQuestClaims",
@@ -9748,7 +9973,14 @@ ${ty.variants.map(
     return expiresAtSeconds <= nowSeconds - TOKEN_EXPIRY_SKEW_SECONDS;
   }
   var EXPIRED_SESSION_MESSAGE = "Your login expired. Open Account and log in again to keep playing.";
-  var SUPERSEDABLE_CALLS = ["publishFarmBoard", "publishFarmPiece", "publishDuelBoard", "publishDuelPiece"];
+  var SUPERSEDABLE_CALLS = [
+    "publishFarmBoard",
+    "publishFarmPiece",
+    "publishDuelBoard",
+    "publishDuelPiece",
+    "publishPartyBoard",
+    "publishPartyPiece"
+  ];
   var QUIET_SUCCESS_CALLS = [
     "publishFarmBoard",
     "publishFarmPiece",
@@ -9763,7 +9995,14 @@ ${ty.variants.map(
     "refreshMyTasks",
     "markTasksSeen",
     "acknowledgeTaskChest",
-    "reportDuelBoardBreak"
+    "reportDuelBoardBreak",
+    "sendPartyBlow",
+    "reportPartyEnemyHeal",
+    "openPartyChest",
+    "reportPartyHealth",
+    "reportPartyDown",
+    "publishPartyBoard",
+    "publishPartyPiece"
   ];
   function reportsSuccess(name) {
     return !QUIET_SUCCESS_CALLS.includes(name);
@@ -9818,7 +10057,18 @@ ${ty.variants.map(
     // of it is the player doing anything.
     "refreshMyTasks",
     "acknowledgeTaskChest",
-    "markTasksSeen"
+    "markTasksSeen",
+    // A co-op run's clears, the Vampiric drinks its board feeds the party's
+    // monster, a chest press, its health and its board: all sent by the fight,
+    // not the player, and none worth replaying after a reconnect -- a lost hit
+    // only ever costs the sender, and settlement tolerates it.
+    "sendPartyBlow",
+    "reportPartyEnemyHeal",
+    "openPartyChest",
+    "reportPartyHealth",
+    "reportPartyDown",
+    "publishPartyBoard",
+    "publishPartyPiece"
   ];
   function isBackgroundCall(name) {
     return BACKGROUND_CALLS.includes(name);
@@ -9916,6 +10166,7 @@ ${ty.variants.map(
   var marketPriceSubscription = null;
   var marketHistorySubscription = null;
   var darkDuelSubscription = null;
+  var partySubscription = null;
   var scopedSubscriptionConnection = null;
   var duelBoardSubscription = null;
   var playerCountsSubscription = null;
@@ -10322,6 +10573,7 @@ ${ty.variants.map(
     marketPriceSubscription = null;
     marketHistorySubscription = null;
     darkDuelSubscription = null;
+    partySubscription = null;
     duelBoardSubscription = null;
     playerCountsSubscription = null;
     questSubscription = null;
@@ -10378,6 +10630,12 @@ ${ty.variants.map(
         duelListings: [],
         duelLobby: null,
         duelRecord: null,
+        party: null,
+        partyMembers: [],
+        partyQueue: null,
+        partySteps: [],
+        partyBoards: [],
+        partyPieces: [],
         darkChestClaims: [],
         questCatalog: [],
         tasks: [],
@@ -10428,6 +10686,18 @@ ${ty.variants.map(
     part("arenaDuels", () => {
       data.duelLobby = rows(activeConnection.db.myDuelLobby)[0] ?? null;
       data.duelRecord = rows(activeConnection.db.myDuelRecord)[0] ?? null;
+    });
+    part("party", () => {
+      data.party = rows(activeConnection.db.myParty)[0] ?? null;
+      data.partyMembers = rows(activeConnection.db.myPartyMembers);
+      data.partyQueue = rows(activeConnection.db.myPartyQueue)[0] ?? null;
+    });
+    part("partySteps", () => {
+      data.partySteps = rows(activeConnection.db.myPartySteps);
+    });
+    part("partyBoard", () => {
+      data.partyBoards = rows(activeConnection.db.myPartyPartnerBoards);
+      data.partyPieces = rows(activeConnection.db.myPartyPartnerPieces);
     });
     part("duelBoard", () => {
       data.duelListings = rows(activeConnection.db.duelListings);
@@ -10705,6 +10975,29 @@ ${ty.variants.map(
       tables.myDarkChestClaims
     ]);
   }
+  function ensurePartySubscription(activeConnection) {
+    if (!coreSubscriptionReady || connection !== activeConnection) return;
+    adoptScopedSubscriptions(activeConnection);
+    if (partySubscription) return;
+    observe(activeConnection, activeConnection.db.myParty, "party");
+    observe(activeConnection, activeConnection.db.myPartyMembers, "party");
+    observe(activeConnection, activeConnection.db.myPartyQueue, "party");
+    observe(activeConnection, activeConnection.db.myPartySteps, "partySteps");
+    observe(activeConnection, activeConnection.db.myPartyPartnerBoards, "partyBoard");
+    observe(activeConnection, activeConnection.db.myPartyPartnerPieces, "partyBoard");
+    partySubscription = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (connection === activeConnection) publishDomains(activeConnection, ["party", "partySteps", "partyBoard"]);
+    }).onError((_ctx, error) => {
+      if (connection === activeConnection) emit({ type: "error", command: "subscribeParty", message: String(error) });
+    }).subscribe([
+      tables.myParty,
+      tables.myPartyMembers,
+      tables.myPartyQueue,
+      tables.myPartySteps,
+      tables.myPartyPartnerBoards,
+      tables.myPartyPartnerPieces
+    ]);
+  }
   function ensurePlayerCountsSubscription(activeConnection) {
     if (!coreSubscriptionReady || connection !== activeConnection) return;
     adoptScopedSubscriptions(activeConnection);
@@ -10832,6 +11125,7 @@ ${ty.variants.map(
         ensureMarketPriceSubscription(conn);
         ensureMarketHistorySubscription(conn);
         ensureDarkDuelSubscription(conn);
+        ensurePartySubscription(conn);
         ensureDuelBoardSubscription(conn);
         ensurePlayerCountsSubscription(conn);
         ensureQuestSubscription(conn);
@@ -11034,7 +11328,10 @@ ${ty.variants.map(
     "myDarkDuel",
     "myDuelLobby",
     "myDuelRecord",
-    "myDarkChestClaims"
+    "myDarkChestClaims",
+    "myParty",
+    "myPartyMembers",
+    "myPartySteps"
   ];
   function snapshotDiagnostics() {
     const counts = {};
