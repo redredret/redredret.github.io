@@ -8566,6 +8566,23 @@ ${ty.variants.map(
     sequence: t.u32()
   };
 
+  // src/module_bindings/publish_farm_board_v_2_reducer.ts
+  var publish_farm_board_v_2_reducer_default = {
+    cells: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    score: t.u32(),
+    linesCleared: t.u32(),
+    toppedOut: t.bool(),
+    sequence: t.u32(),
+    lockKind: t.i32(),
+    lockX: t.i32(),
+    lockY: t.i32(),
+    lockRotation: t.u32()
+  };
+
   // src/module_bindings/publish_farm_piece_reducer.ts
   var publish_farm_piece_reducer_default = {
     activeKind: t.i32(),
@@ -8787,6 +8804,47 @@ ${ty.variants.map(
     state: t.string(),
     postedAt: t.timestamp().name("posted_at"),
     isMine: t.bool().name("is_mine")
+  });
+
+  // src/module_bindings/farm_board_event_table.ts
+  var farm_board_event_table_default = t.row({
+    room: t.u32(),
+    slot: t.u8(),
+    board: t.byteArray(),
+    activeKind: t.i8().name("active_kind"),
+    activeX: t.i8().name("active_x"),
+    activeY: t.u8().name("active_y"),
+    activeRotation: t.u8().name("active_rotation"),
+    score: t.u32(),
+    lines: t.u16(),
+    toppedOut: t.bool().name("topped_out")
+  });
+
+  // src/module_bindings/farm_lock_event_table.ts
+  var farm_lock_event_table_default = t.row({
+    room: t.u32(),
+    slot: t.u8(),
+    lockKind: t.u8().name("lock_kind"),
+    lockX: t.i8().name("lock_x"),
+    lockY: t.u8().name("lock_y"),
+    lockRotation: t.u8().name("lock_rotation"),
+    checksum: t.u16(),
+    activeKind: t.i8().name("active_kind"),
+    activeX: t.i8().name("active_x"),
+    activeY: t.u8().name("active_y"),
+    activeRotation: t.u8().name("active_rotation"),
+    score: t.u32(),
+    lines: t.u16()
+  });
+
+  // src/module_bindings/farm_pose_event_table.ts
+  var farm_pose_event_table_default = t.row({
+    room: t.u32(),
+    slot: t.u8(),
+    kind: t.i8(),
+    x: t.i8(),
+    y: t.u8(),
+    rotation: t.u8()
   });
 
   // src/module_bindings/farm_player_counts_table.ts
@@ -9371,6 +9429,19 @@ ${ty.variants.map(
     toppedOut: t.bool().name("topped_out")
   });
 
+  // src/module_bindings/opponent_farm_keyframes_v_1_table.ts
+  var opponent_farm_keyframes_v_1_table_default = t.row({
+    slot: t.u32().primaryKey(),
+    board: t.byteArray(),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    score: t.u32(),
+    linesCleared: t.u32().name("lines_cleared"),
+    toppedOut: t.bool().name("topped_out")
+  });
+
   // src/module_bindings/opponent_farm_pieces_compact_v_3_table.ts
   var opponent_farm_pieces_compact_v_3_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -9378,6 +9449,16 @@ ${ty.variants.map(
     activeX: t.i32().name("active_x"),
     activeY: t.i32().name("active_y"),
     activeRotation: t.u32().name("active_rotation")
+  });
+
+  // src/module_bindings/opponent_farm_roster_v_1_table.ts
+  var opponent_farm_roster_v_1_table_default = t.row({
+    slot: t.u32().primaryKey(),
+    owner: t.identity(),
+    alive: t.bool(),
+    placement: t.u32(),
+    ready: t.bool(),
+    displayName: t.string().name("display_name")
   });
 
   // src/module_bindings/quest_catalog_table.ts
@@ -9404,6 +9485,36 @@ ${ty.variants.map(
 
   // src/module_bindings/index.ts
   var tablesSchema = schema({
+    farmBoardEvent: table({
+      name: "farm_board_event",
+      indexes: [
+        { accessor: "room", name: "farm_board_event_room_idx_btree", algorithm: "btree", columns: [
+          "room"
+        ] }
+      ],
+      constraints: [],
+      event: true
+    }, farm_board_event_table_default),
+    farmLockEvent: table({
+      name: "farm_lock_event",
+      indexes: [
+        { accessor: "room", name: "farm_lock_event_room_idx_btree", algorithm: "btree", columns: [
+          "room"
+        ] }
+      ],
+      constraints: [],
+      event: true
+    }, farm_lock_event_table_default),
+    farmPoseEvent: table({
+      name: "farm_pose_event",
+      indexes: [
+        { accessor: "room", name: "farm_pose_event_room_idx_btree", algorithm: "btree", columns: [
+          "room"
+        ] }
+      ],
+      constraints: [],
+      event: true
+    }, farm_pose_event_table_default),
     darkPlayerCount: table({
       name: "dark_player_count",
       indexes: [],
@@ -9639,11 +9750,21 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, opponent_farm_boards_compact_v_4_table_default),
+    opponentFarmKeyframesV1: table({
+      name: "opponent_farm_keyframes_v1",
+      indexes: [],
+      constraints: []
+    }, opponent_farm_keyframes_v_1_table_default),
     opponentFarmPiecesCompactV3: table({
       name: "opponent_farm_pieces_compact_v3",
       indexes: [],
       constraints: []
     }, opponent_farm_pieces_compact_v_3_table_default),
+    opponentFarmRosterV1: table({
+      name: "opponent_farm_roster_v1",
+      indexes: [],
+      constraints: []
+    }, opponent_farm_roster_v_1_table_default),
     questCatalog: table({
       name: "quest_catalog",
       indexes: [],
@@ -9699,6 +9820,7 @@ ${ty.variants.map(
     reducerSchema("publish_duel_board", publish_duel_board_reducer_default),
     reducerSchema("publish_duel_piece", publish_duel_piece_reducer_default),
     reducerSchema("publish_farm_board", publish_farm_board_reducer_default),
+    reducerSchema("publish_farm_board_v_2", publish_farm_board_v_2_reducer_default),
     reducerSchema("publish_farm_piece", publish_farm_piece_reducer_default),
     reducerSchema("publish_party_board", publish_party_board_reducer_default),
     reducerSchema("publish_party_piece", publish_party_piece_reducer_default),
@@ -9789,7 +9911,9 @@ ${ty.variants.map(
     "my_upgrade_progress": "myUpgradeProgress",
     "my_upgrade_unlocks": "myUpgradeUnlocks",
     "opponent_farm_boards_compact_v4": "opponentFarmBoardsCompactV4",
+    "opponent_farm_keyframes_v1": "opponentFarmKeyframesV1",
     "opponent_farm_pieces_compact_v3": "opponentFarmPiecesCompactV3",
+    "opponent_farm_roster_v1": "opponentFarmRosterV1",
     "quest_catalog": "questCatalog",
     "quest_details": "questDetails"
   };
@@ -9982,6 +10106,7 @@ ${ty.variants.map(
   var EXPIRED_SESSION_MESSAGE = "Your login expired. Open Account and log in again to keep playing.";
   var SUPERSEDABLE_CALLS = [
     "publishFarmBoard",
+    "publishFarmBoardV2",
     "publishFarmPiece",
     "publishDuelBoard",
     "publishDuelPiece",
@@ -9990,6 +10115,7 @@ ${ty.variants.map(
   ];
   var QUIET_SUCCESS_CALLS = [
     "publishFarmBoard",
+    "publishFarmBoardV2",
     "publishFarmPiece",
     "publishDuelBoard",
     "publishDuelPiece",
@@ -10105,36 +10231,404 @@ ${ty.variants.map(
       opponentFarmPiece: null
     };
   }
-  function boardSignature(row) {
-    return [
-      row.cells,
-      row.score,
-      row.linesCleared,
-      row.toppedOut,
-      row.activeKind,
-      row.activeX,
-      row.activeY,
-      row.activeRotation,
-      row.alive,
-      row.placement,
-      row.ready
-    ].join("|");
+
+  // ../../spacetimedb/src/sim/board.ts
+  var WIDTH = 10;
+  var VISIBLE_HEIGHT = 20;
+  var HIDDEN_ROWS = 20;
+  var TOTAL_HEIGHT = VISIBLE_HEIGHT + HIDDEN_ROWS;
+  var EMPTY = -1;
+  var GARBAGE_CLEAN = 7;
+  var GARBAGE_CRYSTAL = 10;
+  function isGarbageValue(value) {
+    return value >= GARBAGE_CLEAN && value <= GARBAGE_CRYSTAL;
   }
-  function posesSurvivingBoardPatch(seen, boards, pieces) {
-    const unchanged = /* @__PURE__ */ new Set();
-    const present = /* @__PURE__ */ new Set();
-    for (const board of boards) {
-      const owner = String(board.owner ?? "");
-      present.add(owner);
-      const signature = boardSignature(board);
-      if (seen.get(owner) === signature) unchanged.add(owner);
-      seen.set(owner, signature);
+  var Board = class {
+    cells;
+    constructor() {
+      this.cells = new Int8Array(WIDTH * TOTAL_HEIGHT).fill(EMPTY);
     }
-    for (const owner of Array.from(seen.keys())) {
-      if (!present.has(owner)) seen.delete(owner);
+    reset() {
+      this.cells.fill(EMPTY);
     }
-    return pieces.filter((piece) => unchanged.has(String(piece.owner ?? "")));
+    isInside(x, y) {
+      return x >= 0 && x < WIDTH && y >= 0 && y < TOTAL_HEIGHT;
+    }
+    getCell(x, y) {
+      if (!this.isInside(x, y)) return EMPTY;
+      return this.cells[y * WIDTH + x];
+    }
+    setCell(x, y, kind) {
+      this.cells[y * WIDTH + x] = kind;
+    }
+    canPlace(pieceCells, originX, originY) {
+      for (let index = 0; index < pieceCells.length; index += 1) {
+        const x = originX + pieceCells[index].x;
+        const y = originY + pieceCells[index].y;
+        if (x < 0 || x >= WIDTH || y < 0 || y >= TOTAL_HEIGHT) return false;
+        if (this.cells[y * WIDTH + x] !== EMPTY) return false;
+      }
+      return true;
+    }
+    lockPiece(pieceCells, originX, originY, kind) {
+      for (let index = 0; index < pieceCells.length; index += 1) {
+        this.setCell(originX + pieceCells[index].x, originY + pieceCells[index].y, kind);
+      }
+    }
+    isRowFull(y) {
+      const row = y * WIDTH;
+      for (let x = 0; x < WIDTH; x += 1) {
+        if (this.cells[row + x] === EMPTY) return false;
+      }
+      return true;
+    }
+    // Compacts survivors downward exactly as the GDScript does: read from the
+    // bottom, write to the bottom, then blank whatever is left at the top.
+    clearFullLines() {
+      let anyFull = false;
+      for (let y = TOTAL_HEIGHT - 1; y >= 0; y -= 1) {
+        if (this.isRowFull(y)) {
+          anyFull = true;
+          break;
+        }
+      }
+      if (!anyFull) return 0;
+      let cleared = 0;
+      let writeY = TOTAL_HEIGHT - 1;
+      for (let readY = TOTAL_HEIGHT - 1; readY >= 0; readY -= 1) {
+        if (this.isRowFull(readY)) {
+          cleared += 1;
+          continue;
+        }
+        this.copyRow(readY, writeY);
+        writeY -= 1;
+      }
+      while (writeY >= 0) {
+        this.clearRow(writeY);
+        writeY -= 1;
+      }
+      return cleared;
+    }
+    /** Garbage cells sitting in rows that are about to clear. Call before clearing. */
+    garbageBlocksInFullLines() {
+      let count = 0;
+      for (let y = 0; y < TOTAL_HEIGHT; y += 1) {
+        if (!this.isRowFull(y)) continue;
+        for (let x = 0; x < WIDTH; x += 1) {
+          if (isGarbageValue(this.getCell(x, y))) count += 1;
+        }
+      }
+      return count;
+    }
+    addGarbageRows(holeColumns, value = GARBAGE_CLEAN) {
+      let overflowedCells = 0;
+      for (const holeColumn of holeColumns) {
+        for (let x = 0; x < WIDTH; x += 1) {
+          if (this.getCell(x, 0) !== EMPTY) overflowedCells += 1;
+        }
+        for (let y = 0; y < TOTAL_HEIGHT - 1; y += 1) this.copyRow(y + 1, y);
+        for (let x = 0; x < WIDTH; x += 1) {
+          this.setCell(x, TOTAL_HEIGHT - 1, x === holeColumn ? EMPTY : value);
+        }
+      }
+      return overflowedCells;
+    }
+    hasCellsInHiddenRows() {
+      for (let y = 0; y < HIDDEN_ROWS; y += 1) {
+        for (let x = 0; x < WIDTH; x += 1) {
+          if (this.getCell(x, y) !== EMPTY) return true;
+        }
+      }
+      return false;
+    }
+    // Empty cells with a block somewhere above them in their column: the holes a
+    // stack has, as the Farm's Tidy Stack rank reads them. A well is not a hole,
+    // because nothing is over it. Mirrors BoardState.covered_holes.
+    coveredHoles() {
+      let holes = 0;
+      for (let x = 0; x < WIDTH; x += 1) {
+        let covered = false;
+        for (let y = 0; y < TOTAL_HEIGHT; y += 1) {
+          if (this.getCell(x, y) !== EMPTY) covered = true;
+          else if (covered) holes += 1;
+        }
+      }
+      return holes;
+    }
+    isEmpty() {
+      for (let index = this.cells.length - 1; index >= 0; index -= 1) {
+        if (this.cells[index] !== EMPTY) return false;
+      }
+      return true;
+    }
+    copyRow(fromY, toY) {
+      if (fromY === toY) return;
+      this.cells.copyWithin(toY * WIDTH, fromY * WIDTH, fromY * WIDTH + WIDTH);
+    }
+    clearRow(y) {
+      this.cells.fill(EMPTY, y * WIDTH, y * WIDTH + WIDTH);
+    }
+  };
+
+  // ../../spacetimedb/src/sim/tetromino.ts
+  var Kind = {
+    I: 0,
+    J: 1,
+    L: 2,
+    O: 3,
+    S: 4,
+    T: 5,
+    Z: 6
+  };
+  var KIND_COUNT = 7;
+  var BASE = {
+    [Kind.I]: [[-1, 0], [0, 0], [1, 0], [2, 0]],
+    [Kind.J]: [[-1, -1], [-1, 0], [0, 0], [1, 0]],
+    [Kind.L]: [[1, -1], [-1, 0], [0, 0], [1, 0]],
+    [Kind.O]: [[0, -1], [1, -1], [0, 0], [1, 0]],
+    [Kind.S]: [[0, -1], [1, -1], [-1, 0], [0, 0]],
+    [Kind.T]: [[0, -1], [-1, 0], [0, 0], [1, 0]],
+    [Kind.Z]: [[-1, -1], [0, -1], [0, 0], [1, 0]]
+  };
+  var I_CELLS = [
+    [[-1, 0], [0, 0], [1, 0], [2, 0]],
+    [[1, -1], [1, 0], [1, 1], [1, 2]],
+    [[-1, 1], [0, 1], [1, 1], [2, 1]],
+    [[0, -1], [0, 0], [0, 1], [0, 2]]
+  ];
+  function posmod(value, modulus) {
+    return (value % modulus + modulus) % modulus;
   }
+  var CELLS = (() => {
+    const table2 = [];
+    for (let kind = 0; kind < KIND_COUNT; kind += 1) {
+      table2[kind] = [];
+      for (let rotation = 0; rotation < 4; rotation += 1) {
+        if (kind === Kind.I) {
+          table2[kind][rotation] = I_CELLS[rotation].map(([x, y]) => ({ x, y }));
+          continue;
+        }
+        let current = BASE[kind].map(([x, y]) => ({ x, y }));
+        if (kind !== Kind.O) {
+          for (let step = 0; step < rotation; step += 1) {
+            current = current.map((cell) => ({ x: 0 - cell.y, y: cell.x }));
+          }
+        }
+        table2[kind][rotation] = current;
+      }
+    }
+    return table2;
+  })();
+  function cells(kind, rotation = 0) {
+    return CELLS[kind][posmod(rotation, 4)];
+  }
+
+  // ../../spacetimedb/src/farm_board_transport.ts
+  var VISIBLE_CELL_COUNT = WIDTH * VISIBLE_HEIGHT;
+  var MAX_CELL_VALUE = 10;
+  function decodeCell(code) {
+    if (code === 46) return EMPTY;
+    if (code === 65) return 10;
+    if (code >= 48 && code <= 57) return code - 48;
+    return -2;
+  }
+  function encodeCell(value) {
+    if (value === EMPTY) return ".";
+    if (value >= 0 && value <= 9) return String(value);
+    if (value === 10) return "A";
+    return ".";
+  }
+  function isVisibleCells(cells2) {
+    if (cells2.length !== VISIBLE_CELL_COUNT) return false;
+    for (let index = 0; index < VISIBLE_CELL_COUNT; index += 1) {
+      if (decodeCell(cells2.charCodeAt(index)) < EMPTY) return false;
+    }
+    return true;
+  }
+  function unpackVisibleCells(bytes) {
+    if (bytes.length < 1) return null;
+    const skipped = bytes[0];
+    if (!Number.isInteger(skipped) || skipped < 0 || skipped > VISIBLE_HEIGHT) return null;
+    const remaining = (VISIBLE_HEIGHT - skipped) * WIDTH;
+    if (bytes.length !== 1 + remaining / 2) return null;
+    let text = ".".repeat(skipped * WIDTH);
+    for (let index = 0; index < remaining; index += 1) {
+      const byte = bytes[1 + (index >> 1)];
+      const nibble = index % 2 === 0 ? byte >> 4 : byte & 15;
+      if (nibble > MAX_CELL_VALUE + 1) return null;
+      text += nibble === 0 ? "." : encodeCell(nibble - 1);
+    }
+    return text;
+  }
+  function boardChecksum(cells2) {
+    let hash = 2166136261;
+    for (let index = 0; index < cells2.length; index += 1) {
+      hash ^= cells2.charCodeAt(index);
+      hash = Math.imul(hash, 16777619) >>> 0;
+    }
+    return (hash >>> 16 ^ hash & 65535) & 65535;
+  }
+  function farmRoomKey(matchId) {
+    let hash = 2166136261;
+    for (let index = 0; index < matchId.length; index += 1) {
+      hash ^= matchId.charCodeAt(index);
+      hash = Math.imul(hash, 16777619) >>> 0;
+    }
+    return hash >>> 0;
+  }
+  function isLockPose(pose) {
+    return Number.isInteger(pose.kind) && pose.kind >= 0 && pose.kind <= 6 && Number.isInteger(pose.rotation) && pose.rotation >= 0 && pose.rotation <= 3 && Number.isInteger(pose.x) && pose.x >= -3 && pose.x <= WIDTH + 2 && Number.isInteger(pose.y) && pose.y >= 0 && pose.y < HIDDEN_ROWS + VISIBLE_HEIGHT;
+  }
+  function applyLockToVisibleCells(cells2, pose) {
+    if (!isVisibleCells(cells2) || !isLockPose(pose)) return null;
+    const board = new Board();
+    for (let index = 0; index < VISIBLE_CELL_COUNT; index += 1) {
+      board.cells[HIDDEN_ROWS * WIDTH + index] = decodeCell(cells2.charCodeAt(index));
+    }
+    const shape = cells(pose.kind, pose.rotation);
+    if (!board.canPlace(shape, pose.x, pose.y)) return null;
+    board.lockPiece(shape, pose.x, pose.y, pose.kind);
+    board.clearFullLines();
+    let text = "";
+    for (let index = 0; index < VISIBLE_CELL_COUNT; index += 1) {
+      text += encodeCell(board.cells[HIDDEN_ROWS * WIDTH + index]);
+    }
+    return text;
+  }
+
+  // src/farm_rival_boards.ts
+  var EMPTY_CELLS = ".".repeat(VISIBLE_CELL_COUNT);
+  var FarmRivalBoards = class {
+    room = -1;
+    boards = /* @__PURE__ */ new Map();
+    // For a look from the console (window.__ldbgFarmTransport): how the lanes
+    // are doing, and above all whether a rebuilt board ever disagreed.
+    stats = { lockEvents: 0, boardEvents: 0, poseEvents: 0, mismatches: 0, keyframes: 0 };
+    // A different room forgets every board. The same room keeps them: a
+    // reconnect listens again without blanking the cards in front of the player.
+    follow(room) {
+      if (room === this.room) return false;
+      this.room = room;
+      this.boards.clear();
+      return true;
+    }
+    clear() {
+      this.room = -1;
+      this.boards.clear();
+    }
+    applyLock(row) {
+      if (row.room !== this.room) return "ignored";
+      this.stats.lockEvents += 1;
+      const board = this.boards.get(row.slot);
+      if (!board || board.stale) return "ignored";
+      const after = applyLockToVisibleCells(board.cells, {
+        kind: row.lockKind,
+        x: row.lockX,
+        y: row.lockY,
+        rotation: row.lockRotation
+      });
+      if (after === null || boardChecksum(after) !== row.checksum) {
+        this.stats.mismatches += 1;
+        board.stale = true;
+        return "mismatch";
+      }
+      this.boards.set(row.slot, {
+        cells: after,
+        activeKind: row.activeKind,
+        activeX: row.activeX,
+        activeY: row.activeY,
+        activeRotation: row.activeRotation,
+        score: row.score,
+        linesCleared: row.lines,
+        toppedOut: false,
+        stale: false
+      });
+      return "applied";
+    }
+    applyBoard(row) {
+      if (row.room !== this.room) return false;
+      this.stats.boardEvents += 1;
+      const cells2 = unpackVisibleCells(row.board);
+      if (cells2 === null) return false;
+      this.boards.set(row.slot, {
+        cells: cells2,
+        activeKind: row.activeKind,
+        activeX: row.activeX,
+        activeY: row.activeY,
+        activeRotation: row.activeRotation,
+        score: row.score,
+        linesCleared: row.lines,
+        toppedOut: row.toppedOut,
+        stale: false
+      });
+      return true;
+    }
+    applyPose(row) {
+      if (row.room !== this.room) return false;
+      this.stats.poseEvents += 1;
+      const board = this.boards.get(row.slot);
+      if (!board) return false;
+      board.activeKind = row.kind;
+      board.activeX = row.x;
+      board.activeY = row.y;
+      board.activeRotation = row.rotation;
+      return true;
+    }
+    // The truth as of the snapshot. Events that arrived before it were applied
+    // to whatever was held and are simply overwritten.
+    applyKeyframe(rows2) {
+      this.stats.keyframes += 1;
+      for (const row of rows2) {
+        const cells2 = unpackVisibleCells(row.board);
+        if (cells2 === null) continue;
+        this.boards.set(Number(row.slot), {
+          cells: cells2,
+          activeKind: row.activeKind,
+          activeX: row.activeX,
+          activeY: row.activeY,
+          activeRotation: row.activeRotation,
+          score: row.score,
+          linesCleared: row.linesCleared,
+          toppedOut: row.toppedOut,
+          stale: false
+        });
+      }
+    }
+    hasStaleBoard() {
+      for (const board of this.boards.values()) if (board.stale) return true;
+      return false;
+    }
+    // One row per seat on the roster, in the old views' shapes. A seat with no
+    // board yet shows an empty one, as a freshly dealt board is.
+    opponentRows(roster) {
+      const boards = [];
+      const pieces = [];
+      for (const seat of roster) {
+        const board = this.boards.get(Number(seat.slot));
+        const pose = {
+          activeKind: board?.activeKind ?? -1,
+          activeX: board?.activeX ?? 4,
+          activeY: board?.activeY ?? 19,
+          activeRotation: board?.activeRotation ?? 0
+        };
+        boards.push({
+          owner: seat.owner,
+          slot: seat.slot,
+          alive: seat.alive,
+          placement: seat.placement,
+          ready: seat.ready,
+          displayName: seat.displayName,
+          cells: board?.cells ?? EMPTY_CELLS,
+          ...pose,
+          score: board?.score ?? 0,
+          linesCleared: board?.linesCleared ?? 0,
+          toppedOut: board?.toppedOut ?? false
+        });
+        pieces.push({ owner: seat.owner, ...pose });
+      }
+      return { boards, pieces };
+    }
+  };
 
   // src/row_json.ts
   function jsonSafe(value) {
@@ -10168,7 +10662,12 @@ ${ty.variants.map(
   var connectionEpoch = 0;
   var coreSubscription = null;
   var farmSubscription = null;
-  var farmBoardsSeen = /* @__PURE__ */ new Map();
+  var farmEventSubscription = null;
+  var farmEventRoom = -1;
+  var farmKeyframeSubscription = null;
+  var farmKeyframeAskedAt = 0;
+  var farmRivals = new FarmRivalBoards();
+  window.__ldbgFarmTransport = farmRivals.stats;
   var marketSubscription = null;
   var marketPriceSubscription = null;
   var marketHistorySubscription = null;
@@ -10576,6 +11075,9 @@ ${ty.variants.map(
   function releaseScopedSubscriptions() {
     scopedSubscriptionConnection = null;
     farmSubscription = null;
+    farmEventSubscription = null;
+    farmEventRoom = -1;
+    farmKeyframeSubscription = null;
     marketSubscription = null;
     marketPriceSubscription = null;
     marketHistorySubscription = null;
@@ -10714,17 +11216,13 @@ ${ty.variants.map(
       data.farmPvpMember = rows(activeConnection.db.myFarmPvpMemberV2)[0] ?? null;
     });
     part("farmBoard", () => {
-      const opponents = rows(activeConnection.db.opponentFarmBoardsCompactV4);
-      data.farmOpponents = opponents;
-      data.farmOpponentPieces = posesSurvivingBoardPatch(
-        farmBoardsSeen,
-        opponents,
-        rows(activeConnection.db.opponentFarmPiecesCompactV3)
-      );
-      Object.assign(data, farmBoardDomainPatch(opponents[0]));
+      const { boards, pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
+      data.farmOpponents = boards;
+      data.farmOpponentPieces = pieces;
+      Object.assign(data, farmBoardDomainPatch(boards[0]));
     });
     part("farmPiece", () => {
-      const pieces = rows(activeConnection.db.opponentFarmPiecesCompactV3);
+      const { pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
       data.farmOpponentPieces = pieces;
       data.opponentFarmPiece = pieces[0] ?? null;
     });
@@ -10834,9 +11332,87 @@ ${ty.variants.map(
   function stopFarmSubscription() {
     const previous = farmSubscription;
     farmSubscription = null;
-    farmBoardsSeen.clear();
     if (previous && typeof previous.unsubscribe === "function") previous.unsubscribe();
+    stopFarmEvents();
+    farmRivals.clear();
     clearFarmProjection();
+  }
+  function stopFarmEvents() {
+    for (const handle of [farmEventSubscription, farmKeyframeSubscription]) {
+      if (handle && typeof handle.unsubscribe === "function") {
+        try {
+          handle.unsubscribe();
+        } catch {
+        }
+      }
+    }
+    farmEventSubscription = null;
+    farmKeyframeSubscription = null;
+    farmEventRoom = -1;
+  }
+  var farmEventHandlersOn = /* @__PURE__ */ new WeakSet();
+  function watchFarmEvents(activeConnection) {
+    if (farmEventHandlersOn.has(activeConnection)) return;
+    farmEventHandlersOn.add(activeConnection);
+    const db = activeConnection.db;
+    db.farmLockEvent.onInsert((_ctx, row) => {
+      const outcome = farmRivals.applyLock(row);
+      if (outcome === "applied") scheduleDomain(activeConnection, "farmBoard");
+      else if (outcome === "mismatch") requestFarmKeyframe(activeConnection);
+    });
+    db.farmBoardEvent.onInsert((_ctx, row) => {
+      if (farmRivals.applyBoard(row)) scheduleDomain(activeConnection, "farmBoard");
+    });
+    db.farmPoseEvent.onInsert((_ctx, row) => {
+      if (farmRivals.applyPose(row)) scheduleDomain(activeConnection, "farmPiece");
+    });
+    const follow = () => followFarmRoom(activeConnection);
+    db.myFarmPvpMemberV2.onInsert(follow);
+    db.myFarmPvpMemberV2.onDelete(follow);
+    if (typeof db.myFarmPvpMemberV2.onUpdate === "function") db.myFarmPvpMemberV2.onUpdate(follow);
+  }
+  function followFarmRoom(activeConnection) {
+    if (connection !== activeConnection || !farmSubscription || !farmScopeWanted()) return;
+    const member = rows(activeConnection.db.myFarmPvpMemberV2)[0];
+    const room = member && member.matchId ? farmRoomKey(String(member.matchId)) : -1;
+    if (room === farmEventRoom && (farmEventSubscription || room < 0)) return;
+    if (farmRivals.follow(room)) scheduleDomain(activeConnection, "farmBoard");
+    stopFarmEvents();
+    farmEventRoom = room;
+    if (room < 0) return;
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (farmEventSubscription !== handle) return;
+      requestFarmKeyframe(activeConnection, true);
+    }).onError((_ctx, error) => {
+      if (connection === activeConnection) emit({ type: "error", command: "subscribeFarmEvents", message: String(error) });
+    }).subscribe([
+      `SELECT * FROM farm_lock_event WHERE room = ${room}`,
+      `SELECT * FROM farm_board_event WHERE room = ${room}`,
+      `SELECT * FROM farm_pose_event WHERE room = ${room}`
+    ]);
+    farmEventSubscription = handle;
+  }
+  function requestFarmKeyframe(activeConnection, force = false) {
+    if (connection !== activeConnection || !farmEventSubscription || farmKeyframeSubscription) return;
+    const now = Date.now();
+    if (!force && now - farmKeyframeAskedAt < 2e3) return;
+    farmKeyframeAskedAt = now;
+    const room = farmEventRoom;
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (farmKeyframeSubscription !== handle) return;
+      if (room === farmEventRoom) {
+        farmRivals.applyKeyframe(Array.from(activeConnection.db.opponentFarmKeyframesV1.iter()));
+        scheduleDomain(activeConnection, "farmBoard");
+      }
+      farmKeyframeSubscription = null;
+      try {
+        handle.unsubscribe();
+      } catch {
+      }
+    }).onError(() => {
+      if (farmKeyframeSubscription === handle) farmKeyframeSubscription = null;
+    }).subscribe([tables.opponentFarmKeyframesV1]);
+    farmKeyframeSubscription = handle;
   }
   function ensureFarmSubscription(activeConnection) {
     if (!coreSubscriptionReady || connection !== activeConnection) return;
@@ -10844,8 +11420,8 @@ ${ty.variants.map(
     if (!farmScopeWanted() || farmSubscription) return;
     observe(activeConnection, activeConnection.db.myFarmPvpSession, "farmSession");
     observe(activeConnection, activeConnection.db.myFarmPvpMemberV2, "farmSession");
-    observe(activeConnection, activeConnection.db.opponentFarmBoardsCompactV4, "farmBoard");
-    observe(activeConnection, activeConnection.db.opponentFarmPiecesCompactV3, "farmPiece");
+    observe(activeConnection, activeConnection.db.opponentFarmRosterV1, "farmBoard");
+    watchFarmEvents(activeConnection);
     observe(activeConnection, activeConnection.db.myFarmPvpAttacks, "farmAttacks");
     observe(activeConnection, activeConnection.db.mySentFarmPvpAttacks, "farmSentAttacks");
     observe(activeConnection, activeConnection.db.myFarmDarkHaul, "farmDarkHaul");
@@ -10853,13 +11429,13 @@ ${ty.variants.map(
       if (connection !== activeConnection || !farmSubscription || !farmScopeWanted()) return;
       publishDomains(activeConnection, ["farmSession", "farmBoard", "farmPiece", "farmAttacks", "farmSentAttacks", "farmDarkHaul"]);
       emit({ type: "subscription_scope_ready", scope: "farm" });
+      followFarmRoom(activeConnection);
     }).onError((_ctx, error) => {
       if (connection === activeConnection) emit({ type: "error", command: "subscribeFarm", message: String(error) });
     }).subscribe([
       tables.myFarmPvpSession,
       tables.myFarmPvpMemberV2,
-      tables.opponentFarmBoardsCompactV4,
-      tables.opponentFarmPiecesCompactV3,
+      tables.opponentFarmRosterV1,
       tables.myFarmPvpAttacks,
       tables.mySentFarmPvpAttacks,
       tables.myFarmDarkHaul
