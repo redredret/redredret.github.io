@@ -8676,6 +8676,11 @@ ${ty.variants.map(
     detailsJson: t.string()
   };
 
+  // src/module_bindings/request_duel_rematch_reducer.ts
+  var request_duel_rematch_reducer_default = {
+    duelId: t.string()
+  };
+
   // src/module_bindings/reroll_task_reducer.ts
   var reroll_task_reducer_default = {
     taskRowId: t.string()
@@ -9836,6 +9841,7 @@ ${ty.variants.map(
     reducerSchema("report_party_enemy_heal", report_party_enemy_heal_reducer_default),
     reducerSchema("report_party_health", report_party_health_reducer_default),
     reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
+    reducerSchema("request_duel_rematch", request_duel_rematch_reducer_default),
     reducerSchema("reroll_task", reroll_task_reducer_default),
     reducerSchema("sell_item", sell_item_reducer_default),
     reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
