@@ -10690,6 +10690,35 @@ ${ty.variants.map(
   var LOGOUT_POPUP_NAME = "ldbg_spacetime_logout";
   var SESSION_RESET_POPUP_NAME = "ldbg_spacetime_session_reset";
   var POPUP_FEATURES = "popup=yes,width=560,height=760,resizable=yes,scrollbars=yes";
+  var SNAPSHOT_DOMAINS = [
+    "profile",
+    "inventory",
+    "upgrades",
+    "run",
+    "dungeonProgress",
+    "farmSession",
+    "farmBoard",
+    "farmPiece",
+    "farmAttacks",
+    "farmSentAttacks",
+    "farmDarkHaul",
+    "market",
+    "marketPrices",
+    "marketHistory",
+    "arenaDuels",
+    "duelBoard",
+    "darkDuel",
+    "darkPresence",
+    "darkChests",
+    "duelOpponentBoard",
+    "duelOpponentPiece",
+    "playerCounts",
+    "quests",
+    "questCatalog",
+    "party",
+    "partySteps",
+    "partyBoard"
+  ];
   var connection = null;
   var connectionEpoch = 0;
   var coreSubscription = null;
@@ -11138,57 +11167,11 @@ ${ty.variants.map(
     connectionEpoch += 1;
     if (previousConnection && typeof previousConnection.disconnect === "function") previousConnection.disconnect();
   }
+  var EMPTY_CONNECTION = {
+    db: new Proxy({}, { get: () => ({ iter: () => [] }) })
+  };
   function emptyAccountSnapshot() {
-    return {
-      type: "snapshot",
-      data: {
-        profile: null,
-        profilePreferences: null,
-        inventory: [],
-        inventoryOrder: [],
-        equipment: [],
-        equippedFood: [],
-        skills: [],
-        upgradeProgress: null,
-        upgradeUnlocks: [],
-        activeRun: null,
-        dungeonProgress: [],
-        runHistory: [],
-        farmPvpMember: null,
-        myFarmBoard: null,
-        opponentFarmBoard: null,
-        farmOpponents: [],
-        myFarmPiece: null,
-        opponentFarmPiece: null,
-        farmOpponentPieces: [],
-        farmPvpSession: null,
-        farmPvpAttacks: [],
-        farmPvpSentAttacks: [],
-        farmDarkHaul: [],
-        marketListings: [],
-        marketPrices: [],
-        marketTransactions: [],
-        duelListings: [],
-        duelLobby: null,
-        duelRecord: null,
-        party: null,
-        partyMembers: [],
-        partyQueue: null,
-        partySteps: [],
-        partyBoards: [],
-        partyPieces: [],
-        darkChestClaims: [],
-        questCatalog: [],
-        tasks: [],
-        taskChests: [],
-        questProgress: [],
-        taskState: null,
-        questDetails: [],
-        questClaims: [],
-        questStats: [],
-        featClaims: []
-      }
-    };
+    return snapshotPatch(EMPTY_CONNECTION, new Set(SNAPSHOT_DOMAINS));
   }
   function buildDomain(domain, build) {
     buildPatchPart(domain, build, (failed, message) => emit({
@@ -11694,7 +11677,7 @@ ${ty.variants.map(
   }
   async function openBackendConnection(request) {
     const config = resolveBackendConfig(backendConfigOverrides, request);
-    const token = request.token?.trim() || accountToken;
+    const token = accountToken;
     disconnectBackend();
     const epoch = connectionEpoch;
     if (!token) {
@@ -11863,7 +11846,7 @@ ${ty.variants.map(
     if (clientScreen === "farm") return;
     const requiresRefresh = clientScreen === "farm_round_end";
     disconnectBackend();
-    resumeNeeded = !requiresRefresh;
+    resumeNeeded = false;
     emit({ type: "idle_disconnected", requiresRefresh });
   }
   function checkAfkIdle() {
