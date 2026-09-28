@@ -8369,6 +8369,11 @@ ${ty.variants.map(
     listingId: t.string()
   };
 
+  // src/module_bindings/claim_feat_reducer.ts
+  var claim_feat_reducer_default = {
+    featId: t.string()
+  };
+
   // src/module_bindings/claim_play_session_reducer.ts
   var claim_play_session_reducer_default = {
     force: t.bool()
@@ -8751,6 +8756,11 @@ ${ty.variants.map(
   // src/module_bindings/set_skin_tone_reducer.ts
   var set_skin_tone_reducer_default = {
     skinTone: t.u32()
+  };
+
+  // src/module_bindings/start_farm_run_reducer.ts
+  var start_farm_run_reducer_default = {
+    headStart: t.bool()
   };
 
   // src/module_bindings/start_run_reducer.ts
@@ -9151,6 +9161,14 @@ ${ty.variants.map(
     bestLines: t.u32().name("best_lines"),
     bestLevel: t.u32().name("best_level"),
     reachedAt: t.timestamp().name("reached_at")
+  });
+
+  // src/module_bindings/my_feat_claims_table.ts
+  var my_feat_claims_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    featId: t.string().name("feat_id"),
+    claimedAt: t.timestamp().name("claimed_at")
   });
 
   // src/module_bindings/my_inventory_table.ts
@@ -9640,6 +9658,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_farm_records_table_default),
+    myFeatClaims: table({
+      name: "my_feat_claims",
+      indexes: [],
+      constraints: []
+    }, my_feat_claims_table_default),
     myInventory: table({
       name: "my_inventory",
       indexes: [],
@@ -9789,6 +9812,7 @@ ${ty.variants.map(
     reducerSchema("buy_shop_item", buy_shop_item_reducer_default),
     reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
     reducerSchema("challenge_duel_listing", challenge_duel_listing_reducer_default),
+    reducerSchema("claim_feat", claim_feat_reducer_default),
     reducerSchema("claim_play_session", claim_play_session_reducer_default),
     reducerSchema("claim_quest", claim_quest_reducer_default),
     reducerSchema("claim_task", claim_task_reducer_default),
@@ -9852,6 +9876,7 @@ ${ty.variants.map(
     reducerSchema("set_hair", set_hair_reducer_default),
     reducerSchema("set_party_ready", set_party_ready_reducer_default),
     reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
+    reducerSchema("start_farm_run", start_farm_run_reducer_default),
     reducerSchema("start_run", start_run_reducer_default),
     reducerSchema("submit_dungeon_run_result_v_1", submit_dungeon_run_result_v_1_reducer_default),
     reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
@@ -9894,6 +9919,7 @@ ${ty.variants.map(
     "my_farm_pvp_member_v2": "myFarmPvpMemberV2",
     "my_farm_pvp_session": "myFarmPvpSession",
     "my_farm_records": "myFarmRecords",
+    "my_feat_claims": "myFeatClaims",
     "my_inventory": "myInventory",
     "my_inventory_order": "myInventoryOrder",
     "my_market_sale_notice": "myMarketSaleNotice",
@@ -11159,7 +11185,8 @@ ${ty.variants.map(
         taskState: null,
         questDetails: [],
         questClaims: [],
-        questStats: []
+        questStats: [],
+        featClaims: []
       }
     };
   }
@@ -11279,6 +11306,7 @@ ${ty.variants.map(
       data.taskState = rows(activeConnection.db.myTaskState)[0] ?? null;
       data.questClaims = rows(activeConnection.db.myQuestClaims);
       data.questStats = rows(activeConnection.db.myQuestStats);
+      data.featClaims = rows(activeConnection.db.myFeatClaims);
     });
     part("questCatalog", () => {
       data.questCatalog = rows(activeConnection.db.questCatalog);
@@ -11611,6 +11639,7 @@ ${ty.variants.map(
     observe(activeConnection, activeConnection.db.questDetails, "questCatalog");
     observe(activeConnection, activeConnection.db.myQuestClaims, "quests");
     observe(activeConnection, activeConnection.db.myQuestStats, "quests");
+    observe(activeConnection, activeConnection.db.myFeatClaims, "quests");
     questSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection === activeConnection) {
         publishDomains(activeConnection, ["quests", "questCatalog"]);
@@ -11626,7 +11655,8 @@ ${ty.variants.map(
       tables.myTaskState,
       tables.questDetails,
       tables.myQuestClaims,
-      tables.myQuestStats
+      tables.myQuestStats,
+      tables.myFeatClaims
     ]);
   }
   function flushPendingReducerCalls() {
