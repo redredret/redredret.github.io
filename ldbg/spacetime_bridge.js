@@ -8468,12 +8468,6 @@ ${ty.variants.map(
     slot: t.string()
   };
 
-  // src/module_bindings/equip_skill_reducer.ts
-  var equip_skill_reducer_default = {
-    skillId: t.string(),
-    slot: t.u32()
-  };
-
   // src/module_bindings/join_farm_dark_private_reducer.ts
   var join_farm_dark_private_reducer_default = {
     code: t.string()
@@ -9830,7 +9824,6 @@ ${ty.variants.map(
     reducerSchema("equip_food", equip_food_reducer_default),
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
     reducerSchema("equip_inventory_item_to_slot", equip_inventory_item_to_slot_reducer_default),
-    reducerSchema("equip_skill", equip_skill_reducer_default),
     reducerSchema("join_farm_dark_private", join_farm_dark_private_reducer_default),
     reducerSchema("join_farm_dark_public", join_farm_dark_public_reducer_default),
     reducerSchema("join_farm_private", join_farm_private_reducer_default),
@@ -11194,7 +11187,6 @@ ${ty.variants.map(
       data.inventoryOrder = rows(activeConnection.db.myInventoryOrder);
       data.equipment = rows(activeConnection.db.myEquipment);
       data.equippedFood = rows(activeConnection.db.myEquippedFood);
-      data.skills = rows(activeConnection.db.mySkills);
     });
     part("upgrades", () => {
       data.upgradeProgress = rows(activeConnection.db.myUpgradeProgress)[0] ?? null;
@@ -11445,7 +11437,6 @@ ${ty.variants.map(
     farmSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection !== activeConnection || !farmSubscription || !farmScopeWanted()) return;
       publishDomains(activeConnection, ["farmSession", "farmBoard", "farmPiece", "farmAttacks", "farmSentAttacks", "farmDarkHaul"]);
-      emit({ type: "subscription_scope_ready", scope: "farm" });
       followFarmRoom(activeConnection);
     }).onError((_ctx, error) => {
       if (connection === activeConnection) emit({ type: "error", command: "subscribeFarm", message: String(error) });
@@ -11481,7 +11472,6 @@ ${ty.variants.map(
     duelBoardSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection !== activeConnection || !duelBoardSubscription || !duelBoardScopeWanted()) return;
       publishDomains(activeConnection, ["duelBoard"]);
-      emit({ type: "subscription_scope_ready", scope: "duelBoard" });
     }).onError((_ctx, error) => {
       if (connection === activeConnection) {
         emit({ type: "error", command: "subscribeDuelBoard", message: String(error) });
@@ -11505,7 +11495,6 @@ ${ty.variants.map(
     marketSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection !== activeConnection || !marketSubscription || !marketScopeWanted()) return;
       publishDomains(activeConnection, ["market"]);
-      emit({ type: "subscription_scope_ready", scope: "market" });
     }).onError((_ctx, error) => {
       if (connection === activeConnection) emit({ type: "error", command: "subscribeMarket", message: String(error) });
     }).subscribe([tables.marketListings]);
@@ -11626,7 +11615,6 @@ ${ty.variants.map(
     questSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
       if (connection === activeConnection) {
         publishDomains(activeConnection, ["quests", "questCatalog"]);
-        emit({ type: "subscription_scope_ready", scope: "quests" });
       }
     }).onError((_ctx, error) => {
       if (connection === activeConnection) emit({ type: "error", command: "subscribeQuests", message: String(error) });
@@ -11708,7 +11696,6 @@ ${ty.variants.map(
       observe(conn, conn.db.myInventoryOrder, "inventory");
       observe(conn, conn.db.myEquipment, "inventory");
       observe(conn, conn.db.myEquippedFood, "inventory");
-      observe(conn, conn.db.mySkills, "inventory");
       observe(conn, conn.db.myUpgradeProgress, "upgrades");
       observe(conn, conn.db.myUpgradeUnlocks, "upgrades");
       observe(conn, conn.db.myActiveRun, "run");
@@ -11741,7 +11728,6 @@ ${ty.variants.map(
         tables.myInventoryOrder,
         tables.myEquipment,
         tables.myEquippedFood,
-        tables.mySkills,
         tables.myUpgradeProgress,
         tables.myUpgradeUnlocks,
         tables.myActiveRun,
