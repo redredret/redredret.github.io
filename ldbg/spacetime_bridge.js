@@ -723,6 +723,302 @@ ${originalIndentation}`;
     }
   });
 
+  // src/auth.ts
+  var AUTH_CALLBACK_MESSAGE_TYPE = "ldbg:spacetime-auth-callback";
+  var AUTH_CALLBACK_PARAMETERS = [
+    "code",
+    "state",
+    "error",
+    "error_description",
+    "error_uri",
+    "iss",
+    "session_state"
+  ];
+  var DEFAULT_AUTH_CONFIG = {
+    clientId: "",
+    authorizationEndpoint: "https://auth.spacetimedb.com/oidc/auth",
+    tokenEndpoint: "https://auth.spacetimedb.com/oidc/token",
+    endSessionEndpoint: "https://auth.spacetimedb.com/oidc/session/end",
+    issuer: "https://auth.spacetimedb.com/oidc",
+    // offline_access asks for a refresh token. The identity token lasts only a
+    // short while and every reconnect presents it again, so without one a player
+    // whose connection drops after it has lapsed is signed out mid-match.
+    scopes: "openid profile email offline_access"
+  };
+  function resolveAuthConfig(overrides) {
+    return { ...DEFAULT_AUTH_CONFIG, ...overrides ?? {} };
+  }
+  function browserPageUrl(locationHref) {
+    const url = new URL(locationHref);
+    url.search = "";
+    url.hash = "";
+    return url.toString();
+  }
+  function createAuthCallbackMessage(callbackUrl) {
+    return { type: AUTH_CALLBACK_MESSAGE_TYPE, callbackUrl };
+  }
+  function authCallbackUrlFromMessage(value) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+    const candidate = value;
+    if (candidate.type !== AUTH_CALLBACK_MESSAGE_TYPE || typeof candidate.callbackUrl !== "string") return null;
+    try {
+      const url = new URL(candidate.callbackUrl);
+      if (!url.searchParams.has("code") && !url.searchParams.has("error")) return null;
+      return url.toString();
+    } catch {
+      return null;
+    }
+  }
+  function authCallbackTargetsRedirect(callbackUrl, redirectUri2) {
+    try {
+      const callback = new URL(callbackUrl);
+      const redirect = new URL(redirectUri2);
+      for (const parameter of AUTH_CALLBACK_PARAMETERS) callback.searchParams.delete(parameter);
+      return callback.toString() === redirect.toString();
+    } catch {
+      return false;
+    }
+  }
+  function buildAuthorizationUrl(config, redirectUri2, state, nonce, codeChallenge) {
+    const url = new URL(config.authorizationEndpoint);
+    url.searchParams.set("client_id", config.clientId);
+    url.searchParams.set("redirect_uri", redirectUri2);
+    url.searchParams.set("response_type", "code");
+    url.searchParams.set("scope", config.scopes);
+    url.searchParams.set("state", state);
+    url.searchParams.set("nonce", nonce);
+    url.searchParams.set("code_challenge", codeChallenge);
+    url.searchParams.set("code_challenge_method", "S256");
+    return url.toString();
+  }
+  function buildLogoutUrl(config, idTokenHint, defaultReturnUri) {
+    const url = new URL(config.endSessionEndpoint);
+    url.searchParams.set("client_id", config.clientId);
+    if (idTokenHint) url.searchParams.set("id_token_hint", idTokenHint);
+    const returnUri = config.postLogoutRedirectUri?.trim() || defaultReturnUri;
+    if (returnUri) url.searchParams.set("post_logout_redirect_uri", returnUri);
+    return url.toString();
+  }
+  function decodeJwtClaims(token) {
+    const payload = token.split(".")[1];
+    if (!payload) throw new Error("The identity token is malformed.");
+    const padded = payload.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(payload.length / 4) * 4, "=");
+    const binary = globalThis.atob(padded);
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    const parsed = JSON.parse(new TextDecoder().decode(bytes));
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("The identity token claims are malformed.");
+    }
+    return parsed;
+  }
+  function validateIdTokenClaims(claims, config, expectedNonce, nowSeconds = Math.floor(Date.now() / 1e3)) {
+    if (!claims.sub || typeof claims.sub !== "string") return "The identity token has no subject.";
+    if (claims.iss !== config.issuer) return "The identity token issuer is not trusted.";
+    const audiences = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
+    if (!audiences.includes(config.clientId)) return "The identity token was issued for another client.";
+    if (claims.nonce !== expectedNonce) return "The identity token nonce did not match the login request.";
+    if (typeof claims.exp !== "number" || claims.exp <= nowSeconds - 60) return "The identity token has expired.";
+    return null;
+  }
+  function validateRefreshedIdTokenClaims(claims, previous, config, nowSeconds = Math.floor(Date.now() / 1e3)) {
+    if (!claims.sub || typeof claims.sub !== "string") return "The identity token has no subject.";
+    if (!previous || claims.sub !== previous.sub) return "The renewed sign-in belongs to a different account.";
+    if (claims.iss !== config.issuer) return "The identity token issuer is not trusted.";
+    const audiences = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
+    if (!audiences.includes(config.clientId)) return "The identity token was issued for another client.";
+    if (typeof claims.exp !== "number" || claims.exp <= nowSeconds - 60) return "The identity token has expired.";
+    return null;
+  }
+  var TOKEN_REFRESH_LEAD_SECONDS = 5 * 60;
+  var TOKEN_REFRESH_MIN_DELAY_MS = 15 * 1e3;
+  function tokenRefreshDelayMs(expiresAtSeconds, nowMs = Date.now()) {
+    if (typeof expiresAtSeconds !== "number" || !Number.isFinite(expiresAtSeconds)) return null;
+    const due = (expiresAtSeconds - TOKEN_REFRESH_LEAD_SECONDS) * 1e3 - nowMs;
+    return Math.max(TOKEN_REFRESH_MIN_DELAY_MS, due);
+  }
+  function accountLabel(claims) {
+    if (!claims) return "SpacetimeAuth account";
+    for (const key of ["preferred_username", "name", "email"]) {
+      const value = claims[key];
+      if (typeof value === "string" && value.trim()) return value.trim();
+    }
+    return "SpacetimeAuth account";
+  }
+
+  // src/connection_lifecycle.ts
+  var AFK_DISCONNECT_MS = 10 * 60 * 1e3;
+  var AFK_CHECK_INTERVAL_MS = 30 * 1e3;
+  function shouldEnterAfkIdle(state) {
+    if (!state.connected || !state.accountAuthenticated || state.authBusy) return false;
+    if (state.inactiveForMs < AFK_DISCONNECT_MS) return false;
+    if (state.clientScreen === "farm") return false;
+    return true;
+  }
+  function shouldAutoResumeConnection(state) {
+    if (!state.accountAuthenticated || state.authBusy) return false;
+    return state.clientScreen.startsWith("farm") || !state.documentHidden;
+  }
+  var TOKEN_EXPIRY_SKEW_SECONDS = 60;
+  function isAccountTokenExpired(expiresAtSeconds, nowSeconds = Math.floor(Date.now() / 1e3)) {
+    if (typeof expiresAtSeconds !== "number" || !Number.isFinite(expiresAtSeconds)) return false;
+    return expiresAtSeconds <= nowSeconds - TOKEN_EXPIRY_SKEW_SECONDS;
+  }
+  var EXPIRED_SESSION_MESSAGE = "Your login expired. Open Account and log in again to keep playing.";
+  var SUPERSEDABLE_CALLS = [
+    "publishFarmBoard",
+    "publishFarmBoardV2",
+    "publishFarmPiece",
+    "publishDuelBoard",
+    "publishDuelPiece",
+    "publishPartyBoard",
+    "publishPartyPiece"
+  ];
+  var QUIET_SUCCESS_CALLS = [
+    "publishFarmBoard",
+    "publishFarmBoardV2",
+    "publishFarmPiece",
+    "publishDuelBoard",
+    "publishDuelPiece",
+    "sendFarmPvpAttack",
+    "sendDarkDuelBlow",
+    "refreshDarkPresence",
+    // Nothing in Godot waits on these succeeding; their answer is the rows they
+    // write. A failure is still reported.
+    "openDarkChest",
+    "refreshMyTasks",
+    "markTasksSeen",
+    "acknowledgeTaskChest",
+    "reportDuelBoardBreak",
+    "sendPartyBlow",
+    "reportPartyEnemyHeal",
+    "openPartyChest",
+    "reportPartyHealth",
+    "reportPartyDown",
+    "publishPartyBoard",
+    "publishPartyPiece"
+  ];
+  function reportsSuccess(name) {
+    return !QUIET_SUCCESS_CALLS.includes(name);
+  }
+  function mergeSnapshotRuns(events) {
+    const merged = [];
+    for (const event of events) {
+      const previous = merged[merged.length - 1];
+      if (event.type === "snapshot" && previous && previous.type === "snapshot") {
+        merged[merged.length - 1] = {
+          ...previous,
+          data: {
+            ...previous.data ?? {},
+            ...event.data ?? {}
+          }
+        };
+        continue;
+      }
+      merged.push(event);
+    }
+    return merged;
+  }
+  var MAX_PENDING_CALLS = 64;
+  var HELD_CALL_TIMEOUT_MS = 2e4;
+  function partitionExpiredCalls(queued, now, timeoutMs = HELD_CALL_TIMEOUT_MS) {
+    const kept = [];
+    const expired = [];
+    for (const call of queued) {
+      (now - call.queuedAt >= timeoutMs ? expired : kept).push(call);
+    }
+    return { kept, expired };
+  }
+  var BACKGROUND_CALLS = [
+    "claimPlaySession",
+    "renewPlaySession",
+    // Sent on the client's own schedule, not because the player did anything.
+    "reportRunSubmissionProblem",
+    "acknowledgeMarketSales",
+    // A Dark run announces itself between encounters and swings on every clear.
+    // Every name the walk-in has had. Only the old one was listed once, so
+    // walking into a duel counted as the player being at the keyboard -- and then
+    // V3 (the food slot) went out unlisted and did it again. A new walk-in name
+    // goes on this list the day it is sent.
+    "refreshDarkPresence",
+    "sendDarkDuelBlow",
+    "enterDarkDuel",
+    "enterDarkDuelV2",
+    "enterDarkDuelV3",
+    "enterDarkDuelV4",
+    // The client deals its tasks on connect and at each reset, dismisses a chest's
+    // reveal when it closes, and marks tasks seen when the view shows them: none
+    // of it is the player doing anything.
+    "refreshMyTasks",
+    "acknowledgeTaskChest",
+    "markTasksSeen",
+    // A co-op run's clears, the Vampiric drinks its board feeds the party's
+    // monster, a chest press, its health and its board: all sent by the fight,
+    // not the player, and none worth replaying after a reconnect -- a lost hit
+    // only ever costs the sender, and settlement tolerates it.
+    "sendPartyBlow",
+    "reportPartyEnemyHeal",
+    "openPartyChest",
+    "reportPartyHealth",
+    "reportPartyDown",
+    "publishPartyBoard",
+    "publishPartyPiece"
+  ];
+  function isBackgroundCall(name) {
+    return BACKGROUND_CALLS.includes(name);
+  }
+  function collapsePendingCalls(queued, maximum = MAX_PENDING_CALLS) {
+    const lastSupersedable = /* @__PURE__ */ new Map();
+    queued.forEach((call, index) => {
+      if (SUPERSEDABLE_CALLS.includes(call.name)) lastSupersedable.set(call.name, index);
+    });
+    const kept = queued.filter(
+      (call, index) => !SUPERSEDABLE_CALLS.includes(call.name) || lastSupersedable.get(call.name) === index
+    );
+    return kept.length <= maximum ? kept : kept.slice(kept.length - maximum);
+  }
+  function buildPatchPart(domain, build, report) {
+    try {
+      build();
+    } catch (error) {
+      report(domain, String(error));
+    }
+  }
+
+  // src/events.ts
+  var pendingEvents = [];
+  var MAX_PENDING_EVENTS = 512;
+  function emit(event) {
+    pendingEvents.push(event);
+    if (pendingEvents.length <= MAX_PENDING_EVENTS) return;
+    const overflow = pendingEvents.length - MAX_PENDING_EVENTS;
+    for (let removed = 0; removed < overflow; removed += 1) {
+      const index = pendingEvents.findIndex((pending) => pending.type !== "snapshot");
+      pendingEvents.splice(index === -1 ? 0 : index, 1);
+    }
+  }
+  function drainEvents() {
+    if (pendingEvents.length === 0) return "";
+    return JSON.stringify(mergeSnapshotRuns(pendingEvents.splice(0, pendingEvents.length)));
+  }
+
+  // src/state.ts
+  var live = {
+    /** The SDK connection whose core subscription is live or opening; null when there is none. */
+    connection: null,
+    /** Bumped by every disconnect, so callbacks from a connection already thrown away are ignored. */
+    connectionEpoch: 0,
+    /** The core subscription has been applied: the barrier every scoped group and held call waits for. */
+    coreSubscriptionReady: false,
+    /** A connection has been asked for and has neither opened nor failed yet. */
+    connectionOpening: false,
+    /** The connection was lost, not left: the next activity (or the backoff) opens it again. */
+    resumeNeeded: false,
+    /** The target Godot last asked to connect to; a resume reconnects to it. */
+    lastBackendRequest: null,
+    /** The screen Godot last reported (`setClientContext`): what the scoped groups follow. */
+    clientScreen: "title"
+  };
+
   // node_modules/.pnpm/spacetimedb@2.8.2/node_modules/spacetimedb/dist/index.browser.mjs
   var import_base64_js = __toESM(require_base64_js(), 1);
 
@@ -9980,126 +10276,65 @@ ${ty.variants.map(
     };
   };
 
-  // src/auth.ts
-  var AUTH_CALLBACK_MESSAGE_TYPE = "ldbg:spacetime-auth-callback";
-  var AUTH_CALLBACK_PARAMETERS = [
-    "code",
-    "state",
-    "error",
-    "error_description",
-    "error_uri",
-    "iss",
-    "session_state"
-  ];
-  var DEFAULT_AUTH_CONFIG = {
-    clientId: "",
-    authorizationEndpoint: "https://auth.spacetimedb.com/oidc/auth",
-    tokenEndpoint: "https://auth.spacetimedb.com/oidc/token",
-    endSessionEndpoint: "https://auth.spacetimedb.com/oidc/session/end",
-    issuer: "https://auth.spacetimedb.com/oidc",
-    // offline_access asks for a refresh token. The identity token lasts only a
-    // short while and every reconnect presents it again, so without one a player
-    // whose connection drops after it has lapsed is signed out mid-match.
-    scopes: "openid profile email offline_access"
-  };
-  function resolveAuthConfig(overrides) {
-    return { ...DEFAULT_AUTH_CONFIG, ...overrides ?? {} };
+  // src/reducer_queue.ts
+  var pendingReducerCalls = [];
+  var pendingCallTimer = null;
+  function flushPendingReducerCalls() {
+    if (!live.connection || !live.coreSubscriptionReady) return;
+    clearPendingCallTimer();
+    const queued = collapsePendingCalls(pendingReducerCalls.splice(0, pendingReducerCalls.length));
+    for (const item of queued) void callReducer(item.name, item.argumentsJson);
   }
-  function browserPageUrl(locationHref) {
-    const url = new URL(locationHref);
-    url.search = "";
-    url.hash = "";
-    return url.toString();
+  function clearPendingCallTimer() {
+    if (pendingCallTimer !== null) window.clearTimeout(pendingCallTimer);
+    pendingCallTimer = null;
   }
-  function createAuthCallbackMessage(callbackUrl) {
-    return { type: AUTH_CALLBACK_MESSAGE_TYPE, callbackUrl };
+  function expireHeldCalls() {
+    pendingCallTimer = null;
+    const { kept, expired } = partitionExpiredCalls(pendingReducerCalls, Date.now());
+    pendingReducerCalls.length = 0;
+    pendingReducerCalls.push(...kept);
+    for (const call of expired) {
+      emit({
+        type: "error",
+        command: call.name,
+        message: "The server didn't answer. Check your connection or reload the page, then try again."
+      });
+    }
+    armPendingCallTimer();
   }
-  function authCallbackUrlFromMessage(value) {
-    if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-    const candidate = value;
-    if (candidate.type !== AUTH_CALLBACK_MESSAGE_TYPE || typeof candidate.callbackUrl !== "string") return null;
+  function armPendingCallTimer() {
+    if (pendingCallTimer !== null || pendingReducerCalls.length === 0) return;
+    const oldest = pendingReducerCalls.reduce(
+      (at, call) => Math.min(at, call.queuedAt),
+      Number.POSITIVE_INFINITY
+    );
+    const remaining = Math.max(0, HELD_CALL_TIMEOUT_MS - (Date.now() - oldest));
+    pendingCallTimer = window.setTimeout(expireHeldCalls, remaining);
+  }
+  async function callReducer(name, argumentsJson) {
     try {
-      const url = new URL(candidate.callbackUrl);
-      if (!url.searchParams.has("code") && !url.searchParams.has("error")) return null;
-      return url.toString();
-    } catch {
-      return null;
+      const background = isBackgroundCall(name);
+      if (!background) noteUserActivity();
+      if (!live.connection || !live.coreSubscriptionReady) {
+        if (!background && currentAuthMode() === "account" && live.lastBackendRequest && (live.resumeNeeded || live.connectionOpening)) {
+          pendingReducerCalls.push({ name, argumentsJson, queuedAt: Date.now() });
+          const collapsed = collapsePendingCalls(pendingReducerCalls);
+          pendingReducerCalls.length = 0;
+          pendingReducerCalls.push(...collapsed);
+          armPendingCallTimer();
+          resumeBackend();
+          return;
+        }
+        throw new Error("SpacetimeDB is not connected.");
+      }
+      const reducer = live.connection.reducers[name];
+      if (typeof reducer !== "function") throw new Error(`Unknown reducer '${name}'.`);
+      await reducer.call(live.connection.reducers, JSON.parse(argumentsJson));
+      if (reportsSuccess(name)) emit({ type: "command_succeeded", command: name });
+    } catch (error) {
+      emit({ type: "error", command: name, message: String(error) });
     }
-  }
-  function authCallbackTargetsRedirect(callbackUrl, redirectUri2) {
-    try {
-      const callback = new URL(callbackUrl);
-      const redirect = new URL(redirectUri2);
-      for (const parameter of AUTH_CALLBACK_PARAMETERS) callback.searchParams.delete(parameter);
-      return callback.toString() === redirect.toString();
-    } catch {
-      return false;
-    }
-  }
-  function buildAuthorizationUrl(config, redirectUri2, state, nonce, codeChallenge) {
-    const url = new URL(config.authorizationEndpoint);
-    url.searchParams.set("client_id", config.clientId);
-    url.searchParams.set("redirect_uri", redirectUri2);
-    url.searchParams.set("response_type", "code");
-    url.searchParams.set("scope", config.scopes);
-    url.searchParams.set("state", state);
-    url.searchParams.set("nonce", nonce);
-    url.searchParams.set("code_challenge", codeChallenge);
-    url.searchParams.set("code_challenge_method", "S256");
-    return url.toString();
-  }
-  function buildLogoutUrl(config, idTokenHint, defaultReturnUri) {
-    const url = new URL(config.endSessionEndpoint);
-    url.searchParams.set("client_id", config.clientId);
-    if (idTokenHint) url.searchParams.set("id_token_hint", idTokenHint);
-    const returnUri = config.postLogoutRedirectUri?.trim() || defaultReturnUri;
-    if (returnUri) url.searchParams.set("post_logout_redirect_uri", returnUri);
-    return url.toString();
-  }
-  function decodeJwtClaims(token) {
-    const payload = token.split(".")[1];
-    if (!payload) throw new Error("The identity token is malformed.");
-    const padded = payload.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(payload.length / 4) * 4, "=");
-    const binary = globalThis.atob(padded);
-    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-    const parsed = JSON.parse(new TextDecoder().decode(bytes));
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-      throw new Error("The identity token claims are malformed.");
-    }
-    return parsed;
-  }
-  function validateIdTokenClaims(claims, config, expectedNonce, nowSeconds = Math.floor(Date.now() / 1e3)) {
-    if (!claims.sub || typeof claims.sub !== "string") return "The identity token has no subject.";
-    if (claims.iss !== config.issuer) return "The identity token issuer is not trusted.";
-    const audiences = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
-    if (!audiences.includes(config.clientId)) return "The identity token was issued for another client.";
-    if (claims.nonce !== expectedNonce) return "The identity token nonce did not match the login request.";
-    if (typeof claims.exp !== "number" || claims.exp <= nowSeconds - 60) return "The identity token has expired.";
-    return null;
-  }
-  function validateRefreshedIdTokenClaims(claims, previous, config, nowSeconds = Math.floor(Date.now() / 1e3)) {
-    if (!claims.sub || typeof claims.sub !== "string") return "The identity token has no subject.";
-    if (!previous || claims.sub !== previous.sub) return "The renewed sign-in belongs to a different account.";
-    if (claims.iss !== config.issuer) return "The identity token issuer is not trusted.";
-    const audiences = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
-    if (!audiences.includes(config.clientId)) return "The identity token was issued for another client.";
-    if (typeof claims.exp !== "number" || claims.exp <= nowSeconds - 60) return "The identity token has expired.";
-    return null;
-  }
-  var TOKEN_REFRESH_LEAD_SECONDS = 5 * 60;
-  var TOKEN_REFRESH_MIN_DELAY_MS = 15 * 1e3;
-  function tokenRefreshDelayMs(expiresAtSeconds, nowMs = Date.now()) {
-    if (typeof expiresAtSeconds !== "number" || !Number.isFinite(expiresAtSeconds)) return null;
-    const due = (expiresAtSeconds - TOKEN_REFRESH_LEAD_SECONDS) * 1e3 - nowMs;
-    return Math.max(TOKEN_REFRESH_MIN_DELAY_MS, due);
-  }
-  function accountLabel(claims) {
-    if (!claims) return "SpacetimeAuth account";
-    for (const key of ["preferred_username", "name", "email"]) {
-      const value = claims[key];
-      if (typeof value === "string" && value.trim()) return value.trim();
-    }
-    return "SpacetimeAuth account";
   }
 
   // src/runtime_config.ts
@@ -10107,153 +10342,6 @@ ${ty.variants.map(
     return {
       uri: overrides?.uri?.trim() || fallback.uri,
       database: overrides?.database?.trim() || fallback.database
-    };
-  }
-
-  // src/connection_lifecycle.ts
-  var AFK_DISCONNECT_MS = 10 * 60 * 1e3;
-  var AFK_CHECK_INTERVAL_MS = 30 * 1e3;
-  function shouldEnterAfkIdle(state) {
-    if (!state.connected || !state.accountAuthenticated || state.authBusy) return false;
-    if (state.inactiveForMs < AFK_DISCONNECT_MS) return false;
-    if (state.clientScreen === "farm") return false;
-    return true;
-  }
-  function shouldAutoResumeConnection(state) {
-    if (!state.accountAuthenticated || state.authBusy) return false;
-    return state.clientScreen.startsWith("farm") || !state.documentHidden;
-  }
-  var TOKEN_EXPIRY_SKEW_SECONDS = 60;
-  function isAccountTokenExpired(expiresAtSeconds, nowSeconds = Math.floor(Date.now() / 1e3)) {
-    if (typeof expiresAtSeconds !== "number" || !Number.isFinite(expiresAtSeconds)) return false;
-    return expiresAtSeconds <= nowSeconds - TOKEN_EXPIRY_SKEW_SECONDS;
-  }
-  var EXPIRED_SESSION_MESSAGE = "Your login expired. Open Account and log in again to keep playing.";
-  var SUPERSEDABLE_CALLS = [
-    "publishFarmBoard",
-    "publishFarmBoardV2",
-    "publishFarmPiece",
-    "publishDuelBoard",
-    "publishDuelPiece",
-    "publishPartyBoard",
-    "publishPartyPiece"
-  ];
-  var QUIET_SUCCESS_CALLS = [
-    "publishFarmBoard",
-    "publishFarmBoardV2",
-    "publishFarmPiece",
-    "publishDuelBoard",
-    "publishDuelPiece",
-    "sendFarmPvpAttack",
-    "sendDarkDuelBlow",
-    "refreshDarkPresence",
-    // Nothing in Godot waits on these succeeding; their answer is the rows they
-    // write. A failure is still reported.
-    "openDarkChest",
-    "refreshMyTasks",
-    "markTasksSeen",
-    "acknowledgeTaskChest",
-    "reportDuelBoardBreak",
-    "sendPartyBlow",
-    "reportPartyEnemyHeal",
-    "openPartyChest",
-    "reportPartyHealth",
-    "reportPartyDown",
-    "publishPartyBoard",
-    "publishPartyPiece"
-  ];
-  function reportsSuccess(name) {
-    return !QUIET_SUCCESS_CALLS.includes(name);
-  }
-  function mergeSnapshotRuns(events) {
-    const merged = [];
-    for (const event of events) {
-      const previous = merged[merged.length - 1];
-      if (event.type === "snapshot" && previous && previous.type === "snapshot") {
-        merged[merged.length - 1] = {
-          ...previous,
-          data: {
-            ...previous.data ?? {},
-            ...event.data ?? {}
-          }
-        };
-        continue;
-      }
-      merged.push(event);
-    }
-    return merged;
-  }
-  var MAX_PENDING_CALLS = 64;
-  var HELD_CALL_TIMEOUT_MS = 2e4;
-  function partitionExpiredCalls(queued, now, timeoutMs = HELD_CALL_TIMEOUT_MS) {
-    const kept = [];
-    const expired = [];
-    for (const call of queued) {
-      (now - call.queuedAt >= timeoutMs ? expired : kept).push(call);
-    }
-    return { kept, expired };
-  }
-  var BACKGROUND_CALLS = [
-    "claimPlaySession",
-    "renewPlaySession",
-    // Sent on the client's own schedule, not because the player did anything.
-    "reportRunSubmissionProblem",
-    "acknowledgeMarketSales",
-    // A Dark run announces itself between encounters and swings on every clear.
-    // Every name the walk-in has had. Only the old one was listed once, so
-    // walking into a duel counted as the player being at the keyboard -- and then
-    // V3 (the food slot) went out unlisted and did it again. A new walk-in name
-    // goes on this list the day it is sent.
-    "refreshDarkPresence",
-    "sendDarkDuelBlow",
-    "enterDarkDuel",
-    "enterDarkDuelV2",
-    "enterDarkDuelV3",
-    "enterDarkDuelV4",
-    // The client deals its tasks on connect and at each reset, dismisses a chest's
-    // reveal when it closes, and marks tasks seen when the view shows them: none
-    // of it is the player doing anything.
-    "refreshMyTasks",
-    "acknowledgeTaskChest",
-    "markTasksSeen",
-    // A co-op run's clears, the Vampiric drinks its board feeds the party's
-    // monster, a chest press, its health and its board: all sent by the fight,
-    // not the player, and none worth replaying after a reconnect -- a lost hit
-    // only ever costs the sender, and settlement tolerates it.
-    "sendPartyBlow",
-    "reportPartyEnemyHeal",
-    "openPartyChest",
-    "reportPartyHealth",
-    "reportPartyDown",
-    "publishPartyBoard",
-    "publishPartyPiece"
-  ];
-  function isBackgroundCall(name) {
-    return BACKGROUND_CALLS.includes(name);
-  }
-  function collapsePendingCalls(queued, maximum = MAX_PENDING_CALLS) {
-    const lastSupersedable = /* @__PURE__ */ new Map();
-    queued.forEach((call, index) => {
-      if (SUPERSEDABLE_CALLS.includes(call.name)) lastSupersedable.set(call.name, index);
-    });
-    const kept = queued.filter(
-      (call, index) => !SUPERSEDABLE_CALLS.includes(call.name) || lastSupersedable.get(call.name) === index
-    );
-    return kept.length <= maximum ? kept : kept.slice(kept.length - maximum);
-  }
-  function buildPatchPart(domain, build, report) {
-    try {
-      build();
-    } catch (error) {
-      report(domain, String(error));
-    }
-  }
-
-  // src/farm_transport_patch.ts
-  function farmBoardDomainPatch(opponentBoard) {
-    return {
-      opponentFarmBoard: opponentBoard ?? null,
-      opponentFarmPiece: null
     };
   }
 
@@ -10655,6 +10743,107 @@ ${ty.variants.map(
     }
   };
 
+  // src/farm_room.ts
+  var farmEventSubscription = null;
+  var farmEventRoom = -1;
+  var farmKeyframeSubscription = null;
+  var farmKeyframeAskedAt = 0;
+  var farmRivals = new FarmRivalBoards();
+  window.__ldbgFarmTransport = farmRivals.stats;
+  function releaseFarmRoomHandles() {
+    farmEventSubscription = null;
+    farmEventRoom = -1;
+    farmKeyframeSubscription = null;
+  }
+  function farmScopeWanted() {
+    return live.clientScreen === "farm" || live.clientScreen === "farm_round_end";
+  }
+  function stopFarmEvents() {
+    for (const handle of [farmEventSubscription, farmKeyframeSubscription]) {
+      if (handle && typeof handle.unsubscribe === "function") {
+        try {
+          handle.unsubscribe();
+        } catch {
+        }
+      }
+    }
+    farmEventSubscription = null;
+    farmKeyframeSubscription = null;
+    farmEventRoom = -1;
+  }
+  var farmEventHandlersOn = /* @__PURE__ */ new WeakSet();
+  function watchFarmEvents(activeConnection) {
+    if (farmEventHandlersOn.has(activeConnection)) return;
+    farmEventHandlersOn.add(activeConnection);
+    const db = activeConnection.db;
+    db.farmLockEvent.onInsert((_ctx, row) => {
+      const outcome = farmRivals.applyLock(row);
+      if (outcome === "applied") scheduleDomain(activeConnection, "farmBoard");
+      else if (outcome === "mismatch") requestFarmKeyframe(activeConnection);
+    });
+    db.farmBoardEvent.onInsert((_ctx, row) => {
+      if (farmRivals.applyBoard(row)) scheduleDomain(activeConnection, "farmBoard");
+    });
+    db.farmPoseEvent.onInsert((_ctx, row) => {
+      if (farmRivals.applyPose(row)) scheduleDomain(activeConnection, "farmPiece");
+    });
+    const follow = () => followFarmRoom(activeConnection);
+    db.myFarmPvpMemberV2.onInsert(follow);
+    db.myFarmPvpMemberV2.onDelete(follow);
+    if (typeof db.myFarmPvpMemberV2.onUpdate === "function") db.myFarmPvpMemberV2.onUpdate(follow);
+  }
+  function followFarmRoom(activeConnection) {
+    if (live.connection !== activeConnection || !groupSubscribed("farm") || !farmScopeWanted()) return;
+    const member = rows(activeConnection.db.myFarmPvpMemberV2)[0];
+    const room = member && member.matchId ? farmRoomKey(String(member.matchId)) : -1;
+    if (room === farmEventRoom && (farmEventSubscription || room < 0)) return;
+    if (farmRivals.follow(room)) scheduleDomain(activeConnection, "farmBoard");
+    stopFarmEvents();
+    farmEventRoom = room;
+    if (room < 0) return;
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (farmEventSubscription !== handle) return;
+      requestFarmKeyframe(activeConnection, true);
+    }).onError((_ctx, error) => {
+      if (live.connection === activeConnection) emit({ type: "error", command: "subscribeFarmEvents", message: String(error) });
+    }).subscribe([
+      `SELECT * FROM farm_lock_event WHERE room = ${room}`,
+      `SELECT * FROM farm_board_event WHERE room = ${room}`,
+      `SELECT * FROM farm_pose_event WHERE room = ${room}`
+    ]);
+    farmEventSubscription = handle;
+  }
+  function requestFarmKeyframe(activeConnection, force = false) {
+    if (live.connection !== activeConnection || !farmEventSubscription || farmKeyframeSubscription) return;
+    const now = Date.now();
+    if (!force && now - farmKeyframeAskedAt < 2e3) return;
+    farmKeyframeAskedAt = now;
+    const room = farmEventRoom;
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (farmKeyframeSubscription !== handle) return;
+      if (room === farmEventRoom) {
+        farmRivals.applyKeyframe(Array.from(activeConnection.db.opponentFarmKeyframesV1.iter()));
+        scheduleDomain(activeConnection, "farmBoard");
+      }
+      farmKeyframeSubscription = null;
+      try {
+        handle.unsubscribe();
+      } catch {
+      }
+    }).onError(() => {
+      if (farmKeyframeSubscription === handle) farmKeyframeSubscription = null;
+    }).subscribe([tables.opponentFarmKeyframesV1]);
+    farmKeyframeSubscription = handle;
+  }
+
+  // src/farm_transport_patch.ts
+  function farmBoardDomainPatch(opponentBoard) {
+    return {
+      opponentFarmBoard: opponentBoard ?? null,
+      opponentFarmPiece: null
+    };
+  }
+
   // src/row_json.ts
   function jsonSafe(value) {
     return convertBigInts(value);
@@ -10676,65 +10865,613 @@ ${ty.variants.map(
     return result;
   }
 
-  // src/index.ts
+  // src/subscriptions.ts
+  var scopedHandles = /* @__PURE__ */ new Map();
+  var scopedSubscriptionConnection = null;
+  var dirtySnapshotDomains = /* @__PURE__ */ new Set();
+  var snapshotFlushScheduled = false;
+  var observedHandles = /* @__PURE__ */ new WeakSet();
+  function rows(handle) {
+    return Array.from(handle.iter()).map(jsonSafe);
+  }
+  function releaseScopedSubscriptions() {
+    scopedSubscriptionConnection = null;
+    scopedHandles.clear();
+    releaseFarmRoomHandles();
+  }
+  function adoptScopedSubscriptions(activeConnection) {
+    if (scopedSubscriptionConnection === activeConnection) return;
+    releaseScopedSubscriptions();
+    scopedSubscriptionConnection = activeConnection;
+  }
+  var EMPTY_CONNECTION = {
+    db: new Proxy({}, { get: () => ({ iter: () => [] }) })
+  };
+  function one(view) {
+    return { view, one: true };
+  }
+  function many(view) {
+    return { view, one: false };
+  }
+  var DOMAINS = {
+    profile: { group: "core", keys: { profile: one("myProfile"), profilePreferences: one("myProfilePreferences") } },
+    inventory: {
+      group: "core",
+      keys: {
+        inventory: many("myInventory"),
+        inventoryOrder: many("myInventoryOrder"),
+        equipment: many("myEquipment"),
+        equippedFood: many("myEquippedFood")
+      }
+    },
+    upgrades: {
+      group: "core",
+      keys: { upgradeProgress: one("myUpgradeProgress"), upgradeUnlocks: many("myUpgradeUnlocks") }
+    },
+    run: { group: "core", keys: { activeRun: one("myActiveRun") } },
+    // Named for what was in it first. It is the durable RECORDS domain: the
+    // per-account bests and completions that outlive a run, whichever activity
+    // set them. A new record table belongs here rather than in a domain of its
+    // own -- they change once a run at most, and they arrive together.
+    dungeonProgress: {
+      group: "core",
+      keys: {
+        dungeonProgress: many("myDungeonProgress"),
+        endlessRecords: many("myEndlessRecords"),
+        farmRecords: many("myFarmRecords")
+      }
+    },
+    // The Arena's lobby and this player's duel record: both sender-scoped, both
+    // tiny, and both things that HAPPEN to a player -- somebody else takes up
+    // their listing -- so they ride the connection rather than a screen.
+    arenaDuels: { group: "darkDuel", keys: { duelLobby: one("myDuelLobby"), duelRecord: one("myDuelRecord") } },
+    // Co-op (docs/COOP_ENDLESS.md): the party this player is in, everybody in it,
+    // and their place in the quick-match queue. All three change because of
+    // somebody ELSE -- a partner found, a partner ready, a monster's health -- so
+    // they ride the connection. Always all three, so "no party" is an empty row.
+    party: {
+      group: "party",
+      keys: { party: one("myParty"), partyMembers: many("myPartyMembers"), partyQueue: one("myPartyQueue") }
+    },
+    // Every kill and chest the party has had, on a domain of its own: it grows
+    // through the run, and riding 'party' every monster's health tick re-sent it.
+    partySteps: { group: "party", keys: { partySteps: many("myPartySteps") } },
+    // The teammate's board and falling piece, for the mini card.
+    partyBoard: {
+      group: "party",
+      keys: { partyBoards: many("myPartyPartnerBoards"), partyPieces: many("myPartyPartnerPieces") }
+    },
+    // The board itself is the one whole-table projection here, so it is held only
+    // while the Duels screen is open, exactly as the storefront is.
+    duelBoard: { group: "duelBoard", keys: { duelListings: many("duelListings") } },
+    farmSession: {
+      group: "farm",
+      keys: { farmPvpSession: one("myFarmPvpSession"), farmPvpMember: one("myFarmPvpMemberV2") }
+    },
+    // The roster says who sits where; the boards are what the room's events
+    // rebuilt. Godot gets the rows the old views gave it.
+    farmBoard: {
+      group: "farm",
+      observes: ["opponentFarmRosterV1"],
+      build: (activeConnection, data) => {
+        const { boards, pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
+        data.farmOpponents = boards;
+        data.farmOpponentPieces = pieces;
+        Object.assign(data, farmBoardDomainPatch(boards[0]));
+      }
+    },
+    // Refreshed only by the room's pose events; the roster it reads is observed
+    // for farmBoard.
+    farmPiece: {
+      group: "farm",
+      observes: [],
+      build: (activeConnection, data) => {
+        const { pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
+        data.farmOpponentPieces = pieces;
+        data.opponentFarmPiece = pieces[0] ?? null;
+      }
+    },
+    farmAttacks: { group: "farm", keys: { farmPvpAttacks: many("myFarmPvpAttacks") } },
+    // What this player sent, and who the server landed it on: the only way the
+    // sender's screen can aim its garbage slam at the right rival. Its own domain:
+    // both lists grow through a round, and while they shared one every attack
+    // either way re-sent both, and Godot rebuilt the whole versus model for it.
+    farmSentAttacks: { group: "farm", keys: { farmPvpSentAttacks: many("mySentFarmPvpAttacks") } },
+    farmDarkHaul: { group: "farm", keys: { farmDarkHaul: many("myFarmDarkHaul") } },
+    playerCounts: {
+      group: "playerCounts",
+      keys: { farmPlayerCounts: many("farmPlayerCounts"), darkPlayerCount: many("darkPlayerCount") }
+    },
+    market: { group: "market", keys: { marketListings: many("marketListings") } },
+    marketPrices: { group: "marketPrices", keys: { marketPrices: many("marketPriceGuide") } },
+    marketHistory: {
+      group: "marketHistory",
+      keys: {
+        marketTransactions: many("myMarketTransactions"),
+        // Always an array, so "no notice yet" is told apart from "not loaded".
+        marketSaleNotice: many("myMarketSaleNotice")
+      }
+    },
+    // All three always, so "no duel" reads as an empty list rather than as a
+    // domain that has not arrived: a screen cannot tell those apart, and one of
+    // them means somebody is swinging at you.
+    darkDuel: {
+      group: "darkDuel",
+      keys: {
+        darkDuel: many("myDarkDuel"),
+        darkDuelBlows: many("myDarkDuelBlows"),
+        darkDuelHaul: many("myDarkDuelHaul")
+      }
+    },
+    // Whether this player is in the hunt, on a domain of its own: it changes as
+    // the run goes on, and riding darkDuel it re-sent the duel, every blow of the
+    // fight and the haul each time.
+    darkPresence: { group: "darkDuel", keys: { darkPresence: many("myDarkPresence") } },
+    // The Dark chests this player's run has drawn out of the pool of lost gear:
+    // the answer to open_dark_chest. A domain of its own so a claim does not
+    // re-send the whole duel.
+    darkChests: { group: "darkDuel", keys: { darkChestClaims: many("myDarkChestClaims") } },
+    // The other player's board (at most one row, and only while a fight is on),
+    // on a domain of its own. It rode the darkDuel domain, so every pose they
+    // published -- up to five a second -- re-sent the duel row, EVERY blow of the
+    // fight so far, the haul and the presence row, and Godot re-applied the lot:
+    // health reconciled, blows re-walked, the combat panel refreshed, for a
+    // falling piece that moved one cell on a thumbnail. Godot still accepts a
+    // board inside a darkDuel patch, so an old bridge and a new client (or the
+    // reverse) agree during a deploy.
+    duelOpponentBoard: { group: "darkDuel", keys: { duelOpponentBoard: many("myDuelOpponentBoard") } },
+    // Their falling piece between board publishes (dark_duel_piece). Godot takes
+    // whichever of the board and this was written last.
+    duelOpponentPiece: { group: "darkDuel", keys: { duelOpponentPiece: many("myDuelOpponentPiece") } },
+    // Tasks and quests: the tasks this player holds, the chests they have turned
+    // in and not yet seen, and where every quest stands. Always all of them, so
+    // "none" reads as empty lists.
+    quests: {
+      group: "quests",
+      keys: {
+        tasks: many("myTasks"),
+        taskChests: many("myTaskChests"),
+        questProgress: many("myQuests"),
+        // What has been seen and what has been swapped: null for a player who has
+        // done neither, which the client reads as "nothing seen, nothing spent".
+        taskState: one("myTaskState"),
+        // When this player turned quests in, and their lifetime counters.
+        questClaims: many("myQuestClaims"),
+        questStats: many("myQuestStats"),
+        // The feats this player has claimed; their progress is questStats.
+        featClaims: many("myFeatClaims")
+      }
+    },
+    // The quest catalog and each quest's details (condition, chest tier, the
+    // experience it pays): static, read from no table, so sent when the quest
+    // subscription is applied and never again. They were in 'quests' and rode
+    // every patch of it -- ~48 KB and some two hundred JSON parses in Godot on
+    // every run's settlement, for rows that cannot have changed.
+    questCatalog: { group: "quests", keys: { questCatalog: many("questCatalog"), questDetails: many("questDetails") } }
+  };
+  var SNAPSHOT_DOMAINS = Object.keys(DOMAINS);
+  function groupDomains(group) {
+    return SNAPSHOT_DOMAINS.filter((domain) => DOMAINS[domain].group === group);
+  }
+  function domainViews(domain) {
+    const spec = DOMAINS[domain];
+    return "keys" in spec ? Object.values(spec.keys).map((wire) => wire.view) : [...spec.observes];
+  }
+  function groupViews(group) {
+    return [...new Set(groupDomains(group).flatMap(domainViews))];
+  }
+  function observeGroup(activeConnection, group) {
+    for (const domain of groupDomains(group)) {
+      for (const view of domainViews(domain)) observe(activeConnection, activeConnection.db[view], domain);
+    }
+  }
+  function emptyAccountSnapshot() {
+    return snapshotPatch(EMPTY_CONNECTION, new Set(SNAPSHOT_DOMAINS));
+  }
+  function buildDomain(domain, build) {
+    buildPatchPart(domain, build, (failed, message) => emit({
+      type: "error",
+      command: `snapshot:${failed}`,
+      message: `The ${failed} patch could not be built: ${message}`
+    }));
+  }
+  function snapshotPatch(activeConnection, domains) {
+    const data = {};
+    for (const domain of SNAPSHOT_DOMAINS) {
+      if (!domains.has(domain)) continue;
+      const spec = DOMAINS[domain];
+      buildDomain(domain, () => {
+        if (!("keys" in spec)) {
+          spec.build(activeConnection, data);
+          return;
+        }
+        for (const [key, wire] of Object.entries(spec.keys)) {
+          const found = rows(activeConnection.db[wire.view]);
+          data[key] = wire.one ? found[0] ?? null : found;
+        }
+      });
+    }
+    return { type: "snapshot", data };
+  }
+  function publishDomains(activeConnection, domains) {
+    if (!activeConnection || live.connection !== activeConnection) return;
+    const requested = new Set(domains);
+    if (requested.size > 0) emit(snapshotPatch(activeConnection, requested));
+  }
+  function scheduleDomain(activeConnection, domain) {
+    if (!activeConnection || live.connection !== activeConnection) return;
+    dirtySnapshotDomains.add(domain);
+    if (snapshotFlushScheduled) return;
+    snapshotFlushScheduled = true;
+    queueMicrotask(() => {
+      snapshotFlushScheduled = false;
+      if (!activeConnection || live.connection !== activeConnection) {
+        dirtySnapshotDomains.clear();
+        return;
+      }
+      const domains = new Set(dirtySnapshotDomains);
+      dirtySnapshotDomains.clear();
+      publishDomains(activeConnection, domains);
+    });
+  }
+  function observe(activeConnection, handle, domain) {
+    if (!handle || typeof handle === "object" && observedHandles.has(handle)) return;
+    if (typeof handle === "object") observedHandles.add(handle);
+    handle.onInsert(() => scheduleDomain(activeConnection, domain));
+    handle.onDelete(() => scheduleDomain(activeConnection, domain));
+    if (typeof handle.onUpdate === "function") handle.onUpdate(() => scheduleDomain(activeConnection, domain));
+  }
+  var GROUPS = {
+    // The Farm's matchmaking, roster and attacks, held only on the Farm screen
+    // and its round-end context. The rival boards are the room's events, which
+    // farm room following subscribes once the roster says which room.
+    farm: {
+      wanted: farmScopeWanted,
+      errorCommand: "subscribeFarm",
+      afterObserve: watchFarmEvents,
+      afterApplied: followFarmRoom,
+      afterStop: () => {
+        stopFarmEvents();
+        farmRivals.clear();
+      },
+      clearAlso: { myFarmBoard: null, myFarmPiece: null }
+    },
+    // The global listing feed is the one potentially large account projection, so
+    // keep it out of the always-on core subscription and hold it only while Store
+    // is open. The server view omits seller identities. Only the storefront is
+    // dropped on leaving the Store. The player's own history stays: it is what
+    // announces a sale wherever they are.
+    market: { wanted: () => live.clientScreen === "store", errorCommand: "subscribeMarket" },
+    // One aggregate per listed item, derived by the server from the ten cheapest
+    // live listings. Unlike the full storefront this stays subscribed everywhere:
+    // it is small, identity-free, and useful anywhere the game needs to explain
+    // what an item or loadout is worth. The view is pushed on market changes, so no
+    // browser timer polls the whole listing table.
+    marketPrices: { errorCommand: "subscribeMarketPrices" },
+    // The player's own completed trades, for the whole connection. This is what
+    // lets a sale be announced on any screen: it used to ride on the Store-only
+    // subscription above, so a sale was only noticed on walking into the Store.
+    // Pushed, not polled -- nothing crosses the wire until a trade happens -- and
+    // small: sender-scoped, and pruned to fifty rows a player on the server. Kept
+    // out of the core subscription so a failure costs the notices and nothing else.
+    // my_market_sale_notice rides along: how far the player has been told, so a sale
+    // made while the game was closed is announced once on the next load.
+    marketHistory: { errorCommand: "subscribeMarketHistory" },
+    // Dark Greenshore's duels. Subscribed for the whole connection rather than
+    // while a Dark run is open, because being matched is something that HAPPENS to
+    // a player: the row arrives from somebody else's reducer call, and a client
+    // that only listened while it thought a fight was on would never hear the one
+    // that starts it. Every view is small and sender-scoped. The Arena's lobby
+    // rides along for the same reason: being challenged happens to a player too.
+    darkDuel: { errorCommand: "subscribeDarkDuel" },
+    // Co-op parties. Subscribed for the whole connection, like the duels and for the
+    // same reason: a partner being found, readying up, or killing the monster are
+    // all things that happen to a player from somebody else's reducer call. Every
+    // view is sender-scoped and small.
+    party: { errorCommand: "subscribeParty" },
+    // Everybody's open listings: a whole-table projection recomputed for every
+    // subscriber on the Duels screen every time anybody posts, so it is held only
+    // while that screen is open. The server view omits identities. Only the board
+    // is dropped on leaving the Duels screen. The lobby stays (darkDuel): it is
+    // what tells a player somebody has taken their listing up, and a listing does
+    // not expire because they went to look at their inventory.
+    duelBoard: { wanted: () => live.clientScreen === "duels", errorCommand: "subscribeDuelBoard" },
+    // The counters beside the Farm menu's versus modes. Tiny and shared by every
+    // player, so it is subscribed for the whole connection rather than scoped to a
+    // screen. Kept out of the core subscription so a server that predates the view
+    // costs the counters and nothing else; its failure is logged, not surfaced.
+    playerCounts: { quietError: "LDBG: player counts are unavailable:" },
+    // Tasks and quests, for the whole connection: a task finishes during a run, and
+    // the hub's button says so wherever the player is. All the views are small and
+    // sender-scoped (the catalog is shared and never changes). Kept out of the core
+    // subscription so a server without them costs the quest screen and nothing else.
+    quests: { errorCommand: "subscribeQuests" }
+  };
+  var SCOPED_GROUPS = Object.keys(GROUPS);
+  function ensureSubscription(activeConnection, group) {
+    if (!live.coreSubscriptionReady || live.connection !== activeConnection) return;
+    adoptScopedSubscriptions(activeConnection);
+    const spec = GROUPS[group];
+    if (spec.wanted && !spec.wanted() || scopedHandles.get(group)) return;
+    observeGroup(activeConnection, group);
+    spec.afterObserve?.(activeConnection);
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (live.connection !== activeConnection) return;
+      if (spec.wanted && (!scopedHandles.get(group) || !spec.wanted())) return;
+      publishDomains(activeConnection, groupDomains(group));
+      spec.afterApplied?.(activeConnection);
+    }).onError((_ctx, error) => {
+      if (spec.quietError) console.warn(spec.quietError, error);
+      else if (live.connection === activeConnection) emit({ type: "error", command: spec.errorCommand, message: String(error) });
+    }).subscribe(groupViews(group).map((view) => tables[view]));
+    scopedHandles.set(group, handle);
+  }
+  function stopSubscription(group) {
+    const previous = scopedHandles.get(group);
+    scopedHandles.delete(group);
+    if (previous && typeof previous.unsubscribe === "function") previous.unsubscribe();
+    const spec = GROUPS[group];
+    spec.afterStop?.();
+    const cleared = snapshotPatch(EMPTY_CONNECTION, new Set(groupDomains(group)));
+    emit({ ...cleared, data: { ...cleared.data, ...spec.clearAlso } });
+  }
+  function groupSubscribed(group) {
+    return Boolean(scopedHandles.get(group));
+  }
+  function ensureScopedSubscriptions(activeConnection) {
+    for (const group of SCOPED_GROUPS) ensureSubscription(activeConnection, group);
+  }
+  function followClientScreen(activeConnection) {
+    for (const group of SCOPED_GROUPS) {
+      const wanted = GROUPS[group].wanted;
+      if (!wanted) continue;
+      if (wanted()) ensureSubscription(activeConnection, group);
+      else if (scopedHandles.get(group)) stopSubscription(group);
+    }
+  }
+  function forgetDirtyDomains() {
+    dirtySnapshotDomains.clear();
+    snapshotFlushScheduled = false;
+  }
+  function dirtyDomainNames() {
+    return Array.from(dirtySnapshotDomains);
+  }
+
+  // src/connection.ts
+  var coreSubscription = null;
+  var lastUserActivityAt = Date.now();
+  var reconnectTimer = null;
+  var reconnectAttempt = 0;
+  var backendConfigOverrides = window.LDBGBackendConfig;
+  function disconnectBackend() {
+    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+    const previousConnection = live.connection;
+    live.connection = null;
+    coreSubscription = null;
+    releaseScopedSubscriptions();
+    live.coreSubscriptionReady = false;
+    live.connectionOpening = false;
+    forgetDirtyDomains();
+    live.connectionEpoch += 1;
+    if (previousConnection && typeof previousConnection.disconnect === "function") previousConnection.disconnect();
+  }
+  async function openBackendConnection(request) {
+    const config = resolveBackendConfig(backendConfigOverrides, request);
+    const token = currentAccountToken();
+    disconnectBackend();
+    const epoch = live.connectionEpoch;
+    if (!token) {
+      live.resumeNeeded = false;
+      pendingReducerCalls.length = 0;
+      emit({ type: "guest_demo" });
+      return;
+    }
+    const connectionAuthMode = "account";
+    live.connectionOpening = true;
+    live.resumeNeeded = false;
+    emit({
+      type: "connecting",
+      authMode: connectionAuthMode,
+      uri: config.uri,
+      database: config.database
+    });
+    let builder = DbConnection.builder().withUri(config.uri).withDatabaseName(config.database).onConnect((conn, identity, _issuedToken) => {
+      if (epoch !== live.connectionEpoch) {
+        if (typeof conn.disconnect === "function") conn.disconnect();
+        return;
+      }
+      live.connection = conn;
+      emit({ type: "connected", identity: identity.toHexString(), authMode: connectionAuthMode });
+      observeGroup(conn, "core");
+      coreSubscription = conn.subscriptionBuilder().onApplied(() => {
+        if (epoch !== live.connectionEpoch || live.connection !== conn) return;
+        live.coreSubscriptionReady = true;
+        live.connectionOpening = false;
+        reconnectAttempt = 0;
+        publishDomains(conn, groupDomains("core"));
+        emit({ type: "subscribed" });
+        ensureScopedSubscriptions(conn);
+        flushPendingReducerCalls();
+      }).onError((_ctx, error) => {
+        if (epoch === live.connectionEpoch) emit({ type: "error", command: "subscribe", message: String(error) });
+      }).subscribe(groupViews("core").map((view) => tables[view]));
+    }).onDisconnect((_ctx, error) => {
+      if (epoch !== live.connectionEpoch) return;
+      live.connection = null;
+      live.coreSubscriptionReady = false;
+      live.connectionOpening = false;
+      releaseScopedSubscriptions();
+      live.resumeNeeded = currentAuthMode() === "account";
+      emit({ type: "disconnected", message: error ? String(error) : "" });
+      scheduleBackendResume();
+    }).onConnectError((_ctx, error) => {
+      if (epoch === live.connectionEpoch) {
+        live.connectionOpening = false;
+        releaseScopedSubscriptions();
+        live.resumeNeeded = currentAuthMode() === "account";
+        emit({ type: "error", command: "connect", message: String(error) });
+        scheduleBackendResume();
+      }
+    });
+    builder = builder.withToken(token);
+    builder.build();
+  }
+  async function reconnectBackendForCurrentAuth() {
+    if (live.lastBackendRequest) await openBackendConnection(live.lastBackendRequest);
+  }
+  function renewThenResume() {
+    if (!hasRefreshToken()) {
+      reportExpiredSession();
+      return;
+    }
+    void refreshAccountToken().then((renewed) => {
+      if (!renewed) {
+        if (accountSessionExpired()) reportExpiredSession();
+        return;
+      }
+      live.resumeNeeded = true;
+      resumeBackend();
+    });
+  }
+  function reportExpiredSession() {
+    live.resumeNeeded = false;
+    pendingReducerCalls.length = 0;
+    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+    reportAuthExpired();
+  }
+  function resumeBackend() {
+    if (accountSessionExpired()) {
+      renewThenResume();
+      return;
+    }
+    if (live.connection || live.connectionOpening || currentAuthMode() !== "account" || !currentAccountToken() || !live.lastBackendRequest) return;
+    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+    live.resumeNeeded = false;
+    void openBackendConnection(live.lastBackendRequest);
+  }
+  function reconnectBackend() {
+    if (currentAuthMode() !== "account" || !live.lastBackendRequest) return;
+    disconnectBackend();
+    live.resumeNeeded = true;
+    resumeBackend();
+  }
+  function scheduleBackendResume() {
+    if (accountSessionExpired()) {
+      renewThenResume();
+      return;
+    }
+    if (!live.resumeNeeded || live.connection || live.connectionOpening || reconnectTimer !== null) return;
+    if (!shouldAutoResumeConnection({
+      accountAuthenticated: currentAuthMode() === "account",
+      authBusy: isAuthBusy(),
+      clientScreen: live.clientScreen,
+      documentHidden: document.hidden
+    })) return;
+    const delay = Math.min(500 * 2 ** reconnectAttempt, 5e3);
+    reconnectAttempt += 1;
+    reconnectTimer = window.setTimeout(() => {
+      reconnectTimer = null;
+      resumeBackend();
+    }, delay);
+  }
+  function noteUserActivity() {
+    lastUserActivityAt = Date.now();
+    if (live.resumeNeeded) resumeBackend();
+  }
+  function enterAfkIdle() {
+    if (!live.connection || currentAuthMode() !== "account" || isAuthBusy()) return;
+    if (live.clientScreen === "farm") return;
+    const requiresRefresh = live.clientScreen === "farm_round_end";
+    disconnectBackend();
+    live.resumeNeeded = false;
+    emit({ type: "idle_disconnected", requiresRefresh });
+  }
+  function checkAfkIdle() {
+    if (shouldEnterAfkIdle({
+      connected: Boolean(live.connection),
+      accountAuthenticated: currentAuthMode() === "account",
+      authBusy: isAuthBusy(),
+      clientScreen: live.clientScreen,
+      documentHidden: document.hidden,
+      inactiveForMs: Date.now() - lastUserActivityAt
+    })) enterAfkIdle();
+  }
+  function setClientContext(contextJson) {
+    try {
+      const context = JSON.parse(contextJson);
+      const nextScreen = typeof context.screen === "string" ? context.screen : "title";
+      if (nextScreen === live.clientScreen) {
+        noteUserActivity();
+        return;
+      }
+      live.clientScreen = nextScreen;
+      noteUserActivity();
+      if (!live.connection || !live.coreSubscriptionReady) return;
+      followClientScreen(live.connection);
+    } catch (error) {
+      emit({ type: "error", command: "setClientContext", message: String(error) });
+    }
+  }
+  async function connectBackend(configJson) {
+    try {
+      await authInitialization;
+      const request = JSON.parse(configJson);
+      live.lastBackendRequest = request;
+      noteUserActivity();
+      await openBackendConnection(request);
+    } catch (error) {
+      emit({ type: "error", command: "connect", message: String(error) });
+    }
+  }
+  var DIAGNOSTIC_TABLES = [
+    "myProfile",
+    "myActiveRun",
+    "myInventory",
+    "myEquipment",
+    "myEquippedFood",
+    "myDungeonProgress",
+    "myEndlessRecords",
+    "myFarmRecords",
+    "myDarkDuel",
+    "myDuelLobby",
+    "myDuelRecord",
+    "myDarkChestClaims",
+    "myParty",
+    "myPartyMembers",
+    "myPartySteps"
+  ];
+  function snapshotDiagnostics() {
+    const counts = {};
+    for (const name of DIAGNOSTIC_TABLES) {
+      try {
+        const handle = live.connection?.db?.[name];
+        counts[name] = handle ? Array.from(handle.iter()).length : -1;
+      } catch {
+        counts[name] = -2;
+      }
+    }
+    return JSON.stringify({
+      connected: !!live.connection,
+      coreReady: live.coreSubscriptionReady,
+      opening: live.connectionOpening,
+      resumeNeeded: live.resumeNeeded,
+      screen: live.clientScreen,
+      held: pendingReducerCalls.map((call) => call.name),
+      dirty: dirtyDomainNames(),
+      counts
+    });
+  }
+
+  // src/auth_session.ts
   var AUTH_PENDING_KEY = "ldbg.auth.pending.v1";
   var AUTH_PENDING_MAX_AGE_MS = 10 * 60 * 1e3;
   var LOGIN_POPUP_NAME = "ldbg_spacetime_auth";
   var LOGOUT_POPUP_NAME = "ldbg_spacetime_logout";
   var SESSION_RESET_POPUP_NAME = "ldbg_spacetime_session_reset";
   var POPUP_FEATURES = "popup=yes,width=560,height=760,resizable=yes,scrollbars=yes";
-  var SNAPSHOT_DOMAINS = [
-    "profile",
-    "inventory",
-    "upgrades",
-    "run",
-    "dungeonProgress",
-    "farmSession",
-    "farmBoard",
-    "farmPiece",
-    "farmAttacks",
-    "farmSentAttacks",
-    "farmDarkHaul",
-    "market",
-    "marketPrices",
-    "marketHistory",
-    "arenaDuels",
-    "duelBoard",
-    "darkDuel",
-    "darkPresence",
-    "darkChests",
-    "duelOpponentBoard",
-    "duelOpponentPiece",
-    "playerCounts",
-    "quests",
-    "questCatalog",
-    "party",
-    "partySteps",
-    "partyBoard"
-  ];
-  var connection = null;
-  var connectionEpoch = 0;
-  var coreSubscription = null;
-  var farmSubscription = null;
-  var farmEventSubscription = null;
-  var farmEventRoom = -1;
-  var farmKeyframeSubscription = null;
-  var farmKeyframeAskedAt = 0;
-  var farmRivals = new FarmRivalBoards();
-  window.__ldbgFarmTransport = farmRivals.stats;
-  var marketSubscription = null;
-  var marketPriceSubscription = null;
-  var marketHistorySubscription = null;
-  var darkDuelSubscription = null;
-  var partySubscription = null;
-  var scopedSubscriptionConnection = null;
-  var duelBoardSubscription = null;
-  var playerCountsSubscription = null;
-  var questSubscription = null;
-  var coreSubscriptionReady = false;
-  var connectionOpening = false;
-  var resumeNeeded = false;
-  var lastBackendRequest = null;
   var accountToken = "";
   var accountClaims = null;
   var accountRefreshToken = "";
@@ -10749,31 +11486,7 @@ ${ty.variants.map(
   var sessionResetPopup = null;
   var sessionResetPopupMonitor = null;
   var authCallbackHandling = false;
-  var clientScreen = "title";
-  var lastUserActivityAt = Date.now();
-  var reconnectTimer = null;
-  var reconnectAttempt = 0;
-  var pendingReducerCalls = [];
-  var pendingCallTimer = null;
-  var dirtySnapshotDomains = /* @__PURE__ */ new Set();
-  var snapshotFlushScheduled = false;
-  var observedHandles = /* @__PURE__ */ new WeakSet();
-  var pendingEvents = [];
   var authConfig = resolveAuthConfig(window.LDBGAuthConfig);
-  var backendConfigOverrides = window.LDBGBackendConfig;
-  var MAX_PENDING_EVENTS = 512;
-  function emit(event) {
-    pendingEvents.push(event);
-    if (pendingEvents.length <= MAX_PENDING_EVENTS) return;
-    const overflow = pendingEvents.length - MAX_PENDING_EVENTS;
-    for (let removed = 0; removed < overflow; removed += 1) {
-      const index = pendingEvents.findIndex((pending) => pending.type !== "snapshot");
-      pendingEvents.splice(index === -1 ? 0 : index, 1);
-    }
-  }
-  function rows(handle) {
-    return Array.from(handle.iter()).map(jsonSafe);
-  }
   function authAvailable() {
     return authConfig.clientId.trim().length > 0;
   }
@@ -11062,7 +11775,7 @@ ${ty.variants.map(
     }
     await authInitialization;
     disconnectBackend();
-    resumeNeeded = false;
+    live.resumeNeeded = false;
     pendingReducerCalls.length = 0;
     accountToken = "";
     accountClaims = null;
@@ -11126,825 +11839,30 @@ ${ty.variants.map(
       emit({ type: "auth_error", message: authError });
     }
   }
-  function releaseScopedSubscriptions() {
-    scopedSubscriptionConnection = null;
-    farmSubscription = null;
-    farmEventSubscription = null;
-    farmEventRoom = -1;
-    farmKeyframeSubscription = null;
-    marketSubscription = null;
-    marketPriceSubscription = null;
-    marketHistorySubscription = null;
-    darkDuelSubscription = null;
-    partySubscription = null;
-    duelBoardSubscription = null;
-    playerCountsSubscription = null;
-    questSubscription = null;
-  }
-  function adoptScopedSubscriptions(activeConnection) {
-    if (scopedSubscriptionConnection === activeConnection) return;
-    releaseScopedSubscriptions();
-    scopedSubscriptionConnection = activeConnection;
-  }
-  function disconnectBackend() {
-    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
-    reconnectTimer = null;
-    const previousConnection = connection;
-    connection = null;
-    coreSubscription = null;
-    releaseScopedSubscriptions();
-    coreSubscriptionReady = false;
-    connectionOpening = false;
-    dirtySnapshotDomains.clear();
-    snapshotFlushScheduled = false;
-    connectionEpoch += 1;
-    if (previousConnection && typeof previousConnection.disconnect === "function") previousConnection.disconnect();
-  }
-  var EMPTY_CONNECTION = {
-    db: new Proxy({}, { get: () => ({ iter: () => [] }) })
-  };
-  function emptyAccountSnapshot() {
-    return snapshotPatch(EMPTY_CONNECTION, new Set(SNAPSHOT_DOMAINS));
-  }
-  function buildDomain(domain, build) {
-    buildPatchPart(domain, build, (failed, message) => emit({
-      type: "error",
-      command: `snapshot:${failed}`,
-      message: `The ${failed} patch could not be built: ${message}`
-    }));
-  }
-  function snapshotPatch(activeConnection, domains) {
-    const data = {};
-    const part = (domain, build) => {
-      if (domains.has(domain)) buildDomain(domain, build);
-    };
-    part("profile", () => {
-      data.profile = rows(activeConnection.db.myProfile)[0] ?? null;
-      data.profilePreferences = rows(activeConnection.db.myProfilePreferences)[0] ?? null;
-    });
-    part("inventory", () => {
-      data.inventory = rows(activeConnection.db.myInventory);
-      data.inventoryOrder = rows(activeConnection.db.myInventoryOrder);
-      data.equipment = rows(activeConnection.db.myEquipment);
-      data.equippedFood = rows(activeConnection.db.myEquippedFood);
-    });
-    part("upgrades", () => {
-      data.upgradeProgress = rows(activeConnection.db.myUpgradeProgress)[0] ?? null;
-      data.upgradeUnlocks = rows(activeConnection.db.myUpgradeUnlocks);
-    });
-    part("run", () => {
-      data.activeRun = rows(activeConnection.db.myActiveRun)[0] ?? null;
-    });
-    part("dungeonProgress", () => {
-      data.dungeonProgress = rows(activeConnection.db.myDungeonProgress);
-      data.endlessRecords = rows(activeConnection.db.myEndlessRecords);
-      data.farmRecords = rows(activeConnection.db.myFarmRecords);
-    });
-    part("arenaDuels", () => {
-      data.duelLobby = rows(activeConnection.db.myDuelLobby)[0] ?? null;
-      data.duelRecord = rows(activeConnection.db.myDuelRecord)[0] ?? null;
-    });
-    part("party", () => {
-      data.party = rows(activeConnection.db.myParty)[0] ?? null;
-      data.partyMembers = rows(activeConnection.db.myPartyMembers);
-      data.partyQueue = rows(activeConnection.db.myPartyQueue)[0] ?? null;
-    });
-    part("partySteps", () => {
-      data.partySteps = rows(activeConnection.db.myPartySteps);
-    });
-    part("partyBoard", () => {
-      data.partyBoards = rows(activeConnection.db.myPartyPartnerBoards);
-      data.partyPieces = rows(activeConnection.db.myPartyPartnerPieces);
-    });
-    part("duelBoard", () => {
-      data.duelListings = rows(activeConnection.db.duelListings);
-    });
-    part("farmSession", () => {
-      data.farmPvpSession = rows(activeConnection.db.myFarmPvpSession)[0] ?? null;
-      data.farmPvpMember = rows(activeConnection.db.myFarmPvpMemberV2)[0] ?? null;
-    });
-    part("farmBoard", () => {
-      const { boards, pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
-      data.farmOpponents = boards;
-      data.farmOpponentPieces = pieces;
-      Object.assign(data, farmBoardDomainPatch(boards[0]));
-    });
-    part("farmPiece", () => {
-      const { pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
-      data.farmOpponentPieces = pieces;
-      data.opponentFarmPiece = pieces[0] ?? null;
-    });
-    part("farmAttacks", () => {
-      data.farmPvpAttacks = rows(activeConnection.db.myFarmPvpAttacks);
-    });
-    part("farmSentAttacks", () => {
-      data.farmPvpSentAttacks = rows(activeConnection.db.mySentFarmPvpAttacks);
-    });
-    part("farmDarkHaul", () => {
-      data.farmDarkHaul = rows(activeConnection.db.myFarmDarkHaul);
-    });
-    part("playerCounts", () => {
-      data.farmPlayerCounts = rows(activeConnection.db.farmPlayerCounts);
-      data.darkPlayerCount = rows(activeConnection.db.darkPlayerCount);
-    });
-    part("market", () => {
-      data.marketListings = rows(activeConnection.db.marketListings);
-    });
-    part("marketPrices", () => {
-      data.marketPrices = rows(activeConnection.db.marketPriceGuide);
-    });
-    part("marketHistory", () => {
-      data.marketTransactions = rows(activeConnection.db.myMarketTransactions);
-      data.marketSaleNotice = rows(activeConnection.db.myMarketSaleNotice);
-    });
-    part("darkDuel", () => {
-      data.darkDuel = rows(activeConnection.db.myDarkDuel);
-      data.darkDuelBlows = rows(activeConnection.db.myDarkDuelBlows);
-      data.darkDuelHaul = rows(activeConnection.db.myDarkDuelHaul);
-    });
-    part("darkPresence", () => {
-      data.darkPresence = rows(activeConnection.db.myDarkPresence);
-    });
-    part("darkChests", () => {
-      data.darkChestClaims = rows(activeConnection.db.myDarkChestClaims);
-    });
-    part("duelOpponentBoard", () => {
-      data.duelOpponentBoard = rows(activeConnection.db.myDuelOpponentBoard);
-    });
-    part("duelOpponentPiece", () => {
-      data.duelOpponentPiece = rows(activeConnection.db.myDuelOpponentPiece);
-    });
-    part("quests", () => {
-      data.tasks = rows(activeConnection.db.myTasks);
-      data.taskChests = rows(activeConnection.db.myTaskChests);
-      data.questProgress = rows(activeConnection.db.myQuests);
-      data.taskState = rows(activeConnection.db.myTaskState)[0] ?? null;
-      data.questClaims = rows(activeConnection.db.myQuestClaims);
-      data.questStats = rows(activeConnection.db.myQuestStats);
-      data.featClaims = rows(activeConnection.db.myFeatClaims);
-    });
-    part("questCatalog", () => {
-      data.questCatalog = rows(activeConnection.db.questCatalog);
-      data.questDetails = rows(activeConnection.db.questDetails);
-    });
-    return { type: "snapshot", data };
-  }
-  function publishDomains(activeConnection, domains) {
-    if (!activeConnection || connection !== activeConnection) return;
-    const requested = new Set(domains);
-    if (requested.size > 0) emit(snapshotPatch(activeConnection, requested));
-  }
-  function scheduleDomain(activeConnection, domain) {
-    if (!activeConnection || connection !== activeConnection) return;
-    dirtySnapshotDomains.add(domain);
-    if (snapshotFlushScheduled) return;
-    snapshotFlushScheduled = true;
-    queueMicrotask(() => {
-      snapshotFlushScheduled = false;
-      if (!activeConnection || connection !== activeConnection) {
-        dirtySnapshotDomains.clear();
-        return;
-      }
-      const domains = new Set(dirtySnapshotDomains);
-      dirtySnapshotDomains.clear();
-      publishDomains(activeConnection, domains);
-    });
-  }
-  function observe(activeConnection, handle, domain) {
-    if (!handle || typeof handle === "object" && observedHandles.has(handle)) return;
-    if (typeof handle === "object") observedHandles.add(handle);
-    handle.onInsert(() => scheduleDomain(activeConnection, domain));
-    handle.onDelete(() => scheduleDomain(activeConnection, domain));
-    if (typeof handle.onUpdate === "function") handle.onUpdate(() => scheduleDomain(activeConnection, domain));
-  }
-  function clearFarmProjection() {
-    emit({
-      type: "snapshot",
-      data: {
-        farmPvpMember: null,
-        myFarmBoard: null,
-        opponentFarmBoard: null,
-        farmOpponents: [],
-        myFarmPiece: null,
-        opponentFarmPiece: null,
-        farmOpponentPieces: [],
-        farmPvpSession: null,
-        farmPvpAttacks: [],
-        farmPvpSentAttacks: [],
-        farmDarkHaul: []
-      }
-    });
-  }
-  function farmScopeWanted() {
-    return clientScreen === "farm" || clientScreen === "farm_round_end";
-  }
-  function stopFarmSubscription() {
-    const previous = farmSubscription;
-    farmSubscription = null;
-    if (previous && typeof previous.unsubscribe === "function") previous.unsubscribe();
-    stopFarmEvents();
-    farmRivals.clear();
-    clearFarmProjection();
-  }
-  function stopFarmEvents() {
-    for (const handle of [farmEventSubscription, farmKeyframeSubscription]) {
-      if (handle && typeof handle.unsubscribe === "function") {
-        try {
-          handle.unsubscribe();
-        } catch {
-        }
-      }
-    }
-    farmEventSubscription = null;
-    farmKeyframeSubscription = null;
-    farmEventRoom = -1;
-  }
-  var farmEventHandlersOn = /* @__PURE__ */ new WeakSet();
-  function watchFarmEvents(activeConnection) {
-    if (farmEventHandlersOn.has(activeConnection)) return;
-    farmEventHandlersOn.add(activeConnection);
-    const db = activeConnection.db;
-    db.farmLockEvent.onInsert((_ctx, row) => {
-      const outcome = farmRivals.applyLock(row);
-      if (outcome === "applied") scheduleDomain(activeConnection, "farmBoard");
-      else if (outcome === "mismatch") requestFarmKeyframe(activeConnection);
-    });
-    db.farmBoardEvent.onInsert((_ctx, row) => {
-      if (farmRivals.applyBoard(row)) scheduleDomain(activeConnection, "farmBoard");
-    });
-    db.farmPoseEvent.onInsert((_ctx, row) => {
-      if (farmRivals.applyPose(row)) scheduleDomain(activeConnection, "farmPiece");
-    });
-    const follow = () => followFarmRoom(activeConnection);
-    db.myFarmPvpMemberV2.onInsert(follow);
-    db.myFarmPvpMemberV2.onDelete(follow);
-    if (typeof db.myFarmPvpMemberV2.onUpdate === "function") db.myFarmPvpMemberV2.onUpdate(follow);
-  }
-  function followFarmRoom(activeConnection) {
-    if (connection !== activeConnection || !farmSubscription || !farmScopeWanted()) return;
-    const member = rows(activeConnection.db.myFarmPvpMemberV2)[0];
-    const room = member && member.matchId ? farmRoomKey(String(member.matchId)) : -1;
-    if (room === farmEventRoom && (farmEventSubscription || room < 0)) return;
-    if (farmRivals.follow(room)) scheduleDomain(activeConnection, "farmBoard");
-    stopFarmEvents();
-    farmEventRoom = room;
-    if (room < 0) return;
-    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (farmEventSubscription !== handle) return;
-      requestFarmKeyframe(activeConnection, true);
-    }).onError((_ctx, error) => {
-      if (connection === activeConnection) emit({ type: "error", command: "subscribeFarmEvents", message: String(error) });
-    }).subscribe([
-      `SELECT * FROM farm_lock_event WHERE room = ${room}`,
-      `SELECT * FROM farm_board_event WHERE room = ${room}`,
-      `SELECT * FROM farm_pose_event WHERE room = ${room}`
-    ]);
-    farmEventSubscription = handle;
-  }
-  function requestFarmKeyframe(activeConnection, force = false) {
-    if (connection !== activeConnection || !farmEventSubscription || farmKeyframeSubscription) return;
-    const now = Date.now();
-    if (!force && now - farmKeyframeAskedAt < 2e3) return;
-    farmKeyframeAskedAt = now;
-    const room = farmEventRoom;
-    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (farmKeyframeSubscription !== handle) return;
-      if (room === farmEventRoom) {
-        farmRivals.applyKeyframe(Array.from(activeConnection.db.opponentFarmKeyframesV1.iter()));
-        scheduleDomain(activeConnection, "farmBoard");
-      }
-      farmKeyframeSubscription = null;
-      try {
-        handle.unsubscribe();
-      } catch {
-      }
-    }).onError(() => {
-      if (farmKeyframeSubscription === handle) farmKeyframeSubscription = null;
-    }).subscribe([tables.opponentFarmKeyframesV1]);
-    farmKeyframeSubscription = handle;
-  }
-  function ensureFarmSubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection) return;
-    adoptScopedSubscriptions(activeConnection);
-    if (!farmScopeWanted() || farmSubscription) return;
-    observe(activeConnection, activeConnection.db.myFarmPvpSession, "farmSession");
-    observe(activeConnection, activeConnection.db.myFarmPvpMemberV2, "farmSession");
-    observe(activeConnection, activeConnection.db.opponentFarmRosterV1, "farmBoard");
-    watchFarmEvents(activeConnection);
-    observe(activeConnection, activeConnection.db.myFarmPvpAttacks, "farmAttacks");
-    observe(activeConnection, activeConnection.db.mySentFarmPvpAttacks, "farmSentAttacks");
-    observe(activeConnection, activeConnection.db.myFarmDarkHaul, "farmDarkHaul");
-    farmSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (connection !== activeConnection || !farmSubscription || !farmScopeWanted()) return;
-      publishDomains(activeConnection, ["farmSession", "farmBoard", "farmPiece", "farmAttacks", "farmSentAttacks", "farmDarkHaul"]);
-      followFarmRoom(activeConnection);
-    }).onError((_ctx, error) => {
-      if (connection === activeConnection) emit({ type: "error", command: "subscribeFarm", message: String(error) });
-    }).subscribe([
-      tables.myFarmPvpSession,
-      tables.myFarmPvpMemberV2,
-      tables.opponentFarmRosterV1,
-      tables.myFarmPvpAttacks,
-      tables.mySentFarmPvpAttacks,
-      tables.myFarmDarkHaul
-    ]);
-  }
-  function marketScopeWanted() {
-    return clientScreen === "store";
-  }
-  function duelBoardScopeWanted() {
-    return clientScreen === "duels";
-  }
-  function clearDuelBoardProjection() {
-    emit({ type: "snapshot", data: { duelListings: [] } });
-  }
-  function stopDuelBoardSubscription() {
-    const previous = duelBoardSubscription;
-    duelBoardSubscription = null;
-    if (previous && typeof previous.unsubscribe === "function") previous.unsubscribe();
-    clearDuelBoardProjection();
-  }
-  function ensureDuelBoardSubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection) return;
-    adoptScopedSubscriptions(activeConnection);
-    if (!duelBoardScopeWanted() || duelBoardSubscription) return;
-    observe(activeConnection, activeConnection.db.duelListings, "duelBoard");
-    duelBoardSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (connection !== activeConnection || !duelBoardSubscription || !duelBoardScopeWanted()) return;
-      publishDomains(activeConnection, ["duelBoard"]);
-    }).onError((_ctx, error) => {
-      if (connection === activeConnection) {
-        emit({ type: "error", command: "subscribeDuelBoard", message: String(error) });
-      }
-    }).subscribe([tables.duelListings]);
-  }
-  function clearMarketProjection() {
-    emit({ type: "snapshot", data: { marketListings: [] } });
-  }
-  function stopMarketSubscription() {
-    const previous = marketSubscription;
-    marketSubscription = null;
-    if (previous && typeof previous.unsubscribe === "function") previous.unsubscribe();
-    clearMarketProjection();
-  }
-  function ensureMarketSubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection) return;
-    adoptScopedSubscriptions(activeConnection);
-    if (!marketScopeWanted() || marketSubscription) return;
-    observe(activeConnection, activeConnection.db.marketListings, "market");
-    marketSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (connection !== activeConnection || !marketSubscription || !marketScopeWanted()) return;
-      publishDomains(activeConnection, ["market"]);
-    }).onError((_ctx, error) => {
-      if (connection === activeConnection) emit({ type: "error", command: "subscribeMarket", message: String(error) });
-    }).subscribe([tables.marketListings]);
-  }
-  function ensureMarketPriceSubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection) return;
-    adoptScopedSubscriptions(activeConnection);
-    if (marketPriceSubscription) return;
-    observe(activeConnection, activeConnection.db.marketPriceGuide, "marketPrices");
-    marketPriceSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (connection === activeConnection) publishDomains(activeConnection, ["marketPrices"]);
-    }).onError((_ctx, error) => {
-      if (connection === activeConnection) {
-        emit({ type: "error", command: "subscribeMarketPrices", message: String(error) });
-      }
-    }).subscribe([tables.marketPriceGuide]);
-  }
-  function ensureMarketHistorySubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection) return;
-    adoptScopedSubscriptions(activeConnection);
-    if (marketHistorySubscription) return;
-    observe(activeConnection, activeConnection.db.myMarketTransactions, "marketHistory");
-    observe(activeConnection, activeConnection.db.myMarketSaleNotice, "marketHistory");
-    marketHistorySubscription = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (connection === activeConnection) publishDomains(activeConnection, ["marketHistory"]);
-    }).onError((_ctx, error) => {
-      if (connection === activeConnection) emit({ type: "error", command: "subscribeMarketHistory", message: String(error) });
-    }).subscribe([tables.myMarketTransactions, tables.myMarketSaleNotice]);
-  }
-  function ensureDarkDuelSubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection) return;
-    adoptScopedSubscriptions(activeConnection);
-    if (darkDuelSubscription) return;
-    observe(activeConnection, activeConnection.db.myDarkDuel, "darkDuel");
-    observe(activeConnection, activeConnection.db.myDarkDuelBlows, "darkDuel");
-    observe(activeConnection, activeConnection.db.myDarkDuelHaul, "darkDuel");
-    observe(activeConnection, activeConnection.db.myDarkPresence, "darkPresence");
-    observe(activeConnection, activeConnection.db.myDuelOpponentBoard, "duelOpponentBoard");
-    observe(activeConnection, activeConnection.db.myDuelOpponentPiece, "duelOpponentPiece");
-    observe(activeConnection, activeConnection.db.myDuelLobby, "arenaDuels");
-    observe(activeConnection, activeConnection.db.myDuelRecord, "arenaDuels");
-    observe(activeConnection, activeConnection.db.myDarkChestClaims, "darkChests");
-    darkDuelSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (connection === activeConnection) {
-        publishDomains(activeConnection, [
-          "darkDuel",
-          "darkPresence",
-          "duelOpponentBoard",
-          "duelOpponentPiece",
-          "arenaDuels",
-          "darkChests"
-        ]);
-      }
-    }).onError((_ctx, error) => {
-      if (connection === activeConnection) {
-        emit({ type: "error", command: "subscribeDarkDuel", message: String(error) });
-      }
-    }).subscribe([
-      tables.myDarkDuel,
-      tables.myDarkDuelBlows,
-      tables.myDarkDuelHaul,
-      tables.myDarkPresence,
-      tables.myDuelOpponentBoard,
-      tables.myDuelOpponentPiece,
-      tables.myDuelLobby,
-      tables.myDuelRecord,
-      tables.myDarkChestClaims
-    ]);
-  }
-  function ensurePartySubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection) return;
-    adoptScopedSubscriptions(activeConnection);
-    if (partySubscription) return;
-    observe(activeConnection, activeConnection.db.myParty, "party");
-    observe(activeConnection, activeConnection.db.myPartyMembers, "party");
-    observe(activeConnection, activeConnection.db.myPartyQueue, "party");
-    observe(activeConnection, activeConnection.db.myPartySteps, "partySteps");
-    observe(activeConnection, activeConnection.db.myPartyPartnerBoards, "partyBoard");
-    observe(activeConnection, activeConnection.db.myPartyPartnerPieces, "partyBoard");
-    partySubscription = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (connection === activeConnection) publishDomains(activeConnection, ["party", "partySteps", "partyBoard"]);
-    }).onError((_ctx, error) => {
-      if (connection === activeConnection) emit({ type: "error", command: "subscribeParty", message: String(error) });
-    }).subscribe([
-      tables.myParty,
-      tables.myPartyMembers,
-      tables.myPartyQueue,
-      tables.myPartySteps,
-      tables.myPartyPartnerBoards,
-      tables.myPartyPartnerPieces
-    ]);
-  }
-  function ensurePlayerCountsSubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection) return;
-    adoptScopedSubscriptions(activeConnection);
-    if (playerCountsSubscription) return;
-    observe(activeConnection, activeConnection.db.farmPlayerCounts, "playerCounts");
-    observe(activeConnection, activeConnection.db.darkPlayerCount, "playerCounts");
-    playerCountsSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (connection === activeConnection) publishDomains(activeConnection, ["playerCounts"]);
-    }).onError((_ctx, error) => {
-      console.warn("LDBG: player counts are unavailable:", error);
-    }).subscribe([tables.farmPlayerCounts, tables.darkPlayerCount]);
-  }
-  function ensureQuestSubscription(activeConnection) {
-    if (!coreSubscriptionReady || connection !== activeConnection) return;
-    adoptScopedSubscriptions(activeConnection);
-    if (questSubscription) return;
-    observe(activeConnection, activeConnection.db.questCatalog, "questCatalog");
-    observe(activeConnection, activeConnection.db.myTasks, "quests");
-    observe(activeConnection, activeConnection.db.myTaskChests, "quests");
-    observe(activeConnection, activeConnection.db.myQuests, "quests");
-    observe(activeConnection, activeConnection.db.myTaskState, "quests");
-    observe(activeConnection, activeConnection.db.questDetails, "questCatalog");
-    observe(activeConnection, activeConnection.db.myQuestClaims, "quests");
-    observe(activeConnection, activeConnection.db.myQuestStats, "quests");
-    observe(activeConnection, activeConnection.db.myFeatClaims, "quests");
-    questSubscription = activeConnection.subscriptionBuilder().onApplied(() => {
-      if (connection === activeConnection) {
-        publishDomains(activeConnection, ["quests", "questCatalog"]);
-      }
-    }).onError((_ctx, error) => {
-      if (connection === activeConnection) emit({ type: "error", command: "subscribeQuests", message: String(error) });
-    }).subscribe([
-      tables.questCatalog,
-      tables.myTasks,
-      tables.myTaskChests,
-      tables.myQuests,
-      tables.myTaskState,
-      tables.questDetails,
-      tables.myQuestClaims,
-      tables.myQuestStats,
-      tables.myFeatClaims
-    ]);
-  }
-  function flushPendingReducerCalls() {
-    if (!connection || !coreSubscriptionReady) return;
-    clearPendingCallTimer();
-    const queued = collapsePendingCalls(pendingReducerCalls.splice(0, pendingReducerCalls.length));
-    for (const item of queued) void callReducer(item.name, item.argumentsJson);
-  }
-  function clearPendingCallTimer() {
-    if (pendingCallTimer !== null) window.clearTimeout(pendingCallTimer);
-    pendingCallTimer = null;
-  }
-  function expireHeldCalls() {
-    pendingCallTimer = null;
-    const { kept, expired } = partitionExpiredCalls(pendingReducerCalls, Date.now());
-    pendingReducerCalls.length = 0;
-    pendingReducerCalls.push(...kept);
-    for (const call of expired) {
-      emit({
-        type: "error",
-        command: call.name,
-        message: "The server didn't answer. Check your connection or reload the page, then try again."
-      });
-    }
-    armPendingCallTimer();
-  }
-  function armPendingCallTimer() {
-    if (pendingCallTimer !== null || pendingReducerCalls.length === 0) return;
-    const oldest = pendingReducerCalls.reduce(
-      (at, call) => Math.min(at, call.queuedAt),
-      Number.POSITIVE_INFINITY
-    );
-    const remaining = Math.max(0, HELD_CALL_TIMEOUT_MS - (Date.now() - oldest));
-    pendingCallTimer = window.setTimeout(expireHeldCalls, remaining);
-  }
-  async function openBackendConnection(request) {
-    const config = resolveBackendConfig(backendConfigOverrides, request);
-    const token = accountToken;
-    disconnectBackend();
-    const epoch = connectionEpoch;
-    if (!token) {
-      resumeNeeded = false;
-      pendingReducerCalls.length = 0;
-      emit({ type: "guest_demo" });
-      return;
-    }
-    const connectionAuthMode = "account";
-    connectionOpening = true;
-    resumeNeeded = false;
-    emit({
-      type: "connecting",
-      authMode: connectionAuthMode,
-      uri: config.uri,
-      database: config.database
-    });
-    let builder = DbConnection.builder().withUri(config.uri).withDatabaseName(config.database).onConnect((conn, identity, _issuedToken) => {
-      if (epoch !== connectionEpoch) {
-        if (typeof conn.disconnect === "function") conn.disconnect();
-        return;
-      }
-      connection = conn;
-      emit({ type: "connected", identity: identity.toHexString(), authMode: connectionAuthMode });
-      observe(conn, conn.db.myProfile, "profile");
-      observe(conn, conn.db.myProfilePreferences, "profile");
-      observe(conn, conn.db.myInventory, "inventory");
-      observe(conn, conn.db.myInventoryOrder, "inventory");
-      observe(conn, conn.db.myEquipment, "inventory");
-      observe(conn, conn.db.myEquippedFood, "inventory");
-      observe(conn, conn.db.myUpgradeProgress, "upgrades");
-      observe(conn, conn.db.myUpgradeUnlocks, "upgrades");
-      observe(conn, conn.db.myActiveRun, "run");
-      observe(conn, conn.db.myDungeonProgress, "dungeonProgress");
-      observe(conn, conn.db.myEndlessRecords, "dungeonProgress");
-      observe(conn, conn.db.myFarmRecords, "dungeonProgress");
-      coreSubscription = conn.subscriptionBuilder().onApplied(() => {
-        if (epoch !== connectionEpoch || connection !== conn) return;
-        coreSubscriptionReady = true;
-        connectionOpening = false;
-        reconnectAttempt = 0;
-        publishDomains(conn, ["profile", "inventory", "upgrades", "run", "dungeonProgress"]);
-        emit({ type: "subscribed" });
-        ensureFarmSubscription(conn);
-        ensureMarketSubscription(conn);
-        ensureMarketPriceSubscription(conn);
-        ensureMarketHistorySubscription(conn);
-        ensureDarkDuelSubscription(conn);
-        ensurePartySubscription(conn);
-        ensureDuelBoardSubscription(conn);
-        ensurePlayerCountsSubscription(conn);
-        ensureQuestSubscription(conn);
-        flushPendingReducerCalls();
-      }).onError((_ctx, error) => {
-        if (epoch === connectionEpoch) emit({ type: "error", command: "subscribe", message: String(error) });
-      }).subscribe([
-        tables.myProfile,
-        tables.myProfilePreferences,
-        tables.myInventory,
-        tables.myInventoryOrder,
-        tables.myEquipment,
-        tables.myEquippedFood,
-        tables.myUpgradeProgress,
-        tables.myUpgradeUnlocks,
-        tables.myActiveRun,
-        tables.myDungeonProgress,
-        tables.myEndlessRecords,
-        tables.myFarmRecords
-      ]);
-    }).onDisconnect((_ctx, error) => {
-      if (epoch !== connectionEpoch) return;
-      connection = null;
-      coreSubscriptionReady = false;
-      connectionOpening = false;
-      releaseScopedSubscriptions();
-      resumeNeeded = authMode === "account";
-      emit({ type: "disconnected", message: error ? String(error) : "" });
-      scheduleBackendResume();
-    }).onConnectError((_ctx, error) => {
-      if (epoch === connectionEpoch) {
-        connectionOpening = false;
-        releaseScopedSubscriptions();
-        resumeNeeded = authMode === "account";
-        emit({ type: "error", command: "connect", message: String(error) });
-        scheduleBackendResume();
-      }
-    });
-    builder = builder.withToken(token);
-    builder.build();
-  }
-  async function reconnectBackendForCurrentAuth() {
-    if (lastBackendRequest) await openBackendConnection(lastBackendRequest);
-  }
   function accountSessionExpired() {
     return authMode === "account" && isAccountTokenExpired(accountClaims?.exp);
   }
-  function renewThenResume() {
-    if (!accountRefreshToken) {
-      reportExpiredSession();
-      return;
-    }
-    void refreshAccountToken().then((renewed) => {
-      if (!renewed) {
-        if (accountSessionExpired()) reportExpiredSession();
-        return;
-      }
-      resumeNeeded = true;
-      resumeBackend();
-    });
+  function getAuthStatus() {
+    return JSON.stringify(authStatus());
   }
-  function reportExpiredSession() {
-    resumeNeeded = false;
-    pendingReducerCalls.length = 0;
-    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
-    reconnectTimer = null;
+  function currentAuthMode() {
+    return authMode;
+  }
+  function currentAccountToken() {
+    return accountToken;
+  }
+  function hasRefreshToken() {
+    return accountRefreshToken.length > 0;
+  }
+  function isAuthBusy() {
+    return authBusy;
+  }
+  function reportAuthExpired() {
     authBusy = false;
     if (authError === EXPIRED_SESSION_MESSAGE) return;
     authError = EXPIRED_SESSION_MESSAGE;
     publishAuthStatus();
     emit({ type: "auth_error", message: authError });
-  }
-  function resumeBackend() {
-    if (accountSessionExpired()) {
-      renewThenResume();
-      return;
-    }
-    if (connection || connectionOpening || authMode !== "account" || !accountToken || !lastBackendRequest) return;
-    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
-    reconnectTimer = null;
-    resumeNeeded = false;
-    void openBackendConnection(lastBackendRequest);
-  }
-  function reconnectBackend() {
-    if (authMode !== "account" || !lastBackendRequest) return;
-    disconnectBackend();
-    resumeNeeded = true;
-    resumeBackend();
-  }
-  function scheduleBackendResume() {
-    if (accountSessionExpired()) {
-      renewThenResume();
-      return;
-    }
-    if (!resumeNeeded || connection || connectionOpening || reconnectTimer !== null) return;
-    if (!shouldAutoResumeConnection({
-      accountAuthenticated: authMode === "account",
-      authBusy,
-      clientScreen,
-      documentHidden: document.hidden
-    })) return;
-    const delay = Math.min(500 * 2 ** reconnectAttempt, 5e3);
-    reconnectAttempt += 1;
-    reconnectTimer = window.setTimeout(() => {
-      reconnectTimer = null;
-      resumeBackend();
-    }, delay);
-  }
-  function noteUserActivity() {
-    lastUserActivityAt = Date.now();
-    if (resumeNeeded) resumeBackend();
-  }
-  function enterAfkIdle() {
-    if (!connection || authMode !== "account" || authBusy) return;
-    if (clientScreen === "farm") return;
-    const requiresRefresh = clientScreen === "farm_round_end";
-    disconnectBackend();
-    resumeNeeded = false;
-    emit({ type: "idle_disconnected", requiresRefresh });
-  }
-  function checkAfkIdle() {
-    if (shouldEnterAfkIdle({
-      connected: Boolean(connection),
-      accountAuthenticated: authMode === "account",
-      authBusy,
-      clientScreen,
-      documentHidden: document.hidden,
-      inactiveForMs: Date.now() - lastUserActivityAt
-    })) enterAfkIdle();
-  }
-  function setClientContext(contextJson) {
-    try {
-      const context = JSON.parse(contextJson);
-      const nextScreen = typeof context.screen === "string" ? context.screen : "title";
-      if (nextScreen === clientScreen) {
-        noteUserActivity();
-        return;
-      }
-      clientScreen = nextScreen;
-      noteUserActivity();
-      if (!connection || !coreSubscriptionReady) return;
-      if (farmScopeWanted()) ensureFarmSubscription(connection);
-      else if (farmSubscription) stopFarmSubscription();
-      if (marketScopeWanted()) ensureMarketSubscription(connection);
-      else if (marketSubscription) stopMarketSubscription();
-      if (duelBoardScopeWanted()) ensureDuelBoardSubscription(connection);
-      else if (duelBoardSubscription) stopDuelBoardSubscription();
-    } catch (error) {
-      emit({ type: "error", command: "setClientContext", message: String(error) });
-    }
-  }
-  async function connectBackend(configJson) {
-    try {
-      await authInitialization;
-      const request = JSON.parse(configJson);
-      lastBackendRequest = request;
-      noteUserActivity();
-      await openBackendConnection(request);
-    } catch (error) {
-      emit({ type: "error", command: "connect", message: String(error) });
-    }
-  }
-  async function callReducer(name, argumentsJson) {
-    try {
-      const background = isBackgroundCall(name);
-      if (!background) noteUserActivity();
-      if (!connection || !coreSubscriptionReady) {
-        if (!background && authMode === "account" && lastBackendRequest && (resumeNeeded || connectionOpening)) {
-          pendingReducerCalls.push({ name, argumentsJson, queuedAt: Date.now() });
-          const collapsed = collapsePendingCalls(pendingReducerCalls);
-          pendingReducerCalls.length = 0;
-          pendingReducerCalls.push(...collapsed);
-          armPendingCallTimer();
-          resumeBackend();
-          return;
-        }
-        throw new Error("SpacetimeDB is not connected.");
-      }
-      const reducer = connection.reducers[name];
-      if (typeof reducer !== "function") throw new Error(`Unknown reducer '${name}'.`);
-      await reducer.call(connection.reducers, JSON.parse(argumentsJson));
-      if (reportsSuccess(name)) emit({ type: "command_succeeded", command: name });
-    } catch (error) {
-      emit({ type: "error", command: name, message: String(error) });
-    }
-  }
-  function getAuthStatus() {
-    return JSON.stringify(authStatus());
-  }
-  var DIAGNOSTIC_TABLES = [
-    "myProfile",
-    "myActiveRun",
-    "myInventory",
-    "myEquipment",
-    "myEquippedFood",
-    "myDungeonProgress",
-    "myEndlessRecords",
-    "myFarmRecords",
-    "myDarkDuel",
-    "myDuelLobby",
-    "myDuelRecord",
-    "myDarkChestClaims",
-    "myParty",
-    "myPartyMembers",
-    "myPartySteps"
-  ];
-  function snapshotDiagnostics() {
-    const counts = {};
-    for (const name of DIAGNOSTIC_TABLES) {
-      try {
-        const handle = connection?.db?.[name];
-        counts[name] = handle ? Array.from(handle.iter()).length : -1;
-      } catch {
-        counts[name] = -2;
-      }
-    }
-    return JSON.stringify({
-      connected: !!connection,
-      coreReady: coreSubscriptionReady,
-      opening: connectionOpening,
-      resumeNeeded,
-      screen: clientScreen,
-      held: pendingReducerCalls.map((call) => call.name),
-      dirty: Array.from(dirtySnapshotDomains),
-      counts
-    });
-  }
-  function drainEvents() {
-    if (pendingEvents.length === 0) return "";
-    return JSON.stringify(mergeSnapshotRuns(pendingEvents.splice(0, pendingEvents.length)));
   }
   window.addEventListener("message", (event) => {
     if (event.origin !== window.location.origin || !loginPopup || event.source !== loginPopup) return;
@@ -11952,6 +11870,9 @@ ${ty.variants.map(
     if (!callbackUrl || new URL(callbackUrl).origin !== window.location.origin) return;
     void processAuthorizationCallback(callbackUrl, false);
   });
+  var authInitialization = initializeAuthentication();
+
+  // src/index.ts
   for (const eventName of ["pointerdown", "keydown", "touchstart", "focus"]) {
     window.addEventListener(eventName, noteUserActivity, { passive: true });
   }
@@ -11959,7 +11880,6 @@ ${ty.variants.map(
     if (!document.hidden) noteUserActivity();
   });
   window.setInterval(checkAfkIdle, AFK_CHECK_INTERVAL_MS);
-  var authInitialization = initializeAuthentication();
   window.LDBGSpacetime = {
     beginLogin,
     beginLogout,
