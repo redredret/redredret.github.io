@@ -845,13 +845,179 @@ ${originalIndentation}`;
     return "SpacetimeAuth account";
   }
 
+  // src/snapshot_domains.ts
+  function one(view) {
+    return { view, one: true };
+  }
+  function many(view) {
+    return { view, one: false };
+  }
+  var DOMAINS = {
+    profile: { group: "core", keys: { profile: one("myProfile"), profilePreferences: one("myProfilePreferences") } },
+    inventory: {
+      group: "core",
+      keys: {
+        inventory: many("myInventory"),
+        inventoryOrder: many("myInventoryOrder"),
+        equipment: many("myEquipment"),
+        equippedFood: many("myEquippedFood")
+      }
+    },
+    upgrades: {
+      group: "core",
+      keys: { upgradeProgress: one("myUpgradeProgress"), upgradeUnlocks: many("myUpgradeUnlocks") }
+    },
+    run: { group: "core", keys: { activeRun: one("myActiveRun") } },
+    // Named for what was in it first. It is the durable RECORDS domain: the
+    // per-account bests and completions that outlive a run, whichever activity
+    // set them. A new record table belongs here rather than in a domain of its
+    // own -- they change once a run at most, and they arrive together.
+    dungeonProgress: {
+      group: "core",
+      keys: {
+        dungeonProgress: many("myDungeonProgress"),
+        endlessRecords: many("myEndlessRecords"),
+        farmRecords: many("myFarmRecords")
+      }
+    },
+    // The Arena's lobby and this player's duel record: both sender-scoped, both
+    // tiny, and both things that HAPPEN to a player -- somebody else takes up
+    // their listing -- so they ride the connection rather than a screen.
+    arenaDuels: { group: "darkDuel", keys: { duelLobby: one("myDuelLobby"), duelRecord: one("myDuelRecord") } },
+    // Co-op (docs/COOP_ENDLESS.md): the party this player is in, everybody in it,
+    // and their place in the quick-match queue. All three change because of
+    // somebody ELSE -- a partner found, a partner ready, a monster's health -- so
+    // they ride the connection. Always all three, so "no party" is an empty row.
+    party: {
+      group: "party",
+      keys: { party: one("myParty"), partyMembers: many("myPartyMembers"), partyQueue: one("myPartyQueue") }
+    },
+    // Every kill and chest the party has had, on a domain of its own: it grows
+    // through the run, and riding 'party' every monster's health tick re-sent it.
+    partySteps: { group: "party", keys: { partySteps: many("myPartySteps") } },
+    // The teammate's board and falling piece, for the mini card.
+    partyBoard: {
+      group: "party",
+      keys: { partyBoards: many("myPartyPartnerBoards"), partyPieces: many("myPartyPartnerPieces") }
+    },
+    // The board itself is the one whole-table projection here, so it is held only
+    // while the Duels screen is open, exactly as the storefront is.
+    duelBoard: { group: "duelBoard", keys: { duelListings: many("duelListings") } },
+    farmSession: {
+      group: "farm",
+      keys: { farmPvpSession: one("myFarmPvpSession"), farmPvpMember: one("myFarmPvpMemberV2") }
+    },
+    // The roster says who sits where; the boards are what the room's events
+    // rebuilt. Godot gets the rows the old views gave it.
+    farmBoard: {
+      group: "farm",
+      observes: ["opponentFarmRosterV1"],
+      built: ["farmOpponents", "farmOpponentPieces", "opponentFarmBoard", "opponentFarmPiece"]
+    },
+    // Refreshed only by the room's pose events; the roster it reads is observed
+    // for farmBoard.
+    farmPiece: { group: "farm", observes: [], built: ["farmOpponentPieces", "opponentFarmPiece"] },
+    farmAttacks: { group: "farm", keys: { farmPvpAttacks: many("myFarmPvpAttacks") } },
+    // What this player sent, and who the server landed it on: the only way the
+    // sender's screen can aim its garbage slam at the right rival. Its own domain:
+    // both lists grow through a round, and while they shared one every attack
+    // either way re-sent both, and Godot rebuilt the whole versus model for it.
+    farmSentAttacks: { group: "farm", keys: { farmPvpSentAttacks: many("mySentFarmPvpAttacks") } },
+    farmDarkHaul: { group: "farm", keys: { farmDarkHaul: many("myFarmDarkHaul") } },
+    playerCounts: {
+      group: "playerCounts",
+      keys: { farmPlayerCounts: many("farmPlayerCounts"), darkPlayerCount: many("darkPlayerCount") }
+    },
+    market: { group: "market", keys: { marketListings: many("marketListings") } },
+    marketPrices: { group: "marketPrices", keys: { marketPrices: many("marketPriceGuide") } },
+    marketHistory: {
+      group: "marketHistory",
+      keys: {
+        marketTransactions: many("myMarketTransactions"),
+        // Always an array, so "no notice yet" is told apart from "not loaded".
+        marketSaleNotice: many("myMarketSaleNotice")
+      }
+    },
+    // All three always, so "no duel" reads as an empty list rather than as a
+    // domain that has not arrived: a screen cannot tell those apart, and one of
+    // them means somebody is swinging at you.
+    darkDuel: {
+      group: "darkDuel",
+      keys: {
+        darkDuel: many("myDarkDuel"),
+        darkDuelBlows: many("myDarkDuelBlows"),
+        darkDuelHaul: many("myDarkDuelHaul")
+      }
+    },
+    // Whether this player is in the hunt, on a domain of its own: it changes as
+    // the run goes on, and riding darkDuel it re-sent the duel, every blow of the
+    // fight and the haul each time.
+    darkPresence: { group: "darkDuel", keys: { darkPresence: many("myDarkPresence") } },
+    // The Dark chests this player's run has drawn out of the pool of lost gear:
+    // the answer to open_dark_chest. A domain of its own so a claim does not
+    // re-send the whole duel.
+    darkChests: { group: "darkDuel", keys: { darkChestClaims: many("myDarkChestClaims") } },
+    // The other player's board (at most one row, and only while a fight is on),
+    // on a domain of its own. It rode the darkDuel domain, so every pose they
+    // published -- up to five a second -- re-sent the duel row, EVERY blow of the
+    // fight so far, the haul and the presence row, and Godot re-applied the lot:
+    // health reconciled, blows re-walked, the combat panel refreshed, for a
+    // falling piece that moved one cell on a thumbnail. Godot still accepts a
+    // board inside a darkDuel patch, so an old bridge and a new client (or the
+    // reverse) agree during a deploy.
+    duelOpponentBoard: { group: "darkDuel", keys: { duelOpponentBoard: many("myDuelOpponentBoard") } },
+    // Their falling piece between board publishes (dark_duel_piece). Godot takes
+    // whichever of the board and this was written last.
+    duelOpponentPiece: { group: "darkDuel", keys: { duelOpponentPiece: many("myDuelOpponentPiece") } },
+    // Tasks and quests: the tasks this player holds, the chests they have turned
+    // in and not yet seen, and where every quest stands. Always all of them, so
+    // "none" reads as empty lists.
+    quests: {
+      group: "quests",
+      keys: {
+        tasks: many("myTasks"),
+        taskChests: many("myTaskChests"),
+        questProgress: many("myQuests"),
+        // What has been seen and what has been swapped: null for a player who has
+        // done neither, which the client reads as "nothing seen, nothing spent".
+        taskState: one("myTaskState"),
+        // When this player turned quests in, and their lifetime counters.
+        questClaims: many("myQuestClaims"),
+        questStats: many("myQuestStats"),
+        // The feats this player has claimed; their progress is questStats.
+        featClaims: many("myFeatClaims")
+      }
+    },
+    // The quest catalog and each quest's details (condition, chest tier, the
+    // experience it pays): static, read from no table, so sent when the quest
+    // subscription is applied and never again. They were in 'quests' and rode
+    // every patch of it -- ~48 KB and some two hundred JSON parses in Godot on
+    // every run's settlement, for rows that cannot have changed.
+    questCatalog: { group: "quests", keys: { questCatalog: many("questCatalog"), questDetails: many("questDetails") } }
+  };
+  var CLIENT_SCREENS = {
+    /** The screen before Godot has said anything. */
+    title: "title",
+    /** Live Farm play: never idled out, and the Farm group is held. */
+    farm: "farm",
+    /** A finished Farm round: the Farm group is held, and an idle connection is released for good. */
+    farmRoundEnd: "farm_round_end",
+    /** The storefront is subscribed only here. */
+    store: "store",
+    /** The Duels board is subscribed only here. */
+    duels: "duels"
+  };
+
   // src/connection_lifecycle.ts
+  function listed(list, name) {
+    return list.includes(name);
+  }
   var AFK_DISCONNECT_MS = 10 * 60 * 1e3;
   var AFK_CHECK_INTERVAL_MS = 30 * 1e3;
   function shouldEnterAfkIdle(state) {
     if (!state.connected || !state.accountAuthenticated || state.authBusy) return false;
     if (state.inactiveForMs < AFK_DISCONNECT_MS) return false;
-    if (state.clientScreen === "farm") return false;
+    if (state.clientScreen === CLIENT_SCREENS.farm) return false;
     return true;
   }
   function shouldAutoResumeConnection(state) {
@@ -898,7 +1064,7 @@ ${originalIndentation}`;
     "publishPartyPiece"
   ];
   function reportsSuccess(name) {
-    return !QUIET_SUCCESS_CALLS.includes(name);
+    return !listed(QUIET_SUCCESS_CALLS, name);
   }
   function mergeSnapshotRuns(events) {
     const merged = [];
@@ -964,15 +1130,15 @@ ${originalIndentation}`;
     "publishPartyPiece"
   ];
   function isBackgroundCall(name) {
-    return BACKGROUND_CALLS.includes(name);
+    return listed(BACKGROUND_CALLS, name);
   }
   function collapsePendingCalls(queued, maximum = MAX_PENDING_CALLS) {
     const lastSupersedable = /* @__PURE__ */ new Map();
     queued.forEach((call, index) => {
-      if (SUPERSEDABLE_CALLS.includes(call.name)) lastSupersedable.set(call.name, index);
+      if (listed(SUPERSEDABLE_CALLS, call.name)) lastSupersedable.set(call.name, index);
     });
     const kept = queued.filter(
-      (call, index) => !SUPERSEDABLE_CALLS.includes(call.name) || lastSupersedable.get(call.name) === index
+      (call, index) => !listed(SUPERSEDABLE_CALLS, call.name) || lastSupersedable.get(call.name) === index
     );
     return kept.length <= maximum ? kept : kept.slice(kept.length - maximum);
   }
@@ -1016,7 +1182,7 @@ ${originalIndentation}`;
     /** The target Godot last asked to connect to; a resume reconnects to it. */
     lastBackendRequest: null,
     /** The screen Godot last reported (`setClientContext`): what the scoped groups follow. */
-    clientScreen: "title"
+    clientScreen: CLIENT_SCREENS.title
   };
 
   // node_modules/.pnpm/spacetimedb@2.8.2/node_modules/spacetimedb/dist/index.browser.mjs
@@ -10756,7 +10922,7 @@ ${ty.variants.map(
     farmKeyframeSubscription = null;
   }
   function farmScopeWanted() {
-    return live.clientScreen === "farm" || live.clientScreen === "farm_round_end";
+    return live.clientScreen === CLIENT_SCREENS.farm || live.clientScreen === CLIENT_SCREENS.farmRoundEnd;
   }
   function stopFarmEvents() {
     for (const handle of [farmEventSubscription, farmKeyframeSubscription]) {
@@ -10887,169 +11053,21 @@ ${ty.variants.map(
   var EMPTY_CONNECTION = {
     db: new Proxy({}, { get: () => ({ iter: () => [] }) })
   };
-  function one(view) {
-    return { view, one: true };
-  }
-  function many(view) {
-    return { view, one: false };
-  }
-  var DOMAINS = {
-    profile: { group: "core", keys: { profile: one("myProfile"), profilePreferences: one("myProfilePreferences") } },
-    inventory: {
-      group: "core",
-      keys: {
-        inventory: many("myInventory"),
-        inventoryOrder: many("myInventoryOrder"),
-        equipment: many("myEquipment"),
-        equippedFood: many("myEquippedFood")
-      }
-    },
-    upgrades: {
-      group: "core",
-      keys: { upgradeProgress: one("myUpgradeProgress"), upgradeUnlocks: many("myUpgradeUnlocks") }
-    },
-    run: { group: "core", keys: { activeRun: one("myActiveRun") } },
-    // Named for what was in it first. It is the durable RECORDS domain: the
-    // per-account bests and completions that outlive a run, whichever activity
-    // set them. A new record table belongs here rather than in a domain of its
-    // own -- they change once a run at most, and they arrive together.
-    dungeonProgress: {
-      group: "core",
-      keys: {
-        dungeonProgress: many("myDungeonProgress"),
-        endlessRecords: many("myEndlessRecords"),
-        farmRecords: many("myFarmRecords")
-      }
-    },
-    // The Arena's lobby and this player's duel record: both sender-scoped, both
-    // tiny, and both things that HAPPEN to a player -- somebody else takes up
-    // their listing -- so they ride the connection rather than a screen.
-    arenaDuels: { group: "darkDuel", keys: { duelLobby: one("myDuelLobby"), duelRecord: one("myDuelRecord") } },
-    // Co-op (docs/COOP_ENDLESS.md): the party this player is in, everybody in it,
-    // and their place in the quick-match queue. All three change because of
-    // somebody ELSE -- a partner found, a partner ready, a monster's health -- so
-    // they ride the connection. Always all three, so "no party" is an empty row.
-    party: {
-      group: "party",
-      keys: { party: one("myParty"), partyMembers: many("myPartyMembers"), partyQueue: one("myPartyQueue") }
-    },
-    // Every kill and chest the party has had, on a domain of its own: it grows
-    // through the run, and riding 'party' every monster's health tick re-sent it.
-    partySteps: { group: "party", keys: { partySteps: many("myPartySteps") } },
-    // The teammate's board and falling piece, for the mini card.
-    partyBoard: {
-      group: "party",
-      keys: { partyBoards: many("myPartyPartnerBoards"), partyPieces: many("myPartyPartnerPieces") }
-    },
-    // The board itself is the one whole-table projection here, so it is held only
-    // while the Duels screen is open, exactly as the storefront is.
-    duelBoard: { group: "duelBoard", keys: { duelListings: many("duelListings") } },
-    farmSession: {
-      group: "farm",
-      keys: { farmPvpSession: one("myFarmPvpSession"), farmPvpMember: one("myFarmPvpMemberV2") }
-    },
+  var SNAPSHOT_DOMAINS = Object.keys(DOMAINS);
+  var BUILDERS = {
     // The roster says who sits where; the boards are what the room's events
     // rebuilt. Godot gets the rows the old views gave it.
-    farmBoard: {
-      group: "farm",
-      observes: ["opponentFarmRosterV1"],
-      build: (activeConnection, data) => {
-        const { boards, pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
-        data.farmOpponents = boards;
-        data.farmOpponentPieces = pieces;
-        Object.assign(data, farmBoardDomainPatch(boards[0]));
-      }
+    farmBoard: (activeConnection) => {
+      const { boards, pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
+      return { farmOpponents: boards, farmOpponentPieces: pieces, ...farmBoardDomainPatch(boards[0]) };
     },
     // Refreshed only by the room's pose events; the roster it reads is observed
     // for farmBoard.
-    farmPiece: {
-      group: "farm",
-      observes: [],
-      build: (activeConnection, data) => {
-        const { pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
-        data.farmOpponentPieces = pieces;
-        data.opponentFarmPiece = pieces[0] ?? null;
-      }
-    },
-    farmAttacks: { group: "farm", keys: { farmPvpAttacks: many("myFarmPvpAttacks") } },
-    // What this player sent, and who the server landed it on: the only way the
-    // sender's screen can aim its garbage slam at the right rival. Its own domain:
-    // both lists grow through a round, and while they shared one every attack
-    // either way re-sent both, and Godot rebuilt the whole versus model for it.
-    farmSentAttacks: { group: "farm", keys: { farmPvpSentAttacks: many("mySentFarmPvpAttacks") } },
-    farmDarkHaul: { group: "farm", keys: { farmDarkHaul: many("myFarmDarkHaul") } },
-    playerCounts: {
-      group: "playerCounts",
-      keys: { farmPlayerCounts: many("farmPlayerCounts"), darkPlayerCount: many("darkPlayerCount") }
-    },
-    market: { group: "market", keys: { marketListings: many("marketListings") } },
-    marketPrices: { group: "marketPrices", keys: { marketPrices: many("marketPriceGuide") } },
-    marketHistory: {
-      group: "marketHistory",
-      keys: {
-        marketTransactions: many("myMarketTransactions"),
-        // Always an array, so "no notice yet" is told apart from "not loaded".
-        marketSaleNotice: many("myMarketSaleNotice")
-      }
-    },
-    // All three always, so "no duel" reads as an empty list rather than as a
-    // domain that has not arrived: a screen cannot tell those apart, and one of
-    // them means somebody is swinging at you.
-    darkDuel: {
-      group: "darkDuel",
-      keys: {
-        darkDuel: many("myDarkDuel"),
-        darkDuelBlows: many("myDarkDuelBlows"),
-        darkDuelHaul: many("myDarkDuelHaul")
-      }
-    },
-    // Whether this player is in the hunt, on a domain of its own: it changes as
-    // the run goes on, and riding darkDuel it re-sent the duel, every blow of the
-    // fight and the haul each time.
-    darkPresence: { group: "darkDuel", keys: { darkPresence: many("myDarkPresence") } },
-    // The Dark chests this player's run has drawn out of the pool of lost gear:
-    // the answer to open_dark_chest. A domain of its own so a claim does not
-    // re-send the whole duel.
-    darkChests: { group: "darkDuel", keys: { darkChestClaims: many("myDarkChestClaims") } },
-    // The other player's board (at most one row, and only while a fight is on),
-    // on a domain of its own. It rode the darkDuel domain, so every pose they
-    // published -- up to five a second -- re-sent the duel row, EVERY blow of the
-    // fight so far, the haul and the presence row, and Godot re-applied the lot:
-    // health reconciled, blows re-walked, the combat panel refreshed, for a
-    // falling piece that moved one cell on a thumbnail. Godot still accepts a
-    // board inside a darkDuel patch, so an old bridge and a new client (or the
-    // reverse) agree during a deploy.
-    duelOpponentBoard: { group: "darkDuel", keys: { duelOpponentBoard: many("myDuelOpponentBoard") } },
-    // Their falling piece between board publishes (dark_duel_piece). Godot takes
-    // whichever of the board and this was written last.
-    duelOpponentPiece: { group: "darkDuel", keys: { duelOpponentPiece: many("myDuelOpponentPiece") } },
-    // Tasks and quests: the tasks this player holds, the chests they have turned
-    // in and not yet seen, and where every quest stands. Always all of them, so
-    // "none" reads as empty lists.
-    quests: {
-      group: "quests",
-      keys: {
-        tasks: many("myTasks"),
-        taskChests: many("myTaskChests"),
-        questProgress: many("myQuests"),
-        // What has been seen and what has been swapped: null for a player who has
-        // done neither, which the client reads as "nothing seen, nothing spent".
-        taskState: one("myTaskState"),
-        // When this player turned quests in, and their lifetime counters.
-        questClaims: many("myQuestClaims"),
-        questStats: many("myQuestStats"),
-        // The feats this player has claimed; their progress is questStats.
-        featClaims: many("myFeatClaims")
-      }
-    },
-    // The quest catalog and each quest's details (condition, chest tier, the
-    // experience it pays): static, read from no table, so sent when the quest
-    // subscription is applied and never again. They were in 'quests' and rode
-    // every patch of it -- ~48 KB and some two hundred JSON parses in Godot on
-    // every run's settlement, for rows that cannot have changed.
-    questCatalog: { group: "quests", keys: { questCatalog: many("questCatalog"), questDetails: many("questDetails") } }
+    farmPiece: (activeConnection) => {
+      const { pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
+      return { farmOpponentPieces: pieces, opponentFarmPiece: pieces[0] ?? null };
+    }
   };
-  var SNAPSHOT_DOMAINS = Object.keys(DOMAINS);
   function groupDomains(group) {
     return SNAPSHOT_DOMAINS.filter((domain) => DOMAINS[domain].group === group);
   }
@@ -11082,7 +11100,7 @@ ${ty.variants.map(
       const spec = DOMAINS[domain];
       buildDomain(domain, () => {
         if (!("keys" in spec)) {
-          spec.build(activeConnection, data);
+          Object.assign(data, BUILDERS[domain](activeConnection));
           return;
         }
         for (const [key, wire] of Object.entries(spec.keys)) {
@@ -11141,7 +11159,7 @@ ${ty.variants.map(
     // is open. The server view omits seller identities. Only the storefront is
     // dropped on leaving the Store. The player's own history stays: it is what
     // announces a sale wherever they are.
-    market: { wanted: () => live.clientScreen === "store", errorCommand: "subscribeMarket" },
+    market: { wanted: () => live.clientScreen === CLIENT_SCREENS.store, errorCommand: "subscribeMarket" },
     // One aggregate per listed item, derived by the server from the ten cheapest
     // live listings. Unlike the full storefront this stays subscribed everywhere:
     // it is small, identity-free, and useful anywhere the game needs to explain
@@ -11175,7 +11193,7 @@ ${ty.variants.map(
     // is dropped on leaving the Duels screen. The lobby stays (darkDuel): it is
     // what tells a player somebody has taken their listing up, and a listing does
     // not expire because they went to look at their inventory.
-    duelBoard: { wanted: () => live.clientScreen === "duels", errorCommand: "subscribeDuelBoard" },
+    duelBoard: { wanted: () => live.clientScreen === CLIENT_SCREENS.duels, errorCommand: "subscribeDuelBoard" },
     // The counters beside the Farm menu's versus modes. Tiny and shared by every
     // player, so it is subscribed for the whole connection rather than scoped to a
     // screen. Kept out of the core subscription so a server that predates the view
@@ -11383,8 +11401,8 @@ ${ty.variants.map(
   }
   function enterAfkIdle() {
     if (!live.connection || currentAuthMode() !== "account" || isAuthBusy()) return;
-    if (live.clientScreen === "farm") return;
-    const requiresRefresh = live.clientScreen === "farm_round_end";
+    if (live.clientScreen === CLIENT_SCREENS.farm) return;
+    const requiresRefresh = live.clientScreen === CLIENT_SCREENS.farmRoundEnd;
     disconnectBackend();
     live.resumeNeeded = false;
     emit({ type: "idle_disconnected", requiresRefresh });
@@ -11402,7 +11420,7 @@ ${ty.variants.map(
   function setClientContext(contextJson) {
     try {
       const context = JSON.parse(contextJson);
-      const nextScreen = typeof context.screen === "string" ? context.screen : "title";
+      const nextScreen = typeof context.screen === "string" ? context.screen : CLIENT_SCREENS.title;
       if (nextScreen === live.clientScreen) {
         noteUserActivity();
         return;
