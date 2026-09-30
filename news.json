@@ -1,0 +1,13 @@
+{
+  "about": "The landing page's Recently Added list, newest first; the page shows the first four. Add an entry whenever a batch gives players something new to find: a dungeon, a mode, a family of items, a system. Every GREENSHORE_STORY_VERSION from firstTrackedRulesVersion on must be named here, by an entry's rulesVersion or in notNews (a bump players would not call news). spacetimedb/test/landing_news.test.ts holds that. Write it the way a player would say it.",
+  "firstTrackedRulesVersion": 30,
+  "notNews": [31],
+  "entries": [
+    { "date": "2026-09-30", "title": "Ring of Thorns", "text": "Now hits a monster back for twice what it took, and the Garbage Man keeps your best wave.", "rulesVersion": 36 },
+    { "date": "2026-09-29", "title": "Jewellery", "text": "Six idols, three amulets and three new rings.", "rulesVersion": 35 },
+    { "date": "2026-09-28", "title": "Feats", "text": "Four permanent perks for the hardest deeds.", "rulesVersion": 34 },
+    { "date": "2026-09-28", "title": "The Ring of Garbage", "text": "Clear big and the monster's next attack comes later.", "rulesVersion": 33 },
+    { "date": "2026-09-28", "title": "The Garbage Man", "text": "A wave dungeon with its own boss.", "rulesVersion": 32 },
+    { "date": "2026-09-25", "title": "Co-op Endless", "text": "Take on Endless with a friend.", "rulesVersion": 30 }
+  ]
+}

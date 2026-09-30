@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LDBG · A Falling-Block RPG</title>
+<meta name="description" content="Clear lines, slay monsters and keep the loot. A falling-block RPG you play free in your browser.">
+<meta property="og:title" content="LDBG · A Falling-Block RPG">
+<meta property="og:description" content="Clear lines, slay monsters and keep the loot. Free in your browser.">
+<meta property="og:image" content="img/diorama_bandit_king.webp">
+<meta name="theme-color" content="#182226">
+<link rel="icon" href="ui/ldbg_icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Lilita+One&display=swap">
+<link rel="preload" as="image" href="img/area_greenshore.webp">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the game guide</a>
+
+<!-- ============================ MASTHEAD ============================ -->
+<header class="masthead">
+  <div class="masthead-sky" aria-hidden="true"></div>
+  <div class="masthead-inner">
+    <a class="wordmark" href="#top" id="top">
+      <img src="ui/ldbg_wordmark.svg" alt="LDBG" width="420" height="137">
+    </a>
+    <p class="wordmark-caption">A Falling-Block RPG</p>
+  </div>
+  <nav class="topnav" aria-label="Sections">
+    <a class="stone stone-quiet" href="#farm">The Farm</a>
+    <a class="stone stone-quiet" href="#armoury">Armoury</a>
+    <a class="stone stone-quiet" href="#greenshore">Dungeons</a>
+    <a class="stone stone-quiet" href="#bestiary">Bestiary</a>
+    <a class="stone stone-quiet" href="#arena">Arena</a>
+    <a class="stone stone-play nav-play" href="https://redredret.github.io/ldbg/">Play Free</a>
+  </nav>
+</header>
+
+<main class="portal" id="main">
+
+  <!-- ============================ HERO ============================ -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-scene" aria-hidden="true">
+      <img class="hero-foe" src="img/enemy_bandit_king.webp" alt="" width="900" height="799">
+      <img class="hero-knight" src="img/hero_knight.webp" alt="" width="900" height="829">
+    </div>
+    <div class="hero-copy">
+      <h1 id="hero-title" class="ink">Clear lines.<br>Slay monsters.<br>Keep the loot.</h1>
+      <p class="hero-lede">Every line you clear strikes the enemy in front of you. Stack well, and the loot is yours to keep.</p>
+      <a class="stone stone-play play-big" href="https://redredret.github.io/ldbg/">
+        <img src="img/icons/play.webp" alt="" width="44" height="44">Play Now
+      </a>
+      <p class="hero-small">Free &middot; Plays in your browser &middot; Keyboard &amp; controller</p>
+    </div>
+    <!-- The one piece of play on the page: an I piece drops into the gap, the
+         row clears, and what it harvested floats up. It runs once. -->
+    <div class="hero-stack" aria-hidden="true">
+      <div class="stack-row stack-top" data-row="top"></div>
+      <div class="stack-row" data-row="mid"></div>
+      <div class="stack-row" data-row="low"></div>
+      <div class="hero-drop"></div>
+      <ul class="hero-loot">
+        <li><img src="img/items/oak_log.png" alt="">+2 Oak Log</li>
+        <li><img src="img/items/iron_ore.png" alt="">+1 Iron Ore</li>
+        <li><img src="img/items/cotton.png" alt="">+1 Cotton</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ====================== WHAT'S INSIDE STRIP ====================== -->
+  <section class="inside" aria-label="What is in the game">
+    <a class="inside-tile" href="#armoury"><img src="img/icons/inventory.webp" alt="" width="56" height="56"><b data-count="content.items">94</b><span>Items</span></a>
+    <a class="inside-tile" href="#bestiary"><img src="img/icons/dungeon.webp" alt="" width="56" height="56"><b data-count="content.enemies">15</b><span>Monsters</span></a>
+    <a class="inside-tile" href="#armoury"><img src="img/icons/crafting.webp" alt="" width="56" height="56"><b data-count="content.recipes">56</b><span>Recipes</span></a>
+    <a class="inside-tile" href="#grow"><img src="img/icons/upgrades.webp" alt="" width="56" height="56"><b data-count="content.upgrades">80</b><span>Upgrades</span></a>
+    <a class="inside-tile" href="#grow"><img src="img/icons/greenshore.webp" alt="" width="56" height="56"><b data-count="content.quests">43</b><span>Quests</span></a>
+    <a class="inside-tile" href="#arena"><img src="img/icons/arena.webp" alt="" width="56" height="56"><b data-count="content.modes">9</b><span>Ways to play</span></a>
+  </section>
+
+  <div class="columns">
+    <div class="main-col">
+
+      <!-- ========================= I. THE FARM ========================= -->
+      <section class="chapter" id="farm" aria-labelledby="farm-title">
+        <header class="chapter-head">
+          <div class="clearrow" aria-hidden="true"></div>
+          <span class="chapter-num" aria-hidden="true">I</span>
+          <div>
+            <p class="kicker">Chapter I &middot; The Farm</p>
+            <h2 id="farm-title" class="ink">Every line is a harvest</h2>
+          </div>
+        </header>
+        <div class="banner" style="--area: url(img/area_greenshore.webp)">
+          <img class="banner-pop pop-left" src="img/hero_ranger.webp" alt="An adventurer with a maple bow" width="729" height="900" loading="lazy">
+          <div class="board-mock" aria-hidden="true" data-board="farm"></div>
+          <ol class="gathered" aria-label="Materials gathered from clearing lines">
+            <li class="gathered-card"><img src="img/items/maple_log.png" alt="" loading="lazy">Maple Log <b>&times;3</b></li>
+            <li class="gathered-card"><img src="img/items/mithril_ore.png" alt="" loading="lazy">Mithril Ore <b>&times;1</b></li>
+            <li class="gathered-card"><img src="img/items/raw_trout.png" alt="" loading="lazy">Raw Trout <b>&times;2</b></li>
+            <li class="gathered-card"><img src="img/items/flax.png" alt="" loading="lazy">Flax <b>&times;4</b></li>
+          </ol>
+        </div>
+        <div class="chapter-body">
+          <p>The Farm is an endless run. Clear lines and you gather logs, ore, fish and fibre from the land around you, then carry it home to craft with. The better you stack, the more you bring back: quads, T-spins and combos all pay extra.</p>
+          <div class="modes">
+            <article class="mode">
+              <img src="img/icons/farm_solo.webp" alt="" width="96" height="96" loading="lazy">
+              <h3>Farm Solo</h3>
+              <p>Just you and the board. Garbage rises every few pieces, so keep clearing.</p>
+            </article>
+            <article class="mode">
+              <img src="img/icons/farm_versus.webp" alt="" width="96" height="96" loading="lazy">
+              <h3>Farm Versus</h3>
+              <p>Up to ten players in a room, sending garbage at each other. You keep everything you gather.</p>
+            </article>
+            <article class="mode mode-dark">
+              <img src="img/icons/dark_farm.webp" alt="" width="96" height="96" loading="lazy">
+              <h3>Dark Farm</h3>
+              <p>Versus with stakes. Half of what you gather is on the line, and the winner takes it.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================= II. ARMOURY ========================= -->
+      <section class="chapter" id="armoury" aria-labelledby="armoury-title">
+        <header class="chapter-head">
+          <div class="clearrow" aria-hidden="true"></div>
+          <span class="chapter-num" aria-hidden="true">II</span>
+          <div>
+            <p class="kicker">Chapter II &middot; The Armoury</p>
+            <h2 id="armoury-title" class="ink">From leather to adamantite</h2>
+          </div>
+        </header>
+        <div class="banner banner-tall" style="--area: url(img/area_bandit_camp.webp)">
+          <ol class="gear-ladder" aria-label="Four sets of gear, from starter to epic">
+            <li><img src="img/hero_starter.webp" alt="Leather cap and tunic, iron sword and wooden buckler" width="900" height="761" loading="lazy"><span class="lv" data-level-of="leather_cap,leather_tunic,iron_sword,wooden_buckler">Lv 1</span></li>
+            <li><img src="img/hero_knight.webp" alt="Full mithril: helmet, armour, sword and buckler" width="900" height="829" loading="lazy"><span class="lv" data-level-of="mithril_helmet,mithril_armor,mithril_sword,mithril_buckler">Lv 10</span></li>
+            <li><img src="img/hero_adamant.webp" alt="Full adamantite: helmet, armour, sword and buckler" width="900" height="790" loading="lazy"><span class="lv" data-level-of="adamantite_helmet,adamantite_armor,adamantite_sword,adamantite_buckler">Lv 30</span></li>
+            <li><img src="img/hero_champion.webp" alt="Rugged cap, cultist robe, a bandit's blade and a spiked buckler" width="900" height="859" loading="lazy"><span class="lv" data-level-of="rugged_cap,cultist_robe,bandit_blade_a,spiked_buckler">Lv 35</span></li>
+          </ol>
+        </div>
+        <div class="chapter-body">
+          <p>Smelt your ore into ingots, weave your fibre into fabric, and work them into <b data-count="content.equipment">48</b> pieces of gear across <b data-count="content.recipes">56</b> recipes. Everything you wear shows on your character, from helmets and armour to swords, bows, staves, bucklers, rings and necklaces. Trade the rest for Gold with other players on the Market.</p>
+          <div class="inventory" data-inventory>
+            <div class="inventory-tabs" role="tablist" aria-label="Item kinds">
+              <button class="tab" role="tab" aria-selected="true" data-filter="all">All</button>
+              <button class="tab" role="tab" aria-selected="false" data-filter="weapon">Weapons</button>
+              <button class="tab" role="tab" aria-selected="false" data-filter="armor">Armour</button>
+              <button class="tab" role="tab" aria-selected="false" data-filter="accessory">Jewellery</button>
+              <button class="tab" role="tab" aria-selected="false" data-filter="material">Materials</button>
+            </div>
+            <ul class="inventory-grid" aria-label="Every item in the game"></ul>
+            <p class="inventory-caption"><span data-inventory-count>94</span> items. Hover or tap one to look closer.</p>
+            <div class="item-tip" role="status" aria-live="polite" hidden></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================= III. GREENSHORE ======================= -->
+      <section class="chapter" id="greenshore" aria-labelledby="greenshore-title">
+        <header class="chapter-head">
+          <div class="clearrow" aria-hidden="true"></div>
+          <span class="chapter-num" aria-hidden="true">III</span>
+          <div>
+            <p class="kicker">Chapter III &middot; Dungeons</p>
+            <h2 id="greenshore-title" class="ink">Fight your way up the coast</h2>
+          </div>
+        </header>
+        <ol class="route" aria-label="The Greenshore story route">
+          <li style="--area: url(img/area_greenshore.webp)"><span>The Coast</span></li>
+          <li style="--area: url(img/area_bandit_town.webp)"><span>Bandit Country</span></li>
+          <li style="--area: url(img/area_cyclops_arena.webp)"><span>Cyclops Arena</span></li>
+          <li style="--area: url(img/area_cultist_tower.webp)"><span>Cultist Tower</span></li>
+        </ol>
+        <div class="chapter-body split">
+          <figure class="diorama">
+            <img src="img/diorama_cyclops.webp" alt="An adventurer in adamantite facing Punchy the cyclops in the arena" width="954" height="862" loading="lazy">
+            <figcaption>Every clear is a blow. Every enemy hits back at your board.</figcaption>
+          </figure>
+          <div>
+            <p>Greenshore's story runs <b data-count="content.storyEncounters">19</b> fights long, from zombies on the shore to the Cult Leader at the top of the tower. Your lines are your attacks. Theirs land on your board: arrows knock out blocks, fire spreads along the bottom row, and slime costs you a rotation.</p>
+            <ul class="mode-list">
+              <li><img src="img/icons/story.webp" alt="" width="56" height="56" loading="lazy"><div><b>Story</b>One set route through every area and every boss.</div></li>
+              <li><img src="img/icons/endless.webp" alt="" width="56" height="56" loading="lazy"><div><b>Endless</b>A random route that ramps every round, with reward chests and champions. Go alone or bring a friend.</div></li>
+              <li class="dark"><img src="img/icons/dark_dungeon.webp" alt="" width="56" height="56" loading="lazy"><div><b>Dark</b>Enemies at double strength. Die, and you lose everything you wear and everything you found.</div></li>
+              <li><img src="img/icons/garbage_man.webp" alt="" width="56" height="56" loading="lazy"><div><b>The Garbage Man</b><span data-count="content.garbageWaves">10</span> waves of garbage, faster every wave. One top-out ends it.</div></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================= IV. BESTIARY ========================= -->
+      <section class="chapter" id="bestiary" aria-labelledby="bestiary-title">
+        <header class="chapter-head">
+          <div class="clearrow" aria-hidden="true"></div>
+          <span class="chapter-num" aria-hidden="true">IV</span>
+          <div>
+            <p class="kicker">Chapter IV &middot; Bestiary</p>
+            <h2 id="bestiary-title" class="ink">Wanted, for crimes against your stack</h2>
+          </div>
+        </header>
+        <div class="chapter-body">
+          <p><b data-count="content.bosses">7</b> bosses and <span data-count="content.regulars">8</span> lesser foes, each with their own way of wrecking your board. The tallies are from the live game.</p>
+          <ul class="posters">
+            <li class="poster" data-enemy="bandit_king"><img src="img/enemy_bandit_king.webp" alt="" loading="lazy"><h3>Bandit King</h3><p>Switches between arrow rain and a blade spin that cuts your top and bottom rows.</p><span class="bounty">Slain <b data-kills="bandit_king">62</b> times</span></li>
+            <li class="poster" data-enemy="cyclops"><img src="img/enemy_cyclops.webp" alt="" loading="lazy"><h3>Cyclops</h3><p>Knocks blocks loose from the top of your stack, then sets it on fire.</p><span class="bounty">Slain <b data-kills="cyclops">64</b> times</span></li>
+            <li class="poster" data-enemy="punchy"><img src="img/enemy_punchy.webp" alt="" loading="lazy"><h3>Punchy</h3><p>Slams the ground, and a stone wave sweeps across one of your rows.</p><span class="bounty">Slain <b data-kills="punchy">65</b> times</span></li>
+            <li class="poster" data-enemy="shooty"><img src="img/enemy_shooty.webp" alt="" loading="lazy"><h3>Shooty</h3><p>Hurls boulders that drop three or four stone blocks onto your board.</p><span class="bounty">Slain <b data-kills="shooty">67</b> times</span></li>
+            <li class="poster" data-enemy="bernie"><img src="img/enemy_bernie.webp" alt="" loading="lazy"><h3>Bernie</h3><p>A fire-casting cyclops whose fireball spreads along your bottom row.</p><span class="bounty">Slain <b data-kills="bernie">76</b> times</span></li>
+            <li class="poster" data-enemy="cult_leader"><img src="img/enemy_cult_leader.webp" alt="" loading="lazy"><h3>Cult Leader</h3><p>Opens portals and hurls fireballs, then shields itself from your next hit.</p><span class="bounty">Slain <b data-kills="cult_leader">42</b> times</span></li>
+            <li class="poster poster-wide" data-enemy="garbage_man"><img src="img/enemy_garbage_man.webp" alt="" loading="lazy"><h3>The Garbage Man</h3><p>Throws garbage at you one line at a time, faster every wave. Beat wave ten for a Masterwork Vault, then keep going.</p><span class="bounty">Lives in his own dungeon</span></li>
+          </ul>
+          <ul class="rabble" aria-label="Lesser foes">
+            <li><img src="img/enemy_zombie.webp" alt="" loading="lazy"><b>Zombie</b>Swipes a block off your top.</li>
+            <li><img src="img/enemy_super_zombie.webp" alt="" loading="lazy"><b>Super Zombie</b>Rakes off two or three.</li>
+            <li><img src="img/enemy_slime.webp" alt="" loading="lazy"><b>Slime</b>Slimes your piece. No rotating.</li>
+            <li><img src="img/enemy_squirrel.webp" alt="" loading="lazy"><b>Squirrel</b>Nips at you. Never your board.</li>
+            <li><img src="img/enemy_bandit.webp" alt="" loading="lazy"><b>Bandit</b>Arrows knock out a block.</li>
+            <li><img src="img/enemy_bandit_elite.webp" alt="" loading="lazy"><b>Bandit Elite</b>A tougher bandit, crossbow and all.</li>
+            <li><img src="img/enemy_cultist.webp" alt="" loading="lazy"><b>Cultist</b>Fireballs, and a stab at your bottom row.</li>
+            <li><img src="img/enemy_entling.webp" alt="" loading="lazy"><b>Oak Entling</b>A stump that refused to stay felled.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ========================== V. ARENA ========================== -->
+      <section class="chapter" id="arena" aria-labelledby="arena-title">
+        <header class="chapter-head">
+          <div class="clearrow" aria-hidden="true"></div>
+          <span class="chapter-num" aria-hidden="true">V</span>
+          <div>
+            <p class="kicker">Chapter V &middot; The Arena</p>
+            <h2 id="arena-title" class="ink">Duel for the win, or for their gear</h2>
+          </div>
+        </header>
+        <div class="banner banner-duel" style="--area: url(img/area_spire.webp)">
+          <img class="duelist duelist-left" src="img/hero_adamant.webp" alt="A duellist in adamantite" width="900" height="790" loading="lazy">
+          <span class="versus" aria-hidden="true">VS</span>
+          <img class="duelist duelist-right" src="img/hero_wizard.webp" alt="A duellist in a wizard's hat and robe" width="581" height="900" loading="lazy">
+        </div>
+        <div class="chapter-body">
+          <p>In the Hollow Spire you pick your opponent off the board. Look over their gear first, then fight for the win, or put a piece of your gear against a piece of theirs. Every hit you land is a line you cleared, so the better stacker usually walks away richer.</p>
+          <p class="aside-line">Duels won so far: <b data-count="live.duelWins">54</b> &middot; Versus rounds won on the Farm: <b data-count="live.versusWins">150</b></p>
+        </div>
+      </section>
+
+      <!-- ====================== VI. GROW STRONGER ====================== -->
+      <section class="chapter" id="grow" aria-labelledby="grow-title">
+        <header class="chapter-head">
+          <div class="clearrow" aria-hidden="true"></div>
+          <span class="chapter-num" aria-hidden="true">VI</span>
+          <div>
+            <p class="kicker">Chapter VI &middot; Your Legend</p>
+            <h2 id="grow-title" class="ink">Your account keeps growing</h2>
+          </div>
+        </header>
+        <div class="chapter-body">
+          <div class="ledger">
+            <div class="ledger-item"><img src="img/icons/upgrades.webp" alt="" width="64" height="64" loading="lazy"><b data-count="content.upgrades">80</b><span>upgrades across <span data-count="content.upgradeTrees">3</span> atlases: Combat, Skills and Build</span></div>
+            <div class="ledger-item"><img src="img/icons/greenshore.webp" alt="" width="64" height="64" loading="lazy"><b data-count="content.quests">43</b><span>quests from <span data-count="content.questGivers">7</span> townsfolk</span></div>
+            <div class="ledger-item"><img src="img/icons/market.webp" alt="" width="64" height="64" loading="lazy"><b data-count="content.tasks">69</b><span>daily and weekly tasks that pay out in chests</span></div>
+            <div class="ledger-item"><img src="img/icons/play.webp" alt="" width="64" height="64" loading="lazy"><b data-count="content.feats">4</b><span>Feats: permanent perks for the hardest deeds</span></div>
+          </div>
+          <ul class="chests" aria-label="Reward chests">
+            <li><img src="img/chest_1.webp" alt="" loading="lazy"><b>Wooden</b></li>
+            <li><img src="img/chest_2.webp" alt="" loading="lazy"><b>Reinforced</b></li>
+            <li><img src="img/chest_3.webp" alt="" loading="lazy"><b>Masterwork Vault</b></li>
+            <li class="dark"><img src="img/chest_dark.webp" alt="" loading="lazy"><b>Dark Chest</b><small>Holds gear other players lost</small></li>
+          </ul>
+          <div class="skins">
+            <h3>Dress your board</h3>
+            <p>Unlock new block skins as you level, from Toybox to Celestial at level 50.</p>
+            <ul class="skin-rows" aria-label="Block skins"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ FINALE ============================ -->
+      <section class="finale" style="--area: url(img/area_cultist_tower.webp)" aria-labelledby="finale-title">
+        <img class="finale-foe" src="img/enemy_cult_leader.webp" alt="" width="887" height="900" loading="lazy">
+        <div class="finale-copy">
+          <h2 id="finale-title" class="ink">Your adventure starts with one piece</h2>
+          <p>No download and no install. Try it as a guest, or Log In to keep everything you earn.</p>
+          <a class="stone stone-play play-big" href="https://redredret.github.io/ldbg/"><img src="img/icons/play.webp" alt="" width="44" height="44">Play Now</a>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============================ SIDEBAR ============================ -->
+    <aside class="side-col" aria-label="The realm">
+      <section class="panel realm" aria-labelledby="realm-title">
+        <h2 id="realm-title" class="plaque">The Realm So Far</h2>
+        <dl class="tally">
+          <div><dt>Adventurers</dt><dd data-count="live.players">21</dd></div>
+          <div><dt>Monsters slain</dt><dd data-count="live.monstersSlain">1,629</dd></div>
+          <div><dt>Bosses slain</dt><dd data-count="live.bossesSlain">376</dd></div>
+          <div><dt>Champions felled</dt><dd data-count="live.championsSlain">146</dd></div>
+          <div><dt>Quads cleared</dt><dd data-count="live.quads">679</dd></div>
+          <div><dt>T-spins</dt><dd data-count="live.tSpins">425</dd></div>
+          <div><dt>Items crafted</dt><dd data-count="live.itemsCrafted">293</dd></div>
+          <div><dt>Chests opened</dt><dd data-count="live.chestsOpened">64</dd></div>
+          <div><dt>Farm runs</dt><dd data-count="live.farmRuns">708</dd></div>
+          <div><dt>Greenshore conquered</dt><dd data-count="live.storyClears">6</dd></div>
+        </dl>
+        <p class="tally-when">Tallied from the live game <time data-read-at>30 Sep 2026</time></p>
+      </section>
+
+
+      <section class="panel" aria-labelledby="new-title">
+        <h2 id="new-title" class="plaque">Recently Added</h2>
+        <ul class="news" data-news>
+          <li><time datetime="2026-09-30">30 Sep</time><b>Ring of Thorns</b> Now hits a monster back for twice what it took, and the Garbage Man keeps your best wave.</li>
+          <li><time datetime="2026-09-29">29 Sep</time><b>Jewellery</b> Six idols, three amulets and three new rings.</li>
+          <li><time datetime="2026-09-28">28 Sep</time><b>Feats</b> Four permanent perks for the hardest deeds.</li>
+          <li><time datetime="2026-09-28">28 Sep</time><b>The Ring of Garbage</b> Clear big and the monster's next attack comes later.</li>
+        </ul>
+      </section>
+
+      <a class="panel panel-play" href="https://redredret.github.io/ldbg/">
+        <img src="img/chest_3.webp" alt="" width="180" height="128" loading="lazy">
+        <span class="ink">Claim your first chest</span>
+        <span class="stone stone-play">Play Free</span>
+      </a>
+    </aside>
+  </div>
+</main>
+
+<footer class="footer">
+  <img src="ui/ldbg_icon.svg" alt="" width="40" height="40">
+  <p>LDBG is in early beta. Everything here was rendered from the game's own models.</p>
+  <p class="footer-small">Made with Godot &middot; Type set in Baloo 2 and Lilita One</p>
+</footer>
+
+<script src="main.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" width="352" height="32" viewBox="0 0 352 32">
+  <g id="slot-I">
+    <rect width="32" height="32" fill="#37b2c3"/>
+    <rect x="3.429" y="3.429" width="25.143" height="25.143" fill="#45dff4"/>
+    <rect x="3.429" y="2.286" width="25.143" height="2.286" fill="#79e8f7"/>
+    <rect x="2.286" y="3.429" width="2.286" height="25.143" fill="#66e5f6"/>
+  </g>
+  <g id="slot-J">
+    <rect x="32" width="32" height="32" fill="#445fbe"/>
+    <rect x="35.429" y="3.429" width="25.143" height="25.143" fill="#57e"/>
+    <rect x="35.429" y="2.286" width="25.143" height="2.286" fill="#859df3"/>
+    <rect x="34.286" y="3.429" width="2.286" height="25.143" fill="#748ff1"/>
+  </g>
+  <g id="slot-L">
+    <rect x="64" width="32" height="32" fill="#cc7f36"/>
+    <rect x="67.429" y="3.429" width="25.143" height="25.143" fill="#ff9f43"/>
+    <rect x="67.429" y="2.286" width="25.143" height="2.286" fill="#ffba78"/>
+    <rect x="66.286" y="3.429" width="2.286" height="25.143" fill="#ffb065"/>
+  </g>
+  <g id="slot-O">
+    <rect x="96" width="32" height="32" fill="#c6b042"/>
+    <rect x="99.429" y="3.429" width="25.143" height="25.143" fill="#f7dc52"/>
+    <rect x="99.429" y="2.286" width="25.143" height="2.286" fill="#f9e682"/>
+    <rect x="98.286" y="3.429" width="2.286" height="25.143" fill="#f8e271"/>
+  </g>
+  <g id="slot-S">
+    <rect x="128" width="32" height="32" fill="#4aab64"/>
+    <rect x="131.429" y="3.429" width="25.143" height="25.143" fill="#5dd67d"/>
+    <rect x="131.429" y="2.286" width="25.143" height="2.286" fill="#8ae1a1"/>
+    <rect x="130.286" y="3.429" width="2.286" height="25.143" fill="#7add94"/>
+  </g>
+  <g id="slot-T">
+    <rect x="160" width="32" height="32" fill="#9255c2"/>
+    <rect x="163.429" y="3.429" width="25.143" height="25.143" fill="#b66af2"/>
+    <rect x="163.429" y="2.286" width="25.143" height="2.286" fill="#ca94f6"/>
+    <rect x="162.286" y="3.429" width="2.286" height="25.143" fill="#c385f4"/>
+  </g>
+  <g id="slot-Z">
+    <rect x="192" width="32" height="32" fill="#c04954"/>
+    <rect x="195.429" y="3.429" width="25.143" height="25.143" fill="#f05b69"/>
+    <rect x="195.429" y="2.286" width="25.143" height="2.286" fill="#f48993"/>
+    <rect x="194.286" y="3.429" width="2.286" height="25.143" fill="#f37984"/>
+  </g>
+  <g id="slot-garbage-clean">
+    <rect x="224" width="32" height="32" fill="#6d471f"/>
+    <rect x="227.43" y="3.43" width="25.14" height="25.14" fill="#8c6136"/>
+    <rect x="227.43" y="2.29" width="25.14" height="2.28" fill="#af8358"/>
+    <rect x="226.29" y="3.43" width="2.28" height="25.14" fill="#9a744d"/>
+    <path d="M228.1,7.55l3.6-2.9,4.8.3,2.2,2.9-2.5,3.4-5.4.1-2.4-1.5-.3-2.3Z" fill="#78532c"/>
+    <path d="M228.2,18.35l3.6-3.2,4.2.3,3.6,3.4-1.2,4.9-4.4,2.3-4.2-1.4-1.7-3.4.1-2.9Z" fill="#73502d"/>
+    <path d="M242.3,9.25l4.6-3.4,4.1.6,1.3,3.5-3.3,3.6-4.7-.3-2.6-2.2.6-1.8Z" fill="#79552f"/>
+    <path d="M244.8,18.75l4.8-1.7,2.7,1.7-.3,3.3-3.3,2.3-4.1-.6-1.5-2.9,1.7-2.1Z" fill="#7b562f"/>
+    <path d="M240.6,10.65l1.4-.6,1.6.6.3,1.5-1.1,1.1-1.7-.1-.7-1.1.2-1.4Z" fill="#5f4225"/>
+    <path d="M240.8,10.25l1.2-.5,1.2.5-.4,1.1-1.4.4-.9-.6.3-.9Z" fill="#a57a4f"/>
+    <path d="M246.8,18.45l2.2-.7,1.8.8.2,1.8-1.6,1.3-2.3-.3-.7-1.5.4-1.4Z" fill="#5f4225"/>
+    <path d="M247,17.85l1.8-.6,1.4.6-.4,1.1-1.8.6-1.2-.7.2-1Z" fill="#a57a4f"/>
+    <path d="M230,21.15l1.7-.5,1.4.5.2,1.4-1.3,1-1.7-.3-.6-1,.3-1.1Z" fill="#5f4225"/>
+    <path d="M230.2,20.65l1.4-.5,1.1.5-.3.9-1.4.4-.9-.6.1-.7Z" fill="#a57a4f"/>
+  </g>
+  <g id="slot-garbage-armored">
+    <rect x="256" width="32" height="32" fill="#6d471f"/>
+    <rect x="259.43" y="3.43" width="25.14" height="25.14" fill="#8c6136"/>
+    <path d="M260.2,7.55l3.6-2.9,4.8.3,2.2,2.9-2.5,3.4-5.4.1-2.4-1.5-.3-2.3Z" fill="#78532c"/>
+    <path d="M260.3,18.35l3.6-3.2,4.2.3,3.6,3.4-1.2,4.9-4.4,2.3-4.2-1.4-1.7-3.4.1-2.9Z" fill="#73502d"/>
+    <path d="M274.4,9.25l4.6-3.4,4.1.6,1.3,3.5-3.3,3.6-4.7-.3-2.6-2.2.6-1.8Z" fill="#79552f"/>
+    <path d="M276,18.05l3.5-1.4,4,1.5.6,3.1-3.1,2.6-4.5-.5-1.7-2.7,1.2-2.6Z" fill="#7b562f"/>
+    <path d="M262.1,15.35l1.4-.6,1.6.6.3,1.5-1.1,1.1-1.7-.1-.7-1.1.2-1.4Z" fill="#5f4225"/>
+    <path d="M262.244,14.783l1.2-.5,1.2.5-.4,1.1-1.4.4-.9-.6.3-.9Z" fill="#a57a4f"/>
+    <path d="M280.2,21.55l1.7-.5,1.4.5.2,1.4-1.3,1-1.7-.3-.6-1,.3-1.1Z" fill="#5f4225"/>
+    <path d="M280.372,21.189l1.4-.5,1.1.5-.3.9-1.4.4-.9-.6.1-.7Z" fill="#a57a4f"/>
+    <circle cx="262.7" cy="25.45" r="2.4" fill="#6a472a"/>
+    <circle cx="262.7" cy="25.45" r="1.3" fill="#4f351d"/>
+    <circle cx="281.7" cy="7.15" r="2.3" fill="#6a472a"/>
+    <circle cx="281.7" cy="7.15" r="1.2" fill="#4f351d"/>
+    <path d="M262.7,25.45l3.7-1.8,2.1-3.5,1.2-3.8,3.8-3.4,3.5-2.5,4.7-3.3" fill="none" isolation="isolate" opacity=".45" stroke="#7a5634" stroke-linecap="round" stroke-linejoin="round" stroke-width="5.2"/>
+    <path d="M270.2,18.15l1.9,1.1,1.1,1.5" fill="none" isolation="isolate" opacity=".45" stroke="#7a5634" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <path d="M276.7,11.75l2.3.7,1.3,1.7" fill="none" isolation="isolate" opacity=".45" stroke="#7a5634" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <path d="M262.7,25.45l3.7-1.8,2.1-3.5,1.2-3.8,3.8-3.4,3.5-2.5,4.7-3.3" fill="none" stroke="#d9a86a" stroke-linecap="round" stroke-linejoin="round" stroke-width="4.2"/>
+    <path d="M270.2,18.15l1.9,1.1,1.1,1.5" fill="none" stroke="#d9a86a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
+    <path d="M276.7,11.75l2.3.7,1.3,1.7" fill="none" stroke="#d9a86a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
+    <path d="M263.4,24.75l3.4-1.7,2-3.4,1.2-3.4,3.7-3.2,3.4-2.4,3.9-2.9" fill="none" isolation="isolate" opacity=".7" stroke="#efc889" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4"/>
+    <path d="M271.396,11.84l-2.758-.781-1.597-1.065" fill="none" stroke="#d9a86a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
+    <rect x="259.43" y="2.29" width="25.14" height="2.28" fill="#af8358"/>
+    <rect x="258.29" y="3.43" width="2.28" height="25.14" fill="#9a744d"/>
+  </g>
+  <g id="slot-garbage-cursed">
+    <rect x="288" y="1" width="30" height="30" rx="2" ry="2" fill="#351a43"/>
+    <rect x="290" y="3" width="26" height="26" rx="1" ry="1" fill="#8c3f99"/>
+    <path d="M291,27V4h23" fill="none" stroke="#db94e5" stroke-width="3"/>
+    <path d="M304,4l-4,9,5,3-5,12M310,4l-3,8,5,5-4,11" fill="none" stroke="#4c205b" stroke-width="2"/>
+  </g>
+  <g id="slot-garbage-crystal">
+    <rect x="320" y="1" width="30" height="30" rx="2" ry="2" fill="#145e62"/>
+    <rect x="322" y="3" width="26" height="26" rx="1" ry="1" fill="#239e9c"/>
+    <path d="M323,27V4h23" fill="none" stroke="#8df5e7" stroke-width="3"/>
+    <path d="M335,5l10,11-10,12-10-12,10-11Z" fill="#45d7c4" stroke="#b9fff3"/>
+    <path d="M335,5l2,11-2,12-2-12,2-11Z" fill="#188b8c" isolation="isolate" opacity=".75"/>
+  </g>
+</svg>
