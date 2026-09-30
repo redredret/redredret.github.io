@@ -854,6 +854,11 @@ ${originalIndentation}`;
   }
   var DOMAINS = {
     profile: { group: "core", keys: { profile: one("myProfile"), profilePreferences: one("myProfilePreferences") } },
+    // The handling, controls, font and skin that follow the account between
+    // devices (docs/ACCOUNT_SETTINGS.md). A domain of its own rather than part of
+    // 'profile': the game reads it once per sign-in, and each save's echo would
+    // otherwise re-apply the whole profile and redraw every screen that shows it.
+    accountSettings: { group: "core", keys: { accountSettings: one("myAccountSettings") } },
     inventory: {
       group: "core",
       keys: {
@@ -1037,7 +1042,9 @@ ${originalIndentation}`;
     "publishDuelBoard",
     "publishDuelPiece",
     "publishPartyBoard",
-    "publishPartyPiece"
+    "publishPartyPiece",
+    // The whole settings document each time, so only the newest one matters.
+    "saveAccountSettings"
   ];
   var QUIET_SUCCESS_CALLS = [
     "publishFarmBoard",
@@ -1061,7 +1068,9 @@ ${originalIndentation}`;
     "reportPartyHealth",
     "reportPartyDown",
     "publishPartyBoard",
-    "publishPartyPiece"
+    "publishPartyPiece",
+    // The echo of the row is the answer, and nobody reads even that past sign-in.
+    "saveAccountSettings"
   ];
   function reportsSuccess(name) {
     return !listed(QUIET_SUCCESS_CALLS, name);
@@ -1127,7 +1136,10 @@ ${originalIndentation}`;
     "reportPartyHealth",
     "reportPartyDown",
     "publishPartyBoard",
-    "publishPartyPiece"
+    "publishPartyPiece",
+    // Sent a moment after a setting changes, and once at sign-in for an account
+    // that has never saved any (docs/ACCOUNT_SETTINGS.md): the client's timing.
+    "saveAccountSettings"
   ];
   function isBackgroundCall(name) {
     return listed(BACKGROUND_CALLS, name);
@@ -9153,6 +9165,11 @@ ${ty.variants.map(
     taskRowId: t.string()
   };
 
+  // src/module_bindings/save_account_settings_reducer.ts
+  var save_account_settings_reducer_default = {
+    payload: t.string()
+  };
+
   // src/module_bindings/sell_item_reducer.ts
   var sell_item_reducer_default = {
     itemId: t.string(),
@@ -9346,6 +9363,13 @@ ${ty.variants.map(
     itemId: t.string().name("item_id"),
     averagePrice: t.u32().name("average_price"),
     sampleCount: t.u32().name("sample_count")
+  });
+
+  // src/module_bindings/my_account_settings_table.ts
+  var my_account_settings_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    payload: t.string(),
+    updatedAt: t.timestamp().name("updated_at")
   });
 
   // src/module_bindings/my_active_run_table.ts
@@ -10025,6 +10049,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, market_price_guide_table_default),
+    myAccountSettings: table({
+      name: "my_account_settings",
+      indexes: [],
+      constraints: []
+    }, my_account_settings_table_default),
     myActiveRun: table({
       name: "my_active_run",
       indexes: [],
@@ -10329,6 +10358,7 @@ ${ty.variants.map(
     reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
     reducerSchema("request_duel_rematch", request_duel_rematch_reducer_default),
     reducerSchema("reroll_task", reroll_task_reducer_default),
+    reducerSchema("save_account_settings", save_account_settings_reducer_default),
     reducerSchema("sell_item", sell_item_reducer_default),
     reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
@@ -10362,6 +10392,7 @@ ${ty.variants.map(
     "farm_player_counts": "farmPlayerCounts",
     "market_listings": "marketListings",
     "market_price_guide": "marketPriceGuide",
+    "my_account_settings": "myAccountSettings",
     "my_active_run": "myActiveRun",
     "my_dark_chest_claims": "myDarkChestClaims",
     "my_dark_duel": "myDarkDuel",
