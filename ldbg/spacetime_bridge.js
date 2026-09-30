@@ -8988,6 +8988,12 @@ ${ty.variants.map(
     chestIndex: t.u32()
   };
 
+  // src/module_bindings/operator_rename_player_reducer.ts
+  var operator_rename_player_reducer_default = {
+    displayName: t.string(),
+    reason: t.string()
+  };
+
   // src/module_bindings/post_duel_listing_reducer.ts
   var post_duel_listing_reducer_default = {
     stake: t.string()
@@ -10300,6 +10306,7 @@ ${ty.variants.map(
     reducerSchema("mark_tasks_seen", mark_tasks_seen_reducer_default),
     reducerSchema("open_dark_chest", open_dark_chest_reducer_default),
     reducerSchema("open_party_chest", open_party_chest_reducer_default),
+    reducerSchema("operator_rename_player", operator_rename_player_reducer_default),
     reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
     reducerSchema("publish_duel_board", publish_duel_board_reducer_default),
     reducerSchema("publish_duel_piece", publish_duel_piece_reducer_default),
