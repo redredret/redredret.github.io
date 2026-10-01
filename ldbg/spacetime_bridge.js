@@ -859,6 +859,12 @@ ${originalIndentation}`;
     // 'profile': the game reads it once per sign-in, and each save's echo would
     // otherwise re-apply the whole profile and redraw every screen that shows it.
     accountSettings: { group: "core", keys: { accountSettings: one("myAccountSettings") } },
+    // A new account's tutorial stage and its welcome vault (docs/ONBOARDING.md).
+    // Core, so the welcome is decided on the first frame after sign-in.
+    onboarding: {
+      group: "core",
+      keys: { onboarding: one("myOnboarding"), welcomeChest: one("myWelcomeChest") }
+    },
     inventory: {
       group: "core",
       keys: {
@@ -8830,6 +8836,14 @@ ${ty.variants.map(
     chestId: t.string()
   };
 
+  // src/module_bindings/acknowledge_welcome_chest_reducer.ts
+  var acknowledge_welcome_chest_reducer_default = {};
+
+  // src/module_bindings/advance_tutorial_reducer.ts
+  var advance_tutorial_reducer_default = {
+    stage: t.u32()
+  };
+
   // src/module_bindings/buy_market_listing_reducer.ts
   var buy_market_listing_reducer_default = {
     listingId: t.string(),
@@ -8872,6 +8886,9 @@ ${ty.variants.map(
   var claim_task_reducer_default = {
     taskRowId: t.string()
   };
+
+  // src/module_bindings/claim_welcome_chest_reducer.ts
+  var claim_welcome_chest_reducer_default = {};
 
   // src/module_bindings/complete_party_revive_reducer.ts
   var complete_party_revive_reducer_default = {
@@ -9741,6 +9758,14 @@ ${ty.variants.map(
     at: t.timestamp()
   });
 
+  // src/module_bindings/my_onboarding_table.ts
+  var my_onboarding_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    tutorialStage: t.u32().name("tutorial_stage"),
+    createdAt: t.timestamp().name("created_at"),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
   // src/module_bindings/my_party_table.ts
   var my_party_table_default = t.row({
     partyId: t.string().primaryKey().name("party_id"),
@@ -9973,6 +9998,14 @@ ${ty.variants.map(
     upgradeId: t.string().name("upgrade_id"),
     rank: t.u32(),
     pointCost: t.u32().name("point_cost")
+  });
+
+  // src/module_bindings/my_welcome_chest_table.ts
+  var my_welcome_chest_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    claimedAt: t.timestamp().name("claimed_at"),
+    rowsJson: t.string().name("rows_json"),
+    revealed: t.bool()
   });
 
   // src/module_bindings/opponent_farm_boards_compact_v_4_table.ts
@@ -10229,6 +10262,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_market_transactions_table_default),
+    myOnboarding: table({
+      name: "my_onboarding",
+      indexes: [],
+      constraints: []
+    }, my_onboarding_table_default),
     myParty: table({
       name: "my_party",
       indexes: [],
@@ -10319,6 +10357,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_upgrade_unlocks_table_default),
+    myWelcomeChest: table({
+      name: "my_welcome_chest",
+      indexes: [],
+      constraints: []
+    }, my_welcome_chest_table_default),
     opponentFarmBoardsCompactV4: table({
       name: "opponent_farm_boards_compact_v4",
       indexes: [],
@@ -10354,6 +10397,8 @@ ${ty.variants.map(
     reducerSchema("abandon_run", abandon_run_reducer_default),
     reducerSchema("acknowledge_market_sales", acknowledge_market_sales_reducer_default),
     reducerSchema("acknowledge_task_chest", acknowledge_task_chest_reducer_default),
+    reducerSchema("acknowledge_welcome_chest", acknowledge_welcome_chest_reducer_default),
+    reducerSchema("advance_tutorial", advance_tutorial_reducer_default),
     reducerSchema("buy_market_listing", buy_market_listing_reducer_default),
     reducerSchema("buy_shop_item", buy_shop_item_reducer_default),
     reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
@@ -10362,6 +10407,7 @@ ${ty.variants.map(
     reducerSchema("claim_play_session", claim_play_session_reducer_default),
     reducerSchema("claim_quest", claim_quest_reducer_default),
     reducerSchema("claim_task", claim_task_reducer_default),
+    reducerSchema("claim_welcome_chest", claim_welcome_chest_reducer_default),
     reducerSchema("complete_party_revive", complete_party_revive_reducer_default),
     reducerSchema("consume_item", consume_item_reducer_default),
     reducerSchema("continue_dark_run", continue_dark_run_reducer_default),
@@ -10478,6 +10524,7 @@ ${ty.variants.map(
     "my_inventory_order": "myInventoryOrder",
     "my_market_sale_notice": "myMarketSaleNotice",
     "my_market_transactions": "myMarketTransactions",
+    "my_onboarding": "myOnboarding",
     "my_party": "myParty",
     "my_party_members": "myPartyMembers",
     "my_party_partner_boards": "myPartyPartnerBoards",
@@ -10496,6 +10543,7 @@ ${ty.variants.map(
     "my_tasks": "myTasks",
     "my_upgrade_progress": "myUpgradeProgress",
     "my_upgrade_unlocks": "myUpgradeUnlocks",
+    "my_welcome_chest": "myWelcomeChest",
     "opponent_farm_boards_compact_v4": "opponentFarmBoardsCompactV4",
     "opponent_farm_keyframes_v1": "opponentFarmKeyframesV1",
     "opponent_farm_pieces_compact_v3": "opponentFarmPiecesCompactV3",
