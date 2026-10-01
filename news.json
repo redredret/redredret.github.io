@@ -3,6 +3,8 @@
   "firstTrackedRulesVersion": 30,
   "notNews": [31],
   "entries": [
+    { "date": "2026-10-01", "title": "The Cookhouse, the Smelter and the Trading Post", "text": "Three new buildings for your base. The Cookhouse cooks Carrot Stew, Trout Pie and Slime Broth, foods that heal far more than a potion. The Smelter breaks spare gear down into Scrap and melts it back into ingots. The Trading Post cuts the market's cut of your sales to 3% and lets you keep 30 listings up." },
+    { "date": "2026-10-01", "title": "Boosts and Fertiliser", "text": "Your equipment has a new Boosts tab, and nothing in it is lost when you die. Put Fertiliser there and every Solo Farm run gathers 15% more of everything." },
     { "date": "2026-10-01", "title": "A welcome for new adventurers", "text": "Every new account opens a Masterwork Vault, then a short tour starts you off on the Farm." },
     { "date": "2026-10-01", "title": "Dark Greenshore checkpoints", "text": "No more running out the back door. Every two rounds you reach a checkpoint: walk out with your haul, or press on and risk it all. And when more hunters are about, the next fight finds you when you least expect it.", "rulesVersion": 40 },
     { "date": "2026-10-01", "title": "Sharper rotation", "text": "The I piece now kicks off walls and turns 180 the way competitive stackers expect, and a piece on the ground can no longer be spun forever to stall.", "rulesVersion": 39 },
