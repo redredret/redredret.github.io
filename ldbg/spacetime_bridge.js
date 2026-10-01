@@ -871,7 +871,8 @@ ${originalIndentation}`;
         inventory: many("myInventory"),
         inventoryOrder: many("myInventoryOrder"),
         equipment: many("myEquipment"),
-        equippedFood: many("myEquippedFood")
+        equippedFood: many("myEquippedFood"),
+        equippedBoosts: many("myEquippedBoosts")
       }
     },
     upgrades: {
@@ -8964,6 +8965,11 @@ ${ty.variants.map(
     necklace: t.u32()
   };
 
+  // src/module_bindings/equip_boost_reducer.ts
+  var equip_boost_reducer_default = {
+    itemId: t.string()
+  };
+
   // src/module_bindings/equip_food_reducer.ts
   var equip_food_reducer_default = {
     itemId: t.string()
@@ -9221,6 +9227,12 @@ ${ty.variants.map(
     taskRowId: t.string()
   };
 
+  // src/module_bindings/salvage_item_reducer.ts
+  var salvage_item_reducer_default = {
+    itemId: t.string(),
+    quantity: t.u32()
+  };
+
   // src/module_bindings/save_account_settings_reducer.ts
   var save_account_settings_reducer_default = {
     payload: t.string()
@@ -9308,6 +9320,12 @@ ${ty.variants.map(
     headStart: t.bool()
   };
 
+  // src/module_bindings/start_farm_run_v_2_reducer.ts
+  var start_farm_run_v_2_reducer_default = {
+    headStart: t.bool(),
+    fertilise: t.bool()
+  };
+
   // src/module_bindings/start_run_reducer.ts
   var start_run_reducer_default = {
     dungeonId: t.string(),
@@ -9330,6 +9348,11 @@ ${ty.variants.map(
   var submit_farm_waiting_run_result_reducer_default = {
     runId: t.string(),
     trace: t.string()
+  };
+
+  // src/module_bindings/unequip_boost_reducer.ts
+  var unequip_boost_reducer_default = {
+    slot: t.string()
   };
 
   // src/module_bindings/unequip_food_reducer.ts
@@ -9647,6 +9670,15 @@ ${ty.variants.map(
     owner: t.identity(),
     slot: t.string(),
     itemId: t.string().name("item_id")
+  });
+
+  // src/module_bindings/my_equipped_boosts_table.ts
+  var my_equipped_boosts_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    slot: t.string(),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32()
   });
 
   // src/module_bindings/my_equipped_food_table.ts
@@ -10207,6 +10239,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_equipment_table_default),
+    myEquippedBoosts: table({
+      name: "my_equipped_boosts",
+      indexes: [],
+      constraints: []
+    }, my_equipped_boosts_table_default),
     myEquippedFood: table({
       name: "my_equipped_food",
       indexes: [],
@@ -10421,6 +10458,7 @@ ${ty.variants.map(
     reducerSchema("enter_dark_duel_v_2", enter_dark_duel_v_2_reducer_default),
     reducerSchema("enter_dark_duel_v_3", enter_dark_duel_v_3_reducer_default),
     reducerSchema("enter_dark_duel_v_4", enter_dark_duel_v_4_reducer_default),
+    reducerSchema("equip_boost", equip_boost_reducer_default),
     reducerSchema("equip_food", equip_food_reducer_default),
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
     reducerSchema("equip_inventory_item_to_slot", equip_inventory_item_to_slot_reducer_default),
@@ -10464,6 +10502,7 @@ ${ty.variants.map(
     reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
     reducerSchema("request_duel_rematch", request_duel_rematch_reducer_default),
     reducerSchema("reroll_task", reroll_task_reducer_default),
+    reducerSchema("salvage_item", salvage_item_reducer_default),
     reducerSchema("save_account_settings", save_account_settings_reducer_default),
     reducerSchema("sell_item", sell_item_reducer_default),
     reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
@@ -10476,10 +10515,12 @@ ${ty.variants.map(
     reducerSchema("set_party_ready", set_party_ready_reducer_default),
     reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
     reducerSchema("start_farm_run", start_farm_run_reducer_default),
+    reducerSchema("start_farm_run_v_2", start_farm_run_v_2_reducer_default),
     reducerSchema("start_run", start_run_reducer_default),
     reducerSchema("submit_dungeon_run_result_v_1", submit_dungeon_run_result_v_1_reducer_default),
     reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
     reducerSchema("submit_farm_waiting_run_result", submit_farm_waiting_run_result_reducer_default),
+    reducerSchema("unequip_boost", unequip_boost_reducer_default),
     reducerSchema("unequip_food", unequip_food_reducer_default),
     reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default),
     reducerSchema("yield_dark_duel", yield_dark_duel_reducer_default)
@@ -10513,6 +10554,7 @@ ${ty.variants.map(
     "my_dungeon_progress": "myDungeonProgress",
     "my_endless_records": "myEndlessRecords",
     "my_equipment": "myEquipment",
+    "my_equipped_boosts": "myEquippedBoosts",
     "my_equipped_food": "myEquippedFood",
     "my_farm_dark_haul": "myFarmDarkHaul",
     "my_farm_pvp_attacks": "myFarmPvpAttacks",
