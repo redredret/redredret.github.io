@@ -8986,6 +8986,12 @@ ${ty.variants.map(
     slot: t.string()
   };
 
+  // src/module_bindings/insure_duel_lobby_reducer.ts
+  var insure_duel_lobby_reducer_default = {
+    listingId: t.string(),
+    slot: t.string()
+  };
+
   // src/module_bindings/join_farm_dark_private_reducer.ts
   var join_farm_dark_private_reducer_default = {
     code: t.string()
@@ -9313,6 +9319,12 @@ ${ty.variants.map(
   // src/module_bindings/set_skin_tone_reducer.ts
   var set_skin_tone_reducer_default = {
     skinTone: t.u32()
+  };
+
+  // src/module_bindings/start_dark_run_insured_reducer.ts
+  var start_dark_run_insured_reducer_default = {
+    dungeonId: t.string(),
+    slot: t.string()
   };
 
   // src/module_bindings/start_farm_run_reducer.ts
@@ -10462,6 +10474,7 @@ ${ty.variants.map(
     reducerSchema("equip_food", equip_food_reducer_default),
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
     reducerSchema("equip_inventory_item_to_slot", equip_inventory_item_to_slot_reducer_default),
+    reducerSchema("insure_duel_lobby", insure_duel_lobby_reducer_default),
     reducerSchema("join_farm_dark_private", join_farm_dark_private_reducer_default),
     reducerSchema("join_farm_dark_public", join_farm_dark_public_reducer_default),
     reducerSchema("join_farm_private", join_farm_private_reducer_default),
@@ -10514,6 +10527,7 @@ ${ty.variants.map(
     reducerSchema("set_hair", set_hair_reducer_default),
     reducerSchema("set_party_ready", set_party_ready_reducer_default),
     reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
+    reducerSchema("start_dark_run_insured", start_dark_run_insured_reducer_default),
     reducerSchema("start_farm_run", start_farm_run_reducer_default),
     reducerSchema("start_farm_run_v_2", start_farm_run_v_2_reducer_default),
     reducerSchema("start_run", start_run_reducer_default),
