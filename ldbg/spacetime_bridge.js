@@ -1062,6 +1062,7 @@ ${originalIndentation}`;
     "markTasksSeen",
     "acknowledgeTaskChest",
     "reportDuelBoardBreak",
+    "continueDarkRun",
     "sendPartyBlow",
     "reportPartyEnemyHeal",
     "openPartyChest",
@@ -8883,6 +8884,12 @@ ${ty.variants.map(
     quantity: t.u32()
   };
 
+  // src/module_bindings/continue_dark_run_reducer.ts
+  var continue_dark_run_reducer_default = {
+    runId: t.string(),
+    encounter: t.u32()
+  };
+
   // src/module_bindings/craft_item_reducer.ts
   var craft_item_reducer_default = {
     recipeId: t.string(),
@@ -8985,6 +8992,12 @@ ${ty.variants.map(
   // src/module_bindings/learn_skill_reducer.ts
   var learn_skill_reducer_default = {
     skillId: t.string()
+  };
+
+  // src/module_bindings/leave_dark_run_reducer.ts
+  var leave_dark_run_reducer_default = {
+    runId: t.string(),
+    encounter: t.u32()
   };
 
   // src/module_bindings/leave_duel_listing_reducer.ts
@@ -9109,6 +9122,12 @@ ${ty.variants.map(
   // src/module_bindings/purchase_build_upgrade_reducer.ts
   var purchase_build_upgrade_reducer_default = {
     upgradeId: t.string()
+  };
+
+  // src/module_bindings/reach_dark_checkpoint_reducer.ts
+  var reach_dark_checkpoint_reducer_default = {
+    runId: t.string(),
+    encounter: t.u32()
   };
 
   // src/module_bindings/ready_farm_pvp_round_reducer.ts
@@ -10345,6 +10364,7 @@ ${ty.variants.map(
     reducerSchema("claim_task", claim_task_reducer_default),
     reducerSchema("complete_party_revive", complete_party_revive_reducer_default),
     reducerSchema("consume_item", consume_item_reducer_default),
+    reducerSchema("continue_dark_run", continue_dark_run_reducer_default),
     reducerSchema("craft_item", craft_item_reducer_default),
     reducerSchema("create_farm_dark_private", create_farm_dark_private_reducer_default),
     reducerSchema("create_farm_private", create_farm_private_reducer_default),
@@ -10365,6 +10385,7 @@ ${ty.variants.map(
     reducerSchema("join_party_queue", join_party_queue_reducer_default),
     reducerSchema("join_party_room", join_party_room_reducer_default),
     reducerSchema("learn_skill", learn_skill_reducer_default),
+    reducerSchema("leave_dark_run", leave_dark_run_reducer_default),
     reducerSchema("leave_duel_listing", leave_duel_listing_reducer_default),
     reducerSchema("leave_farm_match", leave_farm_match_reducer_default),
     reducerSchema("leave_party", leave_party_reducer_default),
@@ -10382,6 +10403,7 @@ ${ty.variants.map(
     reducerSchema("publish_party_board", publish_party_board_reducer_default),
     reducerSchema("publish_party_piece", publish_party_piece_reducer_default),
     reducerSchema("purchase_build_upgrade", purchase_build_upgrade_reducer_default),
+    reducerSchema("reach_dark_checkpoint", reach_dark_checkpoint_reducer_default),
     reducerSchema("ready_farm_pvp_round", ready_farm_pvp_round_reducer_default),
     reducerSchema("refresh_dark_presence", refresh_dark_presence_reducer_default),
     reducerSchema("refresh_my_tasks", refresh_my_tasks_reducer_default),
