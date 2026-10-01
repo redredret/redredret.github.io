@@ -3,6 +3,11 @@
   "firstTrackedRulesVersion": 30,
   "notNews": [31],
   "entries": [
+    { "date": "2026-10-01", "title": "Sharper rotation", "text": "The I piece now kicks off walls and turns 180 the way competitive stackers expect, and a piece on the ground can no longer be spun forever to stall.", "rulesVersion": 39 },
+    { "date": "2026-09-30", "title": "The Horned Staff", "text": "Mages get a weapon to stand beside the Spiky Bow and the Kris: a staff crowned with the Cult Leader's horns." },
+    { "date": "2026-09-30", "title": "Boss weapons bite in PvP", "text": "Land a Quad or a T-Spin with a Bandit Blade and the King's blade spin hits your rival's board. The Spiky Bow sends the Cult Leader's tentacle. And the Ring of Garbage now throws a slab of garbage you can see.", "rulesVersion": 38 },
+    { "date": "2026-09-30", "title": "Revive your co-op partner", "text": "When your partner goes down, beat the challenge on your board to bring them back. New Mending skills heal them with S and Z spins.", "rulesVersion": 37 },
+    { "date": "2026-09-30", "title": "Your settings travel with you", "text": "Log in anywhere and your handling, controls, font and skin come with you." },
     { "date": "2026-09-30", "title": "Ring of Thorns", "text": "Now hits a monster back for twice what it took, and the Garbage Man keeps your best wave.", "rulesVersion": 36 },
     { "date": "2026-09-29", "title": "Jewellery", "text": "Six idols, three amulets and three new rings.", "rulesVersion": 35 },
     { "date": "2026-09-28", "title": "Feats", "text": "Four permanent perks for the hardest deeds.", "rulesVersion": 34 },

@@ -793,6 +793,11 @@ p { margin: 0 0 12px; }
 .news time { display: block; font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mint); }
 .news b { color: var(--text); }
 
+.panel-download { text-align: center; }
+.panel-download p { margin: 0 4px 12px; font-size: 14px; line-height: 1.4; color: var(--muted); }
+.panel-download .download-note { margin: 12px 4px 0; font-size: 12px; }
+.panel-download .download-note b { color: var(--text); }
+
 .panel-play { text-align: center; text-decoration: none; color: var(--text); }
 .panel-play img { width: 170px; margin: 0 auto; filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.5)); }
 .panel-play .ink { display: block; font-size: 22px; margin: 4px 0 8px; }
