@@ -88,6 +88,14 @@
   "level": 35
  },
  {
+  "id": "horned_staff",
+  "icon": "horned_staff.png",
+  "name": "Horned Staff",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 35
+ },
+ {
   "id": "spiky_bow",
   "icon": "spiky_bow.png",
   "name": "Spiky Bow",
