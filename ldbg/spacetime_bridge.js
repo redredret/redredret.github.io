@@ -1069,6 +1069,9 @@ ${originalIndentation}`;
     "reportPartyDown",
     "publishPartyBoard",
     "publishPartyPiece",
+    "sendPartyHeal",
+    "completePartyRevive",
+    "reportPartyReviveProgress",
     // The echo of the row is the answer, and nobody reads even that past sign-in.
     "saveAccountSettings"
   ];
@@ -1137,6 +1140,12 @@ ${originalIndentation}`;
     "reportPartyDown",
     "publishPartyBoard",
     "publishPartyPiece",
+    // The fight's too (rules version 37): a Mending clear's heal for the partner,
+    // the revive a met challenge claims -- retried by the screen while the partner
+    // is still down -- and the challenge's count for the downed screen.
+    "sendPartyHeal",
+    "completePartyRevive",
+    "reportPartyReviveProgress",
     // Sent a moment after a setting changes, and once at sign-in for an account
     // that has never saved any (docs/ACCOUNT_SETTINGS.md): the client's timing.
     "saveAccountSettings"
@@ -8863,6 +8872,11 @@ ${ty.variants.map(
     taskRowId: t.string()
   };
 
+  // src/module_bindings/complete_party_revive_reducer.ts
+  var complete_party_revive_reducer_default = {
+    partyId: t.string()
+  };
+
   // src/module_bindings/consume_item_reducer.ts
   var consume_item_reducer_default = {
     itemId: t.string(),
@@ -9146,6 +9160,12 @@ ${ty.variants.map(
     health: t.u32()
   };
 
+  // src/module_bindings/report_party_revive_progress_reducer.ts
+  var report_party_revive_progress_reducer_default = {
+    partyId: t.string(),
+    progress: t.u32()
+  };
+
   // src/module_bindings/report_run_submission_problem_reducer.ts
   var report_run_submission_problem_reducer_default = {
     runId: t.string(),
@@ -9209,6 +9229,16 @@ ${ty.variants.map(
     backToBack: t.bool(),
     perfectClear: t.bool(),
     necklace: t.bool()
+  };
+
+  // src/module_bindings/send_party_heal_reducer.ts
+  var send_party_heal_reducer_default = {
+    partyId: t.string(),
+    lines: t.u32(),
+    spinType: t.string(),
+    pieceKind: t.u32(),
+    halfTurn: t.bool(),
+    perfectClear: t.bool()
   };
 
   // src/module_bindings/set_display_name_reducer.ts
@@ -9736,7 +9766,10 @@ ${ty.variants.map(
     necklaceUsed: t.bool().name("necklace_used"),
     disconnectedMicros: t.u64().name("disconnected_micros"),
     joinedAt: t.timestamp().name("joined_at"),
-    snapArmed: t.bool().name("snap_armed")
+    snapArmed: t.bool().name("snap_armed"),
+    revives: t.u32(),
+    healsSent: t.u32().name("heals_sent"),
+    reviveProgress: t.u32().name("revive_progress")
   });
 
   // src/module_bindings/my_party_partner_boards_table.ts
@@ -9787,7 +9820,10 @@ ${ty.variants.map(
     damageJson: t.string().name("damage_json"),
     at: t.timestamp(),
     attackNumber: t.u32().name("attack_number"),
-    snapShotMask: t.u32().name("snap_shot_mask")
+    snapShotMask: t.u32().name("snap_shot_mask"),
+    subjectSlot: t.u32().name("subject_slot"),
+    amount: t.u32(),
+    challenge: t.string()
   });
 
   // src/module_bindings/my_profile_table.ts
@@ -10307,6 +10343,7 @@ ${ty.variants.map(
     reducerSchema("claim_play_session", claim_play_session_reducer_default),
     reducerSchema("claim_quest", claim_quest_reducer_default),
     reducerSchema("claim_task", claim_task_reducer_default),
+    reducerSchema("complete_party_revive", complete_party_revive_reducer_default),
     reducerSchema("consume_item", consume_item_reducer_default),
     reducerSchema("craft_item", craft_item_reducer_default),
     reducerSchema("create_farm_dark_private", create_farm_dark_private_reducer_default),
@@ -10355,6 +10392,7 @@ ${ty.variants.map(
     reducerSchema("report_party_down", report_party_down_reducer_default),
     reducerSchema("report_party_enemy_heal", report_party_enemy_heal_reducer_default),
     reducerSchema("report_party_health", report_party_health_reducer_default),
+    reducerSchema("report_party_revive_progress", report_party_revive_progress_reducer_default),
     reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
     reducerSchema("request_duel_rematch", request_duel_rematch_reducer_default),
     reducerSchema("reroll_task", reroll_task_reducer_default),
@@ -10363,6 +10401,7 @@ ${ty.variants.map(
     reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
     reducerSchema("send_party_blow", send_party_blow_reducer_default),
+    reducerSchema("send_party_heal", send_party_heal_reducer_default),
     reducerSchema("set_display_name", set_display_name_reducer_default),
     reducerSchema("set_duel_ready", set_duel_ready_reducer_default),
     reducerSchema("set_hair", set_hair_reducer_default),
