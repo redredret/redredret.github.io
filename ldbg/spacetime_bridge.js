@@ -10734,7 +10734,7 @@ ${ty.variants.map(
           resumeBackend();
           return;
         }
-        throw new Error("SpacetimeDB is not connected.");
+        throw new Error("You're not connected.");
       }
       const reducer = live.connection.reducers[name];
       if (typeof reducer !== "function") throw new Error(`Unknown reducer '${name}'.`);
