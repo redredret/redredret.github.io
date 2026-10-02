@@ -26,39 +26,73 @@
   }
 
   // --- Hero: an I piece drops into the gap, the row clears, loot rises ------
+  //
+  // The rows are built wider than the card can ever be -- wider than the screen
+  // in either orientation -- and the card's own overflow clips them, so the
+  // ground always reaches both edges whatever the width, the text zoom or the
+  // phone's rotation. A row sized to the card measured once at load stopped
+  // short on an iPhone (owner, 2026-10-01). Only the gap and the falling piece
+  // depend on the card's width, and they are placed again whenever it changes.
+
+  const heroState = { played: false, built: null };
+
+  function heroCell(stack) {
+    return parseFloat(getComputedStyle(stack).getPropertyValue('--cell')) || 44;
+  }
 
   function buildHeroStack() {
     const stack = document.querySelector('.hero-stack');
-    if (!stack) return;
-    const cell = parseFloat(getComputedStyle(stack).getPropertyValue('--cell')) || 44;
-    const columns = Math.ceil(stack.clientWidth / cell);
+    if (!stack) return null;
+    const cell = heroCell(stack);
+    const widest = Math.max(window.screen.width || 0, window.screen.height || 0, window.innerWidth, 2560);
+    const columns = Math.ceil(widest / cell) + 2;
+    const visible = Math.max(5, Math.ceil(stack.clientWidth / cell));
     // The gap sits under the open ground between the knight and the copy.
-    const gapStart = Math.min(columns - 4, Math.max(0, Math.round(columns * 0.47)));
+    const gapStart = Math.min(visible - 4, Math.max(0, Math.round(visible * 0.47)));
     const top = stack.querySelector('[data-row="top"]');
     const mid = stack.querySelector('[data-row="mid"]');
+    const drop = stack.querySelector('.hero-drop');
     top.replaceChildren();
     mid.replaceChildren();
     for (let column = 0; column < columns; column++) {
       const inGap = column >= gapStart && column < gapStart + 4;
       top.append(inGap ? block(0, 'gap') : block(colourAt(column, 0)));
-      mid.append(column === 2 || column === columns - 3 ? block(PIECE.GARBAGE) : block(colourAt(column, 1)));
+      mid.append(column === 2 || column === visible - 3 ? block(PIECE.GARBAGE) : block(colourAt(column, 1)));
     }
-    const drop = stack.querySelector('.hero-drop');
-    drop.replaceChildren(block(PIECE.I), block(PIECE.I), block(PIECE.I), block(PIECE.I));
+    if (!drop.childElementCount) drop.append(block(PIECE.I), block(PIECE.I), block(PIECE.I), block(PIECE.I));
     drop.style.left = gapStart * cell + 'px';
     const loot = stack.querySelector('.hero-loot');
     loot.style.left = Math.max(12, (gapStart - 1) * cell) + 'px';
+    heroState.built = { width: stack.clientWidth, cell };
     return { stack, top, drop, cell };
+  }
+
+  // Rebuilt when the card's width or cell size changes: a resize, a rotation,
+  // a phone crossing the breakpoint where the cells shrink. A row already
+  // cleared stays cleared.
+  function watchHeroStack(parts) {
+    if (!parts || !('ResizeObserver' in window)) return;
+    new ResizeObserver(() => {
+      const width = parts.stack.clientWidth;
+      const cell = heroCell(parts.stack);
+      if (heroState.built && heroState.built.width === width && heroState.built.cell === cell) return;
+      buildHeroStack();
+    }).observe(parts.stack);
+  }
+
+  // The row cleared and what stood on it came down: a class, so the drop is
+  // always one CURRENT cell, however the card has changed since.
+  function settleHero(stack) {
+    heroState.played = true;
+    stack.closest('.hero').classList.add('hero-cleared');
   }
 
   function playHeroClear(parts) {
     if (!parts) return;
-    const { stack, top, drop, cell } = parts;
+    const { stack, top, drop } = parts;
     const scene = document.querySelector('.hero-scene');
     if (reducedMotion || !drop.animate) {
-      top.style.visibility = 'hidden';
-      drop.style.visibility = 'hidden';
-      scene.style.transform = `translateY(${cell}px)`;
+      settleHero(stack);
       return;
     }
     const fall = drop.animate(
@@ -66,21 +100,28 @@
       { duration: 420, easing: 'cubic-bezier(0.55, 0, 1, 1)', fill: 'forwards' }
     );
     fall.onfinish = () => {
-      top.classList.add('flash');
+      const cell = heroCell(stack);
       const flash = document.createElement('div');
       flash.style.cssText = `position:absolute;left:0;right:0;top:0;height:${cell}px;background:#fff8e6;pointer-events:none`;
       stack.append(flash);
-      flash.animate([{ opacity: 0 }, { opacity: 0.95, offset: 0.25 }, { opacity: 0 }], { duration: 380, easing: 'ease-out', fill: 'forwards' });
+      flash.animate([{ opacity: 0 }, { opacity: 0.95, offset: 0.25 }, { opacity: 0 }], { duration: 380, easing: 'ease-out', fill: 'forwards' })
+        .onfinish = () => flash.remove();
       const collapse = [{ transform: 'scaleY(1)', opacity: 1 }, { transform: 'scaleY(0)', opacity: 0 }];
       const timing = { duration: 240, delay: 200, easing: 'ease-in', fill: 'forwards' };
-      top.animate(collapse, timing);
+      const rowGoes = top.animate(collapse, timing);
       drop.animate(collapse, timing).onfinish = () => {
         stack.classList.add('played');
         // What stood on the row comes down with it, as rows above a clear do.
-        scene.animate(
+        const comesDown = scene.animate(
           [{ transform: 'translateY(0)' }, { transform: `translateY(${cell}px)` }],
           { duration: 170, easing: 'cubic-bezier(0.55, 0, 1, 1)', fill: 'forwards' }
         );
+        comesDown.onfinish = () => {
+          settleHero(stack);
+          // The class holds the result now; the animations' frozen pixel
+          // values would not follow a later resize.
+          for (const animation of [fall, rowGoes, comesDown]) animation.cancel();
+        };
       };
     };
   }
@@ -332,6 +373,7 @@
   // --- Start ----------------------------------------------------------------------
 
   const heroParts = buildHeroStack();
+  watchHeroStack(heroParts);
   buildClearRows();
   buildBoard();
   buildSkins();
