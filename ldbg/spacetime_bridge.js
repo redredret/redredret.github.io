@@ -8951,6 +8951,13 @@ ${ty.variants.map(
   // src/module_bindings/delete_my_data_reducer.ts
   var delete_my_data_reducer_default = {};
 
+  // src/module_bindings/enhance_gear_reducer.ts
+  var enhance_gear_reducer_default = {
+    itemId: t.string(),
+    instanceId: t.string(),
+    slot: t.string()
+  };
+
   // src/module_bindings/enter_dark_duel_reducer.ts
   var enter_dark_duel_reducer_default = {
     duelId: t.string(),
@@ -10575,6 +10582,7 @@ ${ty.variants.map(
     reducerSchema("create_market_listing", create_market_listing_reducer_default),
     reducerSchema("create_party_room", create_party_room_reducer_default),
     reducerSchema("delete_my_data", delete_my_data_reducer_default),
+    reducerSchema("enhance_gear", enhance_gear_reducer_default),
     reducerSchema("enter_dark_duel", enter_dark_duel_reducer_default),
     reducerSchema("enter_dark_duel_v_2", enter_dark_duel_v_2_reducer_default),
     reducerSchema("enter_dark_duel_v_3", enter_dark_duel_v_3_reducer_default),
