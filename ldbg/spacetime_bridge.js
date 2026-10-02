@@ -876,7 +876,10 @@ ${originalIndentation}`;
         // The policy on this player's gear, and what a Rugged Satchel last kept
         // (rules version 42): both settled by the server, both for the results card.
         gearInsurance: one("myGearInsurance"),
-        satchelKeep: one("mySatchelKeep")
+        satchelKeep: one("mySatchelKeep"),
+        // Enhanced pieces (docs/ENHANCEMENT_PLAN.md): one row each, in the bag,
+        // worn or listed, apart from the stacks.
+        gearInstances: many("myGearInstances")
       }
     },
     upgrades: {
@@ -8927,6 +8930,12 @@ ${ty.variants.map(
   // src/module_bindings/create_farm_private_reducer.ts
   var create_farm_private_reducer_default = {};
 
+  // src/module_bindings/create_instance_listing_reducer.ts
+  var create_instance_listing_reducer_default = {
+    instanceId: t.string(),
+    pricePer: t.u32()
+  };
+
   // src/module_bindings/create_market_listing_reducer.ts
   var create_market_listing_reducer_default = {
     itemId: t.string(),
@@ -8980,6 +8989,12 @@ ${ty.variants.map(
   // src/module_bindings/equip_food_reducer.ts
   var equip_food_reducer_default = {
     itemId: t.string()
+  };
+
+  // src/module_bindings/equip_gear_instance_reducer.ts
+  var equip_gear_instance_reducer_default = {
+    instanceId: t.string(),
+    slot: t.string()
   };
 
   // src/module_bindings/equip_inventory_item_reducer.ts
@@ -9240,6 +9255,11 @@ ${ty.variants.map(
     taskRowId: t.string()
   };
 
+  // src/module_bindings/salvage_gear_instance_reducer.ts
+  var salvage_gear_instance_reducer_default = {
+    instanceId: t.string()
+  };
+
   // src/module_bindings/salvage_item_reducer.ts
   var salvage_item_reducer_default = {
     itemId: t.string(),
@@ -9249,6 +9269,11 @@ ${ty.variants.map(
   // src/module_bindings/save_account_settings_reducer.ts
   var save_account_settings_reducer_default = {
     payload: t.string()
+  };
+
+  // src/module_bindings/sell_gear_instance_reducer.ts
+  var sell_gear_instance_reducer_default = {
+    instanceId: t.string()
   };
 
   // src/module_bindings/sell_item_reducer.ts
@@ -9463,14 +9488,19 @@ ${ty.variants.map(
     quantity: t.u32(),
     pricePer: t.u32().name("price_per"),
     createdAt: t.timestamp().name("created_at"),
-    isMine: t.bool().name("is_mine")
+    isMine: t.bool().name("is_mine"),
+    instanceId: t.string().name("instance_id"),
+    modifierId: t.string().name("modifier_id"),
+    modifierValue: t.u32().name("modifier_value"),
+    rolls: t.u32()
   });
 
   // src/module_bindings/market_price_guide_table.ts
   var market_price_guide_table_default = t.row({
     itemId: t.string().name("item_id"),
     averagePrice: t.u32().name("average_price"),
-    sampleCount: t.u32().name("sample_count")
+    sampleCount: t.u32().name("sample_count"),
+    enhancedListings: t.u32().name("enhanced_listings")
   });
 
   // src/module_bindings/my_account_settings_table.ts
@@ -9595,7 +9625,8 @@ ${ty.variants.map(
     itemId: t.string().name("item_id"),
     quantity: t.u32(),
     worn: t.bool(),
-    createdAt: t.timestamp().name("created_at")
+    createdAt: t.timestamp().name("created_at"),
+    instanceId: t.u64().name("instance_id")
   });
 
   // src/module_bindings/my_dark_presence_table.ts
@@ -9690,7 +9721,8 @@ ${ty.variants.map(
     id: t.u64().primaryKey(),
     owner: t.identity(),
     slot: t.string(),
-    itemId: t.string().name("item_id")
+    itemId: t.string().name("item_id"),
+    instanceId: t.u64().name("instance_id")
   });
 
   // src/module_bindings/my_equipped_boosts_table.ts
@@ -9776,6 +9808,20 @@ ${ty.variants.map(
     claimedAt: t.timestamp().name("claimed_at")
   });
 
+  // src/module_bindings/my_gear_instances_table.ts
+  var my_gear_instances_table_default = t.row({
+    instanceId: t.u64().primaryKey().name("instance_id"),
+    owner: t.identity(),
+    itemId: t.string().name("item_id"),
+    place: t.string(),
+    modifierId: t.string().name("modifier_id"),
+    value: t.u32(),
+    rolls: t.u32(),
+    scrapSpent: t.u32().name("scrap_spent"),
+    createdAt: t.timestamp().name("created_at"),
+    rolledAt: t.timestamp().name("rolled_at")
+  });
+
   // src/module_bindings/my_gear_insurance_table.ts
   var my_gear_insurance_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -9785,7 +9831,8 @@ ${ty.variants.map(
     itemId: t.string().name("item_id"),
     scrapPaid: t.u32().name("scrap_paid"),
     boughtAt: t.timestamp().name("bought_at"),
-    sealItemId: t.string().name("seal_item_id")
+    sealItemId: t.string().name("seal_item_id"),
+    instanceId: t.u64().name("instance_id")
   });
 
   // src/module_bindings/my_inventory_table.ts
@@ -9820,7 +9867,8 @@ ${ty.variants.map(
     quantity: t.u32(),
     pricePer: t.u32().name("price_per"),
     gold: t.u32(),
-    at: t.timestamp()
+    at: t.timestamp(),
+    modifierId: t.string().name("modifier_id")
   });
 
   // src/module_bindings/my_onboarding_table.ts
@@ -9991,7 +10039,8 @@ ${ty.variants.map(
     owner: t.identity().primaryKey(),
     runId: t.string().name("run_id"),
     itemId: t.string().name("item_id"),
-    keptAt: t.timestamp().name("kept_at")
+    keptAt: t.timestamp().name("kept_at"),
+    instanceId: t.u64().name("instance_id")
   });
 
   // src/module_bindings/my_sent_farm_pvp_attacks_table.ts
@@ -10329,6 +10378,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_feat_claims_table_default),
+    myGearInstances: table({
+      name: "my_gear_instances",
+      indexes: [],
+      constraints: []
+    }, my_gear_instances_table_default),
     myGearInsurance: table({
       name: "my_gear_insurance",
       indexes: [],
@@ -10516,6 +10570,7 @@ ${ty.variants.map(
     reducerSchema("craft_item", craft_item_reducer_default),
     reducerSchema("create_farm_dark_private", create_farm_dark_private_reducer_default),
     reducerSchema("create_farm_private", create_farm_private_reducer_default),
+    reducerSchema("create_instance_listing", create_instance_listing_reducer_default),
     reducerSchema("create_market_listing", create_market_listing_reducer_default),
     reducerSchema("create_party_room", create_party_room_reducer_default),
     reducerSchema("delete_my_data", delete_my_data_reducer_default),
@@ -10525,6 +10580,7 @@ ${ty.variants.map(
     reducerSchema("enter_dark_duel_v_4", enter_dark_duel_v_4_reducer_default),
     reducerSchema("equip_boost", equip_boost_reducer_default),
     reducerSchema("equip_food", equip_food_reducer_default),
+    reducerSchema("equip_gear_instance", equip_gear_instance_reducer_default),
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
     reducerSchema("equip_inventory_item_to_slot", equip_inventory_item_to_slot_reducer_default),
     reducerSchema("insure_duel_lobby", insure_duel_lobby_reducer_default),
@@ -10568,8 +10624,10 @@ ${ty.variants.map(
     reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
     reducerSchema("request_duel_rematch", request_duel_rematch_reducer_default),
     reducerSchema("reroll_task", reroll_task_reducer_default),
+    reducerSchema("salvage_gear_instance", salvage_gear_instance_reducer_default),
     reducerSchema("salvage_item", salvage_item_reducer_default),
     reducerSchema("save_account_settings", save_account_settings_reducer_default),
+    reducerSchema("sell_gear_instance", sell_gear_instance_reducer_default),
     reducerSchema("sell_item", sell_item_reducer_default),
     reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
@@ -10629,6 +10687,7 @@ ${ty.variants.map(
     "my_farm_pvp_session": "myFarmPvpSession",
     "my_farm_records": "myFarmRecords",
     "my_feat_claims": "myFeatClaims",
+    "my_gear_instances": "myGearInstances",
     "my_gear_insurance": "myGearInsurance",
     "my_inventory": "myInventory",
     "my_inventory_order": "myInventoryOrder",
