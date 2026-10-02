@@ -893,7 +893,10 @@ ${originalIndentation}`;
       keys: {
         dungeonProgress: many("myDungeonProgress"),
         endlessRecords: many("myEndlessRecords"),
-        farmRecords: many("myFarmRecords")
+        farmRecords: many("myFarmRecords"),
+        // The challenge skins earned (docs/BLOCK_SKINS_2.md): a record too,
+        // written once by a settlement at most.
+        skinUnlocks: many("mySkinUnlocks")
       }
     },
     // The Arena's lobby and this player's duel record: both sender-scoped, both
@@ -10011,6 +10014,14 @@ ${ty.variants.map(
     equippedSlot: t.option(t.u32()).name("equipped_slot")
   });
 
+  // src/module_bindings/my_skin_unlocks_table.ts
+  var my_skin_unlocks_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    skinId: t.string().name("skin_id"),
+    unlockedAt: t.timestamp().name("unlocked_at")
+  });
+
   // src/module_bindings/my_task_chests_table.ts
   var my_task_chests_table_default = t.row({
     id: t.u64().primaryKey(),
@@ -10418,6 +10429,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_skills_table_default),
+    mySkinUnlocks: table({
+      name: "my_skin_unlocks",
+      indexes: [],
+      constraints: []
+    }, my_skin_unlocks_table_default),
     myTaskChests: table({
       name: "my_task_chests",
       indexes: [],
@@ -10633,6 +10649,7 @@ ${ty.variants.map(
     "my_satchel_keep": "mySatchelKeep",
     "my_sent_farm_pvp_attacks": "mySentFarmPvpAttacks",
     "my_skills": "mySkills",
+    "my_skin_unlocks": "mySkinUnlocks",
     "my_task_chests": "myTaskChests",
     "my_task_state": "myTaskState",
     "my_tasks": "myTasks",
