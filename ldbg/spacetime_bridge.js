@@ -872,7 +872,11 @@ ${originalIndentation}`;
         inventoryOrder: many("myInventoryOrder"),
         equipment: many("myEquipment"),
         equippedFood: many("myEquippedFood"),
-        equippedBoosts: many("myEquippedBoosts")
+        equippedBoosts: many("myEquippedBoosts"),
+        // The policy on this player's gear, and what a Rugged Satchel last kept
+        // (rules version 42): both settled by the server, both for the results card.
+        gearInsurance: one("myGearInsurance"),
+        satchelKeep: one("mySatchelKeep")
       }
     },
     upgrades: {
@@ -9769,6 +9773,18 @@ ${ty.variants.map(
     claimedAt: t.timestamp().name("claimed_at")
   });
 
+  // src/module_bindings/my_gear_insurance_table.ts
+  var my_gear_insurance_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    scope: t.string(),
+    ref: t.string(),
+    slot: t.string(),
+    itemId: t.string().name("item_id"),
+    scrapPaid: t.u32().name("scrap_paid"),
+    boughtAt: t.timestamp().name("bought_at"),
+    sealItemId: t.string().name("seal_item_id")
+  });
+
   // src/module_bindings/my_inventory_table.ts
   var my_inventory_table_default = t.row({
     id: t.u64().primaryKey(),
@@ -9859,7 +9875,8 @@ ${ty.variants.map(
     snapArmed: t.bool().name("snap_armed"),
     revives: t.u32(),
     healsSent: t.u32().name("heals_sent"),
-    reviveProgress: t.u32().name("revive_progress")
+    reviveProgress: t.u32().name("revive_progress"),
+    bandaged: t.bool()
   });
 
   // src/module_bindings/my_party_partner_boards_table.ts
@@ -9964,6 +9981,14 @@ ${ty.variants.map(
     progress: t.u32(),
     target: t.u32(),
     state: t.string()
+  });
+
+  // src/module_bindings/my_satchel_keep_table.ts
+  var my_satchel_keep_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    runId: t.string().name("run_id"),
+    itemId: t.string().name("item_id"),
+    keptAt: t.timestamp().name("kept_at")
   });
 
   // src/module_bindings/my_sent_farm_pvp_attacks_table.ts
@@ -10293,6 +10318,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_feat_claims_table_default),
+    myGearInsurance: table({
+      name: "my_gear_insurance",
+      indexes: [],
+      constraints: []
+    }, my_gear_insurance_table_default),
     myInventory: table({
       name: "my_inventory",
       indexes: [],
@@ -10373,6 +10403,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_quests_table_default),
+    mySatchelKeep: table({
+      name: "my_satchel_keep",
+      indexes: [],
+      constraints: []
+    }, my_satchel_keep_table_default),
     mySentFarmPvpAttacks: table({
       name: "my_sent_farm_pvp_attacks",
       indexes: [],
@@ -10578,6 +10613,7 @@ ${ty.variants.map(
     "my_farm_pvp_session": "myFarmPvpSession",
     "my_farm_records": "myFarmRecords",
     "my_feat_claims": "myFeatClaims",
+    "my_gear_insurance": "myGearInsurance",
     "my_inventory": "myInventory",
     "my_inventory_order": "myInventoryOrder",
     "my_market_sale_notice": "myMarketSaleNotice",
@@ -10594,6 +10630,7 @@ ${ty.variants.map(
     "my_quest_claims": "myQuestClaims",
     "my_quest_stats": "myQuestStats",
     "my_quests": "myQuests",
+    "my_satchel_keep": "mySatchelKeep",
     "my_sent_farm_pvp_attacks": "mySentFarmPvpAttacks",
     "my_skills": "mySkills",
     "my_task_chests": "myTaskChests",
