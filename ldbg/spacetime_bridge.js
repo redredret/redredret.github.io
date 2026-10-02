@@ -9613,7 +9613,8 @@ ${ty.variants.map(
     createdAt: t.timestamp().name("created_at"),
     effectBehavior: t.string().name("effect_behavior"),
     effectCells: t.u32().name("effect_cells"),
-    effectSeed: t.u32().name("effect_seed")
+    effectSeed: t.u32().name("effect_seed"),
+    effects: t.string()
   });
 
   // src/module_bindings/my_dark_duel_haul_table.ts
