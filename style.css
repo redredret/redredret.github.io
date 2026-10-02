@@ -802,6 +802,19 @@ p { margin: 0 0 12px; }
 .panel-download p { margin: 0 4px 12px; font-size: 14px; line-height: 1.4; color: var(--muted); }
 .panel-download .download-note { margin: 12px 4px 0; font-size: 12px; }
 .panel-download .download-note b { color: var(--text); }
+/* The release listing beside the direct download: a quiet mint link, the
+   game's colour for something to press that is not the main action. */
+.panel-download .release-link {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--mint);
+  text-decoration: none;
+}
+.panel-download .release-link:hover { text-decoration: underline; }
+.panel-download .release-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
 
 .panel-play { text-align: center; text-decoration: none; color: var(--text); }
 .panel-play img { width: 170px; margin: 0 auto; filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.5)); }
