@@ -3,6 +3,7 @@
   "firstTrackedRulesVersion": 30,
   "notNews": [31],
   "entries": [
+    { "date": "2026-10-04", "title": "Composts", "text": "Fertiliser now doubles every material a Solo Farm run gathers. Rich Compost doubles tier three, and a compost for each gathering skill makes a run mostly one material, doubled. Farm Fighter now adds 50% to every Farm material." },
     { "date": "2026-10-04", "title": "Two new gathering skills", "text": "Seasoned Gatherer raises your chance of tier-three materials on every line, and it keeps growing as you level. Signature Mastery makes a Finesse spin that strikes tier three give even more of it." },
     { "date": "2026-10-04", "title": "Cheaper tier-three refining", "text": "Ipe Planks, Adamantite Ingots and Nettle Fabric now take 25 raw materials instead of 50. Build the new Master Refinery to make them from 20, and to transmute tier-two materials into tier three for some Scrap." },
     { "date": "2026-10-02", "title": "The Scrap Forge", "text": "Build the Scrap Forge and spend Scrap to roll a modifier onto a piece of gear: more Attack, Power or Armor, or a chance to hit harder, heal, halve a hit, hurt what hits you, or heal on a kill. Enhanced gear gets a star and counts in duels too. Each roll on the same piece costs more, and the new roll replaces the old one.", "rulesVersion": 45 },
