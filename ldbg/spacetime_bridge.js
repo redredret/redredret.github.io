@@ -1130,6 +1130,8 @@ ${originalIndentation}`;
     // Sent on the client's own schedule, not because the player did anything.
     "reportRunSubmissionProblem",
     "acknowledgeMarketSales",
+    // Freeze and crash reports, sent from the outbox on the client's schedule.
+    "reportClientProblem",
     // A Dark run announces itself between encounters and swings on every clear.
     // Every name the walk-in has had. Only the old one was listed once, so
     // walking into a duel counted as the player being at the keyboard -- and then
@@ -9213,6 +9215,14 @@ ${ty.variants.map(
     targetIndex: t.u32()
   };
 
+  // src/module_bindings/report_client_problem_reducer.ts
+  var report_client_problem_reducer_default = {
+    kind: t.string(),
+    signature: t.string(),
+    build: t.string(),
+    payload: t.string()
+  };
+
   // src/module_bindings/report_duel_board_break_reducer.ts
   var report_duel_board_break_reducer_default = {
     duelId: t.string(),
@@ -10628,6 +10638,7 @@ ${ty.variants.map(
     reducerSchema("refresh_my_tasks", refresh_my_tasks_reducer_default),
     reducerSchema("renew_play_session", renew_play_session_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
+    reducerSchema("report_client_problem", report_client_problem_reducer_default),
     reducerSchema("report_duel_board_break", report_duel_board_break_reducer_default),
     reducerSchema("report_farm_pvp_top_out", report_farm_pvp_top_out_reducer_default),
     reducerSchema("report_party_down", report_party_down_reducer_default),
@@ -11750,8 +11761,8 @@ ${ty.variants.map(
   }
   function setClientContext(contextJson) {
     try {
-      const context = JSON.parse(contextJson);
-      const nextScreen = typeof context.screen === "string" ? context.screen : CLIENT_SCREENS.title;
+      const context2 = JSON.parse(contextJson);
+      const nextScreen = typeof context2.screen === "string" ? context2.screen : CLIENT_SCREENS.title;
       if (nextScreen === live.clientScreen) {
         noteUserActivity();
         return;
@@ -12221,7 +12232,333 @@ ${ty.variants.map(
   });
   var authInitialization = initializeAuthentication();
 
+  // src/problem_watch.ts
+  var LOG_LINE_LIMIT = 300;
+  var LOG_KEEP = 200;
+  var SCRUBBERS = [
+    [/eyJ[A-Za-z0-9_-]{6,}\.[A-Za-z0-9_-]{6,}\.[A-Za-z0-9_-]{6,}/g, "[jwt]"],
+    [/\b(Bearer|Basic)\s+[A-Za-z0-9._~+/=-]{8,}/gi, "$1 [token]"],
+    [/\b((?:access|id|refresh)_token|code|state|nonce|code_verifier|client_secret)=([^&\s"']+)/gi, "$1=[redacted]"],
+    [/"((?:access|id|refresh)Token|(?:access|id|refresh)_token|token|password)"\s*:\s*"[^"]*"/gi, '"$1":"[redacted]"'],
+    [/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[email]"]
+  ];
+  function scrub(text) {
+    let out = String(text ?? "");
+    for (const [pattern, replacement] of SCRUBBERS) out = out.replace(pattern, replacement);
+    return out;
+  }
+  function logLine(level, parts) {
+    const text = parts.map((part) => {
+      if (typeof part === "string") return part;
+      if (part instanceof Error) return `${part.name}: ${part.message}`;
+      try {
+        return JSON.stringify(part);
+      } catch {
+        return String(part);
+      }
+    }).join(" ");
+    const line = scrub(`${level}: ${text}`);
+    return line.length <= LOG_LINE_LIMIT ? line : `${line.slice(0, LOG_LINE_LIMIT)}\u2026`;
+  }
+  var LogRing = class {
+    constructor(keep = LOG_KEEP) {
+      this.keep = keep;
+    }
+    lines = [];
+    push(line) {
+      this.lines.push(line);
+      if (this.lines.length > this.keep) this.lines.splice(0, this.lines.length - this.keep);
+    }
+    tail() {
+      return this.lines.slice();
+    }
+  };
+  function buildTagFrom(sources) {
+    for (const source of sources) {
+      const versioned = /index\.js\?v=([0-9a-f]{6,})/.exec(source);
+      if (versioned) return `index-${versioned[1]}`;
+      const named = /(index-[0-9a-f]{6,})\.js/.exec(source);
+      if (named) return named[1];
+    }
+    return "local";
+  }
+  function watchdogMain(scope) {
+    const FREEZE = 5e3;
+    const CHECK = 1e3;
+    const REWRITE = 5e3;
+    const KEEP_LINES = 200;
+    const KEEP_RECORDS = 10;
+    const clock = () => typeof scope.now === "function" ? scope.now() : Date.now();
+    let lastBeat = 0;
+    let visible = true;
+    let armed = false;
+    let context2 = null;
+    let stall = null;
+    const lines = [];
+    const openDb = () => {
+      if (!scope.indexedDB) return null;
+      return new Promise((resolve) => {
+        try {
+          const request = scope.indexedDB.open("ldbg-diagnostics", 1);
+          request.onupgradeneeded = () => request.result.createObjectStore("reports", { keyPath: "id" });
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => resolve(null);
+        } catch {
+          resolve(null);
+        }
+      });
+    };
+    const db = openDb();
+    const withStore = (mode, work) => {
+      if (!db) return;
+      db.then((handle) => {
+        if (!handle) return;
+        try {
+          work(handle.transaction("reports", mode).objectStore("reports"));
+        } catch {
+        }
+      });
+    };
+    const signature = (ctx) => {
+      const screen = String(ctx?.screen ?? "");
+      const activity = String(ctx?.activity ?? "");
+      return activity ? `${screen}/${activity}` : screen;
+    };
+    const snapshot = (at, recovered) => ({
+      id: stall.id,
+      kind: "freeze",
+      signature: signature(context2),
+      startedAt: new Date(stall.startedAt).toISOString(),
+      stallMs: at - stall.startedAt,
+      recovered,
+      context: context2,
+      log: lines.slice()
+    });
+    const write = (record) => withStore("readwrite", (store) => store.put(record));
+    const check = (at = clock()) => {
+      if (!armed || !visible) return;
+      if (!stall) {
+        if (at - lastBeat <= FREEZE) return;
+        stall = { id: `freeze-${lastBeat}-${Math.floor(Math.random() * 1e6)}`, startedAt: lastBeat, writtenAt: at };
+        write(snapshot(at, false));
+        return;
+      }
+      if (at - stall.writtenAt >= REWRITE) {
+        stall.writtenAt = at;
+        write(snapshot(at, false));
+      }
+    };
+    const receive = (message, at = clock()) => {
+      if (!message || typeof message !== "object") return;
+      if (message.type === "beat") {
+        if (stall) {
+          const record = snapshot(at, true);
+          stall = null;
+          write(record);
+          scope.postMessage({ type: "freeze", record });
+        }
+        lastBeat = at;
+        armed = true;
+        if (message.context) context2 = message.context;
+      } else if (message.type === "visibility") {
+        visible = !!message.visible;
+        lastBeat = at;
+      } else if (message.type === "log") {
+        for (const line of message.lines ?? []) {
+          lines.push(String(line));
+        }
+        if (lines.length > KEEP_LINES) lines.splice(0, lines.length - KEEP_LINES);
+      } else if (message.type === "delete") {
+        const ids = message.ids ?? [];
+        withStore("readwrite", (store) => ids.forEach((id) => store.delete(id)));
+      } else if (message.type === "stop") {
+        armed = false;
+      }
+    };
+    scope.onmessage = (event) => receive(event?.data);
+    if (typeof scope.setInterval === "function") scope.setInterval(() => check(), CHECK);
+    withStore("readonly", (store) => {
+      const request = store.getAll();
+      request.onsuccess = () => {
+        const records = (request.result ?? []).slice(-KEEP_RECORDS);
+        if (records.length > 0) scope.postMessage({ type: "pending", records });
+      };
+    });
+    return { check, receive, state: () => ({ armed, visible, stalled: !!stall, lines: lines.length }) };
+  }
+  function watchdogSource() {
+    return `(${watchdogMain.toString()})(self);`;
+  }
+
+  // src/diagnostics.ts
+  var ring = new LogRing();
+  var ready = /* @__PURE__ */ new Map();
+  var worker = null;
+  var lastContext = null;
+  var lastShellContextAt = 0;
+  var pageErrors = 0;
+  var pageErrorSignatures = /* @__PURE__ */ new Set();
+  var MAX_PAGE_ERRORS = 3;
+  var SHELL_CONTEXT_MS = 2e3;
+  var unsent = [];
+  function shell() {
+    const client = window.ldbgClient;
+    return client && typeof client === "object" ? client : null;
+  }
+  function buildTag() {
+    try {
+      return buildTagFrom(Array.from(document.scripts).map((script) => script.src));
+    } catch {
+      return "local";
+    }
+  }
+  function flushLines() {
+    if (!worker || unsent.length === 0) return;
+    worker.postMessage({ type: "log", lines: unsent });
+    unsent = [];
+  }
+  function capture(level, parts) {
+    const line = logLine(level, parts);
+    ring.push(line);
+    unsent.push(line);
+    if (unsent.length > 200) unsent.splice(0, unsent.length - 200);
+    if (level === "error" || level === "warn") flushLines();
+  }
+  function wrapConsole() {
+    const target = console;
+    for (const level of ["log", "info", "warn", "error", "debug"]) {
+      const original = target[level];
+      if (typeof original !== "function" || original.__ldbgWrapped) continue;
+      const wrapped = (...parts) => {
+        try {
+          capture(level, parts);
+        } catch {
+        }
+        return original.apply(console, parts);
+      };
+      wrapped.__ldbgWrapped = true;
+      target[level] = wrapped;
+    }
+  }
+  function context() {
+    return {
+      ...lastContext ?? {},
+      build: buildTag(),
+      visible: document.visibilityState === "visible",
+      connection: {
+        connected: !!live.connection,
+        coreReady: live.coreSubscriptionReady,
+        opening: live.connectionOpening,
+        resumeNeeded: live.resumeNeeded,
+        held: pendingReducerCalls.length
+      },
+      shell: !!shell()
+    };
+  }
+  function pageError(message, where) {
+    const text = scrub(message).slice(0, 300);
+    capture("error", [`${where}: ${text}`]);
+    const signature = text.slice(0, 120);
+    if (pageErrors >= MAX_PAGE_ERRORS || pageErrorSignatures.has(signature)) return;
+    pageErrors += 1;
+    pageErrorSignatures.add(signature);
+    const id = `page-${Date.now()}-${pageErrors}`;
+    ready.set(id, {
+      id,
+      kind: "page_error",
+      signature,
+      startedAt: (/* @__PURE__ */ new Date()).toISOString(),
+      message: text,
+      where,
+      context: context(),
+      log: ring.tail()
+    });
+  }
+  function startWorker() {
+    if (typeof Worker === "undefined" || typeof Blob === "undefined" || typeof URL === "undefined") return;
+    try {
+      const url = URL.createObjectURL(new Blob([watchdogSource()], { type: "text/javascript" }));
+      worker = new Worker(url);
+      worker.onmessage = (event) => {
+        const data = event.data;
+        if (data?.type === "freeze" && data.record?.id) ready.set(data.record.id, data.record);
+        if (data?.type === "pending") {
+          for (const record of data.records ?? []) if (record?.id) ready.set(record.id, record);
+        }
+      };
+      worker.postMessage({ type: "visibility", visible: document.visibilityState === "visible" });
+    } catch {
+      worker = null;
+    }
+  }
+  function adoptShellReports() {
+    const client = shell();
+    if (!client || typeof client.problemReports !== "function") return;
+    try {
+      const records = JSON.parse(String(client.problemReports() || "[]"));
+      for (const record of Array.isArray(records) ? records : []) {
+        if (record?.id) ready.set(String(record.id), { ...record, fromShell: true });
+      }
+    } catch {
+    }
+  }
+  function diagnosticsBeat(contextJson) {
+    try {
+      lastContext = JSON.parse(contextJson);
+    } catch {
+      return;
+    }
+    flushLines();
+    const merged = context();
+    worker?.postMessage({ type: "beat", context: merged });
+    const client = shell();
+    const now = Date.now();
+    if (client && typeof client.diagnosticsContext === "function" && now - lastShellContextAt >= SHELL_CONTEXT_MS) {
+      lastShellContextAt = now;
+      try {
+        client.diagnosticsContext(JSON.stringify(merged));
+      } catch {
+      }
+    }
+  }
+  function takeProblemReports() {
+    adoptShellReports();
+    if (ready.size === 0) return "";
+    const records = Array.from(ready.values());
+    ready.clear();
+    const stored = records.filter((record) => !record.fromShell && String(record.id).startsWith("freeze-")).map((record) => record.id);
+    if (stored.length > 0) worker?.postMessage({ type: "delete", ids: stored });
+    const fromShell = records.filter((record) => record.fromShell).map((record) => record.id);
+    const client = shell();
+    if (fromShell.length > 0 && client && typeof client.ackProblemReports === "function") {
+      try {
+        client.ackProblemReports(JSON.stringify(fromShell));
+      } catch {
+      }
+    }
+    return JSON.stringify(records);
+  }
+  function diagnosticsLogTail() {
+    return JSON.stringify(ring.tail());
+  }
+  function installDiagnostics() {
+    wrapConsole();
+    window.addEventListener("error", (event) => {
+      pageError(String(event.message || "error"), "uncaught");
+    });
+    window.addEventListener("unhandledrejection", (event) => {
+      const reason = event.reason;
+      pageError(reason instanceof Error ? `${reason.name}: ${reason.message}` : String(reason), "rejection");
+    });
+    document.addEventListener("visibilitychange", () => {
+      worker?.postMessage({ type: "visibility", visible: document.visibilityState === "visible" });
+    });
+    window.addEventListener("pagehide", () => worker?.postMessage({ type: "stop" }));
+    startWorker();
+  }
+
   // src/index.ts
+  installDiagnostics();
   for (const eventName of ["pointerdown", "keydown", "touchstart", "focus"]) {
     window.addEventListener(eventName, noteUserActivity, { passive: true });
   }
@@ -12240,6 +12577,9 @@ ${ty.variants.map(
     getAuthStatus,
     snapshotDiagnostics,
     reconnectBackend,
-    drainEvents
+    drainEvents,
+    diagnosticsBeat,
+    takeProblemReports,
+    diagnosticsLogTail
   };
 })();
