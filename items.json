@@ -64,6 +64,70 @@
   "level": 40
  },
  {
+  "id": "lotus_hat",
+  "icon": "lotus_hat.png",
+  "name": "Lotus Hat",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "lotus_robe",
+  "icon": "lotus_robe.png",
+  "name": "Lotus Robe",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "lotus_tome",
+  "icon": "lotus_tome.png",
+  "name": "Lotus Tome",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "lotus_cap",
+  "icon": "lotus_cap.png",
+  "name": "Lotus-Lined Cap",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "lotus_tunic",
+  "icon": "lotus_tunic.png",
+  "name": "Lotus-Lined Tunic",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "orichalcum_armor",
+  "icon": "orichalcum_armor.png",
+  "name": "Orichalcum Armor",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "orichalcum_buckler",
+  "icon": "orichalcum_buckler.png",
+  "name": "Orichalcum Buckler",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "orichalcum_helmet",
+  "icon": "orichalcum_helmet.png",
+  "name": "Orichalcum Helmet",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
   "id": "spiked_buckler",
   "icon": "spiked_buckler.png",
   "name": "Spiked Buckler",
@@ -80,6 +144,54 @@
   "level": 1
  },
  {
+  "id": "darkwood_log",
+  "icon": "darkwood_log.png",
+  "name": "Darkwood Log",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "darkwood_plank",
+  "icon": "darkwood_plank.png",
+  "name": "Darkwood Plank",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "lotus_cloth",
+  "icon": "lotus_cloth.png",
+  "name": "Lotus Cloth",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "lotus_leaves",
+  "icon": "lotus_leaves.png",
+  "name": "Lotus Leaves",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "orichalcum_ingot",
+  "icon": "orichalcum_ingot.png",
+  "name": "Orichalcum Ingot",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "orichalcum_ore",
+  "icon": "orichalcum_ore.png",
+  "name": "Orichalcum Ore",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "bandit_blade_a",
   "icon": "bandit_blade_a.png",
   "name": "Bandit Blade (A)",
@@ -88,12 +200,36 @@
   "level": 35
  },
  {
+  "id": "darkwood_bow",
+  "icon": "darkwood_bow.png",
+  "name": "Darkwood Bow",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 50
+ },
+ {
+  "id": "darkwood_staff",
+  "icon": "darkwood_staff.png",
+  "name": "Darkwood Staff",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 50
+ },
+ {
   "id": "horned_staff",
   "icon": "horned_staff.png",
   "name": "Horned Staff",
   "rarity": "epic",
   "type": "weapon",
   "level": 35
+ },
+ {
+  "id": "orichalcum_sword",
+  "icon": "orichalcum_sword.png",
+  "name": "Orichalcum Sword",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 50
  },
  {
   "id": "spiky_bow",
@@ -206,6 +342,22 @@
   "rarity": "rare",
   "type": "armor",
   "level": 10
+ },
+ {
+  "id": "slime_broth",
+  "icon": "slime_broth.png",
+  "name": "Slime Broth",
+  "rarity": "rare",
+  "type": "consumable",
+  "level": 1
+ },
+ {
+  "id": "trout_pie",
+  "icon": "trout_pie.png",
+  "name": "Trout Pie",
+  "rarity": "rare",
+  "type": "consumable",
+  "level": 1
  },
  {
   "id": "adamantite_ingot",
@@ -440,6 +592,14 @@
   "level": 10
  },
  {
+  "id": "carrot_stew",
+  "icon": "carrot_stew.png",
+  "name": "Carrot Stew",
+  "rarity": "uncommon",
+  "type": "consumable",
+  "level": 1
+ },
+ {
   "id": "sardine_stew",
   "icon": "sardine_stew.png",
   "name": "Guppy Stew",
@@ -656,6 +816,22 @@
   "level": 1
  },
  {
+  "id": "anglers_compost",
+  "icon": "anglers_compost.png",
+  "name": "Angler's Compost",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "bandage_roll",
+  "icon": "bandage_roll.png",
+  "name": "Bandage Roll",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "carrot",
   "icon": "carrot.png",
   "name": "Carrot",
@@ -667,6 +843,22 @@
   "id": "coal",
   "icon": "coal.png",
   "name": "Coal",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "farmers_compost",
+  "icon": "farmers_compost.png",
+  "name": "Farmer's Compost",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "fertiliser",
+  "icon": "fertiliser.png",
+  "name": "Fertiliser",
   "rarity": "common",
   "type": "material",
   "level": 1
@@ -728,6 +920,14 @@
   "level": 1
  },
  {
+  "id": "miners_compost",
+  "icon": "miners_compost.png",
+  "name": "Miner's Compost",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "oak_log",
   "icon": "oak_log.png",
   "name": "Oak Log",
@@ -739,6 +939,54 @@
   "id": "oak_plank",
   "icon": "oak_plank.png",
   "name": "Oak Plank",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "provisions_pouch",
+  "icon": "provisions_pouch.png",
+  "name": "Provisions Pouch",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "rich_compost",
+  "icon": "rich_compost.png",
+  "name": "Rich Compost",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "rugged_satchel",
+  "icon": "rugged_satchel.png",
+  "name": "Rugged Satchel",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "treasure_seal",
+  "icon": "treasure_seal.png",
+  "name": "Treasure Seal",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "wardens_seal",
+  "icon": "wardens_seal.png",
+  "name": "Warden's Seal",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "woodcutters_compost",
+  "icon": "woodcutters_compost.png",
+  "name": "Woodcutter's Compost",
   "rarity": "common",
   "type": "material",
   "level": 1
