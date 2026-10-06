@@ -737,7 +737,7 @@ p { margin: 0 0 12px; }
   margin: 22px 0 0;
   padding: 16px 10px 12px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   background: var(--well);
   border: 1px solid var(--well-edge);
@@ -749,6 +749,7 @@ p { margin: 0 0 12px; }
 .chests li:nth-child(1) b { color: #d8b07a; }
 .chests li:nth-child(2) b { color: #7cc4ff; }
 .chests li:nth-child(3) b { color: var(--legendary); }
+.chests li:nth-child(4) b { color: #ec8cf2; }
 .chests .dark b { color: var(--dark-chest); }
 .chests b { display: block; font: 400 17px/1.1 var(--display); }
 .chests small { display: block; color: var(--muted); font-size: 12px; line-height: 1.2; margin-top: 2px; }

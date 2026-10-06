@@ -160,6 +160,14 @@
   "level": 1
  },
  {
+  "id": "duskhide",
+  "icon": "duskhide.png",
+  "name": "Duskhide",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "lotus_cloth",
   "icon": "lotus_cloth.png",
   "name": "Lotus Cloth",
