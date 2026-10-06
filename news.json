@@ -3,6 +3,7 @@
   "firstTrackedRulesVersion": 30,
   "notNews": [31],
   "entries": [
+    { "date": "2026-10-06", "title": "Freezes get reported", "text": "If the game freezes or crashes, it now sends a report the next time you log in, so it can be fixed. The report says where you were and how the game was running. It never includes your password or email. You can turn it off in Settings, under Performance. In the desktop client, a frozen game also offers to reload instead of making you close it." },
     { "date": "2026-10-05", "title": "Enhanced finds", "text": "A Masterwork Vault can now hold a piece of starter gear that already carries a Forge roll. So can the Garbage Man's vault for beating his ten waves, and every wave you beat from wave ten on. It is grade I or II, and yours to reroll at the Forge.", "rulesVersion": 47 },
     { "date": "2026-10-05", "title": "Enhanced gear is worth more", "text": "An enhanced piece now salvages for more Scrap and sells to a shop for more Gold than a plain one: the higher its grade and the better its roll, the more. A top Bandit Blade sells for 165 Gold instead of 75. It is never more than the Scrap you put into rolling it." },
     { "date": "2026-10-05", "title": "Forge rolls have grades", "text": "Every Scrap Forge roll now lands on a grade, I to IV, and the piece shows it: Vampiric III, Keen IV. The star on the piece is its grade's colour, green, blue, purple or gold. Better gear rolls higher grades more often, and only gear from level 30 can reach IV. Pieces you already have moved up to the next grade, so none got worse." },
