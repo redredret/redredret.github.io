@@ -3,6 +3,7 @@
   "firstTrackedRulesVersion": 30,
   "notNews": [31],
   "entries": [
+    { "date": "2026-10-05", "title": "Enhanced gear is worth more", "text": "An enhanced piece now salvages for more Scrap and sells to a shop for more Gold than a plain one: the higher its grade and the better its roll, the more. A top Bandit Blade sells for 165 Gold instead of 75. It is never more than the Scrap you put into rolling it." },
     { "date": "2026-10-05", "title": "Forge rolls have grades", "text": "Every Scrap Forge roll now lands on a grade, I to IV, and the piece shows it: Vampiric III, Keen IV. The star on the piece is its grade's colour, green, blue, purple or gold. Better gear rolls higher grades more often, and only gear from level 30 can reach IV. Pieces you already have moved up to the next grade, so none got worse." },
     { "date": "2026-10-05", "title": "Twenty-seven new Forge rolls", "text": "The Scrap Forge can now roll effects for every kind of gear: a weapon that staggers, an armour that hits back, a helmet that heals at Dark checkpoints, a ring that hits harder until you are touched, and many more. They work in duels at half strength.", "rulesVersion": 46 },
     { "date": "2026-10-05", "title": "Forge rolls that pay", "text": "Six new Scrap Forge rolls change what a run earns. Scholar adds experience. Gilded adds coins. Scavenger's finds Scrap on kills. Gambler's Charm can make a kill drop its loot twice, and Fortune does the same for champions. Blessed makes a chest's second reward likelier." },
