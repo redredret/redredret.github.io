@@ -877,6 +877,8 @@ ${originalIndentation}`;
         // (rules version 42): both settled by the server, both for the results card.
         gearInsurance: one("myGearInsurance"),
         satchelKeep: one("mySatchelKeep"),
+        // And what a Slime Bag last kept (rules version 49): up to three entries.
+        slimeBagKeep: one("mySlimeBagKeep"),
         // Enhanced pieces (docs/ENHANCEMENT_PLAN.md): one row each, in the bag,
         // worn or listed, apart from the stacks.
         gearInstances: many("myGearInstances")
@@ -10092,6 +10094,14 @@ ${ty.variants.map(
     unlockedAt: t.timestamp().name("unlocked_at")
   });
 
+  // src/module_bindings/my_slime_bag_keep_table.ts
+  var my_slime_bag_keep_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    runId: t.string().name("run_id"),
+    keptJson: t.string().name("kept_json"),
+    keptAt: t.timestamp().name("kept_at")
+  });
+
   // src/module_bindings/my_task_chests_table.ts
   var my_task_chests_table_default = t.row({
     id: t.u64().primaryKey(),
@@ -10509,6 +10519,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_skin_unlocks_table_default),
+    mySlimeBagKeep: table({
+      name: "my_slime_bag_keep",
+      indexes: [],
+      constraints: []
+    }, my_slime_bag_keep_table_default),
     myTaskChests: table({
       name: "my_task_chests",
       indexes: [],
@@ -10733,6 +10748,7 @@ ${ty.variants.map(
     "my_sent_farm_pvp_attacks": "mySentFarmPvpAttacks",
     "my_skills": "mySkills",
     "my_skin_unlocks": "mySkinUnlocks",
+    "my_slime_bag_keep": "mySlimeBagKeep",
     "my_task_chests": "myTaskChests",
     "my_task_state": "myTaskState",
     "my_tasks": "myTasks",
@@ -10866,11 +10882,42 @@ ${ty.variants.map(
   }
   var Board = class {
     cells;
+    // The columns in play, inclusive. Cells outside them are frozen: no rule reads
+    // or writes them, and they come back exactly as they were when the corridor
+    // opens again. Mirrors BoardState.play_left / play_right.
+    playLeft = 0;
+    playRight = WIDTH - 1;
     constructor() {
       this.cells = new Int8Array(WIDTH * TOTAL_HEIGHT).fill(EMPTY);
     }
+    // A reset board is a fresh board: the whole width again.
     reset() {
       this.cells.fill(EMPTY);
+      this.openCorridor();
+    }
+    /** Narrows play to columns left..right. Mirrors BoardState.narrow_corridor. */
+    narrowCorridor(left, right) {
+      this.playLeft = Math.max(0, Math.min(WIDTH - 1, Math.trunc(left)));
+      this.playRight = Math.max(this.playLeft, Math.min(WIDTH - 1, Math.trunc(right)));
+    }
+    openCorridor() {
+      this.playLeft = 0;
+      this.playRight = WIDTH - 1;
+    }
+    hasCorridor() {
+      return this.playLeft !== 0 || this.playRight !== WIDTH - 1;
+    }
+    /**
+     * THE column rule. Every rule that asks whether a column is part of the game
+     * -- placing, kicking, spin corners, full rows, clears, garbage, top-out, an
+     * All Clear -- asks here. Mirrors BoardState.column_in_play.
+     */
+    columnInPlay(x) {
+      return x >= this.playLeft && x <= this.playRight;
+    }
+    // Inside the board AND in play: what a wall is to a piece.
+    inPlay(x, y) {
+      return this.columnInPlay(x) && y >= 0 && y < TOTAL_HEIGHT;
     }
     isInside(x, y) {
       return x >= 0 && x < WIDTH && y >= 0 && y < TOTAL_HEIGHT;
@@ -10886,7 +10933,7 @@ ${ty.variants.map(
       for (let index = 0; index < pieceCells.length; index += 1) {
         const x = originX + pieceCells[index].x;
         const y = originY + pieceCells[index].y;
-        if (x < 0 || x >= WIDTH || y < 0 || y >= TOTAL_HEIGHT) return false;
+        if (!this.inPlay(x, y)) return false;
         if (this.cells[y * WIDTH + x] !== EMPTY) return false;
       }
       return true;
@@ -10899,7 +10946,7 @@ ${ty.variants.map(
     isRowFull(y) {
       const row = y * WIDTH;
       for (let x = 0; x < WIDTH; x += 1) {
-        if (this.cells[row + x] === EMPTY) return false;
+        if (this.columnInPlay(x) && this.cells[row + x] === EMPTY) return false;
       }
       return true;
     }
@@ -10936,7 +10983,7 @@ ${ty.variants.map(
       for (let y = 0; y < TOTAL_HEIGHT; y += 1) {
         if (!this.isRowFull(y)) continue;
         for (let x = 0; x < WIDTH; x += 1) {
-          if (isGarbageValue(this.getCell(x, y))) count += 1;
+          if (this.columnInPlay(x) && isGarbageValue(this.getCell(x, y))) count += 1;
         }
       }
       return count;
@@ -10945,11 +10992,11 @@ ${ty.variants.map(
       let overflowedCells = 0;
       for (const holeColumn of holeColumns) {
         for (let x = 0; x < WIDTH; x += 1) {
-          if (this.getCell(x, 0) !== EMPTY) overflowedCells += 1;
+          if (this.columnInPlay(x) && this.getCell(x, 0) !== EMPTY) overflowedCells += 1;
         }
         for (let y = 0; y < TOTAL_HEIGHT - 1; y += 1) this.copyRow(y + 1, y);
         for (let x = 0; x < WIDTH; x += 1) {
-          this.setCell(x, TOTAL_HEIGHT - 1, x === holeColumn ? EMPTY : value);
+          if (this.columnInPlay(x)) this.setCell(x, TOTAL_HEIGHT - 1, x === holeColumn ? EMPTY : value);
         }
       }
       return overflowedCells;
@@ -10957,7 +11004,7 @@ ${ty.variants.map(
     hasCellsInHiddenRows() {
       for (let y = 0; y < HIDDEN_ROWS; y += 1) {
         for (let x = 0; x < WIDTH; x += 1) {
-          if (this.getCell(x, y) !== EMPTY) return true;
+          if (this.columnInPlay(x) && this.getCell(x, y) !== EMPTY) return true;
         }
       }
       return false;
@@ -10976,18 +11023,21 @@ ${ty.variants.map(
       }
       return holes;
     }
+    // Empty in play: an All Clear in a corridor ignores the frozen sides.
     isEmpty() {
       for (let index = this.cells.length - 1; index >= 0; index -= 1) {
-        if (this.cells[index] !== EMPTY) return false;
+        if (this.cells[index] !== EMPTY && this.columnInPlay(index % WIDTH)) return false;
       }
       return true;
     }
+    // Row moves touch only the columns in play: a frozen side neither falls nor
+    // is lifted.
     copyRow(fromY, toY) {
       if (fromY === toY) return;
-      this.cells.copyWithin(toY * WIDTH, fromY * WIDTH, fromY * WIDTH + WIDTH);
+      this.cells.copyWithin(toY * WIDTH + this.playLeft, fromY * WIDTH + this.playLeft, fromY * WIDTH + this.playRight + 1);
     }
     clearRow(y) {
-      this.cells.fill(EMPTY, y * WIDTH, y * WIDTH + WIDTH);
+      this.cells.fill(EMPTY, y * WIDTH + this.playLeft, y * WIDTH + this.playRight + 1);
     }
   };
 
