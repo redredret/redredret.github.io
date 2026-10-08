@@ -56,6 +56,14 @@
   "level": 45
  },
  {
+  "id": "ring_of_goop",
+  "icon": "ring_of_goop.png",
+  "name": "Ring of Goop",
+  "rarity": "epic",
+  "type": "accessory",
+  "level": 40
+ },
+ {
   "id": "ring_of_thorns",
   "icon": "ring_of_thorns.png",
   "name": "Ring of Thorns",
@@ -134,6 +142,14 @@
   "rarity": "epic",
   "type": "armor",
   "level": 35
+ },
+ {
+  "id": "royal_slime_broth",
+  "icon": "royal_slime_broth.png",
+  "name": "Royal Slime Broth",
+  "rarity": "epic",
+  "type": "consumable",
+  "level": 1
  },
  {
   "id": "cult_idol",
@@ -408,6 +424,14 @@
   "level": 1
  },
  {
+  "id": "goop_idol",
+  "icon": "goop_idol.png",
+  "name": "Goop Idol",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "horn_chunk",
   "icon": "horn_chunk.png",
   "name": "Horn Chunks",
@@ -459,6 +483,14 @@
   "id": "nettle_fabric",
   "icon": "nettle_fabric.png",
   "name": "Nettle Fabric",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "royal_jelly",
+  "icon": "royal_jelly.png",
+  "name": "Royal Jelly",
   "rarity": "rare",
   "type": "material",
   "level": 1
@@ -971,6 +1003,22 @@
   "id": "rugged_satchel",
   "icon": "rugged_satchel.png",
   "name": "Rugged Satchel",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "slime_bag",
+  "icon": "slime_bag.png",
+  "name": "Slime Bag",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "super_compost",
+  "icon": "super_compost.png",
+  "name": "Super Compost",
   "rarity": "common",
   "type": "material",
   "level": 1
