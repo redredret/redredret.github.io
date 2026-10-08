@@ -12320,6 +12320,8 @@ ${ty.variants.map(
       });
     };
     const signature = (ctx) => {
+      const boot = String(ctx?.bootPhase ?? "");
+      if (boot && boot !== "ready") return `boot/${boot}`;
       const screen = String(ctx?.screen ?? "");
       const activity = String(ctx?.activity ?? "");
       return activity ? `${screen}/${activity}` : screen;
@@ -12395,6 +12397,7 @@ ${ty.variants.map(
   var ready = /* @__PURE__ */ new Map();
   var worker = null;
   var lastContext = null;
+  var shellBootPhase = "";
   var lastShellContextAt = 0;
   var pageErrors = 0;
   var pageErrorSignatures = /* @__PURE__ */ new Set();
@@ -12441,8 +12444,12 @@ ${ty.variants.map(
     }
   }
   function context() {
+    const game = lastContext ?? { screen: "boot" };
     return {
-      ...lastContext ?? {},
+      ...game,
+      // The game's own phase once it has spoken (BootProgress), the loading
+      // screen's before that.
+      bootPhase: game.bootPhase ?? shellBootPhase,
       build: buildTag(),
       visible: document.visibilityState === "visible",
       connection: {
@@ -12521,6 +12528,11 @@ ${ty.variants.map(
       }
     }
   }
+  function diagnosticsBootBeat(phase) {
+    shellBootPhase = String(phase ?? "").slice(0, 24);
+    flushLines();
+    worker?.postMessage({ type: "beat", context: context() });
+  }
   function takeProblemReports() {
     adoptShellReports();
     if (ready.size === 0) return "";
@@ -12579,6 +12591,7 @@ ${ty.variants.map(
     reconnectBackend,
     drainEvents,
     diagnosticsBeat,
+    diagnosticsBootBeat,
     takeProblemReports,
     diagnosticsLogTail
   };

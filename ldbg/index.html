@@ -142,17 +142,22 @@ body {
 	overflow: hidden;
 }
 
+/* Filled by transform rather than width, so the bar moves on the compositor and
+   costs the page's thread nothing while the game is starting. */
 #status-progress-fill {
 	position: absolute;
 	inset: 0 auto 0 0;
-	width: 0;
+	width: 100%;
 	border-radius: 3px;
 	background: linear-gradient(90deg, var(--gold-deep), var(--gold));
-	transition: width 200ms ease;
+	transform: scaleX(0);
+	transform-origin: left center;
+	transition: transform 200ms ease;
 }
 
 #status-progress.indeterminate #status-progress-fill {
 	width: 35%;
+	transform: none;
 	animation: sweep 1.2s ease-in-out infinite;
 }
 
@@ -403,7 +408,7 @@ window.addEventListener('keydown', function (event) {
 		</script>
 		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
-<script src="auth_config.js?v=c99e9044942b"></script><script src="spacetime_bridge.js?v=933c5c06150b"></script>
+<script src="auth_config.js?v=c99e9044942b"></script><script src="spacetime_bridge.js?v=5bfa7c95dfff"></script>
 	</head>
 	<body>
 		<canvas id="canvas">
@@ -431,9 +436,9 @@ window.addEventListener('keydown', function (event) {
 			<div id="status-notice"></div>
 		</div>
 
-		<script src="index.js?v=e3120271c0e6"></script>
+		<script src="index.js?v=b6303340b5b4"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index-e3120271c0e6","experimentalVK":false,"fileSizes":{"index-e3120271c0e6.pck":30058244,"index-e3120271c0e6.wasm":37695054},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index-b6303340b5b4","experimentalVK":false,"fileSizes":{"index-b6303340b5b4.pck":30088736,"index-b6303340b5b4.wasm":37695054},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
@@ -445,21 +450,76 @@ const engine = new Engine(GODOT_CONFIG);
 	const statusNotice = document.getElementById('status-notice');
 	const loader = document.getElementById('loader');
 
-	// How long the overlay waits for the game to say it is ready once the engine
-	// is running. Only a safety net: a build that never calls done() still
-	// uncovers itself.
+	// How long the overlay waits, once the engine is running, for the game to
+	// say anything more (progress or done). Only a safety net: a build that never
+	// calls done() still uncovers itself. Counted from the last word, because a
+	// cold browser's warm-up legitimately takes longer than this in all.
 	const READY_TIMEOUT_MS = 20000;
+	// And the longest it waits in all, however much progress it hears.
+	const READY_LIMIT_MS = 120000;
 
 	let initializing = true;
 	let statusMode = '';
 	let engineStarted = false;
 	let gameReady = false;
+	let lastWordAt = 0;
+	let engineStartedAt = 0;
+
+	// Where the boot has got to, for the bar and for the freeze watchdog
+	// (docs/CLIENT_PROBLEMS.md, "The boot"): 'download' while the engine and the
+	// game are fetched, 'engine' from the moment they are in until the game
+	// speaks, then whatever the game reports (src/main/boot_progress.gd).
+	let bootPhase = 'download';
+	let bootFraction = 0;
+	// The bar, one sweep for the whole boot: the download fills its first half,
+	// the game's own phases the rest.
+	const PHASE_SPAN = {
+		download: [0, 0.5],
+		engine: [0.5, 0.55],
+		loading: [0.55, 0.75],
+		building: [0.75, 0.78],
+		warming: [0.78, 1],
+		ready: [1, 1],
+	};
+	const PHASE_LABEL = {
+		download: 'LOADING',
+		engine: 'STARTING',
+		loading: 'STARTING',
+		building: 'STARTING',
+		warming: 'PREPARING',
+		ready: 'READY',
+	};
+
+	function showProgress(phase, fraction) {
+		const span = PHASE_SPAN[phase] || PHASE_SPAN.engine;
+		const at = span[0] + (span[1] - span[0]) * Math.min(1, Math.max(0, fraction));
+		statusProgress.classList.remove('indeterminate');
+		statusFill.style.transform = 'scaleX(' + at.toFixed(3) + ')';
+		statusLabel.textContent = PHASE_LABEL[phase] || 'STARTING';
+	}
+
+	// A heartbeat from the page's own thread to the bridge's freeze watchdog,
+	// from the first moment, so a boot that holds the thread is caught too. A
+	// timer is the honest witness: it fires only when the thread is free.
+	function bootBeat() {
+		const bridge = window.LDBGSpacetime;
+		if (bridge && typeof bridge.diagnosticsBootBeat === 'function') {
+			try {
+				bridge.diagnosticsBootBeat(bootPhase);
+			} catch (err) {
+				// Diagnostics must never stop the game loading.
+			}
+		}
+	}
+	bootBeat();
+	const bootBeatTimer = setInterval(bootBeat, 500);
 
 	function reveal() {
 		if (!initializing) {
 			return;
 		}
 		initializing = false;
+		clearInterval(bootBeatTimer);
 		statusOverlay.classList.add('leaving');
 		setTimeout(function () {
 			statusOverlay.remove();
@@ -475,7 +535,18 @@ const engine = new Engine(GODOT_CONFIG);
 	window.LDBGLoading = {
 		done: function () {
 			gameReady = true;
+			bootPhase = 'ready';
+			bootBeat();
 			maybeReveal();
+		},
+		// The game's own progress (BootProgress): its phase, and how far into it.
+		progress: function (phase, percent) {
+			lastWordAt = Date.now();
+			bootPhase = String(phase || 'engine');
+			bootFraction = Number(percent || 0) / 100;
+			if (initializing && statusMode === 'progress') {
+				showProgress(bootPhase, bootFraction);
+			}
 		},
 	};
 
@@ -553,19 +624,36 @@ const engine = new Engine(GODOT_CONFIG);
 		engine.startGame({
 			'onProgress': function (current, total) {
 				if (current > 0 && total > 0) {
-					statusProgress.classList.remove('indeterminate');
-					statusFill.style.width = Math.min(100, (100 * current) / total) + '%';
+					showProgress('download', current / total);
+					if (current >= total && bootPhase === 'download') {
+						// Everything is in: what follows is the engine starting on
+						// this thread, the stretch a watchdog must not lose.
+						bootPhase = 'engine';
+					}
 				} else {
 					statusProgress.classList.add('indeterminate');
-					statusFill.style.width = '';
+					statusFill.style.transform = '';
 				}
 			},
 		}).then(() => {
 			engineStarted = true;
-			statusProgress.classList.remove('indeterminate');
-			statusFill.style.width = '100%';
-			statusLabel.textContent = 'STARTING';
-			setTimeout(reveal, READY_TIMEOUT_MS);
+			engineStartedAt = Date.now();
+			lastWordAt = engineStartedAt;
+			if (bootPhase === 'download') {
+				bootPhase = 'engine';
+			}
+			if (!gameReady) {
+				showProgress(bootPhase, bootFraction);
+			}
+			const fallback = setInterval(function () {
+				const now = Date.now();
+				if (!initializing) {
+					clearInterval(fallback);
+				} else if (now - lastWordAt >= READY_TIMEOUT_MS || now - engineStartedAt >= READY_LIMIT_MS) {
+					clearInterval(fallback);
+					reveal();
+				}
+			}, 1000);
 			maybeReveal();
 		}, displayFailureNotice);
 	}
