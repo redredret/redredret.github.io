@@ -10150,7 +10150,8 @@ ${ty.variants.map(
     weeklySeen: t.u32().name("weekly_seen"),
     dailyReroll: t.u32().name("daily_reroll"),
     weeklyReroll: t.u32().name("weekly_reroll"),
-    updatedAt: t.timestamp().name("updated_at")
+    updatedAt: t.timestamp().name("updated_at"),
+    dailyRerollsUsed: t.u32().name("daily_rerolls_used")
   });
 
   // src/module_bindings/my_tasks_table.ts
