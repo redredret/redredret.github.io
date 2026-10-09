@@ -904,6 +904,14 @@ ${originalIndentation}`;
         skinUnlocks: many("mySkinUnlocks")
       }
     },
+    // The Collection Log (docs/COLLECTION_LOG_PLAN.md): every item an enemy's kill
+    // has dropped this account, and its kill count of each enemy. Core, because
+    // the in-run card asks it whether a drop is new. Not part of the records
+    // domain: a run that drops anything changes it, where a record changes rarely.
+    collection: {
+      group: "core",
+      keys: { collectionLog: many("myCollectionLog"), collectionKills: many("myCollectionKills") }
+    },
     // The Arena's lobby and this player's duel record: both sender-scoped, both
     // tiny, and both things that HAPPEN to a player -- somebody else takes up
     // their listing -- so they ride the connection rather than a screen.
@@ -9560,6 +9568,25 @@ ${ty.variants.map(
     partyId: t.string().name("party_id")
   });
 
+  // src/module_bindings/my_collection_kills_table.ts
+  var my_collection_kills_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    sourceId: t.string().name("source_id"),
+    kills: t.u64()
+  });
+
+  // src/module_bindings/my_collection_log_table.ts
+  var my_collection_log_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    itemId: t.string().name("item_id"),
+    firstSourceId: t.string().name("first_source_id"),
+    firstAt: t.timestamp().name("first_at"),
+    firstKillCount: t.u64().name("first_kill_count"),
+    obtained: t.u64()
+  });
+
   // src/module_bindings/my_dark_chest_claims_table.ts
   var my_dark_chest_claims_table_default = t.row({
     id: t.u64().primaryKey(),
@@ -10320,6 +10347,16 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_active_run_table_default),
+    myCollectionKills: table({
+      name: "my_collection_kills",
+      indexes: [],
+      constraints: []
+    }, my_collection_kills_table_default),
+    myCollectionLog: table({
+      name: "my_collection_log",
+      indexes: [],
+      constraints: []
+    }, my_collection_log_table_default),
     myDarkChestClaims: table({
       name: "my_dark_chest_claims",
       indexes: [],
@@ -10722,6 +10759,8 @@ ${ty.variants.map(
     "market_price_guide": "marketPriceGuide",
     "my_account_settings": "myAccountSettings",
     "my_active_run": "myActiveRun",
+    "my_collection_kills": "myCollectionKills",
+    "my_collection_log": "myCollectionLog",
     "my_dark_chest_claims": "myDarkChestClaims",
     "my_dark_duel": "myDarkDuel",
     "my_dark_duel_blows": "myDarkDuelBlows",
