@@ -952,6 +952,9 @@ ${originalIndentation}`;
       group: "playerCounts",
       keys: { farmPlayerCounts: many("farmPlayerCounts"), darkPlayerCount: many("darkPlayerCount") }
     },
+    // The Slime King's best waves, solo and co-op (rules version 52): anonymous,
+    // tiny and shared, so it rides the counters' group.
+    slimeBoard: { group: "playerCounts", keys: { slimeBestWaves: many("slimeBestWaves") } },
     market: { group: "market", keys: { marketListings: many("marketListings") } },
     marketPrices: { group: "marketPrices", keys: { marketPrices: many("marketPriceGuide") } },
     marketHistory: {
@@ -10242,6 +10245,14 @@ ${ty.variants.map(
     detailJson: t.string().name("detail_json")
   });
 
+  // src/module_bindings/slime_best_waves_table.ts
+  var slime_best_waves_table_default = t.row({
+    board: t.string(),
+    rank: t.u32(),
+    displayName: t.string().name("display_name"),
+    wave: t.u32()
+  });
+
   // src/module_bindings/index.ts
   var tablesSchema = schema({
     farmBoardEvent: table({
@@ -10583,7 +10594,12 @@ ${ty.variants.map(
       name: "quest_details",
       indexes: [],
       constraints: []
-    }, quest_details_table_default)
+    }, quest_details_table_default),
+    slimeBestWaves: table({
+      name: "slime_best_waves",
+      indexes: [],
+      constraints: []
+    }, slime_best_waves_table_default)
   });
   var reducersSchema = reducers(
     reducerSchema("abandon_run", abandon_run_reducer_default),
@@ -10760,7 +10776,8 @@ ${ty.variants.map(
     "opponent_farm_pieces_compact_v3": "opponentFarmPiecesCompactV3",
     "opponent_farm_roster_v1": "opponentFarmRosterV1",
     "quest_catalog": "questCatalog",
-    "quest_details": "questDetails"
+    "quest_details": "questDetails",
+    "slime_best_waves": "slimeBestWaves"
   };
   function __withTableAccessorAliases(target, freeze = false) {
     const out = Object.create(Object.getPrototypeOf(target));
