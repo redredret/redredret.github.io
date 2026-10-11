@@ -10058,7 +10058,8 @@ ${ty.variants.map(
     direction: t.string(),
     name: t.string(),
     level: t.u32(),
-    sentAt: t.timestamp().name("sent_at")
+    sentAt: t.timestamp().name("sent_at"),
+    look: t.string()
   });
 
   // src/module_bindings/my_friend_settings_table.ts
@@ -10079,7 +10080,8 @@ ${ty.variants.map(
     online: t.bool(),
     activity: t.string(),
     lastSeenMicros: t.u64().name("last_seen_micros"),
-    since: t.timestamp()
+    since: t.timestamp(),
+    look: t.string()
   });
 
   // src/module_bindings/my_game_invites_table.ts
@@ -10095,7 +10097,8 @@ ${ty.variants.map(
     capacity: t.u32(),
     stakes: t.bool(),
     expiresMicros: t.u64().name("expires_micros"),
-    state: t.string()
+    state: t.string(),
+    look: t.string()
   });
 
   // src/module_bindings/my_gear_instances_table.ts
@@ -10332,7 +10335,8 @@ ${ty.variants.map(
     context: t.string(),
     at: t.timestamp(),
     isFriend: t.bool().name("is_friend"),
-    requested: t.bool()
+    requested: t.bool(),
+    look: t.string()
   });
 
   // src/module_bindings/my_satchel_keep_table.ts
