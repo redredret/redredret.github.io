@@ -1037,7 +1037,15 @@ ${originalIndentation}`;
     // All empty lists while chat is closed to the player, which the views decide.
     chatGlobal: { group: "chat", keys: { chatGlobal: many("myChatGlobal") } },
     chatRoom: { group: "chat", keys: { chatRoom: many("myChatRoom"), chatStatus: one("myChatStatus") } },
-    chatBlocks: { group: "chat", keys: { chatBlocks: many("myChatBlocks") } }
+    chatBlocks: { group: "chat", keys: { chatBlocks: many("myChatBlocks") } },
+    // Friends (docs/FRIENDS.md). The list and the player's own settings together:
+    // a friend coming online or changing what they are doing moves the list.
+    // Requests, recent players and invites each on a domain of their own, so an
+    // invite -- the one that moves while a player waits -- re-sends nothing else.
+    friends: { group: "friends", keys: { friends: many("myFriends"), friendSettings: many("myFriendSettings") } },
+    friendRequests: { group: "friends", keys: { friendRequests: many("myFriendRequests") } },
+    recentPlayers: { group: "friends", keys: { recentPlayers: many("myRecentPlayers") } },
+    gameInvites: { group: "friends", keys: { gameInvites: many("myGameInvites") } }
   };
   var CLIENT_SCREENS = {
     /** The screen before Godot has said anything. */
@@ -1083,7 +1091,9 @@ ${originalIndentation}`;
     "publishPartyBoard",
     "publishPartyPiece",
     // The whole settings document each time, so only the newest one matters.
-    "saveAccountSettings"
+    "saveAccountSettings",
+    // The friends privacy settings, the same: all four each time.
+    "setFriendSettings"
   ];
   var QUIET_SUCCESS_CALLS = [
     "publishFarmBoard",
@@ -1119,7 +1129,18 @@ ${originalIndentation}`;
     "sendChatMessage",
     "blockChatAuthor",
     "unblockChatPlayer",
-    "reportChatMessage"
+    "reportChatMessage",
+    // Friends: every answer is a row in a friends view. A refusal still reports.
+    "sendFriendRequest",
+    "sendFriendRequestRecent",
+    "respondFriendRequest",
+    "cancelFriendRequest",
+    "removeFriend",
+    "blockPlayer",
+    "reportPlayer",
+    "setFriendSettings",
+    "inviteFriend",
+    "respondInvite"
   ];
   function reportsSuccess(name) {
     return !listed(QUIET_SUCCESS_CALLS, name);
@@ -8890,6 +8911,12 @@ ${ty.variants.map(
     lineId: t.string()
   };
 
+  // src/module_bindings/block_player_reducer.ts
+  var block_player_reducer_default = {
+    kind: t.string(),
+    id: t.string()
+  };
+
   // src/module_bindings/buy_market_listing_reducer.ts
   var buy_market_listing_reducer_default = {
     listingId: t.string(),
@@ -8901,6 +8928,11 @@ ${ty.variants.map(
     shopId: t.string(),
     itemId: t.string(),
     quantity: t.u32()
+  };
+
+  // src/module_bindings/cancel_friend_request_reducer.ts
+  var cancel_friend_request_reducer_default = {
+    requestId: t.string()
   };
 
   // src/module_bindings/cancel_market_listing_reducer.ts
@@ -9054,6 +9086,11 @@ ${ty.variants.map(
   var insure_duel_lobby_reducer_default = {
     listingId: t.string(),
     slot: t.string()
+  };
+
+  // src/module_bindings/invite_friend_reducer.ts
+  var invite_friend_reducer_default = {
+    friendId: t.string()
   };
 
   // src/module_bindings/join_farm_dark_private_reducer.ts
@@ -9275,6 +9312,11 @@ ${ty.variants.map(
   // src/module_bindings/refresh_my_tasks_reducer.ts
   var refresh_my_tasks_reducer_default = {};
 
+  // src/module_bindings/remove_friend_reducer.ts
+  var remove_friend_reducer_default = {
+    friendId: t.string()
+  };
+
   // src/module_bindings/renew_play_session_reducer.ts
   var renew_play_session_reducer_default = {};
 
@@ -9331,6 +9373,13 @@ ${ty.variants.map(
     progress: t.u32()
   };
 
+  // src/module_bindings/report_player_reducer.ts
+  var report_player_reducer_default = {
+    kind: t.string(),
+    id: t.string(),
+    reason: t.string()
+  };
+
   // src/module_bindings/report_run_submission_problem_reducer.ts
   var report_run_submission_problem_reducer_default = {
     runId: t.string(),
@@ -9348,6 +9397,18 @@ ${ty.variants.map(
   // src/module_bindings/reroll_task_reducer.ts
   var reroll_task_reducer_default = {
     taskRowId: t.string()
+  };
+
+  // src/module_bindings/respond_friend_request_reducer.ts
+  var respond_friend_request_reducer_default = {
+    requestId: t.string(),
+    accept: t.bool()
+  };
+
+  // src/module_bindings/respond_invite_reducer.ts
+  var respond_invite_reducer_default = {
+    inviteId: t.string(),
+    accept: t.bool()
   };
 
   // src/module_bindings/salvage_gear_instance_reducer.ts
@@ -9405,6 +9466,16 @@ ${ty.variants.map(
     sequence: t.u32()
   };
 
+  // src/module_bindings/send_friend_request_reducer.ts
+  var send_friend_request_reducer_default = {
+    name: t.string()
+  };
+
+  // src/module_bindings/send_friend_request_recent_reducer.ts
+  var send_friend_request_recent_reducer_default = {
+    recentId: t.string()
+  };
+
   // src/module_bindings/send_party_blow_reducer.ts
   var send_party_blow_reducer_default = {
     partyId: t.string(),
@@ -9436,6 +9507,15 @@ ${ty.variants.map(
   // src/module_bindings/set_duel_ready_reducer.ts
   var set_duel_ready_reducer_default = {
     ready: t.bool()
+  };
+
+  // src/module_bindings/set_friend_settings_reducer.ts
+  var set_friend_settings_reducer_default = {
+    requests: t.string(),
+    appearOffline: t.bool(),
+    showActivity: t.bool(),
+    acceptInvites: t.bool(),
+    onlineToasts: t.bool()
   };
 
   // src/module_bindings/set_hair_reducer.ts
@@ -9972,6 +10052,52 @@ ${ty.variants.map(
     claimedAt: t.timestamp().name("claimed_at")
   });
 
+  // src/module_bindings/my_friend_requests_table.ts
+  var my_friend_requests_table_default = t.row({
+    requestId: t.u64().name("request_id"),
+    direction: t.string(),
+    name: t.string(),
+    level: t.u32(),
+    sentAt: t.timestamp().name("sent_at")
+  });
+
+  // src/module_bindings/my_friend_settings_table.ts
+  var my_friend_settings_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    requests: t.string(),
+    appearOffline: t.bool().name("appear_offline"),
+    showActivity: t.bool().name("show_activity"),
+    acceptInvites: t.bool().name("accept_invites"),
+    onlineToasts: t.bool().name("online_toasts")
+  });
+
+  // src/module_bindings/my_friends_table.ts
+  var my_friends_table_default = t.row({
+    friendId: t.u64().name("friend_id"),
+    name: t.string(),
+    level: t.u32(),
+    online: t.bool(),
+    activity: t.string(),
+    lastSeenMicros: t.u64().name("last_seen_micros"),
+    since: t.timestamp()
+  });
+
+  // src/module_bindings/my_game_invites_table.ts
+  var my_game_invites_table_default = t.row({
+    inviteId: t.u64().name("invite_id"),
+    direction: t.string(),
+    name: t.string(),
+    level: t.u32(),
+    kind: t.string(),
+    dungeonId: t.string().name("dungeon_id"),
+    code: t.string(),
+    filled: t.u32(),
+    capacity: t.u32(),
+    stakes: t.bool(),
+    expiresMicros: t.u64().name("expires_micros"),
+    state: t.string()
+  });
+
   // src/module_bindings/my_gear_instances_table.ts
   var my_gear_instances_table_default = t.row({
     instanceId: t.u64().primaryKey().name("instance_id"),
@@ -10196,6 +10322,17 @@ ${ty.variants.map(
     progress: t.u32(),
     target: t.u32(),
     state: t.string()
+  });
+
+  // src/module_bindings/my_recent_players_table.ts
+  var my_recent_players_table_default = t.row({
+    recentId: t.u64().name("recent_id"),
+    name: t.string(),
+    level: t.u32(),
+    context: t.string(),
+    at: t.timestamp(),
+    isFriend: t.bool().name("is_friend"),
+    requested: t.bool()
   });
 
   // src/module_bindings/my_satchel_keep_table.ts
@@ -10589,6 +10726,26 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_feat_claims_table_default),
+    myFriendRequests: table({
+      name: "my_friend_requests",
+      indexes: [],
+      constraints: []
+    }, my_friend_requests_table_default),
+    myFriendSettings: table({
+      name: "my_friend_settings",
+      indexes: [],
+      constraints: []
+    }, my_friend_settings_table_default),
+    myFriends: table({
+      name: "my_friends",
+      indexes: [],
+      constraints: []
+    }, my_friends_table_default),
+    myGameInvites: table({
+      name: "my_game_invites",
+      indexes: [],
+      constraints: []
+    }, my_game_invites_table_default),
     myGearInstances: table({
       name: "my_gear_instances",
       indexes: [],
@@ -10679,6 +10836,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_quests_table_default),
+    myRecentPlayers: table({
+      name: "my_recent_players",
+      indexes: [],
+      constraints: []
+    }, my_recent_players_table_default),
     mySatchelKeep: table({
       name: "my_satchel_keep",
       indexes: [],
@@ -10777,8 +10939,10 @@ ${ty.variants.map(
     reducerSchema("acknowledge_welcome_chest", acknowledge_welcome_chest_reducer_default),
     reducerSchema("advance_tutorial", advance_tutorial_reducer_default),
     reducerSchema("block_chat_author", block_chat_author_reducer_default),
+    reducerSchema("block_player", block_player_reducer_default),
     reducerSchema("buy_market_listing", buy_market_listing_reducer_default),
     reducerSchema("buy_shop_item", buy_shop_item_reducer_default),
+    reducerSchema("cancel_friend_request", cancel_friend_request_reducer_default),
     reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
     reducerSchema("challenge_duel_listing", challenge_duel_listing_reducer_default),
     reducerSchema("claim_feat", claim_feat_reducer_default),
@@ -10807,6 +10971,7 @@ ${ty.variants.map(
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
     reducerSchema("equip_inventory_item_to_slot", equip_inventory_item_to_slot_reducer_default),
     reducerSchema("insure_duel_lobby", insure_duel_lobby_reducer_default),
+    reducerSchema("invite_friend", invite_friend_reducer_default),
     reducerSchema("join_farm_dark_private", join_farm_dark_private_reducer_default),
     reducerSchema("join_farm_dark_public", join_farm_dark_public_reducer_default),
     reducerSchema("join_farm_private", join_farm_private_reducer_default),
@@ -10843,6 +11008,7 @@ ${ty.variants.map(
     reducerSchema("ready_farm_pvp_round", ready_farm_pvp_round_reducer_default),
     reducerSchema("refresh_dark_presence", refresh_dark_presence_reducer_default),
     reducerSchema("refresh_my_tasks", refresh_my_tasks_reducer_default),
+    reducerSchema("remove_friend", remove_friend_reducer_default),
     reducerSchema("renew_play_session", renew_play_session_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
     reducerSchema("report_chat_message", report_chat_message_reducer_default),
@@ -10853,9 +11019,12 @@ ${ty.variants.map(
     reducerSchema("report_party_enemy_heal", report_party_enemy_heal_reducer_default),
     reducerSchema("report_party_health", report_party_health_reducer_default),
     reducerSchema("report_party_revive_progress", report_party_revive_progress_reducer_default),
+    reducerSchema("report_player", report_player_reducer_default),
     reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
     reducerSchema("request_duel_rematch", request_duel_rematch_reducer_default),
     reducerSchema("reroll_task", reroll_task_reducer_default),
+    reducerSchema("respond_friend_request", respond_friend_request_reducer_default),
+    reducerSchema("respond_invite", respond_invite_reducer_default),
     reducerSchema("salvage_gear_instance", salvage_gear_instance_reducer_default),
     reducerSchema("salvage_item", salvage_item_reducer_default),
     reducerSchema("save_account_settings", save_account_settings_reducer_default),
@@ -10864,10 +11033,13 @@ ${ty.variants.map(
     reducerSchema("send_chat_message", send_chat_message_reducer_default),
     reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
+    reducerSchema("send_friend_request", send_friend_request_reducer_default),
+    reducerSchema("send_friend_request_recent", send_friend_request_recent_reducer_default),
     reducerSchema("send_party_blow", send_party_blow_reducer_default),
     reducerSchema("send_party_heal", send_party_heal_reducer_default),
     reducerSchema("set_display_name", set_display_name_reducer_default),
     reducerSchema("set_duel_ready", set_duel_ready_reducer_default),
+    reducerSchema("set_friend_settings", set_friend_settings_reducer_default),
     reducerSchema("set_hair", set_hair_reducer_default),
     reducerSchema("set_party_ready", set_party_ready_reducer_default),
     reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
@@ -10927,6 +11099,10 @@ ${ty.variants.map(
     "my_farm_pvp_session": "myFarmPvpSession",
     "my_farm_records": "myFarmRecords",
     "my_feat_claims": "myFeatClaims",
+    "my_friend_requests": "myFriendRequests",
+    "my_friend_settings": "myFriendSettings",
+    "my_friends": "myFriends",
+    "my_game_invites": "myGameInvites",
     "my_gear_instances": "myGearInstances",
     "my_gear_insurance": "myGearInsurance",
     "my_inventory": "myInventory",
@@ -10945,6 +11121,7 @@ ${ty.variants.map(
     "my_quest_claims": "myQuestClaims",
     "my_quest_stats": "myQuestStats",
     "my_quests": "myQuests",
+    "my_recent_players": "myRecentPlayers",
     "my_satchel_keep": "mySatchelKeep",
     "my_sent_farm_pvp_attacks": "mySentFarmPvpAttacks",
     "my_skills": "mySkills",
@@ -11802,7 +11979,11 @@ ${ty.variants.map(
     // and walking into a room happens to a player. Small and sender-scoped; every
     // view is empty while chat is closed to the player. Kept out of the core
     // subscription so a server without chat costs the chat and nothing else.
-    chat: { errorCommand: "subscribeChat" }
+    chat: { errorCommand: "subscribeChat" },
+    // Friends, for the whole connection: a request, an invite or a friend coming
+    // online all happen to a player because of somebody else. Every view is
+    // sender-scoped and small.
+    friends: { errorCommand: "subscribeFriends" }
   };
   var SCOPED_GROUPS = Object.keys(GROUPS);
   function ensureSubscription(activeConnection, group) {
