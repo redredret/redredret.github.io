@@ -1028,7 +1028,16 @@ ${originalIndentation}`;
     // subscription is applied and never again. They were in 'quests' and rode
     // every patch of it -- ~48 KB and some two hundred JSON parses in Godot on
     // every run's settlement, for rows that cannot have changed.
-    questCatalog: { group: "quests", keys: { questCatalog: many("questCatalog"), questDetails: many("questDetails") } }
+    questCatalog: { group: "quests", keys: { questCatalog: many("questCatalog"), questDetails: many("questDetails") } },
+    // Chat (docs/CHAT_PLAN.md). Global on a domain of its own: it is the one that
+    // moves when somebody anywhere speaks, and riding with the room it would
+    // re-send the room's lines too. The room's lines and the status (open, muted,
+    // which room) change together when the player walks into or out of a room.
+    // The blocks change when the player blocks somebody, and at no other time.
+    // All empty lists while chat is closed to the player, which the views decide.
+    chatGlobal: { group: "chat", keys: { chatGlobal: many("myChatGlobal") } },
+    chatRoom: { group: "chat", keys: { chatRoom: many("myChatRoom"), chatStatus: one("myChatStatus") } },
+    chatBlocks: { group: "chat", keys: { chatBlocks: many("myChatBlocks") } }
   };
   var CLIENT_SCREENS = {
     /** The screen before Godot has said anything. */
@@ -1104,7 +1113,13 @@ ${originalIndentation}`;
     "completePartyRevive",
     "reportPartyReviveProgress",
     // The echo of the row is the answer, and nobody reads even that past sign-in.
-    "saveAccountSettings"
+    "saveAccountSettings",
+    // Chat: the line, the block or the report arrives as rows. A refusal still
+    // reports, and the chat box shows it on the line that was refused.
+    "sendChatMessage",
+    "blockChatAuthor",
+    "unblockChatPlayer",
+    "reportChatMessage"
   ];
   function reportsSuccess(name) {
     return !listed(QUIET_SUCCESS_CALLS, name);
@@ -8870,6 +8885,11 @@ ${ty.variants.map(
     stage: t.u32()
   };
 
+  // src/module_bindings/block_chat_author_reducer.ts
+  var block_chat_author_reducer_default = {
+    lineId: t.string()
+  };
+
   // src/module_bindings/buy_market_listing_reducer.ts
   var buy_market_listing_reducer_default = {
     listingId: t.string(),
@@ -9100,6 +9120,42 @@ ${ty.variants.map(
     chestIndex: t.u32()
   };
 
+  // src/module_bindings/operator_chat_clear_reducer.ts
+  var operator_chat_clear_reducer_default = {
+    channel: t.string(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/operator_chat_delete_reducer.ts
+  var operator_chat_delete_reducer_default = {
+    lineId: t.u64(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/operator_chat_mute_reducer.ts
+  var operator_chat_mute_reducer_default = {
+    displayName: t.string(),
+    hours: t.u32(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/operator_chat_set_mode_reducer.ts
+  var operator_chat_set_mode_reducer_default = {
+    mode: t.string()
+  };
+
+  // src/module_bindings/operator_chat_tester_reducer.ts
+  var operator_chat_tester_reducer_default = {
+    displayName: t.string(),
+    allowed: t.bool()
+  };
+
+  // src/module_bindings/operator_chat_unmute_reducer.ts
+  var operator_chat_unmute_reducer_default = {
+    displayName: t.string(),
+    reason: t.string()
+  };
+
   // src/module_bindings/operator_regrade_enhancements_reducer.ts
   var operator_regrade_enhancements_reducer_default = {};
 
@@ -9228,6 +9284,12 @@ ${ty.variants.map(
     targetIndex: t.u32()
   };
 
+  // src/module_bindings/report_chat_message_reducer.ts
+  var report_chat_message_reducer_default = {
+    lineId: t.string(),
+    reason: t.string()
+  };
+
   // src/module_bindings/report_client_problem_reducer.ts
   var report_client_problem_reducer_default = {
     kind: t.string(),
@@ -9313,6 +9375,12 @@ ${ty.variants.map(
   var sell_item_reducer_default = {
     itemId: t.string(),
     quantity: t.u32()
+  };
+
+  // src/module_bindings/send_chat_message_reducer.ts
+  var send_chat_message_reducer_default = {
+    kind: t.string(),
+    text: t.string()
   };
 
   // src/module_bindings/send_dark_duel_blow_reducer.ts
@@ -9425,6 +9493,11 @@ ${ty.variants.map(
   var submit_farm_waiting_run_result_reducer_default = {
     runId: t.string(),
     trace: t.string()
+  };
+
+  // src/module_bindings/unblock_chat_player_reducer.ts
+  var unblock_chat_player_reducer_default = {
+    blockId: t.string()
   };
 
   // src/module_bindings/unequip_boost_reducer.ts
@@ -9566,6 +9639,44 @@ ${ty.variants.map(
     foodQuantity: t.u32().name("food_quantity"),
     necklaceItemId: t.string().name("necklace_item_id"),
     partyId: t.string().name("party_id")
+  });
+
+  // src/module_bindings/my_chat_blocks_table.ts
+  var my_chat_blocks_table_default = t.row({
+    blockId: t.u64().name("block_id"),
+    name: t.string(),
+    at: t.timestamp()
+  });
+
+  // src/module_bindings/my_chat_global_table.ts
+  var my_chat_global_table_default = t.row({
+    id: t.u64().primaryKey(),
+    channel: t.string(),
+    authorName: t.string().name("author_name"),
+    authorLevel: t.u32().name("author_level"),
+    text: t.string(),
+    sentAt: t.timestamp().name("sent_at")
+  });
+
+  // src/module_bindings/my_chat_room_table.ts
+  var my_chat_room_table_default = t.row({
+    id: t.u64().primaryKey(),
+    channel: t.string(),
+    authorName: t.string().name("author_name"),
+    authorLevel: t.u32().name("author_level"),
+    text: t.string(),
+    sentAt: t.timestamp().name("sent_at")
+  });
+
+  // src/module_bindings/my_chat_status_table.ts
+  var my_chat_status_table_default = t.row({
+    open: t.bool(),
+    mutedUntilMicros: t.u64().name("muted_until_micros"),
+    muteReason: t.string().name("mute_reason"),
+    room: t.string(),
+    channel: t.string(),
+    presetsOnly: t.bool().name("presets_only"),
+    globalMinLevel: t.u32().name("global_min_level")
   });
 
   // src/module_bindings/my_collection_kills_table.ts
@@ -10348,6 +10459,26 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_active_run_table_default),
+    myChatBlocks: table({
+      name: "my_chat_blocks",
+      indexes: [],
+      constraints: []
+    }, my_chat_blocks_table_default),
+    myChatGlobal: table({
+      name: "my_chat_global",
+      indexes: [],
+      constraints: []
+    }, my_chat_global_table_default),
+    myChatRoom: table({
+      name: "my_chat_room",
+      indexes: [],
+      constraints: []
+    }, my_chat_room_table_default),
+    myChatStatus: table({
+      name: "my_chat_status",
+      indexes: [],
+      constraints: []
+    }, my_chat_status_table_default),
     myCollectionKills: table({
       name: "my_collection_kills",
       indexes: [],
@@ -10645,6 +10776,7 @@ ${ty.variants.map(
     reducerSchema("acknowledge_task_chest", acknowledge_task_chest_reducer_default),
     reducerSchema("acknowledge_welcome_chest", acknowledge_welcome_chest_reducer_default),
     reducerSchema("advance_tutorial", advance_tutorial_reducer_default),
+    reducerSchema("block_chat_author", block_chat_author_reducer_default),
     reducerSchema("buy_market_listing", buy_market_listing_reducer_default),
     reducerSchema("buy_shop_item", buy_shop_item_reducer_default),
     reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
@@ -10690,6 +10822,12 @@ ${ty.variants.map(
     reducerSchema("mark_tasks_seen", mark_tasks_seen_reducer_default),
     reducerSchema("open_dark_chest", open_dark_chest_reducer_default),
     reducerSchema("open_party_chest", open_party_chest_reducer_default),
+    reducerSchema("operator_chat_clear", operator_chat_clear_reducer_default),
+    reducerSchema("operator_chat_delete", operator_chat_delete_reducer_default),
+    reducerSchema("operator_chat_mute", operator_chat_mute_reducer_default),
+    reducerSchema("operator_chat_set_mode", operator_chat_set_mode_reducer_default),
+    reducerSchema("operator_chat_tester", operator_chat_tester_reducer_default),
+    reducerSchema("operator_chat_unmute", operator_chat_unmute_reducer_default),
     reducerSchema("operator_regrade_enhancements", operator_regrade_enhancements_reducer_default),
     reducerSchema("operator_rename_player", operator_rename_player_reducer_default),
     reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
@@ -10707,6 +10845,7 @@ ${ty.variants.map(
     reducerSchema("refresh_my_tasks", refresh_my_tasks_reducer_default),
     reducerSchema("renew_play_session", renew_play_session_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
+    reducerSchema("report_chat_message", report_chat_message_reducer_default),
     reducerSchema("report_client_problem", report_client_problem_reducer_default),
     reducerSchema("report_duel_board_break", report_duel_board_break_reducer_default),
     reducerSchema("report_farm_pvp_top_out", report_farm_pvp_top_out_reducer_default),
@@ -10722,6 +10861,7 @@ ${ty.variants.map(
     reducerSchema("save_account_settings", save_account_settings_reducer_default),
     reducerSchema("sell_gear_instance", sell_gear_instance_reducer_default),
     reducerSchema("sell_item", sell_item_reducer_default),
+    reducerSchema("send_chat_message", send_chat_message_reducer_default),
     reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
     reducerSchema("send_party_blow", send_party_blow_reducer_default),
@@ -10738,6 +10878,7 @@ ${ty.variants.map(
     reducerSchema("submit_dungeon_run_result_v_1", submit_dungeon_run_result_v_1_reducer_default),
     reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
     reducerSchema("submit_farm_waiting_run_result", submit_farm_waiting_run_result_reducer_default),
+    reducerSchema("unblock_chat_player", unblock_chat_player_reducer_default),
     reducerSchema("unequip_boost", unequip_boost_reducer_default),
     reducerSchema("unequip_food", unequip_food_reducer_default),
     reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default),
@@ -10760,6 +10901,10 @@ ${ty.variants.map(
     "market_price_guide": "marketPriceGuide",
     "my_account_settings": "myAccountSettings",
     "my_active_run": "myActiveRun",
+    "my_chat_blocks": "myChatBlocks",
+    "my_chat_global": "myChatGlobal",
+    "my_chat_room": "myChatRoom",
+    "my_chat_status": "myChatStatus",
     "my_collection_kills": "myCollectionKills",
     "my_collection_log": "myCollectionLog",
     "my_dark_chest_claims": "myDarkChestClaims",
@@ -11652,7 +11797,12 @@ ${ty.variants.map(
     // the hub's button says so wherever the player is. All the views are small and
     // sender-scoped (the catalog is shared and never changes). Kept out of the core
     // subscription so a server without them costs the quest screen and nothing else.
-    quests: { errorCommand: "subscribeQuests" }
+    quests: { errorCommand: "subscribeQuests" },
+    // Chat, for the whole connection: a line arrives because somebody ELSE spoke,
+    // and walking into a room happens to a player. Small and sender-scoped; every
+    // view is empty while chat is closed to the player. Kept out of the core
+    // subscription so a server without chat costs the chat and nothing else.
+    chat: { errorCommand: "subscribeChat" }
   };
   var SCOPED_GROUPS = Object.keys(GROUPS);
   function ensureSubscription(activeConnection, group) {
