@@ -9420,6 +9420,9 @@ ${ty.variants.map(
     accept: t.bool()
   };
 
+  // src/module_bindings/restart_tutorial_reducer.ts
+  var restart_tutorial_reducer_default = {};
+
   // src/module_bindings/salvage_gear_instance_reducer.ts
   var salvage_gear_instance_reducer_default = {
     instanceId: t.string()
@@ -11066,6 +11069,7 @@ ${ty.variants.map(
     reducerSchema("reroll_task", reroll_task_reducer_default),
     reducerSchema("respond_friend_request", respond_friend_request_reducer_default),
     reducerSchema("respond_invite", respond_invite_reducer_default),
+    reducerSchema("restart_tutorial", restart_tutorial_reducer_default),
     reducerSchema("salvage_gear_instance", salvage_gear_instance_reducer_default),
     reducerSchema("salvage_item", salvage_item_reducer_default),
     reducerSchema("save_account_settings", save_account_settings_reducer_default),
