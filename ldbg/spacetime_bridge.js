@@ -881,7 +881,11 @@ ${originalIndentation}`;
         slimeBagKeep: one("mySlimeBagKeep"),
         // Enhanced pieces (docs/ENHANCEMENT_PLAN.md): one row each, in the bag,
         // worn or listed, apart from the stacks.
-        gearInstances: many("myGearInstances")
+        gearInstances: many("myGearInstances"),
+        // Which of those pieces are broken, and what the last Dark death a
+        // monster caused did to the gear (repair.ts): the Repair Station's.
+        brokenGear: many("myBrokenGear"),
+        darkDeathLoss: one("myDarkDeathLoss")
       }
     },
     upgrades: {
@@ -9326,6 +9330,11 @@ ${ty.variants.map(
     targetIndex: t.u32()
   };
 
+  // src/module_bindings/repair_gear_reducer.ts
+  var repair_gear_reducer_default = {
+    instanceId: t.string()
+  };
+
   // src/module_bindings/report_chat_message_reducer.ts
   var report_chat_message_reducer_default = {
     lineId: t.string(),
@@ -9721,6 +9730,12 @@ ${ty.variants.map(
     partyId: t.string().name("party_id")
   });
 
+  // src/module_bindings/my_broken_gear_table.ts
+  var my_broken_gear_table_default = t.row({
+    instanceId: t.u64().primaryKey().name("instance_id"),
+    brokenAt: t.timestamp().name("broken_at")
+  });
+
   // src/module_bindings/my_chat_blocks_table.ts
   var my_chat_blocks_table_default = t.row({
     blockId: t.u64().name("block_id"),
@@ -9787,6 +9802,17 @@ ${ty.variants.map(
     source: t.string(),
     rowsJson: t.string().name("rows_json"),
     claimedAt: t.timestamp().name("claimed_at")
+  });
+
+  // src/module_bindings/my_dark_death_loss_table.ts
+  var my_dark_death_loss_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    runId: t.string().name("run_id"),
+    lostItemId: t.string().name("lost_item_id"),
+    lostInstanceId: t.u64().name("lost_instance_id"),
+    lostFate: t.string().name("lost_fate"),
+    brokenJson: t.string().name("broken_json"),
+    settledAt: t.timestamp().name("settled_at")
   });
 
   // src/module_bindings/my_dark_duel_table.ts
@@ -10600,6 +10626,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_active_run_table_default),
+    myBrokenGear: table({
+      name: "my_broken_gear",
+      indexes: [],
+      constraints: []
+    }, my_broken_gear_table_default),
     myChatBlocks: table({
       name: "my_chat_blocks",
       indexes: [],
@@ -10635,6 +10666,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_dark_chest_claims_table_default),
+    myDarkDeathLoss: table({
+      name: "my_dark_death_loss",
+      indexes: [],
+      constraints: []
+    }, my_dark_death_loss_table_default),
     myDarkDuel: table({
       name: "my_dark_duel",
       indexes: [],
@@ -11015,6 +11051,7 @@ ${ty.variants.map(
     reducerSchema("remove_friend", remove_friend_reducer_default),
     reducerSchema("renew_play_session", renew_play_session_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
+    reducerSchema("repair_gear", repair_gear_reducer_default),
     reducerSchema("report_chat_message", report_chat_message_reducer_default),
     reducerSchema("report_client_problem", report_client_problem_reducer_default),
     reducerSchema("report_duel_board_break", report_duel_board_break_reducer_default),
@@ -11077,6 +11114,7 @@ ${ty.variants.map(
     "market_price_guide": "marketPriceGuide",
     "my_account_settings": "myAccountSettings",
     "my_active_run": "myActiveRun",
+    "my_broken_gear": "myBrokenGear",
     "my_chat_blocks": "myChatBlocks",
     "my_chat_global": "myChatGlobal",
     "my_chat_room": "myChatRoom",
@@ -11084,6 +11122,7 @@ ${ty.variants.map(
     "my_collection_kills": "myCollectionKills",
     "my_collection_log": "myCollectionLog",
     "my_dark_chest_claims": "myDarkChestClaims",
+    "my_dark_death_loss": "myDarkDeathLoss",
     "my_dark_duel": "myDarkDuel",
     "my_dark_duel_blows": "myDarkDuelBlows",
     "my_dark_duel_haul": "myDarkDuelHaul",
