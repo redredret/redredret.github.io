@@ -9563,6 +9563,12 @@ ${ty.variants.map(
     fertilise: t.bool()
   };
 
+  // src/module_bindings/start_omen_run_reducer.ts
+  var start_omen_run_reducer_default = {
+    dungeonId: t.string(),
+    insuredSlot: t.string()
+  };
+
   // src/module_bindings/start_run_reducer.ts
   var start_run_reducer_default = {
     dungeonId: t.string(),
@@ -11091,6 +11097,7 @@ ${ty.variants.map(
     reducerSchema("start_dark_run_insured", start_dark_run_insured_reducer_default),
     reducerSchema("start_farm_run", start_farm_run_reducer_default),
     reducerSchema("start_farm_run_v_2", start_farm_run_v_2_reducer_default),
+    reducerSchema("start_omen_run", start_omen_run_reducer_default),
     reducerSchema("start_run", start_run_reducer_default),
     reducerSchema("submit_dungeon_run_result_v_1", submit_dungeon_run_result_v_1_reducer_default),
     reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
