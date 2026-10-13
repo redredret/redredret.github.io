@@ -58,7 +58,7 @@
  {
   "id": "ring_of_goop",
   "icon": "ring_of_goop.png",
-  "name": "Ring of Goop",
+  "name": "Oozing Ring",
   "rarity": "epic",
   "type": "accessory",
   "level": 40
@@ -426,7 +426,7 @@
  {
   "id": "goop_idol",
   "icon": "goop_idol.png",
-  "name": "Goop Idol",
+  "name": "Ooze Idol",
   "rarity": "rare",
   "type": "material",
   "level": 1
