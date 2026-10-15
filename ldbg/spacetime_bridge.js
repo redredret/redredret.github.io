@@ -893,6 +893,11 @@ ${originalIndentation}`;
       keys: { upgradeProgress: one("myUpgradeProgress"), upgradeUnlocks: many("myUpgradeUnlocks") }
     },
     run: { group: "core", keys: { activeRun: one("myActiveRun") } },
+    // The loot seeds the server has handed over for the open run, one a kill, chest
+    // or vault (rules version 57, docs/SECURITY_FIX_PLAN.md batch 4): what the run's
+    // drops are rolled from, never known before the run has got there. Its own
+    // domain, so a seed arriving re-applies nothing else.
+    lootReveals: { group: "core", keys: { lootReveals: many("myRunLootReveals") } },
     // Named for what was in it first. It is the durable RECORDS domain: the
     // per-account bests and completions that outlive a run, whichever activity
     // set them. A new record table belongs here rather than in a domain of its
@@ -1144,7 +1149,9 @@ ${originalIndentation}`;
     "reportPlayer",
     "setFriendSettings",
     "inviteFriend",
-    "respondInvite"
+    "respondInvite",
+    // A loot seed's answer is its row in my_run_loot_reveals, or nothing yet.
+    "revealRunLoot"
   ];
   function reportsSuccess(name) {
     return !listed(QUIET_SUCCESS_CALLS, name);
@@ -1221,7 +1228,10 @@ ${originalIndentation}`;
     "reportPartyReviveProgress",
     // Sent a moment after a setting changes, and once at sign-in for an account
     // that has never saved any (docs/ACCOUNT_SETTINGS.md): the client's timing.
-    "saveAccountSettings"
+    "saveAccountSettings",
+    // A run asking for its loot seeds (rules version 57), on its own timer until
+    // each is answered: the fight's traffic, not the player's.
+    "revealRunLoot"
   ];
   function isBackgroundCall(name) {
     return listed(BACKGROUND_CALLS, name);
@@ -9206,6 +9216,11 @@ ${ty.variants.map(
     reason: t.string()
   };
 
+  // src/module_bindings/operator_set_loot_key_reducer.ts
+  var operator_set_loot_key_reducer_default = {
+    key: t.string()
+  };
+
   // src/module_bindings/post_duel_listing_reducer.ts
   var post_duel_listing_reducer_default = {
     stake: t.string()
@@ -9422,6 +9437,13 @@ ${ty.variants.map(
 
   // src/module_bindings/restart_tutorial_reducer.ts
   var restart_tutorial_reducer_default = {};
+
+  // src/module_bindings/reveal_run_loot_reducer.ts
+  var reveal_run_loot_reducer_default = {
+    runId: t.string(),
+    kind: t.string(),
+    index: t.u32()
+  };
 
   // src/module_bindings/salvage_gear_instance_reducer.ts
   var salvage_gear_instance_reducer_default = {
@@ -10374,6 +10396,17 @@ ${ty.variants.map(
     look: t.string()
   });
 
+  // src/module_bindings/my_run_loot_reveals_table.ts
+  var my_run_loot_reveals_table_default = t.row({
+    revealId: t.string().primaryKey().name("reveal_id"),
+    owner: t.identity(),
+    runId: t.string().name("run_id"),
+    kind: t.string(),
+    index: t.u32(),
+    seed: t.u32(),
+    createdAt: t.timestamp().name("created_at")
+  });
+
   // src/module_bindings/my_satchel_keep_table.ts
   var my_satchel_keep_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -10890,6 +10923,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_recent_players_table_default),
+    myRunLootReveals: table({
+      name: "my_run_loot_reveals",
+      indexes: [],
+      constraints: []
+    }, my_run_loot_reveals_table_default),
     mySatchelKeep: table({
       name: "my_satchel_keep",
       indexes: [],
@@ -11044,6 +11082,7 @@ ${ty.variants.map(
     reducerSchema("operator_chat_unmute", operator_chat_unmute_reducer_default),
     reducerSchema("operator_regrade_enhancements", operator_regrade_enhancements_reducer_default),
     reducerSchema("operator_rename_player", operator_rename_player_reducer_default),
+    reducerSchema("operator_set_loot_key", operator_set_loot_key_reducer_default),
     reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
     reducerSchema("publish_duel_board", publish_duel_board_reducer_default),
     reducerSchema("publish_duel_piece", publish_duel_piece_reducer_default),
@@ -11076,6 +11115,7 @@ ${ty.variants.map(
     reducerSchema("respond_friend_request", respond_friend_request_reducer_default),
     reducerSchema("respond_invite", respond_invite_reducer_default),
     reducerSchema("restart_tutorial", restart_tutorial_reducer_default),
+    reducerSchema("reveal_run_loot", reveal_run_loot_reducer_default),
     reducerSchema("salvage_gear_instance", salvage_gear_instance_reducer_default),
     reducerSchema("salvage_item", salvage_item_reducer_default),
     reducerSchema("save_account_settings", save_account_settings_reducer_default),
@@ -11176,6 +11216,7 @@ ${ty.variants.map(
     "my_quest_stats": "myQuestStats",
     "my_quests": "myQuests",
     "my_recent_players": "myRecentPlayers",
+    "my_run_loot_reveals": "myRunLootReveals",
     "my_satchel_keep": "mySatchelKeep",
     "my_sent_farm_pvp_attacks": "mySentFarmPvpAttacks",
     "my_skills": "mySkills",
