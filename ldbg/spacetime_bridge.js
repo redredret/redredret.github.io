@@ -1151,7 +1151,10 @@ ${originalIndentation}`;
     "inviteFriend",
     "respondInvite",
     // A loot seed's answer is its row in my_run_loot_reveals, or nothing yet.
-    "revealRunLoot"
+    "revealRunLoot",
+    // A duel win's proof (rules version 58): its answer is the bag filling, or a
+    // report. A refusal still reports.
+    "verifyDarkDuelWin"
   ];
   function reportsSuccess(name) {
     return !listed(QUIET_SUCCESS_CALLS, name);
@@ -1231,7 +1234,9 @@ ${originalIndentation}`;
     "saveAccountSettings",
     // A run asking for its loot seeds (rules version 57), on its own timer until
     // each is answered: the fight's traffic, not the player's.
-    "revealRunLoot"
+    "revealRunLoot",
+    // Sent by the fight's end, not the player (rules version 58).
+    "verifyDarkDuelWin"
   ];
   function isBackgroundCall(name) {
     return listed(BACKGROUND_CALLS, name);
@@ -9633,6 +9638,12 @@ ${ty.variants.map(
     slot: t.string()
   };
 
+  // src/module_bindings/verify_dark_duel_win_reducer.ts
+  var verify_dark_duel_win_reducer_default = {
+    duelId: t.string(),
+    trace: t.string()
+  };
+
   // src/module_bindings/yield_dark_duel_reducer.ts
   var yield_dark_duel_reducer_default = {
     duelId: t.string(),
@@ -11146,6 +11157,7 @@ ${ty.variants.map(
     reducerSchema("unequip_boost", unequip_boost_reducer_default),
     reducerSchema("unequip_food", unequip_food_reducer_default),
     reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default),
+    reducerSchema("verify_dark_duel_win", verify_dark_duel_win_reducer_default),
     reducerSchema("yield_dark_duel", yield_dark_duel_reducer_default)
   );
   var proceduresSchema = procedures();
