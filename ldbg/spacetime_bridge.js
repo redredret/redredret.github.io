@@ -9212,6 +9212,12 @@ ${ty.variants.map(
     reason: t.string()
   };
 
+  // src/module_bindings/operator_lift_suspension_reducer.ts
+  var operator_lift_suspension_reducer_default = {
+    displayName: t.string(),
+    reason: t.string()
+  };
+
   // src/module_bindings/operator_regrade_enhancements_reducer.ts
   var operator_regrade_enhancements_reducer_default = {};
 
@@ -9224,6 +9230,13 @@ ${ty.variants.map(
   // src/module_bindings/operator_set_loot_key_reducer.ts
   var operator_set_loot_key_reducer_default = {
     key: t.string()
+  };
+
+  // src/module_bindings/operator_suspend_account_reducer.ts
+  var operator_suspend_account_reducer_default = {
+    displayName: t.string(),
+    hours: t.u32(),
+    reason: t.string()
   };
 
   // src/module_bindings/post_duel_listing_reducer.ts
@@ -11091,9 +11104,11 @@ ${ty.variants.map(
     reducerSchema("operator_chat_set_mode", operator_chat_set_mode_reducer_default),
     reducerSchema("operator_chat_tester", operator_chat_tester_reducer_default),
     reducerSchema("operator_chat_unmute", operator_chat_unmute_reducer_default),
+    reducerSchema("operator_lift_suspension", operator_lift_suspension_reducer_default),
     reducerSchema("operator_regrade_enhancements", operator_regrade_enhancements_reducer_default),
     reducerSchema("operator_rename_player", operator_rename_player_reducer_default),
     reducerSchema("operator_set_loot_key", operator_set_loot_key_reducer_default),
+    reducerSchema("operator_suspend_account", operator_suspend_account_reducer_default),
     reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
     reducerSchema("publish_duel_board", publish_duel_board_reducer_default),
     reducerSchema("publish_duel_piece", publish_duel_piece_reducer_default),
