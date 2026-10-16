@@ -1001,6 +1001,9 @@ ${originalIndentation}`;
     // the answer to open_dark_chest. A domain of its own so a claim does not
     // re-send the whole duel.
     darkChests: { group: "darkDuel", keys: { darkChestClaims: many("myDarkChestClaims") } },
+    // A duel win that was not proven, told to both sides (security batch 5): rare,
+    // and on its own domain so a notice re-sends nothing else.
+    duelNotices: { group: "darkDuel", keys: { duelNotices: many("myDuelNotices") } },
     // The other player's board (at most one row, and only while a fight is on),
     // on a domain of its own. It rode the darkDuel domain, so every pose they
     // published -- up to five a second -- re-sent the duel row, EVERY blow of the
@@ -1154,7 +1157,9 @@ ${originalIndentation}`;
     "revealRunLoot",
     // A duel win's proof (rules version 58): its answer is the bag filling, or a
     // report. A refusal still reports.
-    "verifyDarkDuelWin"
+    "verifyDarkDuelWin",
+    // Reading a duel notice: the notice going is the answer.
+    "acknowledgeDuelNotice"
   ];
   function reportsSuccess(name) {
     return !listed(QUIET_SUCCESS_CALLS, name);
@@ -8907,6 +8912,11 @@ ${ty.variants.map(
     runId: t.string()
   };
 
+  // src/module_bindings/acknowledge_duel_notice_reducer.ts
+  var acknowledge_duel_notice_reducer_default = {
+    noticeId: t.string()
+  };
+
   // src/module_bindings/acknowledge_market_sales_reducer.ts
   var acknowledge_market_sales_reducer_default = {
     throughId: t.string()
@@ -9989,6 +9999,16 @@ ${ty.variants.map(
     matchedAt: t.timestamp().name("matched_at")
   });
 
+  // src/module_bindings/my_duel_notices_table.ts
+  var my_duel_notices_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    duelId: t.string().name("duel_id"),
+    side: t.string(),
+    opponentName: t.string().name("opponent_name"),
+    at: t.timestamp()
+  });
+
   // src/module_bindings/my_duel_opponent_board_table.ts
   var my_duel_opponent_board_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -10762,6 +10782,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_duel_lobby_table_default),
+    myDuelNotices: table({
+      name: "my_duel_notices",
+      indexes: [],
+      constraints: []
+    }, my_duel_notices_table_default),
     myDuelOpponentBoard: table({
       name: "my_duel_opponent_board",
       indexes: [],
@@ -11045,6 +11070,7 @@ ${ty.variants.map(
   });
   var reducersSchema = reducers(
     reducerSchema("abandon_run", abandon_run_reducer_default),
+    reducerSchema("acknowledge_duel_notice", acknowledge_duel_notice_reducer_default),
     reducerSchema("acknowledge_market_sales", acknowledge_market_sales_reducer_default),
     reducerSchema("acknowledge_task_chest", acknowledge_task_chest_reducer_default),
     reducerSchema("acknowledge_welcome_chest", acknowledge_welcome_chest_reducer_default),
@@ -11206,6 +11232,7 @@ ${ty.variants.map(
     "my_dark_duel_haul": "myDarkDuelHaul",
     "my_dark_presence": "myDarkPresence",
     "my_duel_lobby": "myDuelLobby",
+    "my_duel_notices": "myDuelNotices",
     "my_duel_opponent_board": "myDuelOpponentBoard",
     "my_duel_opponent_piece": "myDuelOpponentPiece",
     "my_duel_record": "myDuelRecord",
