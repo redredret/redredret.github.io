@@ -9815,7 +9815,8 @@ ${ty.variants.map(
     authorName: t.string().name("author_name"),
     authorLevel: t.u32().name("author_level"),
     text: t.string(),
-    sentAt: t.timestamp().name("sent_at")
+    sentAt: t.timestamp().name("sent_at"),
+    authorColor: t.u32().name("author_color")
   });
 
   // src/module_bindings/my_chat_room_table.ts
@@ -9825,7 +9826,8 @@ ${ty.variants.map(
     authorName: t.string().name("author_name"),
     authorLevel: t.u32().name("author_level"),
     text: t.string(),
-    sentAt: t.timestamp().name("sent_at")
+    sentAt: t.timestamp().name("sent_at"),
+    authorColor: t.u32().name("author_color")
   });
 
   // src/module_bindings/my_chat_status_table.ts
