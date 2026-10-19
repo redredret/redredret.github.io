@@ -11531,6 +11531,20 @@ ${ty.variants.map(
       }
       return overflowedCells;
     }
+    /**
+     * How many rows the stack stands in play, from the floor to its highest block
+     * in a column in play (hidden rows included, so it can pass VISIBLE_HEIGHT).
+     * What crowded-board relief reads (endless_regions.ts). Mirrors
+     * BoardState.stack_height_in_play.
+     */
+    stackHeightInPlay() {
+      for (let y = 0; y < TOTAL_HEIGHT; y += 1) {
+        for (let x = this.playLeft; x <= this.playRight; x += 1) {
+          if (this.cells[y * WIDTH + x] !== EMPTY) return TOTAL_HEIGHT - y;
+        }
+      }
+      return 0;
+    }
     hasCellsInHiddenRows() {
       for (let y = 0; y < HIDDEN_ROWS; y += 1) {
         for (let x = 0; x < WIDTH; x += 1) {
