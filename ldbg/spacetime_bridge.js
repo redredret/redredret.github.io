@@ -908,6 +908,9 @@ ${originalIndentation}`;
         dungeonProgress: many("myDungeonProgress"),
         endlessRecords: many("myEndlessRecords"),
         farmRecords: many("myFarmRecords"),
+        // The Endless Dungeon's regions this account has been to
+        // (docs/ENDLESS_DUNGEON.md, "Discovery"): the Region Log's rows.
+        endlessRegions: many("myEndlessRegions"),
         // The challenge skins earned (docs/BLOCK_SKINS_2.md): a record too,
         // written once by a settlement at most.
         skinUnlocks: many("mySkinUnlocks")
@@ -10063,6 +10066,17 @@ ${ty.variants.map(
     reachedAt: t.timestamp().name("reached_at")
   });
 
+  // src/module_bindings/my_endless_regions_table.ts
+  var my_endless_regions_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    regionId: t.string().name("region_id"),
+    firstSeenAt: t.timestamp().name("first_seen_at"),
+    timesEntered: t.u32().name("times_entered"),
+    chestsOpened: t.u32().name("chests_opened"),
+    deepestEncounter: t.u32().name("deepest_encounter")
+  });
+
   // src/module_bindings/my_equipment_table.ts
   var my_equipment_table_default = t.row({
     id: t.u64().primaryKey(),
@@ -10814,6 +10828,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_endless_records_table_default),
+    myEndlessRegions: table({
+      name: "my_endless_regions",
+      indexes: [],
+      constraints: []
+    }, my_endless_regions_table_default),
     myEquipment: table({
       name: "my_equipment",
       indexes: [],
@@ -11240,6 +11259,7 @@ ${ty.variants.map(
     "my_duel_record": "myDuelRecord",
     "my_dungeon_progress": "myDungeonProgress",
     "my_endless_records": "myEndlessRecords",
+    "my_endless_regions": "myEndlessRegions",
     "my_equipment": "myEquipment",
     "my_equipped_boosts": "myEquippedBoosts",
     "my_equipped_food": "myEquippedFood",
