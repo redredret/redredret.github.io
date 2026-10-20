@@ -215,7 +215,11 @@ p { margin: 0 0 12px; }
 }
 .hero-scene { position: absolute; inset: 0; }
 .hero-scene img { position: absolute; bottom: calc(var(--cell) * 2 - 22px); }
-.hero-foe { right: -14%; height: 430px; width: auto; filter: drop-shadow(0 18px 20px rgba(0, 0, 0, 0.35)); }
+/* The foe steps in from the card's edge as the card widens: cropped at -14%
+   while the card is narrow and the knight needs the room (900px and under),
+   whole and 2% in from the edge at the portal's full width (1104px), and a
+   straight line between. */
+.hero-foe { right: clamp(-14%, calc(72.5% - 778px), 2%); height: 430px; width: auto; filter: drop-shadow(0 18px 20px rgba(0, 0, 0, 0.35)); }
 .hero-knight { right: 37%; height: 300px; width: auto; filter: drop-shadow(0 14px 16px rgba(0, 0, 0, 0.35)); }
 .hero-copy {
   position: relative;
@@ -837,7 +841,9 @@ video.duelist-right { right: 12%; height: 326px; bottom: 2px; }
   background: linear-gradient(90deg, rgba(16, 20, 26, 0.9) 0%, rgba(16, 20, 26, 0.5) 55%, rgba(16, 20, 26, 0.1)), var(--area) center / cover;
   box-shadow: 0 0 0 2px #0b1113, 0 0 0 5px #3d4a4d, 0 0 0 7px #0b1113;
 }
-.finale-foe { position: absolute; right: -12%; bottom: 0; height: 340px; width: auto; filter: drop-shadow(0 0 30px rgba(196, 155, 255, 0.35)); }
+/* As the hero's foe: cropped at -12% on a narrow card, whole and clear of the
+   copy once the card is the main column's full 776px. */
+.finale-foe { position: absolute; right: clamp(-12%, calc(85% - 645px), 2%); bottom: 0; height: 320px; width: auto; filter: drop-shadow(0 0 30px rgba(196, 155, 255, 0.35)); }
 .finale-copy { position: relative; padding: 48px 40px; max-width: 470px; }
 .finale h2 { font-size: 40px; line-height: 1.05; margin-bottom: 12px; }
 .finale p { color: var(--text); text-shadow: 0 1px 4px #000; }
