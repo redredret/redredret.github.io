@@ -4,6 +4,8 @@
 //  2. Fill in the numbers from stats.json (tools/landing/build_stats.mjs), and
 //     count the live tallies up the first time they are seen.
 //  3. The Armoury's inventory: every item, filterable, with a look-closer card.
+//  4. The character clips: each plays once when it is seen, again on a hover
+//     or a tap.
 // The page reads as a complete, correct document without any of it.
 (() => {
   'use strict';
@@ -370,6 +372,66 @@
     show('all');
   }
 
+  // --- Clips ----------------------------------------------------------------------
+  //
+  // The promo animations (tools/landing/encode_clips.py), as VP9 with alpha. Only
+  // a browser that draws that alpha is given one: WebKit -- Safari, and every
+  // browser on an iPhone -- plays VP9 but paints its transparency black, so
+  // there the poster, the clip's first frame, stands. So it does for reduced
+  // motion and for Data Saver. The page names no source, so nobody downloads a
+  // clip they will not see: the source is set as the clip nears the screen.
+
+  function clipsPlay() {
+    if (reducedMotion || !('IntersectionObserver' in window)) return false;
+    if (navigator.connection && navigator.connection.saveData) return false;
+    if (/Apple/.test(navigator.vendor || '')) return false;
+    const probe = document.createElement('video');
+    return Boolean(probe.canPlayType && probe.canPlayType('video/webm; codecs="vp9"'));
+  }
+
+  function play(video) {
+    if (!video.src) return;
+    if (video.ended || video.currentTime > 0) video.currentTime = 0;
+    const started = video.play();
+    if (started && started.catch) started.catch(() => { /* The poster stands. */ });
+  }
+
+  function setUpClips() {
+    const clips = Array.from(document.querySelectorAll('video[data-clip]'));
+    if (!clips.length || !clipsPlay()) return;
+    const load = (video) => {
+      if (video.src) return;
+      video.preload = 'auto';
+      video.src = `clips/${video.dataset.clip}.webm`;
+    };
+    const nearing = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        nearing.unobserve(entry.target);
+        load(entry.target);
+      }
+    }, { rootMargin: '600px 0px' });
+    // Once, when most of it is on screen: a performance, not wallpaper.
+    const seen = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        seen.unobserve(entry.target);
+        load(entry.target);
+        play(entry.target);
+      }
+    }, { threshold: 0.6 });
+    for (const video of clips) {
+      nearing.observe(video);
+      seen.observe(video);
+      // The card a clip stands in asks for an encore, so a hover anywhere on
+      // a poster plays it again; a tap does the same on a phone.
+      const stage = video.closest('.poster, .lineup, .banner, .rabble-clip, .route-wrap') || video;
+      const encore = () => { if (video.paused || video.ended) play(video); };
+      stage.addEventListener('pointerenter', (event) => { if (event.pointerType === 'mouse') encore(); });
+      stage.addEventListener('click', encore);
+    }
+  }
+
   // --- Start ----------------------------------------------------------------------
 
   const heroParts = buildHeroStack();
@@ -377,6 +439,7 @@
   buildClearRows();
   buildBoard();
   buildSkins();
+  setUpClips();
   // The clear is only worth watching once the two figures standing on the row
   // are drawn; the rest of the page may still be loading.
   const figures = Array.from(document.querySelectorAll('.hero-scene img'));

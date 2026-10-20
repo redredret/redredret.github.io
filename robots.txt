@@ -1,0 +1,30 @@
+# LDBG, a free falling-block RPG: https://redredret.github.io/
+# Search engines and AI assistants are welcome to read, index and quote this
+# site. A plain-text summary for language models is at /llms.txt.
+
+User-agent: *
+Allow: /
+# The game's own binaries are tens of megabytes and say nothing a reader needs.
+Disallow: /ldbg/*.pck$
+Disallow: /ldbg/*.wasm$
+
+# Named so their welcome is not left to a default.
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: Bingbot
+User-agent: DuckAssistBot
+User-agent: meta-externalagent
+Allow: /
+Disallow: /ldbg/*.pck$
+Disallow: /ldbg/*.wasm$
+
+Sitemap: https://redredret.github.io/sitemap.xml

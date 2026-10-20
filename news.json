@@ -1,8 +1,16 @@
 {
   "about": "The landing page's Recently Added list, newest first; the page shows the first four. Add an entry whenever a batch gives players something new to find: a dungeon, a mode, a family of items, a system. Every GREENSHORE_STORY_VERSION from firstTrackedRulesVersion on must be named here, by an entry's rulesVersion or in notNews (a bump players would not call news). spacetimedb/test/landing_news.test.ts holds that. Write it the way a player would say it.",
   "firstTrackedRulesVersion": 30,
-  "notNews": [31, 51, 55],
+  "notNews": [
+    31,
+    51,
+    55,
+    57,
+    58,
+    59
+  ],
   "entries": [
+    { "date": "2026-10-19", "title": "The Endless Dungeon", "text": "Endless is one dungeon now, made of regions: Greenshore Fields, Bandit Camp, Bandit Town, the Cyclops Arena and the Cultist Tower, plus the Dump once you beat the Garbage Man's third wave and the Slime Grotto once you reach wave 10 of the Slime King's pit. Each region ends in a chest, harder regions hold better chests (the Cultist Tower never pays less than a Masterwork Vault), and the hardest can pay an Arcane Vault or a Royal Chest. The deeper you go, the harder the regions get. The Garbage Man and the Slime King appear as gentler versions of themselves, and deep enemies hit less hard on a messy board. Co-op works too: regions either of you has opened can come up.", "rulesVersion": 60 },
     { "date": "2026-10-14", "title": "Bosses make an entrance", "text": "Every boss now arrives in style. The Bandit King spins down out of the sky and bounces onto his spot, the Slime King lands with a splat, the Cult Leader whirls out of a burst of dark magic, and the Garbage Man hops in with a bag balanced on his head. Shooty juggles his way on, until the last stone comes down on his head, and Punchy, Bernie and the Cyclops each have a move of their own. The fight starts exactly when it always did." },
     { "date": "2026-10-13", "title": "Gel Packs", "text": "A new block skin for anyone who maxes out a Slime King run, alone or with a friend: keep going until the game tells you the run has reached its limit. Pouches of coloured gel that squash flat when they land, bulge, and wobble back into place. Slam a piece down and the blocks underneath feel it too, and a line clear lands everything above it with a squish. Fights against him, and every fight, also run lighter: the health bars cost far less to draw while they move." },
     { "date": "2026-10-13", "title": "Omens, and the Golden Slime King", "text": "Now and then a Slime King walks in golden: beat him for three times his loot and up to 200 coins. And Endless and Dark have Omens. Open 30 chests in Endless or Dark to claim the Omen Seeker feat, then switch Omens on from the Endless and Dark cards. After every third chest an omen takes hold for a few kills: a boon like Wrath, Bounty or Gold Rush, a curse like Frenzy or Thick Hide, or a pact that makes the fight harder and pays far more. Every run with Omens on earns 20% more XP.", "rulesVersion": 56 },
