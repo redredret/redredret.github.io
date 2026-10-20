@@ -13291,9 +13291,17 @@ ${ty.variants.map(
           return name;
         });
       }
-      if (typeof entry.leadIn !== "string" || !leadIns.has(entry.leadIn)) fail(`${where} leadIn names no lead-in: ${String(entry.leadIn)}`);
+      const sound = (key) => {
+        const id = entry[key];
+        if (id == null) return null;
+        if (typeof id !== "string" || !leadIns.has(id)) fail(`${where} ${key} names no lead-in: ${String(id)}`);
+        return id;
+      };
+      const leadIn = sound("leadIn");
+      const hit = sound("hit");
+      if (leadIn === null && hit === null) fail(`${where} plays nothing: give it a leadIn or a hit`);
       const every = entry.switchEveryBars == null ? null : integer(entry.switchEveryBars, `${where} switchEveryBars`, 1, 512);
-      transitions.push({ from, to, leadIn: entry.leadIn, switchEveryBars: every });
+      transitions.push({ from, to, leadIn, hit, switchEveryBars: every });
     });
     const fallbacks = /* @__PURE__ */ new Map();
     const rawFallbacks = root.fallbacks ?? {};
@@ -13327,7 +13335,7 @@ ${ty.variants.map(
     return null;
   }
   function leadInSeconds(manifest, transition, intoSection) {
-    if (transition === null) return 0;
+    if (transition === null || transition.leadIn === null) return 0;
     return manifest.leadIns.get(transition.leadIn).beats * 60 / manifest.sections.get(intoSection).bpm;
   }
   function nextSwitchTime(manifest, segment, earliest, everyBars = null) {
@@ -13374,7 +13382,9 @@ ${ty.variants.map(
   function prefetchPlan(manifest) {
     const entries = [];
     for (const transition of manifest.transitions) {
-      if (!entries.includes(transition.leadIn)) entries.push(transition.leadIn);
+      for (const id of [transition.leadIn, transition.hit]) {
+        if (id !== null && !entries.includes(id)) entries.push(id);
+      }
     }
     for (const state of manifest.states.values()) {
       const id = state.intro ?? state.play[0];
@@ -13422,6 +13432,9 @@ ${ty.variants.map(
     // The last section that played, kept through a silence: a transition out of
     // the Outro applies after the Outro has finished.
     lastSection = null;
+    // Every transition sound placed and not yet finished. Only one sounds at a
+    // time: a player bouncing between the menu and an activity hears one cymbal.
+    stingers = [];
     bytes = /* @__PURE__ */ new Map();
     decoded = /* @__PURE__ */ new Map();
     decoding = /* @__PURE__ */ new Map();
@@ -13488,7 +13501,8 @@ ${ty.variants.map(
           end: playing.segment.end,
           offsetBars: playing.segment.offsetBars,
           cutAt: playing.cutAt,
-          leadAt: playing.leadAt
+          leadAt: playing.leadAt,
+          hitAt: playing.hitAt
         }))
       };
     }
@@ -13506,6 +13520,12 @@ ${ty.variants.map(
         return true;
       });
       if (this.queue.length === 0 && last !== void 0 && last.cutAt === null) this.orphan = last.segment;
+      this.stingers = this.stingers.filter((stinger) => {
+        if (stinger.end + RELEASE_SECONDS >= now) return true;
+        stinger.source.disconnect();
+        stinger.gain.disconnect();
+        return false;
+      });
       this.planFollowing();
     }
     loadManifest() {
@@ -13598,9 +13618,11 @@ ${ty.variants.map(
       const next = enterState(manifest, target, at, from, this.introsPlayed);
       if (next !== null) {
         const buffer = this.decoded.get(next.section);
-        const leadBuffer = transition === null ? null : this.decoded.get(transition.leadIn);
-        if (buffer === void 0 || leadBuffer === void 0) {
-          const waits = [this.decode(next.section), ...transition === null ? [] : [this.decode(transition.leadIn)]];
+        const leadBuffer = transition?.leadIn == null ? null : this.decoded.get(transition.leadIn);
+        const hitBuffer = transition?.hit == null ? null : this.decoded.get(transition.hit);
+        if (buffer === void 0 || leadBuffer === void 0 || hitBuffer === void 0) {
+          const sounds = transition === null ? [] : [transition.leadIn, transition.hit].filter((id) => id !== null);
+          const waits = [this.decode(next.section), ...sounds.map((id) => this.decode(id))];
           void Promise.all(waits).then((ready2) => {
             if (ready2.every((item) => item !== null) && resolveState(manifest, this.requested) === target) this.apply();
           });
@@ -13609,7 +13631,8 @@ ${ty.variants.map(
         }
         if (committed !== null && at < committed.segment.end - 1e-6) this.cut(committed, at);
         const playing = this.schedule(next, buffer);
-        if (leadBuffer !== null) this.scheduleLeadIn(playing, leadBuffer, at - lead);
+        if (leadBuffer !== null && this.playStinger(playing, leadBuffer, at - lead)) playing.leadAt = at - lead;
+        if (hitBuffer !== null && this.playStinger(playing, hitBuffer, at)) playing.hitAt = at;
       } else if (committed !== null && at < committed.segment.end - 1e-6) {
         this.cut(committed, at);
       } else if (committed !== null) {
@@ -13668,7 +13691,7 @@ ${ty.variants.map(
         gain.gain.setValueAtTime(0, start);
         gain.gain.linearRampToValueAtTime(1, start + FADE_IN_SECONDS);
       }
-      const playing = { segment, source, gain, cutAt: null, lead: null, leadAt: null };
+      const playing = { segment, source, gain, cutAt: null, stingers: [], leadAt: null, hitAt: null };
       this.orphan = null;
       this.lastSection = segment.section;
       if (segment.playIndex < 0) this.introsPlayed.add(segment.state);
@@ -13678,19 +13701,27 @@ ${ty.variants.map(
       this.evictDecoded();
       return playing;
     }
-    // The lead-in into `playing`, played whole from `at`: it ends on the
-    // section's downbeat. A lead-in with a ring left on its end rings over it.
-    scheduleLeadIn(playing, buffer, at) {
+    // A transition's sound for `playing`, played whole from `at`: a lead-in is
+    // placed to end on the section's downbeat, a hit to start on it. Skipped,
+    // returning false, when another is still to sound over any of that time:
+    // one cymbal at a time, however fast the player bounces between screens.
+    playStinger(playing, buffer, at) {
       const context2 = this.context;
+      const now = context2.currentTime;
+      this.stingers = this.stingers.filter((stinger2) => stinger2.end > now);
+      const end = at + buffer.duration;
+      if (this.stingers.some((stinger2) => stinger2.start < end && at < stinger2.end)) return false;
       const source = context2.createBufferSource();
       const gain = context2.createGain();
       source.buffer = buffer;
       source.connect(gain);
       gain.connect(this.master);
-      const start = Math.max(at, context2.currentTime + LATE_JOIN_SECONDS);
+      const start = Math.max(at, now + LATE_JOIN_SECONDS);
       source.start(start, start - at, buffer.duration - (start - at));
-      playing.lead = { source, gain };
-      playing.leadAt = at;
+      const stinger = { source, gain, start: at, end };
+      this.stingers.push(stinger);
+      playing.stingers.push(stinger);
+      return true;
     }
     cut(playing, at) {
       const now = this.context.currentTime;
@@ -13708,21 +13739,27 @@ ${ty.variants.map(
       playing.gain.gain.setValueAtTime(1, now);
       playing.source.stop(playing.segment.end + RELEASE_SECONDS);
     }
-    // A planned section that never started, and its lead-in.
+    // A planned section that never started, and its transition sounds that
+    // have not begun either. One already sounding plays out.
     cancel(playing) {
       playing.source.onended = null;
       playing.source.stop(0);
-      if (playing.lead !== null) playing.lead.source.stop(0);
+      const now = this.context.currentTime;
+      for (const stinger of playing.stingers) {
+        if (stinger.start <= now) continue;
+        stinger.source.stop(0);
+        stinger.source.disconnect();
+        stinger.gain.disconnect();
+        this.stingers = this.stingers.filter((other) => other !== stinger);
+      }
       this.release(playing);
     }
+    // Its transition sounds are not released with it: a hit outlives a section
+    // cut short under it, and is let go once it has finished (tick).
     release(playing) {
       playing.source.onended = null;
       playing.source.disconnect();
       playing.gain.disconnect();
-      if (playing.lead !== null) {
-        playing.lead.source.disconnect();
-        playing.lead.gain.disconnect();
-      }
     }
     fetchSection(id) {
       let pending = this.bytes.get(id);
