@@ -39,10 +39,6 @@
     "cymbal_lead_up": {
       "file": "cymbal_lead_up-c42b03fa8f1b.ogg",
       "beats": 1.5
-    },
-    "cymbal_crash": {
-      "file": "cymbal_crash-f1cfae217b4e.ogg",
-      "beats": 1.5
     }
   },
   "transitions": [
@@ -67,7 +63,7 @@
       "to": [
         "menu"
       ],
-      "hit": "cymbal_crash"
+      "leadIn": "cymbal_lead_up"
     },
     {
       "from": [
@@ -76,7 +72,7 @@
       "to": [
         "menu"
       ],
-      "hit": "cymbal_crash",
+      "leadIn": "cymbal_lead_up",
       "switchEveryBars": 1
     },
     {
