@@ -5,7 +5,7 @@
 //     count the live tallies up the first time they are seen.
 //  3. The Armoury's inventory: every item, filterable, with a look-closer card.
 //  4. The character clips: each plays once when it is seen, again on a hover
-//     or a tap.
+//     or a tap; the Bestiary's play only when a portrait is hovered or tapped.
 // The page reads as a complete, correct document without any of it.
 (() => {
   'use strict';
@@ -421,15 +421,40 @@
       }
     }, { threshold: 0.6 });
     for (const video of clips) {
+      if (video.dataset.play === 'hover') {
+        setUpPortrait(video, load);
+        continue;
+      }
       nearing.observe(video);
       seen.observe(video);
-      // The card a clip stands in asks for an encore, so a hover anywhere on
-      // a poster plays it again; a tap does the same on a phone.
-      const stage = video.closest('.poster, .lineup, .banner, .rabble-clip, .route-wrap') || video;
+      // The place a clip stands in asks for an encore, so a hover anywhere on
+      // it plays it again; a tap does the same on a phone.
+      const stage = video.closest('.banner, .route-wrap') || video;
       const encore = () => { if (video.paused || video.ended) play(video); };
       stage.addEventListener('pointerenter', (event) => { if (event.pointerType === 'mouse') encore(); });
       stage.addEventListener('click', encore);
     }
+  }
+
+  // The Bestiary keeps its stills; a boss with a clip performs it only when
+  // his portrait is hovered or tapped, then goes back to his still. The clip
+  // starts loading when the pointer reaches his card, so it is usually ready
+  // by the time it reaches the portrait, and the still stays up until the clip
+  // is actually playing.
+  function setUpPortrait(video, load) {
+    const portrait = video.closest('.portrait');
+    if (!portrait) return;
+    const card = portrait.closest('.poster, li') || portrait;
+    card.addEventListener('pointerenter', () => load(video));
+    const perform = () => {
+      load(video);
+      if (!video.paused && !video.ended) return;
+      play(video);
+    };
+    portrait.addEventListener('pointerenter', (event) => { if (event.pointerType === 'mouse') perform(); });
+    portrait.addEventListener('click', perform);
+    video.addEventListener('playing', () => portrait.classList.add('playing'));
+    video.addEventListener('ended', () => portrait.classList.remove('playing'));
   }
 
   // --- Start ----------------------------------------------------------------------
