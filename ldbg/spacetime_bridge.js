@@ -271,8 +271,8 @@
       }
       function configure2(options) {
         options = { ...options };
-        const fail = getStrictOption(options);
-        if (fail) {
+        const fail2 = getStrictOption(options);
+        if (fail2) {
           if (options.bigint === void 0) {
             options.bigint = false;
           }
@@ -383,7 +383,7 @@ ${originalIndentation}`;
               return `{${res}}`;
             }
             case "number":
-              return isFinite(value) ? String(value) : fail ? fail(value) : "null";
+              return isFinite(value) ? String(value) : fail2 ? fail2(value) : "null";
             case "boolean":
               return value === true ? "true" : "false";
             case "undefined":
@@ -394,7 +394,7 @@ ${originalIndentation}`;
               }
             // fallthrough
             default:
-              return fail ? fail(value) : void 0;
+              return fail2 ? fail2(value) : void 0;
           }
         }
         function stringifyArrayReplacer(key, value, stack, replacer, spacer, indentation) {
@@ -474,7 +474,7 @@ ${originalIndentation}`;
               return `{${res}}`;
             }
             case "number":
-              return isFinite(value) ? String(value) : fail ? fail(value) : "null";
+              return isFinite(value) ? String(value) : fail2 ? fail2(value) : "null";
             case "boolean":
               return value === true ? "true" : "false";
             case "undefined":
@@ -485,7 +485,7 @@ ${originalIndentation}`;
               }
             // fallthrough
             default:
-              return fail ? fail(value) : void 0;
+              return fail2 ? fail2(value) : void 0;
           }
         }
         function stringifyIndent(key, value, stack, spacer, indentation) {
@@ -586,7 +586,7 @@ ${originalIndentation}`;
               return `{${res}}`;
             }
             case "number":
-              return isFinite(value) ? String(value) : fail ? fail(value) : "null";
+              return isFinite(value) ? String(value) : fail2 ? fail2(value) : "null";
             case "boolean":
               return value === true ? "true" : "false";
             case "undefined":
@@ -597,7 +597,7 @@ ${originalIndentation}`;
               }
             // fallthrough
             default:
-              return fail ? fail(value) : void 0;
+              return fail2 ? fail2(value) : void 0;
           }
         }
         function stringifySimple(key, value, stack) {
@@ -682,7 +682,7 @@ ${originalIndentation}`;
               return `{${res}}`;
             }
             case "number":
-              return isFinite(value) ? String(value) : fail ? fail(value) : "null";
+              return isFinite(value) ? String(value) : fail2 ? fail2(value) : "null";
             case "boolean":
               return value === true ? "true" : "false";
             case "undefined":
@@ -693,7 +693,7 @@ ${originalIndentation}`;
               }
             // fallthrough
             default:
-              return fail ? fail(value) : void 0;
+              return fail2 ? fail2(value) : void 0;
           }
         }
         function stringify4(value, replacer, space) {
@@ -13192,6 +13192,640 @@ ${ty.variants.map(
     startWorker();
   }
 
+  // src/music_schedule.ts
+  var SWITCH_SAFETY_SECONDS = 0.2;
+  var START_DELAY_SECONDS = 0.1;
+  var EPSILON = 1e-6;
+  var SILENCE = "silence";
+  var SAFE_FILE = /^[A-Za-z0-9][A-Za-z0-9_.-]*$/;
+  var SAFE_ID = /^[A-Za-z0-9_][A-Za-z0-9_-]*$/;
+  function fail(message) {
+    throw new Error(`music manifest: ${message}`);
+  }
+  function integer(value, name, min, max) {
+    if (typeof value !== "number" || !Number.isInteger(value) || value < min || value > max) {
+      fail(`${name} must be a whole number from ${min} to ${max}`);
+    }
+    return value;
+  }
+  function sectionId(value, sections, where) {
+    if (typeof value !== "string" || !sections.has(value)) fail(`${where} names no section: ${String(value)}`);
+    return value;
+  }
+  function parseMusicManifest(raw) {
+    if (raw === null || typeof raw !== "object") fail("not an object");
+    const root = raw;
+    const version = integer(root.version, "version", 1, 1);
+    const bpm = typeof root.bpm === "number" ? root.bpm : NaN;
+    if (!(bpm >= 30 && bpm <= 300)) fail("bpm must be from 30 to 300");
+    const beatsPerBar = integer(root.beatsPerBar ?? 4, "beatsPerBar", 1, 16);
+    const switchEvery = integer(root.switchEveryBars ?? 4, "switchEveryBars", 0, 512);
+    const gainDb = root.gainDb ?? 0;
+    if (typeof gainDb !== "number" || !(gainDb >= -40 && gainDb <= 6)) fail("gainDb must be from -40 to 6");
+    const sections = /* @__PURE__ */ new Map();
+    const rawSections = root.sections;
+    if (rawSections === null || typeof rawSections !== "object") fail("sections must be an object");
+    for (const [id, value] of Object.entries(rawSections)) {
+      if (!SAFE_ID.test(id)) fail(`section id ${id} has characters a file name cannot`);
+      const entry = value ?? {};
+      if (typeof entry.file !== "string" || !SAFE_FILE.test(entry.file)) fail(`section ${id} needs a plain file name`);
+      const sectionBpm = typeof entry.bpm === "number" ? entry.bpm : bpm;
+      if (!(sectionBpm >= 30 && sectionBpm <= 300)) fail(`section ${id} bpm must be from 30 to 300`);
+      sections.set(id, {
+        id,
+        file: entry.file,
+        bars: integer(entry.bars, `section ${id} bars`, 1, 512),
+        bpm: sectionBpm,
+        beatsPerBar: integer(entry.beatsPerBar ?? beatsPerBar, `section ${id} beatsPerBar`, 1, 16),
+        switchEveryBars: integer(entry.switchEveryBars ?? switchEvery, `section ${id} switchEveryBars`, 0, 512)
+      });
+    }
+    if (sections.size === 0) fail("no sections");
+    const states = /* @__PURE__ */ new Map();
+    const rawStates = root.states;
+    if (rawStates === null || typeof rawStates !== "object") fail("states must be an object");
+    for (const [name, value] of Object.entries(rawStates)) {
+      if (name === SILENCE) fail(`"${SILENCE}" is built in and cannot be mapped`);
+      const entry = value ?? {};
+      const play = entry.play ?? [];
+      if (!Array.isArray(play)) fail(`state ${name} play must be a list`);
+      states.set(name, {
+        name,
+        intro: entry.intro == null ? null : sectionId(entry.intro, sections, `state ${name} intro`),
+        introOnce: entry.introOnce === true,
+        play: play.map((id, index) => sectionId(id, sections, `state ${name} play[${index}]`)),
+        then: entry.then == null ? null : String(entry.then),
+        syncPosition: entry.syncPosition === true
+      });
+    }
+    for (const state of states.values()) {
+      if (state.then !== null && !states.has(state.then)) fail(`state ${state.name} then names no state: ${state.then}`);
+      if (state.intro === null && state.play.length === 0 && state.then === null) {
+        fail(`state ${state.name} plays nothing; leave it out, or map it to "${SILENCE}" through fallbacks`);
+      }
+    }
+    const leadIns = /* @__PURE__ */ new Map();
+    const rawLeadIns = root.leadIns ?? {};
+    if (rawLeadIns === null || typeof rawLeadIns !== "object") fail("leadIns must be an object");
+    for (const [id, value] of Object.entries(rawLeadIns)) {
+      if (!SAFE_ID.test(id) || sections.has(id)) fail(`lead-in id ${id} is not a plain id of its own`);
+      const entry = value ?? {};
+      if (typeof entry.file !== "string" || !SAFE_FILE.test(entry.file)) fail(`lead-in ${id} needs a plain file name`);
+      const beats = entry.beats;
+      if (typeof beats !== "number" || !(beats > 0 && beats <= 64)) fail(`lead-in ${id} beats must be above 0 and at most 64`);
+      leadIns.set(id, { id, file: entry.file, beats });
+    }
+    const transitions = [];
+    const rawTransitions = root.transitions ?? [];
+    if (!Array.isArray(rawTransitions)) fail("transitions must be a list");
+    rawTransitions.forEach((value, index) => {
+      const entry = value ?? {};
+      const where = `transitions[${index}]`;
+      if (!Array.isArray(entry.from) || entry.from.length === 0) fail(`${where} from must be a list of sections`);
+      const from = entry.from.map((id) => sectionId(id, sections, `${where} from`));
+      let to = null;
+      if (entry.to !== "*") {
+        if (!Array.isArray(entry.to) || entry.to.length === 0) fail(`${where} to must be a list of states or "*"`);
+        to = entry.to.map((name) => {
+          if (typeof name !== "string" || !states.has(name)) fail(`${where} to names no state: ${String(name)}`);
+          return name;
+        });
+      }
+      if (typeof entry.leadIn !== "string" || !leadIns.has(entry.leadIn)) fail(`${where} leadIn names no lead-in: ${String(entry.leadIn)}`);
+      const every = entry.switchEveryBars == null ? null : integer(entry.switchEveryBars, `${where} switchEveryBars`, 1, 512);
+      transitions.push({ from, to, leadIn: entry.leadIn, switchEveryBars: every });
+    });
+    const fallbacks = /* @__PURE__ */ new Map();
+    const rawFallbacks = root.fallbacks ?? {};
+    if (rawFallbacks === null || typeof rawFallbacks !== "object") fail("fallbacks must be an object");
+    for (const [from, to] of Object.entries(rawFallbacks)) {
+      if (typeof to !== "string" || to !== SILENCE && !states.has(to) && !(to in rawFallbacks)) {
+        fail(`fallback ${from} names no state: ${String(to)}`);
+      }
+      fallbacks.set(from, to);
+    }
+    return { version, gainDb, sections, leadIns, transitions, states, fallbacks };
+  }
+  function barSeconds(section) {
+    return 60 / section.bpm * section.beatsPerBar;
+  }
+  function resolveState(manifest, requested) {
+    let name = requested;
+    for (let hop = 0; hop < 8; hop++) {
+      if (name === SILENCE || manifest.states.has(name)) return name;
+      const next = manifest.fallbacks.get(name);
+      if (next === void 0) return null;
+      name = next;
+    }
+    return null;
+  }
+  function findTransition(manifest, fromSection, target) {
+    if (fromSection === null) return null;
+    for (const transition of manifest.transitions) {
+      if (transition.from.includes(fromSection) && (transition.to === null || transition.to.includes(target))) return transition;
+    }
+    return null;
+  }
+  function leadInSeconds(manifest, transition, intoSection) {
+    if (transition === null) return 0;
+    return manifest.leadIns.get(transition.leadIn).beats * 60 / manifest.sections.get(intoSection).bpm;
+  }
+  function nextSwitchTime(manifest, segment, earliest, everyBars = null) {
+    const section = manifest.sections.get(segment.section);
+    if (earliest >= segment.end - EPSILON) return Math.max(segment.end, earliest);
+    const every = everyBars ?? section.switchEveryBars;
+    if (every <= 0) return segment.end;
+    const bar = barSeconds(section);
+    const step = every * bar;
+    const sectionStart = segment.start - segment.offsetBars * bar;
+    const k = Math.max(1, Math.ceil((earliest - sectionStart) / step - EPSILON));
+    const at = sectionStart + k * step;
+    return at < segment.end - EPSILON ? at : segment.end;
+  }
+  function place(manifest, section, state, playIndex, offsetBars, start) {
+    const info = manifest.sections.get(section);
+    return { section, state, playIndex, offsetBars, start, end: start + (info.bars - offsetBars) * barSeconds(info) };
+  }
+  function enterState(manifest, stateName, at, from, introsPlayed = /* @__PURE__ */ new Set()) {
+    if (stateName === SILENCE) return null;
+    const state = manifest.states.get(stateName);
+    if (state === void 0) return null;
+    if (state.intro !== null && !(state.introOnce && introsPlayed.has(stateName))) {
+      return place(manifest, state.intro, stateName, -1, 0, at);
+    }
+    if (state.play.length === 0) return state.then === null ? null : enterState(manifest, state.then, at, from);
+    let offsetBars = 0;
+    if (state.syncPosition && from !== null && at < from.end - EPSILON) {
+      const fromSection = manifest.sections.get(from.section);
+      const reached = Math.round(from.offsetBars + (at - from.start) / barSeconds(fromSection));
+      offsetBars = reached % manifest.sections.get(state.play[0]).bars;
+    }
+    return place(manifest, state.play[0], stateName, 0, offsetBars, at);
+  }
+  function followingSegment(manifest, segment) {
+    const state = manifest.states.get(segment.state);
+    if (state === void 0) return null;
+    if (state.play.length === 0) {
+      return state.then === null ? null : enterState(manifest, state.then, segment.end, null);
+    }
+    const index = segment.playIndex < 0 ? 0 : (segment.playIndex + 1) % state.play.length;
+    return place(manifest, state.play[index], segment.state, index, 0, segment.end);
+  }
+  function prefetchPlan(manifest) {
+    const entries = [];
+    for (const transition of manifest.transitions) {
+      if (!entries.includes(transition.leadIn)) entries.push(transition.leadIn);
+    }
+    for (const state of manifest.states.values()) {
+      const id = state.intro ?? state.play[0];
+      if (id !== void 0 && !entries.includes(id)) entries.push(id);
+    }
+    const rest = [...manifest.sections.keys()].filter((id) => !entries.includes(id));
+    return [...entries.map((id) => ({ id, decode: true })), ...rest.map((id) => ({ id, decode: false }))];
+  }
+  function continuesInto(manifest, segment, stateName) {
+    if (segment.playIndex < 0) return -1;
+    const state = manifest.states.get(stateName);
+    if (state === void 0) return -1;
+    return state.play.indexOf(segment.section);
+  }
+
+  // src/music_engine.ts
+  var RELEASE_SECONDS = 0.03;
+  var FADE_IN_SECONDS = 0.01;
+  var LATE_JOIN_SECONDS = 0.05;
+  var PLAN_AHEAD_SECONDS = 1.5;
+  var TICK_MS = 250;
+  var DECODED_BUDGET_BYTES = 80 * 1024 * 1024;
+  var IDLE_FETCH_DELAY_MS = 2e3;
+  var IDLE_FETCH_GAP_MS = 750;
+  function startsBy(playing) {
+    return playing.leadAt ?? playing.segment.start;
+  }
+  var MusicEngine = class {
+    deps;
+    baseUrl;
+    manifest = null;
+    manifestLoad = null;
+    disabledReason = "";
+    context = null;
+    master = null;
+    volume = 0;
+    requested = "";
+    active = "";
+    // Started or planned, in start order. Never more than one past the playing one,
+    // except a cut section's last moments.
+    queue = [];
+    // A section that played out with nothing yet planned after it (its follower
+    // was still decoding). What follows is planned from it, late but on the beat.
+    orphan = null;
+    // The last section that played, kept through a silence: a transition out of
+    // the Outro applies after the Outro has finished.
+    lastSection = null;
+    bytes = /* @__PURE__ */ new Map();
+    decoded = /* @__PURE__ */ new Map();
+    decoding = /* @__PURE__ */ new Map();
+    failed = /* @__PURE__ */ new Set();
+    introsPlayed = /* @__PURE__ */ new Set();
+    idleFetchStarted = false;
+    timer = null;
+    constructor(deps) {
+      this.deps = deps;
+      this.baseUrl = deps.baseUrl ?? "music/";
+    }
+    // What the player is doing, in the game's words (src/core/music_mood.gd). The
+    // music follows at its next switch point; a name the map does not know
+    // leaves it as it is.
+    setState(name) {
+      this.requested = String(name);
+      if (this.manifest === null) {
+        void this.loadManifest().then(() => this.apply());
+        return;
+      }
+      this.apply();
+    }
+    // Master x Music, 0 when muted, linear (src/core/volume_settings.gd).
+    setVolume(linear) {
+      const value = Number(linear);
+      this.volume = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
+      if (this.master !== null && this.context !== null) {
+        const now = this.context.currentTime;
+        this.master.gain.cancelScheduledValues(now);
+        this.master.gain.setValueAtTime(this.master.gain.value, now);
+        this.master.gain.linearRampToValueAtTime(this.level(), now + 0.05);
+      }
+    }
+    // The slider's volume, with the song's own level under it.
+    level() {
+      return this.volume * Math.pow(10, (this.manifest?.gainDb ?? 0) / 20);
+    }
+    // A browser keeps an audio context suspended until the page is used; the page
+    // calls this on the first click or key.
+    resume() {
+      if (this.context !== null && this.context.state !== "running") {
+        this.context.resume().catch(() => {
+        });
+      }
+    }
+    status() {
+      let decodedBytes = 0;
+      for (const buffer of this.decoded.values()) decodedBytes += buffer.length * buffer.numberOfChannels * 4;
+      return {
+        enabled: this.manifest !== null,
+        disabledReason: this.disabledReason,
+        requested: this.requested,
+        active: this.active,
+        contextState: this.context?.state ?? "none",
+        now: this.context?.currentTime ?? 0,
+        volume: this.volume,
+        decodedBytes,
+        decoded: [...this.decoded.keys()],
+        fetched: [...this.bytes.keys()],
+        queue: this.queue.map((playing) => ({
+          section: playing.segment.section,
+          state: playing.segment.state,
+          start: playing.segment.start,
+          end: playing.segment.end,
+          offsetBars: playing.segment.offsetBars,
+          cutAt: playing.cutAt,
+          leadAt: playing.leadAt
+        }))
+      };
+    }
+    // Moves the queue on: lets finished sections go, and plans the next one.
+    tick() {
+      if (this.context === null || this.manifest === null) return;
+      const now = this.context.currentTime;
+      const last = this.queue[this.queue.length - 1];
+      this.queue = this.queue.filter((playing) => {
+        const over = (playing.cutAt ?? playing.segment.end) + RELEASE_SECONDS;
+        if (over < now) {
+          this.release(playing);
+          return false;
+        }
+        return true;
+      });
+      if (this.queue.length === 0 && last !== void 0 && last.cutAt === null) this.orphan = last.segment;
+      this.planFollowing();
+    }
+    loadManifest() {
+      if (this.manifestLoad !== null) return this.manifestLoad;
+      this.manifestLoad = this.deps.fetchBytes(`${this.baseUrl}manifest.json`).then((bytes) => {
+        const raw = JSON.parse(new TextDecoder().decode(bytes));
+        if (raw !== null && typeof raw === "object" && raw.none === true) {
+          this.disabledReason = "this build has no music";
+          return;
+        }
+        this.manifest = parseMusicManifest(raw);
+        this.context = this.deps.createContext();
+        if (this.context === null) {
+          this.manifest = null;
+          this.disabledReason = "this browser has no Web Audio";
+          return;
+        }
+        this.master = this.context.createGain();
+        this.master.gain.value = this.level();
+        this.master.connect(this.context.destination);
+        if (this.deps.timers !== false) this.timer = setInterval(() => this.tick(), TICK_MS);
+      }).catch((error) => {
+        this.manifest = null;
+        this.disabledReason = String(error instanceof Error ? error.message : error);
+        this.deps.log(`music: off (${this.disabledReason})`);
+      });
+      return this.manifestLoad;
+    }
+    // The latest section that has started, or is too close to starting to change.
+    // One whose lead-in has begun counts as started: a change of mind never
+    // chops the swell into it.
+    committed(now) {
+      let found = null;
+      for (const playing of this.queue) {
+        if (startsBy(playing) <= now + SWITCH_SAFETY_SECONDS) found = playing;
+      }
+      return found;
+    }
+    apply() {
+      const manifest = this.manifest;
+      const context2 = this.context;
+      if (manifest === null || context2 === null) return;
+      const target = resolveState(manifest, this.requested);
+      if (target === null) return;
+      const now = context2.currentTime;
+      const earliest = now + SWITCH_SAFETY_SECONDS;
+      this.orphan = null;
+      let committed = this.committed(now);
+      for (const playing of this.queue) {
+        if (playing !== committed && startsBy(playing) > earliest) this.cancel(playing);
+      }
+      this.queue = this.queue.filter((playing) => playing === committed || startsBy(playing) <= earliest);
+      if (committed !== null && committed.cutAt !== null) {
+        if (committed.cutAt > earliest) {
+          this.uncut(committed);
+        } else {
+          committed = null;
+        }
+      }
+      if (committed !== null && committed.segment.end <= earliest) committed = null;
+      const fromSection = committed?.segment.section ?? this.lastSection;
+      const probe = committed !== null && committed.segment.state === target ? null : enterState(manifest, target, 0, null, this.introsPlayed);
+      const transition = probe === null ? null : findTransition(manifest, fromSection, target);
+      const lead = probe === null ? 0 : leadInSeconds(manifest, transition, probe.section);
+      if (lead > 0 && committed !== null && committed.cutAt === null && earliest + lead >= committed.segment.end - 1e-6) {
+        const follower = followingSegment(manifest, committed.segment);
+        const buffer = follower === null ? void 0 : this.decoded.get(follower.section);
+        if (follower !== null && buffer !== void 0) committed = this.schedule(follower, buffer);
+      }
+      let at;
+      let from = null;
+      if (committed === null) {
+        at = now + START_DELAY_SECONDS + lead;
+      } else if (committed.segment.state === target) {
+        this.active = target;
+        this.planFollowing();
+        return;
+      } else {
+        const index = continuesInto(manifest, committed.segment, target);
+        if (index >= 0) {
+          committed.segment.state = target;
+          committed.segment.playIndex = index;
+          this.active = target;
+          this.planFollowing();
+          return;
+        }
+        at = nextSwitchTime(manifest, committed.segment, earliest + lead, transition?.switchEveryBars ?? null);
+        from = committed.segment;
+      }
+      const next = enterState(manifest, target, at, from, this.introsPlayed);
+      if (next !== null) {
+        const buffer = this.decoded.get(next.section);
+        const leadBuffer = transition === null ? null : this.decoded.get(transition.leadIn);
+        if (buffer === void 0 || leadBuffer === void 0) {
+          const waits = [this.decode(next.section), ...transition === null ? [] : [this.decode(transition.leadIn)]];
+          void Promise.all(waits).then((ready2) => {
+            if (ready2.every((item) => item !== null) && resolveState(manifest, this.requested) === target) this.apply();
+          });
+          this.planFollowing();
+          return;
+        }
+        if (committed !== null && at < committed.segment.end - 1e-6) this.cut(committed, at);
+        const playing = this.schedule(next, buffer);
+        if (leadBuffer !== null) this.scheduleLeadIn(playing, leadBuffer, at - lead);
+      } else if (committed !== null && at < committed.segment.end - 1e-6) {
+        this.cut(committed, at);
+      } else if (committed !== null) {
+        committed.cutAt = committed.segment.end;
+      }
+      this.active = target;
+      this.prefetchState(target);
+      this.planFollowing();
+      this.startIdleFetch();
+    }
+    // Plans the section after the last one queued, once that one is close to
+    // starting. A section ending in a cut has nothing after it.
+    planFollowing() {
+      const manifest = this.manifest;
+      const context2 = this.context;
+      if (manifest === null || context2 === null) return;
+      const last = this.queue[this.queue.length - 1];
+      if (last !== void 0 && last.cutAt !== null) return;
+      const lastSegment = last?.segment ?? this.orphan;
+      if (lastSegment === null) return;
+      if (lastSegment.start > context2.currentTime + PLAN_AHEAD_SECONDS) return;
+      const following = followingSegment(manifest, lastSegment);
+      if (following === null) {
+        if (last !== void 0) last.cutAt = last.segment.end;
+        this.orphan = null;
+        return;
+      }
+      const buffer = this.decoded.get(following.section);
+      if (buffer === void 0) {
+        void this.decode(following.section).then((ready2) => {
+          if (ready2 !== null) this.tick();
+        });
+        return;
+      }
+      this.schedule(following, buffer);
+      if (following.state !== this.active) this.active = following.state;
+      const afterThat = followingSegment(manifest, following);
+      if (afterThat !== null) void this.decode(afterThat.section);
+    }
+    schedule(segment, buffer) {
+      const context2 = this.context;
+      const section = this.manifest.sections.get(segment.section);
+      const source = context2.createBufferSource();
+      const gain = context2.createGain();
+      source.buffer = buffer;
+      source.connect(gain);
+      gain.connect(this.master);
+      let offset = segment.offsetBars * barSeconds(section);
+      let start = segment.start;
+      const earliest = context2.currentTime + LATE_JOIN_SECONDS;
+      if (start < earliest) {
+        offset += earliest - start;
+        start = earliest;
+      }
+      if (offset > 0) {
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(1, start + FADE_IN_SECONDS);
+      }
+      const playing = { segment, source, gain, cutAt: null, lead: null, leadAt: null };
+      this.orphan = null;
+      this.lastSection = segment.section;
+      if (segment.playIndex < 0) this.introsPlayed.add(segment.state);
+      source.onended = () => this.tick();
+      source.start(start, offset, segment.end - start);
+      this.queue.push(playing);
+      this.evictDecoded();
+      return playing;
+    }
+    // The lead-in into `playing`, played whole from `at`: it ends on the
+    // section's downbeat. A lead-in with a ring left on its end rings over it.
+    scheduleLeadIn(playing, buffer, at) {
+      const context2 = this.context;
+      const source = context2.createBufferSource();
+      const gain = context2.createGain();
+      source.buffer = buffer;
+      source.connect(gain);
+      gain.connect(this.master);
+      const start = Math.max(at, context2.currentTime + LATE_JOIN_SECONDS);
+      source.start(start, start - at, buffer.duration - (start - at));
+      playing.lead = { source, gain };
+      playing.leadAt = at;
+    }
+    cut(playing, at) {
+      const now = this.context.currentTime;
+      playing.cutAt = at;
+      playing.gain.gain.cancelScheduledValues(now);
+      playing.gain.gain.setValueAtTime(1, Math.max(now, at));
+      playing.gain.gain.linearRampToValueAtTime(0, at + RELEASE_SECONDS);
+      playing.source.stop(at + RELEASE_SECONDS);
+    }
+    // A change called off before its switch point: the section plays out again.
+    uncut(playing) {
+      const now = this.context.currentTime;
+      playing.cutAt = null;
+      playing.gain.gain.cancelScheduledValues(now);
+      playing.gain.gain.setValueAtTime(1, now);
+      playing.source.stop(playing.segment.end + RELEASE_SECONDS);
+    }
+    // A planned section that never started, and its lead-in.
+    cancel(playing) {
+      playing.source.onended = null;
+      playing.source.stop(0);
+      if (playing.lead !== null) playing.lead.source.stop(0);
+      this.release(playing);
+    }
+    release(playing) {
+      playing.source.onended = null;
+      playing.source.disconnect();
+      playing.gain.disconnect();
+      if (playing.lead !== null) {
+        playing.lead.source.disconnect();
+        playing.lead.gain.disconnect();
+      }
+    }
+    fetchSection(id) {
+      let pending = this.bytes.get(id);
+      if (pending === void 0) {
+        const file = this.manifest.sections.get(id)?.file ?? this.manifest.leadIns.get(id).file;
+        pending = this.deps.fetchBytes(`${this.baseUrl}${file}`);
+        this.bytes.set(id, pending);
+        pending.catch(() => this.bytes.delete(id));
+      }
+      return pending;
+    }
+    decode(id) {
+      const ready2 = this.decoded.get(id);
+      if (ready2 !== void 0) return Promise.resolve(ready2);
+      if (this.failed.has(id)) return Promise.resolve(null);
+      let pending = this.decoding.get(id);
+      if (pending === void 0) {
+        pending = this.fetchSection(id).then((bytes) => this.context.decodeAudioData(bytes.slice(0))).then((buffer) => {
+          this.decoded.set(id, buffer);
+          return buffer;
+        }).catch((error) => {
+          this.failed.add(id);
+          this.deps.log(`music: section ${id} could not be loaded (${String(error)})`);
+          return null;
+        }).finally(() => this.decoding.delete(id));
+        this.decoding.set(id, pending);
+      }
+      return pending;
+    }
+    stateSections(name) {
+      const state = this.manifest?.states.get(name);
+      if (state === void 0) return [];
+      return [...state.intro === null ? [] : [state.intro], ...state.play];
+    }
+    // What a state needs first: its intro and the first of its play list. The
+    // rest of the list is decoded one section ahead as it plays (planFollowing).
+    prefetchState(name) {
+      const state = this.manifest?.states.get(name);
+      if (state === void 0) return;
+      if (state.intro !== null) void this.decode(state.intro);
+      if (state.play.length > 0) void this.decode(state.play[0]);
+    }
+    evictDecoded() {
+      let total = 0;
+      for (const buffer of this.decoded.values()) total += buffer.length * buffer.numberOfChannels * 4;
+      if (total <= DECODED_BUDGET_BYTES) return;
+      const keep = new Set(this.queue.map((playing) => playing.segment.section));
+      for (const id of this.manifest.leadIns.keys()) keep.add(id);
+      for (const id of this.stateSections(this.active)) keep.add(id);
+      for (const [id, buffer] of this.decoded) {
+        if (total <= DECODED_BUDGET_BYTES) break;
+        if (keep.has(id)) continue;
+        this.decoded.delete(id);
+        total -= buffer.length * buffer.numberOfChannels * 4;
+      }
+    }
+    startIdleFetch() {
+      if (this.idleFetchStarted || this.deps.timers === false || this.manifest === null) return;
+      this.idleFetchStarted = true;
+      const plan = prefetchPlan(this.manifest);
+      const next = () => {
+        const step = plan.shift();
+        if (step === void 0) return;
+        const load = step.decode ? this.decode(step.id) : this.fetchSection(step.id);
+        load.then(
+          () => setTimeout(next, IDLE_FETCH_GAP_MS),
+          () => setTimeout(next, IDLE_FETCH_GAP_MS)
+        );
+      };
+      setTimeout(next, IDLE_FETCH_DELAY_MS);
+    }
+  };
+
+  // src/music.ts
+  function installMusic() {
+    const engine = new MusicEngine({
+      createContext: () => {
+        const Context = window.AudioContext || window.webkitAudioContext;
+        if (!Context) return null;
+        try {
+          return new Context({ latencyHint: "playback" });
+        } catch {
+          return null;
+        }
+      },
+      // no-cache revalidates rather than refetches: the manifest is tiny and must
+      // be current, and the section files it names carry their content hash.
+      fetchBytes: (url) => fetch(url, { cache: url.endsWith("manifest.json") ? "no-cache" : "default" }).then(
+        (response) => response.ok ? response.arrayBuffer() : Promise.reject(new Error(`${response.status} ${url}`))
+      ),
+      log: (message) => console.info(message)
+    });
+    const unlock = () => engine.resume();
+    for (const eventName of ["pointerdown", "keydown", "touchend"]) {
+      window.addEventListener(eventName, unlock, { passive: true });
+    }
+    window.LDBGMusic = {
+      setState: (name) => engine.setState(name),
+      setVolume: (linear) => engine.setVolume(linear),
+      status: () => JSON.stringify(engine.status())
+    };
+  }
+
   // src/index.ts
   installDiagnostics();
   for (const eventName of ["pointerdown", "keydown", "touchstart", "focus"]) {
@@ -13201,6 +13835,7 @@ ${ty.variants.map(
     if (!document.hidden) noteUserActivity();
   });
   window.setInterval(checkAfkIdle, AFK_CHECK_INTERVAL_MS);
+  installMusic();
   window.LDBGSpacetime = {
     beginLogin,
     beginLogout,

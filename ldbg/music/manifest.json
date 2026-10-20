@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "bpm": 170,
+  "beatsPerBar": 4,
+  "switchEveryBars": 4,
+  "gainDb": -6,
+  "sections": {
+    "intro_loop": {
+      "bars": 8,
+      "file": "intro_loop-d6503431fb7e.ogg"
+    },
+    "a": {
+      "bars": 24,
+      "file": "a-06046a2f53bd.ogg"
+    },
+    "b": {
+      "bars": 24,
+      "file": "b-d41cdfa9a585.ogg"
+    },
+    "a_2": {
+      "bars": 16,
+      "file": "a_2-06ec70d4ae94.ogg"
+    },
+    "c": {
+      "bars": 22,
+      "file": "c-8d94e19d4731.ogg"
+    },
+    "a_3": {
+      "bars": 16,
+      "file": "a_3-b909d8da4c45.ogg"
+    },
+    "outro": {
+      "bars": 9,
+      "switchEveryBars": 0,
+      "file": "outro-dc993417d2bc.ogg"
+    }
+  },
+  "leadIns": {
+    "cymbal_lead_up": {
+      "file": "cymbal_lead_up-c42b03fa8f1b.ogg",
+      "beats": 1.5
+    }
+  },
+  "transitions": [
+    {
+      "from": [
+        "intro_loop"
+      ],
+      "to": [
+        "farm"
+      ],
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1
+    },
+    {
+      "from": [
+        "outro"
+      ],
+      "to": "*",
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1
+    }
+  ],
+  "states": {
+    "menu": {
+      "play": [
+        "intro_loop"
+      ]
+    },
+    "farm": {
+      "play": [
+        "a",
+        "b",
+        "a_2",
+        "c",
+        "a_3"
+      ]
+    },
+    "results": {
+      "intro": "outro",
+      "play": []
+    }
+  },
+  "fallbacks": {
+    "farm_versus": "farm",
+    "dungeon": "farm",
+    "dark": "farm",
+    "boss": "farm",
+    "duel": "farm"
+  }
+}
