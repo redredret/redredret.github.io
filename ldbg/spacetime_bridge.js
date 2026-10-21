@@ -13255,6 +13255,8 @@ ${ty.variants.map(
         introOnce: entry.introOnce === true,
         play: play.map((id, index) => sectionId(id, sections, `state ${name} play[${index}]`)),
         then: entry.then == null ? null : String(entry.then),
+        thenOverlapBars: integer(entry.thenOverlapBars ?? 0, `state ${name} thenOverlapBars`, 0, 64),
+        thenFadeInBars: integer(entry.thenFadeInBars ?? 0, `state ${name} thenFadeInBars`, 0, 64),
         syncPosition: entry.syncPosition === true
       });
     }
@@ -13262,6 +13264,12 @@ ${ty.variants.map(
       if (state.then !== null && !states.has(state.then)) fail(`state ${state.name} then names no state: ${state.then}`);
       if (state.intro === null && state.play.length === 0 && state.then === null) {
         fail(`state ${state.name} plays nothing; leave it out, or map it to "${SILENCE}" through fallbacks`);
+      }
+      if (state.thenOverlapBars > 0 && (state.then === null || state.intro === null || state.play.length > 0)) {
+        fail(`state ${state.name} thenOverlapBars needs an intro, an empty play list and a then`);
+      }
+      if (state.intro !== null && state.thenOverlapBars > sections.get(state.intro).bars) {
+        fail(`state ${state.name} thenOverlapBars is longer than its intro`);
       }
     }
     const leadIns = /* @__PURE__ */ new Map();
@@ -13369,7 +13377,7 @@ ${ty.variants.map(
   }
   function place(manifest, section, state, playIndex, offsetBars, start) {
     const info = manifest.sections.get(section);
-    return { section, state, playIndex, offsetBars, start, end: start + (info.bars - offsetBars) * barSeconds(info) };
+    return { section, state, playIndex, offsetBars, start, end: start + (info.bars - offsetBars) * barSeconds(info), fadeIn: 0 };
   }
   function enterState(manifest, stateName, at, from, introsPlayed = /* @__PURE__ */ new Set()) {
     if (stateName === SILENCE) return null;
@@ -13391,7 +13399,14 @@ ${ty.variants.map(
     const state = manifest.states.get(segment.state);
     if (state === void 0) return null;
     if (state.play.length === 0) {
-      return state.then === null ? null : enterState(manifest, state.then, segment.end, null);
+      if (state.then === null) return null;
+      const bar = barSeconds(manifest.sections.get(segment.section));
+      const at = Math.max(segment.start, segment.end - state.thenOverlapBars * bar);
+      const next = enterState(manifest, state.then, at, null);
+      if (next !== null && state.thenFadeInBars > 0) {
+        next.fadeIn = state.thenFadeInBars * barSeconds(manifest.sections.get(next.section));
+      }
+      return next;
     }
     const index = segment.playIndex < 0 ? 0 : (segment.playIndex + 1) % state.play.length;
     return place(manifest, state.play[index], segment.state, index, 0, segment.end);
@@ -13420,6 +13435,16 @@ ${ty.variants.map(
   // src/music_engine.ts
   var RELEASE_SECONDS = 0.03;
   var FADE_IN_SECONDS = 0.01;
+  var CURVE_POINTS = 64;
+  function fadeCurve(from, to) {
+    const curve = new Float32Array(CURVE_POINTS);
+    for (let i = 0; i < CURVE_POINTS; i++) {
+      const t2 = i / (CURVE_POINTS - 1);
+      const shape = to < from ? Math.cos(t2 * Math.PI / 2) : Math.sin(t2 * Math.PI / 2);
+      curve[i] = to < from ? to + (from - to) * shape : from + (to - from) * shape;
+    }
+    return curve;
+  }
   var LATE_JOIN_SECONDS = 0.05;
   var PLAN_AHEAD_SECONDS = 1.5;
   var TICK_MS = 250;
@@ -13519,7 +13544,8 @@ ${ty.variants.map(
           offsetBars: playing.segment.offsetBars,
           cutAt: playing.cutAt,
           leadAt: playing.leadAt,
-          hitAt: playing.hitAt
+          hitAt: playing.hitAt,
+          fadeIn: playing.segment.fadeIn
         }))
       };
     }
@@ -13591,6 +13617,13 @@ ${ty.variants.map(
       const earliest = now + SWITCH_SAFETY_SECONDS;
       this.orphan = null;
       let committed = this.committed(now);
+      if (committed !== null && committed.cutAt === null) {
+        const settled = committed.segment.state === target || this.queue.some((playing) => playing !== committed && playing.cutAt === null && playing.segment.state === target && playing.segment.start >= committed.segment.start);
+        if (settled) {
+          this.planFollowing();
+          return;
+        }
+      }
       for (const playing of this.queue) {
         if (playing !== committed && startsBy(playing) > earliest) this.cancel(playing);
       }
@@ -13708,11 +13741,20 @@ ${ty.variants.map(
         offset += earliest - start;
         start = earliest;
       }
-      if (offset > 0) {
+      let fade = null;
+      if (segment.fadeIn > 0) {
+        fade = { start: segment.start, duration: segment.fadeIn };
+        const from = Math.min(1, Math.max(0, (start - segment.start) / segment.fadeIn));
+        const left = segment.start + segment.fadeIn - start;
+        if (left > 0) {
+          gain.gain.setValueAtTime(Math.sin(from * Math.PI / 2), start);
+          gain.gain.setValueCurveAtTime(fadeCurve(Math.sin(from * Math.PI / 2), 1), start, left);
+        }
+      } else if (offset > 0) {
         gain.gain.setValueAtTime(0, start);
         gain.gain.linearRampToValueAtTime(1, start + FADE_IN_SECONDS);
       }
-      const playing = { segment, source, gain, cutAt: null, stingers: [], leadAt: null, hitAt: null };
+      const playing = { segment, source, gain, cutAt: null, fade, stingers: [], leadAt: null, hitAt: null };
       this.orphan = null;
       this.lastSection = segment.section;
       if (segment.playIndex < 0) this.introsPlayed.add(segment.state);
@@ -13740,14 +13782,15 @@ ${ty.variants.map(
       this.active = target;
       const next = enterState(manifest, target, at, null, this.introsPlayed);
       let playing = null;
+      const wanted = () => resolveState(manifest, this.requested) === target;
       const startSection = (section2) => {
-        if (this.active !== target || next === null || section2 === null) return;
+        if (!wanted() || next === null || section2 === null) return;
         if (this.queue.some((queued) => queued.segment === next)) return;
         playing = this.schedule(next, section2);
         this.planFollowing();
       };
       const startHit = (hit2) => {
-        if (this.active !== target || hit2 === null) return;
+        if (!wanted() || hit2 === null) return;
         if (this.playStinger(playing, hit2, at, true) && playing !== null) playing.hitAt = at;
       };
       const section = next === null ? null : this.decoded.get(next.section);
@@ -13770,7 +13813,7 @@ ${ty.variants.map(
       const now = context2.currentTime;
       this.stingers = this.stingers.filter((stinger2) => stinger2.end > now);
       const end = at + buffer.duration;
-      const overlapping = this.stingers.filter((stinger2) => stinger2.start < end && at < stinger2.end);
+      const overlapping = this.stingers.filter((stinger2) => stinger2.start < end && at < stinger2.end && (forced || !stinger2.forced));
       if (overlapping.length > 0 && !forced) return false;
       for (const stinger2 of overlapping) {
         if (stinger2.start > now) {
@@ -13790,25 +13833,52 @@ ${ty.variants.map(
       gain.connect(this.master);
       const start = Math.max(at, now + LATE_JOIN_SECONDS);
       source.start(start, start - at, buffer.duration - (start - at));
-      const stinger = { source, gain, start: at, end };
+      const stinger = { source, gain, start: at, end, forced };
       this.stingers.push(stinger);
       if (playing !== null) playing.stingers.push(stinger);
       return true;
     }
+    // Its level at `time`: 1, or where its fade in had got to.
+    levelAt(playing, time) {
+      if (playing.fade === null) return 1;
+      const t2 = (time - playing.fade.start) / playing.fade.duration;
+      return t2 >= 1 ? 1 : Math.sin(Math.max(0, t2) * Math.PI / 2);
+    }
+    // Cancelling automation drops a fade in mid-way, which would jump the level
+    // back to where that fade began: so the level now is held first, from the
+    // fade's own curve.
+    holdLevel(playing, now) {
+      const level = this.levelAt(playing, now);
+      playing.gain.gain.cancelScheduledValues(now);
+      playing.gain.gain.setValueAtTime(level, now);
+      return level;
+    }
+    // A cut at `at`: over RELEASE_SECONDS a quick linear fade, and over a longer
+    // release (an immediate cut's fall-away) an equal-power one.
     cut(playing, at, release = RELEASE_SECONDS) {
       const now = this.context.currentTime;
       playing.cutAt = at;
-      playing.gain.gain.cancelScheduledValues(now);
-      playing.gain.gain.setValueAtTime(1, Math.max(now, at));
-      playing.gain.gain.linearRampToValueAtTime(0, at + release);
+      const level = this.holdLevel(playing, now);
+      const from = Math.max(now, at);
+      if (release > RELEASE_SECONDS) {
+        if (from > now) playing.gain.gain.setValueAtTime(level, from);
+        playing.gain.gain.setValueCurveAtTime(fadeCurve(level, 0), from, release);
+      } else {
+        playing.gain.gain.setValueAtTime(level, from);
+        playing.gain.gain.linearRampToValueAtTime(0, at + release);
+      }
+      playing.fade = null;
       playing.source.stop(at + release);
     }
     // A change called off before its switch point: the section plays out again.
     uncut(playing) {
       const now = this.context.currentTime;
       playing.cutAt = null;
-      playing.gain.gain.cancelScheduledValues(now);
-      playing.gain.gain.setValueAtTime(1, now);
+      const level = this.holdLevel(playing, now);
+      const segment = playing.segment;
+      const fadeEnd = segment.fadeIn > 0 ? segment.start + segment.fadeIn : now;
+      playing.gain.gain.linearRampToValueAtTime(1, Math.max(now + FADE_IN_SECONDS, fadeEnd));
+      if (level < 1 && segment.fadeIn > 0) playing.fade = { start: segment.start, duration: segment.fadeIn };
       playing.source.stop(playing.segment.end + RELEASE_SECONDS);
     }
     // A planned section that never started, and its transition sounds that

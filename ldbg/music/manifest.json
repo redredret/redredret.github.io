@@ -45,8 +45,8 @@
       "file": "cymbal_lead_up-c42b03fa8f1b.ogg",
       "beats": 1.5
     },
-    "death_echo": {
-      "file": "death_echo-f14ecfce342b.ogg",
+    "death_boom": {
+      "file": "death_boom-1aa5188fc982.ogg",
       "beats": 12
     }
   },
@@ -56,9 +56,9 @@
       "to": [
         "death"
       ],
-      "hit": "death_echo",
+      "hit": "death_boom",
       "immediate": true,
-      "releaseSeconds": 0.5
+      "releaseSeconds": 0.12
     },
     {
       "from": [
@@ -131,7 +131,10 @@
     },
     "death": {
       "intro": "death_ambient",
-      "play": []
+      "play": [],
+      "then": "menu",
+      "thenOverlapBars": 2,
+      "thenFadeInBars": 3
     }
   },
   "fallbacks": {
