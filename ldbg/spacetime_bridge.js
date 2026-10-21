@@ -13281,8 +13281,11 @@ ${ty.variants.map(
     rawTransitions.forEach((value, index) => {
       const entry = value ?? {};
       const where = `transitions[${index}]`;
-      if (!Array.isArray(entry.from) || entry.from.length === 0) fail(`${where} from must be a list of sections`);
-      const from = entry.from.map((id) => sectionId(id, sections, `${where} from`));
+      let from = null;
+      if (entry.from !== "*") {
+        if (!Array.isArray(entry.from) || entry.from.length === 0) fail(`${where} from must be a list of sections or "*"`);
+        from = entry.from.map((id) => sectionId(id, sections, `${where} from`));
+      }
       let to = null;
       if (entry.to !== "*") {
         if (!Array.isArray(entry.to) || entry.to.length === 0) fail(`${where} to must be a list of states or "*"`);
@@ -13301,7 +13304,21 @@ ${ty.variants.map(
       const hit = sound("hit");
       if (leadIn === null && hit === null) fail(`${where} plays nothing: give it a leadIn or a hit`);
       const every = entry.switchEveryBars == null ? null : integer(entry.switchEveryBars, `${where} switchEveryBars`, 1, 512);
-      transitions.push({ from, to, leadIn, hit, switchEveryBars: every });
+      const immediate = entry.immediate === true;
+      if (immediate && leadIn !== null) fail(`${where} is immediate, so it has no time for a leadIn; give it a hit`);
+      const release = entry.releaseSeconds;
+      if (release != null && (typeof release !== "number" || !(release >= 0 && release <= 10))) {
+        fail(`${where} releaseSeconds must be from 0 to 10`);
+      }
+      transitions.push({
+        from,
+        to,
+        leadIn,
+        hit,
+        switchEveryBars: every,
+        immediate,
+        releaseSeconds: release == null ? null : release
+      });
     });
     const fallbacks = /* @__PURE__ */ new Map();
     const rawFallbacks = root.fallbacks ?? {};
@@ -13328,9 +13345,9 @@ ${ty.variants.map(
     return null;
   }
   function findTransition(manifest, fromSection, target) {
-    if (fromSection === null) return null;
     for (const transition of manifest.transitions) {
-      if (transition.from.includes(fromSection) && (transition.to === null || transition.to.includes(target))) return transition;
+      const fromMatches = transition.from === null || fromSection !== null && transition.from.includes(fromSection);
+      if (fromMatches && (transition.to === null || transition.to.includes(target))) return transition;
     }
     return null;
   }
@@ -13590,6 +13607,10 @@ ${ty.variants.map(
       const probe = committed !== null && committed.segment.state === target ? null : enterState(manifest, target, 0, null, this.introsPlayed);
       const transition = probe === null ? null : findTransition(manifest, fromSection, target);
       const lead = probe === null ? 0 : leadInSeconds(manifest, transition, probe.section);
+      if (transition !== null && transition.immediate && probe !== null) {
+        this.applyImmediately(manifest, target, transition);
+        return;
+      }
       if (lead > 0 && committed !== null && committed.cutAt === null && earliest + lead >= committed.segment.end - 1e-6) {
         const follower = followingSegment(manifest, committed.segment);
         const buffer = follower === null ? void 0 : this.decoded.get(follower.section);
@@ -13701,16 +13722,67 @@ ${ty.variants.map(
       this.evictDecoded();
       return playing;
     }
+    // An immediate change (a death): every section still sounding falls away
+    // over the transition's release from now, anything planned is called off,
+    // and the new state's music starts at once under the hit. Nothing here waits
+    // for a decode: a section not yet decoded joins as soon as it is, and a hit
+    // not yet decoded is let go (the background load decodes both early).
+    applyImmediately(manifest, target, transition) {
+      const context2 = this.context;
+      const at = context2.currentTime + LATE_JOIN_SECONDS;
+      const release = transition.releaseSeconds ?? RELEASE_SECONDS;
+      for (const playing2 of this.queue) {
+        if (startsBy(playing2) > at) this.cancel(playing2);
+        else if ((playing2.cutAt ?? playing2.segment.end) > at) this.cut(playing2, at, release);
+      }
+      this.queue = this.queue.filter((playing2) => startsBy(playing2) <= at);
+      this.orphan = null;
+      this.active = target;
+      const next = enterState(manifest, target, at, null, this.introsPlayed);
+      let playing = null;
+      const startSection = (section2) => {
+        if (this.active !== target || next === null || section2 === null) return;
+        if (this.queue.some((queued) => queued.segment === next)) return;
+        playing = this.schedule(next, section2);
+        this.planFollowing();
+      };
+      const startHit = (hit2) => {
+        if (this.active !== target || hit2 === null) return;
+        if (this.playStinger(playing, hit2, at, true) && playing !== null) playing.hitAt = at;
+      };
+      const section = next === null ? null : this.decoded.get(next.section);
+      if (section !== void 0) startSection(section);
+      else if (next !== null) void this.decode(next.section).then(startSection);
+      const hit = transition.hit === null ? null : this.decoded.get(transition.hit);
+      if (hit !== void 0) startHit(hit);
+      else if (transition.hit !== null) void this.decode(transition.hit).then(startHit);
+      this.prefetchState(target);
+      this.planFollowing();
+    }
     // A transition's sound for `playing`, played whole from `at`: a lead-in is
     // placed to end on the section's downbeat, a hit to start on it. Skipped,
     // returning false, when another is still to sound over any of that time:
     // one cymbal at a time, however fast the player bounces between screens.
-    playStinger(playing, buffer, at) {
+    // A `forced` one (a death's impact) is never skipped: it fades out whatever
+    // it would sound over instead.
+    playStinger(playing, buffer, at, forced = false) {
       const context2 = this.context;
       const now = context2.currentTime;
       this.stingers = this.stingers.filter((stinger2) => stinger2.end > now);
       const end = at + buffer.duration;
-      if (this.stingers.some((stinger2) => stinger2.start < end && at < stinger2.end)) return false;
+      const overlapping = this.stingers.filter((stinger2) => stinger2.start < end && at < stinger2.end);
+      if (overlapping.length > 0 && !forced) return false;
+      for (const stinger2 of overlapping) {
+        if (stinger2.start > now) {
+          stinger2.source.stop(0);
+        } else {
+          stinger2.gain.gain.cancelScheduledValues(now);
+          stinger2.gain.gain.setValueAtTime(1, Math.max(now, at));
+          stinger2.gain.gain.linearRampToValueAtTime(0, at + RELEASE_SECONDS);
+          stinger2.source.stop(at + RELEASE_SECONDS);
+        }
+        this.stingers = this.stingers.filter((other) => other !== stinger2);
+      }
       const source = context2.createBufferSource();
       const gain = context2.createGain();
       source.buffer = buffer;
@@ -13720,16 +13792,16 @@ ${ty.variants.map(
       source.start(start, start - at, buffer.duration - (start - at));
       const stinger = { source, gain, start: at, end };
       this.stingers.push(stinger);
-      playing.stingers.push(stinger);
+      if (playing !== null) playing.stingers.push(stinger);
       return true;
     }
-    cut(playing, at) {
+    cut(playing, at, release = RELEASE_SECONDS) {
       const now = this.context.currentTime;
       playing.cutAt = at;
       playing.gain.gain.cancelScheduledValues(now);
       playing.gain.gain.setValueAtTime(1, Math.max(now, at));
-      playing.gain.gain.linearRampToValueAtTime(0, at + RELEASE_SECONDS);
-      playing.source.stop(at + RELEASE_SECONDS);
+      playing.gain.gain.linearRampToValueAtTime(0, at + release);
+      playing.source.stop(at + release);
     }
     // A change called off before its switch point: the section plays out again.
     uncut(playing) {

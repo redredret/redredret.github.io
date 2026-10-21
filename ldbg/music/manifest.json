@@ -33,15 +33,33 @@
       "bars": 9,
       "switchEveryBars": 0,
       "file": "outro-dc993417d2bc.ogg"
+    },
+    "death_ambient": {
+      "bars": 6,
+      "switchEveryBars": 0,
+      "file": "death_ambient-75b95b0ba2ba.ogg"
     }
   },
   "leadIns": {
     "cymbal_lead_up": {
       "file": "cymbal_lead_up-c42b03fa8f1b.ogg",
       "beats": 1.5
+    },
+    "death_echo": {
+      "file": "death_echo-f14ecfce342b.ogg",
+      "beats": 12
     }
   },
   "transitions": [
+    {
+      "from": "*",
+      "to": [
+        "death"
+      ],
+      "hit": "death_echo",
+      "immediate": true,
+      "releaseSeconds": 0.5
+    },
     {
       "from": [
         "intro_loop"
@@ -82,6 +100,14 @@
       "to": "*",
       "leadIn": "cymbal_lead_up",
       "switchEveryBars": 1
+    },
+    {
+      "from": [
+        "death_ambient"
+      ],
+      "to": "*",
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1
     }
   ],
   "states": {
@@ -101,6 +127,10 @@
     },
     "results": {
       "intro": "outro",
+      "play": []
+    },
+    "death": {
+      "intro": "death_ambient",
       "play": []
     }
   },
