@@ -858,6 +858,11 @@ video.duelist-right { right: 12%; height: 326px; bottom: 2px; }
 .skin-rows .strip { display: flex; --cell: 22px; }
 .skin-rows .blk { width: var(--cell); height: var(--cell); flex-basis: var(--cell); }
 .skin-rows .lvreq { margin-left: auto; color: var(--gold); font-weight: 700; }
+.skins-sub { margin: 16px 0 8px; font: 400 18px/1.2 var(--display); color: var(--text); }
+.skin-rows-earned li { align-items: flex-start; }
+.skin-rows-earned .strip { margin-top: 2px; }
+.skin-rows-earned b { display: block; color: var(--text); }
+.skin-rows-earned small { display: block; font-size: 13px; font-weight: 500; line-height: 1.35; }
 
 /* Finale. */
 .finale {

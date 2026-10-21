@@ -79,11 +79,15 @@ Yes. LDBG is free and plays in your browser at redredret.github.io/ldbg. Try it 
 
 ### Do I need to download anything?
 
-No. It runs in a desktop browser such as Chrome or Edge. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates; it isn't signed yet, so Windows asks you to confirm before it runs.
+No. It runs in a desktop browser such as Chrome, Edge or Firefox. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates; it isn't signed yet, so Windows asks you to confirm before it runs.
 
 ### What do I play it with?
 
 A keyboard or a controller, on a computer. Every control can be rebound in Settings, and handling such as auto-repeat and soft drop speed can be tuned the way competitive stackers like it.
+
+### Can I play on my phone?
+
+Not yet. LDBG needs a keyboard or a controller, so play it on a computer. Touch controls are planned.
 
 ### How does the RPG side work?
 
@@ -95,7 +99,7 @@ Yes. Farm Versus seats up to ten players who send garbage at each other, Dark Fa
 
 ### Is my progress saved?
 
-When you Log In, your progress is kept on the game's servers and follows you to any computer. Guest play is a short local demo, and nothing earned as a guest moves to an account.
+Yes. When you Log In, your progress is kept on the game's servers and follows you to any computer, and it stays through the beta: nothing you earn now will be wiped. Guest play is a short local demo, and nothing earned as a guest moves to an account.
 
 ### Is LDBG finished?
 

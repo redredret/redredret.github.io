@@ -63,7 +63,7 @@
    ],
    "applicationCategory": "GameApplication",
    "applicationSubCategory": "Puzzle RPG",
-   "operatingSystem": "A desktop web browser such as Chrome or Edge; Windows app",
+   "operatingSystem": "A desktop web browser such as Chrome, Edge or Firefox; Windows app",
    "playMode": [
     "SinglePlayer",
     "MultiPlayer",
@@ -126,7 +126,7 @@
      "name": "Do I need to download anything?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "No. It runs in a desktop browser such as Chrome or Edge. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates; it isn't signed yet, so Windows asks you to confirm before it runs."
+      "text": "No. It runs in a desktop browser such as Chrome, Edge or Firefox. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates; it isn't signed yet, so Windows asks you to confirm before it runs."
      }
     },
     {
@@ -135,6 +135,14 @@
      "acceptedAnswer": {
       "@type": "Answer",
       "text": "A keyboard or a controller, on a computer. Every control can be rebound in Settings, and handling such as auto-repeat and soft drop speed can be tuned the way competitive stackers like it."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I play on my phone?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Not yet. LDBG needs a keyboard or a controller, so play it on a computer. Touch controls are planned."
      }
     },
     {
@@ -158,7 +166,7 @@
      "name": "Is my progress saved?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "When you Log In, your progress is kept on the game's servers and follows you to any computer. Guest play is a short local demo, and nothing earned as a guest moves to an account."
+      "text": "Yes. When you Log In, your progress is kept on the game's servers and follows you to any computer, and it stays through the beta: nothing you earn now will be wiped. Guest play is a short local demo, and nothing earned as a guest moves to an account."
      }
     },
     {
@@ -582,8 +590,30 @@
           </ul>
           <div class="skins">
             <h3>Dress your board</h3>
-            <p>Unlock new block skins as you level, from Toybox to Celestial at level 50.</p>
-            <ul class="skin-rows" aria-label="Block skins"></ul>
+            <p>Unlock new block skins as you level, from Toybox to Celestial at level 50, and earn eleven more by taking on challenges, like Gel Packs for a maxed-out Slime King run.</p>
+            <ul class="skin-rows" aria-label="Block skins you unlock as you level">
+              <li data-skin="chalk"><span class="skin-name">Chalk</span><span class="lvreq">Free</span></li>
+              <li data-skin="toybox"><span class="skin-name">Toybox</span><span class="lvreq">Free</span></li>
+              <li data-skin="gemstone"><span class="skin-name">Gemstone</span><span class="lvreq">Lv 10</span></li>
+              <li data-skin="neon"><span class="skin-name">Neon Arcade</span><span class="lvreq">Lv 20</span></li>
+              <li data-skin="stained_glass"><span class="skin-name">Stained Glass</span><span class="lvreq">Lv 30</span></li>
+              <li data-skin="runestone"><span class="skin-name">Runestone</span><span class="lvreq">Lv 40</span></li>
+              <li data-skin="celestial"><span class="skin-name">Celestial</span><span class="lvreq">Lv 50</span></li>
+            </ul>
+            <h4 class="skins-sub">Earned by challenges</h4>
+            <ul class="skin-rows skin-rows-earned" aria-label="Block skins you earn by taking on challenges">
+              <li data-skin="bevel"><span class="skin-name"><b>Bevel</b><small>Clear 10 Quads in one run.</small></span></li>
+              <li data-skin="voxel"><span class="skin-name"><b>Voxel</b><small>Beat the Garbage Man's wave 10.</small></span></li>
+              <li data-skin="gummy"><span class="skin-name"><b>Gummy</b><small>Get 2 Perfect Clears in one run.</small></span></li>
+              <li data-skin="chrome"><span class="skin-name"><b>Chrome</b><small>Win a duel against someone 5 or more levels above you.</small></span></li>
+              <li data-skin="glacier"><span class="skin-name"><b>Glacier</b><small>Defeat 25 enemies in one Dark Endless run.</small></span></li>
+              <li data-skin="pocket"><span class="skin-name"><b>Pocket</b><small>Reach level 10 in a Farm run without using hold.</small></span></li>
+              <li data-skin="eight_bit"><span class="skin-name"><b>8-Bit</b><small>Build a 12 combo in one run.</small></span></li>
+              <li data-skin="vector"><span class="skin-name"><b>Vector</b><small>Land 5 T-Spin Triples in one run.</small></span></li>
+              <li data-skin="origami"><span class="skin-name"><b>Origami</b><small>Clear lines with 10 non-T spins in one run.</small></span></li>
+              <li data-skin="hologram"><span class="skin-name"><b>Hologram</b><small>Reach fight 30 alone in the Endless Dungeon.</small></span></li>
+              <li data-skin="gel"><span class="skin-name"><b>Gel Packs</b><small>Max out a Slime King run: play on until it reaches its limit.</small></span></li>
+            </ul>
           </div>
         </div>
       </section>
@@ -614,11 +644,15 @@
             </div>
             <div class="faq-item">
               <dt>Do I need to download anything?</dt>
-              <dd>No. It runs in a desktop browser such as Chrome or Edge. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates; it isn't signed yet, so Windows asks you to confirm before it runs.</dd>
+              <dd>No. It runs in a desktop browser such as Chrome, Edge or Firefox. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates; it isn't signed yet, so Windows asks you to confirm before it runs.</dd>
             </div>
             <div class="faq-item">
               <dt>What do I play it with?</dt>
               <dd>A keyboard or a controller, on a computer. Every control can be rebound in Settings, and handling such as auto-repeat and soft drop speed can be tuned the way competitive stackers like it.</dd>
+            </div>
+            <div class="faq-item">
+              <dt>Can I play on my phone?</dt>
+              <dd>Not yet. LDBG needs a keyboard or a controller, so play it on a computer. Touch controls are planned.</dd>
             </div>
             <div class="faq-item">
               <dt>How does the RPG side work?</dt>
@@ -630,7 +664,7 @@
             </div>
             <div class="faq-item">
               <dt>Is my progress saved?</dt>
-              <dd>When you Log In, your progress is kept on the game's servers and follows you to any computer. Guest play is a short local demo, and nothing earned as a guest moves to an account.</dd>
+              <dd>Yes. When you Log In, your progress is kept on the game's servers and follows you to any computer, and it stays through the beta: nothing you earn now will be wiped. Guest play is a short local demo, and nothing earned as a guest moves to an account.</dd>
             </div>
             <div class="faq-item">
               <dt>Is LDBG finished?</dt>

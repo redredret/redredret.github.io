@@ -187,29 +187,17 @@
 
   // --- Skins --------------------------------------------------------------------
 
-  const SKINS = [
-    ['chalk', 'Chalk', 0], ['toybox', 'Toybox', 0], ['gemstone', 'Gemstone', 10],
-    ['neon', 'Neon Arcade', 20], ['stained_glass', 'Stained Glass', 30],
-    ['runestone', 'Runestone', 40], ['celestial', 'Celestial', 50],
-  ];
-
+  // The skins are listed in the page itself (name, and the level or challenge
+  // that opens each); this paints each one's row of blocks from its atlas.
   function buildSkins() {
-    const list = document.querySelector('.skin-rows');
-    if (!list) return;
-    for (const [id, name, level] of SKINS) {
-      const item = document.createElement('li');
+    document.querySelectorAll('.skin-rows [data-skin]').forEach((item) => {
       const strip = document.createElement('span');
       strip.className = 'strip';
-      strip.style.setProperty('--skin', `url(ui/skins/${id}.svg)`);
+      strip.setAttribute('aria-hidden', 'true');
+      strip.style.setProperty('--skin', `url(ui/skins/${item.dataset.skin}.svg)`);
       for (let piece = 0; piece < 7; piece++) strip.append(block(piece));
-      const label = document.createElement('span');
-      label.textContent = name;
-      const gate = document.createElement('span');
-      gate.className = 'lvreq';
-      gate.textContent = level ? `Lv ${level}` : 'Free';
-      item.append(strip, label, gate);
-      list.append(item);
-    }
+      item.prepend(strip);
+    });
   }
 
   // --- Numbers ------------------------------------------------------------------
