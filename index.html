@@ -23,9 +23,9 @@
 <link rel="alternate" type="text/markdown" href="llms.txt" title="LDBG, in plain text for AI assistants">
 <meta name="theme-color" content="#182226">
 <link rel="icon" href="ui/ldbg_icon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Lilita+One&display=swap">
+<link rel="preload" as="font" type="font/woff2" href="fonts/baloo2-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="fonts/lilitaone-latin.woff2" crossorigin>
+<link rel="preload" as="image" href="img/area_bandit_camp.webp" fetchpriority="high">
 <link rel="preload" as="image" href="img/area_greenshore.webp">
 <link rel="stylesheet" href="style.css">
 <!-- Written by tools/landing/bake_page.mjs from stats.json and the FAQ below. -->
@@ -63,7 +63,7 @@
    ],
    "applicationCategory": "GameApplication",
    "applicationSubCategory": "Puzzle RPG",
-   "operatingSystem": "Any desktop web browser (Chrome, Edge, Firefox); Windows app",
+   "operatingSystem": "A desktop web browser such as Chrome or Edge; Windows app",
    "playMode": [
     "SinglePlayer",
     "MultiPlayer",
@@ -77,7 +77,7 @@
    "inLanguage": "en",
    "isAccessibleForFree": true,
    "softwareVersion": "Early beta",
-   "dateModified": "2026-10-20",
+   "dateModified": "2026-10-21",
    "gameEdition": "Early beta",
    "image": [
     "https://redredret.github.io/img/social_card.jpg",
@@ -126,7 +126,7 @@
      "name": "Do I need to download anything?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "No. It runs in a desktop browser such as Chrome, Edge or Firefox. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates."
+      "text": "No. It runs in a desktop browser such as Chrome or Edge. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates; it isn't signed yet, so Windows asks you to confirm before it runs."
      }
     },
     {
@@ -202,8 +202,8 @@
   <!-- ============================ HERO ============================ -->
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero-scene" aria-hidden="true">
-      <img class="hero-foe" src="img/enemy_bandit_king.webp" alt="" width="900" height="799">
-      <img class="hero-knight" src="img/hero_knight.webp" alt="" width="900" height="829">
+      <img width="793" height="900" class="hero-foe" src="img/enemy_bandit_king.webp" srcset="img/enemy_bandit_king_sm.webp 423w, img/enemy_bandit_king.webp 793w" sizes="(max-width: 720px) 220px, 380px" alt="">
+      <img width="900" height="815" class="hero-knight" src="img/hero_knight.webp" srcset="img/hero_knight_sm.webp 480w, img/hero_knight.webp 900w" sizes="(max-width: 720px) 210px, 330px" alt="">
     </div>
     <div class="hero-copy">
       <h1 id="hero-title" class="ink">Clear lines.<br>Slay monsters.<br>Keep the loot.</h1>
@@ -221,21 +221,21 @@
       <div class="stack-row" data-row="low"></div>
       <div class="hero-drop"></div>
       <ul class="hero-loot">
-        <li><img src="img/items/oak_log.png" alt="">+2 Oak Log</li>
-        <li><img src="img/items/iron_ore.png" alt="">+1 Iron Ore</li>
-        <li><img src="img/items/cotton.png" alt="">+1 Cotton</li>
+        <li><img src="img/items/oak_log.webp" alt="">+2 Oak Log</li>
+        <li><img src="img/items/iron_ore.webp" alt="">+1 Iron Ore</li>
+        <li><img src="img/items/cotton.webp" alt="">+1 Cotton</li>
       </ul>
     </div>
   </section>
 
   <!-- ====================== WHAT'S INSIDE STRIP ====================== -->
   <section class="inside" aria-label="What is in the game">
-    <a class="inside-tile" href="#armoury"><img src="img/icons/inventory.webp" alt="" width="56" height="56"><b data-count="content.items">133</b><span>Items</span></a>
+    <a class="inside-tile" href="#armoury"><img src="img/icons/inventory.webp" alt="" width="56" height="56"><b data-count="content.items">143</b><span>Items</span></a>
     <a class="inside-tile" href="#bestiary"><img src="img/icons/dungeon.webp" alt="" width="56" height="56"><b data-count="content.enemies">16</b><span>Monsters</span></a>
-    <a class="inside-tile" href="#armoury"><img src="img/icons/crafting.webp" alt="" width="56" height="56"><b data-count="content.recipes">96</b><span>Recipes</span></a>
-    <a class="inside-tile" href="#grow"><img src="img/icons/upgrades.webp" alt="" width="56" height="56"><b data-count="content.upgrades">103</b><span>Upgrades</span></a>
+    <a class="inside-tile" href="#armoury"><img src="img/icons/crafting.webp" alt="" width="56" height="56"><b data-count="content.recipes">107</b><span>Recipes</span></a>
+    <a class="inside-tile" href="#grow"><img src="img/icons/upgrades.webp" alt="" width="56" height="56"><b data-count="content.upgrades">107</b><span>Upgrades</span></a>
     <a class="inside-tile" href="#grow"><img src="img/icons/greenshore.webp" alt="" width="56" height="56"><b data-count="content.quests">46</b><span>Quests</span></a>
-    <a class="inside-tile" href="#arena"><img src="img/icons/arena.webp" alt="" width="56" height="56"><b data-count="content.modes">9</b><span>Ways to play</span></a>
+    <a class="inside-tile" href="#arena"><img src="img/icons/arena.webp" alt="" width="56" height="56"><b data-count="content.modes">10</b><span>Ways to play</span></a>
   </section>
 
   <div class="columns">
@@ -255,10 +255,10 @@
           <video class="clip banner-pop pop-left" data-clip="hero_ranger_dance" poster="clips/hero_ranger_dance.webp" width="492" height="480" muted playsinline preload="none" aria-label="An adventurer in rugged hide dancing with the Spiky Bow"></video>
           <div class="board-mock" aria-hidden="true" data-board="farm"></div>
           <ol class="gathered" aria-label="Materials gathered from clearing lines">
-            <li class="gathered-card"><img src="img/items/maple_log.png" alt="" loading="lazy">Maple Log <b>&times;3</b></li>
-            <li class="gathered-card"><img src="img/items/mithril_ore.png" alt="" loading="lazy">Mithril Ore <b>&times;1</b></li>
-            <li class="gathered-card"><img src="img/items/raw_trout.png" alt="" loading="lazy">Raw Trout <b>&times;2</b></li>
-            <li class="gathered-card"><img src="img/items/flax.png" alt="" loading="lazy">Flax <b>&times;4</b></li>
+            <li class="gathered-card"><img src="img/items/maple_log.webp" alt="" loading="lazy">Maple Log <b>&times;3</b></li>
+            <li class="gathered-card"><img src="img/items/mithril_ore.webp" alt="" loading="lazy">Mithril Ore <b>&times;1</b></li>
+            <li class="gathered-card"><img src="img/items/raw_trout.webp" alt="" loading="lazy">Raw Trout <b>&times;2</b></li>
+            <li class="gathered-card"><img src="img/items/flax.webp" alt="" loading="lazy">Flax <b>&times;4</b></li>
           </ol>
         </div>
         <div class="chapter-body">
@@ -295,14 +295,14 @@
         </header>
         <div class="banner banner-tall" style="--area: url(img/area_bandit_camp.webp)">
           <ol class="gear-ladder" aria-label="Four sets of gear, from starter to epic">
-            <li><img src="img/hero_starter.webp" alt="Leather cap and tunic, iron sword and wooden buckler" width="900" height="761" loading="lazy"><span class="lv" data-level-of="leather_cap,leather_tunic,iron_sword,wooden_buckler">Lv 1</span></li>
-            <li><img src="img/hero_knight.webp" alt="Full mithril: helmet, armour, sword and buckler" width="900" height="829" loading="lazy"><span class="lv" data-level-of="mithril_helmet,mithril_armor,mithril_sword,mithril_buckler">Lv 10</span></li>
-            <li><img src="img/hero_adamant.webp" alt="Full adamantite: helmet, armour, sword and buckler" width="900" height="790" loading="lazy"><span class="lv" data-level-of="adamantite_helmet,adamantite_armor,adamantite_sword,adamantite_buckler">Lv 30</span></li>
-            <li><img src="img/hero_champion.webp" alt="Rugged cap, cultist robe, a bandit's blade and a spiked buckler" width="900" height="859" loading="lazy"><span class="lv" data-level-of="rugged_cap,cultist_robe,bandit_blade_a,spiked_buckler">Lv 35</span></li>
+            <li><img width="900" height="740" src="img/hero_starter.webp" srcset="img/hero_starter_sm.webp 480w, img/hero_starter.webp 900w" sizes="(max-width: 720px) 100px, 210px" alt="Leather cap and tunic, iron sword and wooden buckler" loading="lazy"><span class="lv" data-level-of="leather_cap,leather_tunic,iron_sword,wooden_buckler">Lv 1</span></li>
+            <li><img width="900" height="815" src="img/hero_knight.webp" srcset="img/hero_knight_sm.webp 480w, img/hero_knight.webp 900w" sizes="(max-width: 720px) 100px, 210px" alt="Full mithril: helmet, armour, sword and buckler" loading="lazy"><span class="lv" data-level-of="mithril_helmet,mithril_armor,mithril_sword,mithril_buckler">Lv 10</span></li>
+            <li><img width="900" height="778" src="img/hero_adamant.webp" srcset="img/hero_adamant_sm.webp 480w, img/hero_adamant.webp 900w" sizes="(max-width: 720px) 100px, 210px" alt="Full adamantite: helmet, armour, sword and buckler" loading="lazy"><span class="lv" data-level-of="adamantite_helmet,adamantite_armor,adamantite_sword,adamantite_buckler">Lv 30</span></li>
+            <li><img width="900" height="834" src="img/hero_champion.webp" srcset="img/hero_champion_sm.webp 480w, img/hero_champion.webp 900w" sizes="(max-width: 720px) 100px, 210px" alt="Rugged cap, cultist robe, a bandit's blade and a spiked buckler" loading="lazy"><span class="lv" data-level-of="rugged_cap,cultist_robe,bandit_blade_a,spiked_buckler">Lv 35</span></li>
           </ol>
         </div>
         <div class="chapter-body">
-          <p>Smelt your ore into ingots, weave your fibre into fabric, and work them into <b data-count="content.equipment">61</b> pieces of gear across <b data-count="content.recipes">96</b> recipes. Everything you wear shows on your character, from helmets and armour to swords, bows, staves, bucklers, rings and necklaces. Trade the rest for Gold with other players on the Market.</p>
+          <p>Smelt your ore into ingots, weave your fibre into fabric, and work them into <b data-count="content.equipment">61</b> pieces of gear across <b data-count="content.recipes">107</b> recipes. Everything you wear shows on your character, from helmets and armour to swords, bows, staves, bucklers, rings and necklaces. Trade the rest for Gold with other players on the Market.</p>
           <div class="inventory" data-inventory>
             <div class="inventory-tabs" role="tablist" aria-label="Item kinds">
               <button class="tab" role="tab" aria-selected="true" data-filter="all">All</button>
@@ -312,141 +312,152 @@
               <button class="tab" role="tab" aria-selected="false" data-filter="material">Materials</button>
             </div>
             <ul class="inventory-grid" aria-label="Every item in the game">
-              <li class="slot" tabindex="0" style="--rarity: var(--legendary)" data-id="cultist_amulet"><img src="img/items/cultist_amulet.png" alt="Cultist's Amulet" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--legendary)" data-id="bandit_crown"><img src="img/items/bandit_crown.png" alt="Bandit Crown" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="clutched_ring"><img src="img/items/clutched_ring.png" alt="Clutched Ring" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="hourglass_amulet"><img src="img/items/hourglass_amulet.png" alt="Hourglass Amulet" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="kings_amulet"><img src="img/items/kings_amulet.png" alt="King's Amulet" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="recycler_ring"><img src="img/items/recycler_ring.png" alt="Recycler's Ring" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="ring_of_garbage"><img src="img/items/ring_of_garbage.png" alt="Ring of Garbage" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="ring_of_goop"><img src="img/items/ring_of_goop.png" alt="Oozing Ring" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="ring_of_thorns"><img src="img/items/ring_of_thorns.png" alt="Ring of Thorns" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_hat"><img src="img/items/lotus_hat.png" alt="Lotus Hat" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_robe"><img src="img/items/lotus_robe.png" alt="Lotus Robe" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_tome"><img src="img/items/lotus_tome.png" alt="Lotus Tome" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_cap"><img src="img/items/lotus_cap.png" alt="Lotus-Lined Cap" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_tunic"><img src="img/items/lotus_tunic.png" alt="Lotus-Lined Tunic" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="orichalcum_armor"><img src="img/items/orichalcum_armor.png" alt="Orichalcum Armor" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="orichalcum_buckler"><img src="img/items/orichalcum_buckler.png" alt="Orichalcum Buckler" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="orichalcum_helmet"><img src="img/items/orichalcum_helmet.png" alt="Orichalcum Helmet" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="spiked_buckler"><img src="img/items/spiked_buckler.png" alt="Spiked Buckler" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="royal_slime_broth"><img src="img/items/royal_slime_broth.png" alt="Royal Slime Broth" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="cult_idol"><img src="img/items/cult_idol.png" alt="Cult Idol" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="darkwood_log"><img src="img/items/darkwood_log.png" alt="Darkwood Log" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="darkwood_plank"><img src="img/items/darkwood_plank.png" alt="Darkwood Plank" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="duskhide"><img src="img/items/duskhide.png" alt="Duskhide" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_cloth"><img src="img/items/lotus_cloth.png" alt="Lotus Cloth" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_leaves"><img src="img/items/lotus_leaves.png" alt="Lotus Leaves" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="orichalcum_ingot"><img src="img/items/orichalcum_ingot.png" alt="Orichalcum Ingot" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="orichalcum_ore"><img src="img/items/orichalcum_ore.png" alt="Orichalcum Ore" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="bandit_blade_a"><img src="img/items/bandit_blade_a.png" alt="Bandit Blade (A)" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="darkwood_bow"><img src="img/items/darkwood_bow.png" alt="Darkwood Bow" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="darkwood_staff"><img src="img/items/darkwood_staff.png" alt="Darkwood Staff" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="horned_staff"><img src="img/items/horned_staff.png" alt="Horned Staff" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="orichalcum_sword"><img src="img/items/orichalcum_sword.png" alt="Orichalcum Sword" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="spiky_bow"><img src="img/items/spiky_bow.png" alt="Spiky Bow" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="kamikaze_necklace"><img src="img/items/kamikaze_necklace.png" alt="Kamikaze Necklace" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="adamantite_armor"><img src="img/items/adamantite_armor.png" alt="Adamantite Armor" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="adamantite_buckler"><img src="img/items/adamantite_buckler.png" alt="Adamantite Buckler" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="adamantite_helmet"><img src="img/items/adamantite_helmet.png" alt="Adamantite Helmet" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="bernie_hat"><img src="img/items/bernie_hat.png" alt="Bernie's Hat" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="cultist_book"><img src="img/items/cultist_book.png" alt="Cultist Book" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="cultist_robe"><img src="img/items/cultist_robe.png" alt="Cultist Robe" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="nettle_hat"><img src="img/items/nettle_hat.png" alt="Nettle Hat" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="nettle_robe"><img src="img/items/nettle_robe.png" alt="Nettle Robe" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="punchy_hat"><img src="img/items/punchy_hat.png" alt="Punchy's Hat" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="rugged_cap"><img src="img/items/rugged_cap.png" alt="Rugged Hide Cap" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="rugged_chest"><img src="img/items/rugged_chest.png" alt="Rugged Hide Cuirass" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="shooty_hat"><img src="img/items/shooty_hat.png" alt="Shooty's Hat" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="slime_broth"><img src="img/items/slime_broth.png" alt="Slime Broth" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="trout_pie"><img src="img/items/trout_pie.png" alt="Trout Pie" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="adamantite_ingot"><img src="img/items/adamantite_ingot.png" alt="Adamantite Ingot" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="adamantite_ore"><img src="img/items/adamantite_ore.png" alt="Adamantite Ore" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="horn"><img src="img/items/horn.png" alt="Broken Horn" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="clutch_idol"><img src="img/items/clutch_idol.png" alt="Clutch Idol" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="garbage_idol"><img src="img/items/garbage_idol.png" alt="Garbage Idol" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="goop_idol"><img src="img/items/goop_idol.png" alt="Ooze Idol" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="horn_chunk"><img src="img/items/horn_chunk.png" alt="Horn Chunks" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="ipe_log"><img src="img/items/ipe_log.png" alt="Ipe Log" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="ipe_plank"><img src="img/items/ipe_plank.png" alt="Ipe Plank" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="kamikaze_idol"><img src="img/items/kamikaze_idol.png" alt="Kamikaze Idol" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="kings_idol"><img src="img/items/kings_idol.png" alt="King's Idol" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="nettle"><img src="img/items/nettle.png" alt="Nettle" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="nettle_fabric"><img src="img/items/nettle_fabric.png" alt="Nettle Fabric" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="royal_jelly"><img src="img/items/royal_jelly.png" alt="Royal Jelly" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="rugged_hide"><img src="img/items/rugged_hide.png" alt="Rugged Hide" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="sand_idol"><img src="img/items/sand_idol.png" alt="Sand Idol" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="scrap_idol"><img src="img/items/scrap_idol.png" alt="Scrap Idol" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="thorny_idol"><img src="img/items/thorny_idol.png" alt="Thorny Idol" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="adamantite_sword"><img src="img/items/adamantite_sword.png" alt="Adamantite Sword" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="burning_staff"><img src="img/items/burning_staff.png" alt="Burning Staff" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="ipe_bow"><img src="img/items/ipe_bow.png" alt="Ipe Bow" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="kris"><img src="img/items/kris.png" alt="Kris" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="magic_ring"><img src="img/items/magic_ring.png" alt="Magic Ring" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="cotton_hat"><img src="img/items/cotton_hat.png" alt="Cotton Hat" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="cotton_robe"><img src="img/items/cotton_robe.png" alt="Cotton Robe" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="iron_armor"><img src="img/items/iron_armor.png" alt="Iron Armor" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_armor"><img src="img/items/mithril_armor.png" alt="Mithril Armor" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_buckler"><img src="img/items/mithril_buckler.png" alt="Mithril Buckler" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_helmet"><img src="img/items/mithril_helmet.png" alt="Mithril Helmet" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="rough_leather_cap"><img src="img/items/rough_leather_cap.png" alt="Rough Leather Cap" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="rough_leather_tunic"><img src="img/items/rough_leather_tunic.png" alt="Rough Leather Tunic" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="carrot_stew"><img src="img/items/carrot_stew.png" alt="Carrot Stew" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="sardine_stew"><img src="img/items/sardine_stew.png" alt="Guppy Stew" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="minor_healing_potion"><img src="img/items/minor_healing_potion.png" alt="Minor Healing Potion" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="bernie_skin"><img src="img/items/bernie_skin.png" alt="Bernie's Skin" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="cotton"><img src="img/items/cotton.png" alt="Cotton" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="cotton_fabric"><img src="img/items/cotton_fabric.png" alt="Cotton Fabric" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="eye_ball"><img src="img/items/eye_ball.png" alt="Eye Ball" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="magic_chain"><img src="img/items/magic_chain.png" alt="Magic Chain" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="maple_log"><img src="img/items/maple_log.png" alt="Maple Log" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="maple_plank"><img src="img/items/maple_plank.png" alt="Maple Plank" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_arrow"><img src="img/items/mithril_arrow.png" alt="Mithril Arrow" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_ingot"><img src="img/items/mithril_ingot.png" alt="Mithril Ingot" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_ore"><img src="img/items/mithril_ore.png" alt="Mithril Ore" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="punchy_skin"><img src="img/items/punchy_skin.png" alt="Punchy's Skin" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="rough_fabric"><img src="img/items/rough_fabric.png" alt="Rough Leather" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="shooty_skin"><img src="img/items/shooty_skin.png" alt="Shooty's Skin" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="slime_gel"><img src="img/items/slime_gel.png" alt="Slime Ball" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="raw_trout"><img src="img/items/raw_trout.png" alt="Trout" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="bandit_blades"><img src="img/items/bandit_blades.png" alt="Bandit Blade" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="fire_staff"><img src="img/items/fire_staff.png" alt="Fire Staff" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="maple_bow"><img src="img/items/maple_bow.png" alt="Maple Bow" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_sword"><img src="img/items/mithril_sword.png" alt="Mithril Sword" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="iron_helmet"><img src="img/items/iron_helmet.png" alt="Iron Helmet" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="leather_cap"><img src="img/items/leather_cap.png" alt="Leather Cap" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="leather_tunic"><img src="img/items/leather_tunic.png" alt="Leather Tunic" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="wizard_hat"><img src="img/items/wizard_hat.png" alt="Wizard Hat" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="wizard_robe"><img src="img/items/wizard_robe.png" alt="Wizard Robe" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="wooden_buckler"><img src="img/items/wooden_buckler.png" alt="Wooden Buckler" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="anglers_compost"><img src="img/items/anglers_compost.png" alt="Angler's Compost" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="bandage_roll"><img src="img/items/bandage_roll.png" alt="Bandage Roll" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="carrot"><img src="img/items/carrot.png" alt="Carrot" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="coal"><img src="img/items/coal.png" alt="Coal" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="farmers_compost"><img src="img/items/farmers_compost.png" alt="Farmer's Compost" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="fertiliser"><img src="img/items/fertiliser.png" alt="Fertiliser" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="flax"><img src="img/items/flax.png" alt="Flax" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="flax_fabric"><img src="img/items/flax_fabric.png" alt="Flax Fabric" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="gold_coin"><img src="img/items/gold_coin.png" alt="Gold Coin" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="raw_guppy"><img src="img/items/raw_guppy.png" alt="Guppy" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="iron_ingot"><img src="img/items/iron_ingot.png" alt="Iron Ingot" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="iron_ore"><img src="img/items/iron_ore.png" alt="Iron Ore" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="leather"><img src="img/items/leather.png" alt="Leather" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="miners_compost"><img src="img/items/miners_compost.png" alt="Miner's Compost" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="oak_log"><img src="img/items/oak_log.png" alt="Oak Log" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="oak_plank"><img src="img/items/oak_plank.png" alt="Oak Plank" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="provisions_pouch"><img src="img/items/provisions_pouch.png" alt="Provisions Pouch" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="rich_compost"><img src="img/items/rich_compost.png" alt="Rich Compost" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="rugged_satchel"><img src="img/items/rugged_satchel.png" alt="Rugged Satchel" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="slime_bag"><img src="img/items/slime_bag.png" alt="Slime Bag" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="super_compost"><img src="img/items/super_compost.png" alt="Super Compost" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="treasure_seal"><img src="img/items/treasure_seal.png" alt="Treasure Seal" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="wardens_seal"><img src="img/items/wardens_seal.png" alt="Warden's Seal" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="woodcutters_compost"><img src="img/items/woodcutters_compost.png" alt="Woodcutter's Compost" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="iron_sword"><img src="img/items/iron_sword.png" alt="Iron Sword" loading="lazy" width="128" height="128"></li>
-              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="oak_bow"><img src="img/items/oak_bow.png" alt="Oak Bow" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--legendary)" data-id="cultist_amulet"><img src="img/items/cultist_amulet.webp" alt="Cultist's Amulet" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--legendary)" data-id="bandit_crown"><img src="img/items/bandit_crown.webp" alt="Bandit Crown" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="clutched_ring"><img src="img/items/clutched_ring.webp" alt="Clutched Ring" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="hourglass_amulet"><img src="img/items/hourglass_amulet.webp" alt="Hourglass Amulet" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="kings_amulet"><img src="img/items/kings_amulet.webp" alt="King's Amulet" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="ring_of_goop"><img src="img/items/ring_of_goop.webp" alt="Oozing Ring" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="recycler_ring"><img src="img/items/recycler_ring.webp" alt="Recycler's Ring" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="ring_of_garbage"><img src="img/items/ring_of_garbage.webp" alt="Ring of Garbage" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="ring_of_thorns"><img src="img/items/ring_of_thorns.webp" alt="Ring of Thorns" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_hat"><img src="img/items/lotus_hat.webp" alt="Lotus Hat" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_robe"><img src="img/items/lotus_robe.webp" alt="Lotus Robe" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_tome"><img src="img/items/lotus_tome.webp" alt="Lotus Tome" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_cap"><img src="img/items/lotus_cap.webp" alt="Lotus-Lined Cap" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_tunic"><img src="img/items/lotus_tunic.webp" alt="Lotus-Lined Tunic" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="orichalcum_armor"><img src="img/items/orichalcum_armor.webp" alt="Orichalcum Armor" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="orichalcum_buckler"><img src="img/items/orichalcum_buckler.webp" alt="Orichalcum Buckler" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="orichalcum_helmet"><img src="img/items/orichalcum_helmet.webp" alt="Orichalcum Helmet" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="spiked_buckler"><img src="img/items/spiked_buckler.webp" alt="Spiked Buckler" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="royal_slime_broth"><img src="img/items/royal_slime_broth.webp" alt="Royal Slime Broth" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="cult_idol"><img src="img/items/cult_idol.webp" alt="Cult Idol" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="darkwood_log"><img src="img/items/darkwood_log.webp" alt="Darkwood Log" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="darkwood_plank"><img src="img/items/darkwood_plank.webp" alt="Darkwood Plank" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="duskhide"><img src="img/items/duskhide.webp" alt="Duskhide" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_cloth"><img src="img/items/lotus_cloth.webp" alt="Lotus Cloth" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="lotus_leaves"><img src="img/items/lotus_leaves.webp" alt="Lotus Leaves" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="orichalcum_ingot"><img src="img/items/orichalcum_ingot.webp" alt="Orichalcum Ingot" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="orichalcum_ore"><img src="img/items/orichalcum_ore.webp" alt="Orichalcum Ore" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="thick_slime"><img src="img/items/thick_slime.webp" alt="Thick Slime" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="bandit_blade_a"><img src="img/items/bandit_blade_a.webp" alt="Bandit Blade (A)" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="darkwood_bow"><img src="img/items/darkwood_bow.webp" alt="Darkwood Bow" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="darkwood_staff"><img src="img/items/darkwood_staff.webp" alt="Darkwood Staff" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="horned_staff"><img src="img/items/horned_staff.webp" alt="Horned Staff" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="orichalcum_sword"><img src="img/items/orichalcum_sword.webp" alt="Orichalcum Sword" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--epic)" data-id="spiky_bow"><img src="img/items/spiky_bow.webp" alt="Spiky Bow" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="kamikaze_necklace"><img src="img/items/kamikaze_necklace.webp" alt="Kamikaze Necklace" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="adamantite_armor"><img src="img/items/adamantite_armor.webp" alt="Adamantite Armor" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="adamantite_buckler"><img src="img/items/adamantite_buckler.webp" alt="Adamantite Buckler" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="adamantite_helmet"><img src="img/items/adamantite_helmet.webp" alt="Adamantite Helmet" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="bernie_hat"><img src="img/items/bernie_hat.webp" alt="Bernie's Hat" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="cultist_book"><img src="img/items/cultist_book.webp" alt="Cultist Book" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="cultist_robe"><img src="img/items/cultist_robe.webp" alt="Cultist Robe" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="nettle_hat"><img src="img/items/nettle_hat.webp" alt="Nettle Hat" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="nettle_robe"><img src="img/items/nettle_robe.webp" alt="Nettle Robe" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="punchy_hat"><img src="img/items/punchy_hat.webp" alt="Punchy's Hat" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="rugged_cap"><img src="img/items/rugged_cap.webp" alt="Rugged Hide Cap" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="rugged_chest"><img src="img/items/rugged_chest.webp" alt="Rugged Hide Cuirass" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="shooty_hat"><img src="img/items/shooty_hat.webp" alt="Shooty's Hat" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="slime_broth"><img src="img/items/slime_broth.webp" alt="Slime Broth" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="trout_pie"><img src="img/items/trout_pie.webp" alt="Trout Pie" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="adamantite_ingot"><img src="img/items/adamantite_ingot.webp" alt="Adamantite Ingot" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="adamantite_ore"><img src="img/items/adamantite_ore.webp" alt="Adamantite Ore" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="horn"><img src="img/items/horn.webp" alt="Broken Horn" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="clutch_idol"><img src="img/items/clutch_idol.webp" alt="Clutch Idol" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="garbage_idol"><img src="img/items/garbage_idol.webp" alt="Garbage Idol" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="horn_chunk"><img src="img/items/horn_chunk.webp" alt="Horn Chunks" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="ipe_log"><img src="img/items/ipe_log.webp" alt="Ipe Log" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="ipe_plank"><img src="img/items/ipe_plank.webp" alt="Ipe Plank" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="kamikaze_idol"><img src="img/items/kamikaze_idol.webp" alt="Kamikaze Idol" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="kings_idol"><img src="img/items/kings_idol.webp" alt="King's Idol" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="nettle"><img src="img/items/nettle.webp" alt="Nettle" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="nettle_fabric"><img src="img/items/nettle_fabric.webp" alt="Nettle Fabric" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="goop_idol"><img src="img/items/goop_idol.webp" alt="Ooze Idol" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="royal_jelly"><img src="img/items/royal_jelly.webp" alt="Royal Jelly" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="rugged_hide"><img src="img/items/rugged_hide.webp" alt="Rugged Hide" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="sand_idol"><img src="img/items/sand_idol.webp" alt="Sand Idol" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="scrap_idol"><img src="img/items/scrap_idol.webp" alt="Scrap Idol" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="thorny_idol"><img src="img/items/thorny_idol.webp" alt="Thorny Idol" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="adamantite_sword"><img src="img/items/adamantite_sword.webp" alt="Adamantite Sword" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="burning_staff"><img src="img/items/burning_staff.webp" alt="Burning Staff" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="ipe_bow"><img src="img/items/ipe_bow.webp" alt="Ipe Bow" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--rare)" data-id="kris"><img src="img/items/kris.webp" alt="Kris" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="magic_ring"><img src="img/items/magic_ring.webp" alt="Magic Ring" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="cotton_hat"><img src="img/items/cotton_hat.webp" alt="Cotton Hat" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="cotton_robe"><img src="img/items/cotton_robe.webp" alt="Cotton Robe" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="iron_armor"><img src="img/items/iron_armor.webp" alt="Iron Armor" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_armor"><img src="img/items/mithril_armor.webp" alt="Mithril Armor" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_buckler"><img src="img/items/mithril_buckler.webp" alt="Mithril Buckler" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_helmet"><img src="img/items/mithril_helmet.webp" alt="Mithril Helmet" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="rough_leather_cap"><img src="img/items/rough_leather_cap.webp" alt="Rough Leather Cap" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="rough_leather_tunic"><img src="img/items/rough_leather_tunic.webp" alt="Rough Leather Tunic" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="carrot_stew"><img src="img/items/carrot_stew.webp" alt="Carrot Stew" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="sardine_stew"><img src="img/items/sardine_stew.webp" alt="Guppy Stew" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="minor_healing_potion"><img src="img/items/minor_healing_potion.webp" alt="Minor Healing Potion" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="bernie_skin"><img src="img/items/bernie_skin.webp" alt="Bernie's Skin" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="cotton"><img src="img/items/cotton.webp" alt="Cotton" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="cotton_fabric"><img src="img/items/cotton_fabric.webp" alt="Cotton Fabric" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="eye_ball"><img src="img/items/eye_ball.webp" alt="Eye Ball" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="magic_chain"><img src="img/items/magic_chain.webp" alt="Magic Chain" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="maple_log"><img src="img/items/maple_log.webp" alt="Maple Log" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="maple_plank"><img src="img/items/maple_plank.webp" alt="Maple Plank" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_arrow"><img src="img/items/mithril_arrow.webp" alt="Mithril Arrow" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_ingot"><img src="img/items/mithril_ingot.webp" alt="Mithril Ingot" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_ore"><img src="img/items/mithril_ore.webp" alt="Mithril Ore" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="punchy_skin"><img src="img/items/punchy_skin.webp" alt="Punchy's Skin" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="rough_fabric"><img src="img/items/rough_fabric.webp" alt="Rough Leather" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="shooty_skin"><img src="img/items/shooty_skin.webp" alt="Shooty's Skin" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="slime_gel"><img src="img/items/slime_gel.webp" alt="Slime Ball" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="raw_trout"><img src="img/items/raw_trout.webp" alt="Trout" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="bandit_blades"><img src="img/items/bandit_blades.webp" alt="Bandit Blade" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="fire_staff"><img src="img/items/fire_staff.webp" alt="Fire Staff" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="maple_bow"><img src="img/items/maple_bow.webp" alt="Maple Bow" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--uncommon)" data-id="mithril_sword"><img src="img/items/mithril_sword.webp" alt="Mithril Sword" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="iron_helmet"><img src="img/items/iron_helmet.webp" alt="Iron Helmet" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="leather_cap"><img src="img/items/leather_cap.webp" alt="Leather Cap" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="leather_tunic"><img src="img/items/leather_tunic.webp" alt="Leather Tunic" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="wizard_hat"><img src="img/items/wizard_hat.webp" alt="Wizard Hat" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="wizard_robe"><img src="img/items/wizard_robe.webp" alt="Wizard Robe" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="wooden_buckler"><img src="img/items/wooden_buckler.webp" alt="Wooden Buckler" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="anglers_compost"><img src="img/items/anglers_compost.webp" alt="Angler's Compost" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="bandage_roll"><img src="img/items/bandage_roll.webp" alt="Bandage Roll" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="blank_chart"><img src="img/items/blank_chart.webp" alt="Blank Chart" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="bandit_camp_chart"><img src="img/items/bandit_camp_chart.webp" alt="Camp Chart" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="carrot"><img src="img/items/carrot.webp" alt="Carrot" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="coal"><img src="img/items/coal.webp" alt="Coal" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="cultist_tower_chart"><img src="img/items/cultist_tower_chart.webp" alt="Cultist Chart" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="cyclops_arena_chart"><img src="img/items/cyclops_arena_chart.webp" alt="Cyclops Chart" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="the_dump_chart"><img src="img/items/the_dump_chart.webp" alt="Dump Chart" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="farmers_compost"><img src="img/items/farmers_compost.webp" alt="Farmer's Compost" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="fertiliser"><img src="img/items/fertiliser.webp" alt="Fertiliser" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="greenshore_fields_chart"><img src="img/items/greenshore_fields_chart.webp" alt="Fields Chart" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="flax"><img src="img/items/flax.webp" alt="Flax" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="flax_fabric"><img src="img/items/flax_fabric.webp" alt="Flax Fabric" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="gold_coin"><img src="img/items/gold_coin.webp" alt="Gold Coin" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="slime_grotto_chart"><img src="img/items/slime_grotto_chart.webp" alt="Grotto Chart" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="raw_guppy"><img src="img/items/raw_guppy.webp" alt="Guppy" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="iron_ingot"><img src="img/items/iron_ingot.webp" alt="Iron Ingot" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="iron_ore"><img src="img/items/iron_ore.webp" alt="Iron Ore" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="leather"><img src="img/items/leather.webp" alt="Leather" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="miners_compost"><img src="img/items/miners_compost.webp" alt="Miner's Compost" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="oak_log"><img src="img/items/oak_log.webp" alt="Oak Log" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="oak_plank"><img src="img/items/oak_plank.webp" alt="Oak Plank" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="provisions_pouch"><img src="img/items/provisions_pouch.webp" alt="Provisions Pouch" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="rich_compost"><img src="img/items/rich_compost.webp" alt="Rich Compost" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="rugged_satchel"><img src="img/items/rugged_satchel.webp" alt="Rugged Satchel" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="scrap"><img src="img/items/scrap.webp" alt="Scrap" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="slime_bag"><img src="img/items/slime_bag.webp" alt="Slime Bag" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="super_compost"><img src="img/items/super_compost.webp" alt="Super Compost" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="bandit_town_chart"><img src="img/items/bandit_town_chart.webp" alt="Town Chart" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="treasure_seal"><img src="img/items/treasure_seal.webp" alt="Treasure Seal" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="wardens_seal"><img src="img/items/wardens_seal.webp" alt="Warden's Seal" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="woodcutters_compost"><img src="img/items/woodcutters_compost.webp" alt="Woodcutter's Compost" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="iron_sword"><img src="img/items/iron_sword.webp" alt="Iron Sword" loading="lazy" width="128" height="128"></li>
+              <li class="slot" tabindex="0" style="--rarity: var(--common)" data-id="oak_bow"><img src="img/items/oak_bow.webp" alt="Oak Bow" loading="lazy" width="128" height="128"></li>
             </ul>
-            <p class="inventory-caption"><span data-inventory-count>133</span> items. Hover or tap one to look closer.</p>
+            <p class="inventory-caption"><span data-inventory-count>143</span> items. Hover or tap one to look closer.</p>
+            <button class="stone stone-quiet inventory-more" type="button" aria-expanded="false" hidden>Show all items</button>
             <div class="item-tip" role="status" aria-live="polite" hidden></div>
           </div>
         </div>
@@ -479,11 +490,11 @@
           <div>
             <p>Greenshore's story runs <b data-count="content.storyEncounters">19</b> fights long, from zombies on the shore to the Cult Leader at the top of the tower. Your lines are your attacks. Theirs land on your board: arrows knock out blocks, fire spreads along the bottom row, and slime costs you a rotation.</p>
             <ul class="mode-list">
-              <li><img src="img/icons/story.webp" alt="" width="56" height="56" loading="lazy"><div><b>Story</b>One set route through every area and every boss.</div></li>
-              <li><img src="img/icons/endless.webp" alt="" width="56" height="56" loading="lazy"><div><b>Endless</b>One dungeon made of regions, each ending in a reward chest. The deeper you go, the harder the regions and the better the chests. Go alone or bring a friend.</div></li>
-              <li class="dark"><img src="img/icons/dark_dungeon.webp" alt="" width="56" height="56" loading="lazy"><div><b>Dark</b>Enemies at double strength, and other hunters on the loose. Monsters break your gear and you lose what you found; lose to a player and they take what you wear.</div></li>
+              <li><img src="img/icons/story.webp" alt="" width="56" height="56" loading="lazy"><div><b>Story</b>Greenshore's set route, through every area and every boss.</div></li>
+              <li><img src="img/icons/endless.webp" alt="" width="56" height="56" loading="lazy"><div><b>Endless</b>One dungeon made of regions, each ending in a reward chest. The deeper you go, the harder the regions and the better the chests. Build the Cartographer's Table to chart a region you've found and steer your run there. Go alone or bring a friend.</div></li>
+              <li class="dark"><img src="img/icons/dark_dungeon.webp" alt="" width="56" height="56" loading="lazy"><div><b>Dark Endless</b>The Endless Dungeon at Dark strength: enemies hit twice as hard, every kill drops three times over, and chests pay double. Leave at a checkpoint to keep your haul. Die to a monster and you lose it and your gear breaks; lose to another hunter and they take what you wear.</div></li>
               <li><img src="img/icons/garbage_man.webp" alt="" width="56" height="56" loading="lazy"><div><b>The Garbage Man</b><span data-count="content.garbageWaves">10</span> waves of garbage, faster every wave. One top-out ends it.</div></li>
-              <li><img src="img/enemy_slime.webp" alt="" width="56" height="56" loading="lazy"><div><b>The Slime King</b>A king after every king, alone or with a friend. He walls your board down to four columns until he falls.</div></li>
+              <li><img width="56" height="56" src="img/enemy_slime_king_sm.webp" alt="" loading="lazy"><div><b>The Slime King</b>A king after every king, alone or with a friend. He walls your board down to four columns until he falls.</div></li>
             </ul>
           </div>
         </div>
@@ -502,23 +513,24 @@
         <div class="chapter-body">
           <p><b data-count="content.bosses">8</b> bosses and <span data-count="content.regulars">8</span> lesser foes, each with their own way of wrecking your board. The tallies are from the live game.</p>
           <ul class="posters">
-            <li class="poster" data-enemy="bandit_king"><div class="portrait"><img src="img/enemy_bandit_king.webp" alt="The Bandit King, a boss in LDBG" loading="lazy"><video class="clip portrait-clip" data-clip="bandit_king_spin" data-play="hover" poster="clips/bandit_king_spin.webp" style="--h: 1.914; --x: -0.522; --y: -0.242" muted playsinline preload="none" aria-hidden="true"></video></div><h3>Bandit King</h3><p>Switches between arrow rain and a blade spin that cuts your top and bottom rows.</p><span class="bounty">Slain <b data-kills="bandit_king">87</b> times</span></li>
-            <li class="poster" data-enemy="cyclops"><img src="img/enemy_cyclops.webp" alt="The Cyclops, a dungeon boss in LDBG" loading="lazy"><h3>Cyclops</h3><p>Knocks blocks loose from the top of your stack, then sets it on fire.</p><span class="bounty">Slain <b data-kills="cyclops">85</b> times</span></li>
-            <li class="poster" data-enemy="punchy"><img src="img/enemy_punchy.webp" alt="Punchy, a red cyclops boss" loading="lazy"><h3>Punchy</h3><p>Slams the ground, and a stone wave sweeps across one of your rows.</p><span class="bounty">Slain <b data-kills="punchy">91</b> times</span></li>
-            <li class="poster" data-enemy="shooty"><div class="portrait"><img src="img/enemy_shooty.webp" alt="Shooty, a green cyclops boss" loading="lazy"><video class="clip portrait-clip" data-clip="shooty_bonk" data-play="hover" poster="clips/shooty_bonk.webp" style="--h: 1.798; --x: -0.861; --y: -0.154" muted playsinline preload="none" aria-hidden="true"></video></div><h3>Shooty</h3><p>Hurls boulders that drop three or four stone blocks onto your board.</p><span class="bounty">Slain <b data-kills="shooty">90</b> times</span></li>
-            <li class="poster" data-enemy="bernie"><img src="img/enemy_bernie.webp" alt="Bernie, a blue fire-casting cyclops boss" loading="lazy"><h3>Bernie</h3><p>A fire-casting cyclops whose fireball spreads along your bottom row.</p><span class="bounty">Slain <b data-kills="bernie">114</b> times</span></li>
-            <li class="poster" data-enemy="cult_leader"><div class="portrait"><img src="img/enemy_cult_leader.webp" alt="The Cult Leader, the boss at the top of the Cultist Tower" loading="lazy"><video class="clip portrait-clip" data-clip="cult_leader_flex" data-play="hover" poster="clips/cult_leader_flex.webp" style="--h: 1.471; --x: -0.43; --y: -0.079" muted playsinline preload="none" aria-hidden="true"></video></div><h3>Cult Leader</h3><p>Opens portals and hurls fireballs, then shields itself from your next hit.</p><span class="bounty">Slain <b data-kills="cult_leader">61</b> times</span></li>
-            <li class="poster poster-wide" data-enemy="garbage_man"><div class="portrait"><img src="img/enemy_garbage_man.webp" alt="The Garbage Man, the boss of his own dungeon" loading="lazy"><video class="clip portrait-clip" data-clip="garbage_man_juggle" data-play="hover" poster="clips/garbage_man_juggle.webp" style="--h: 1.093; --x: -0.144; --y: -0.017" muted playsinline preload="none" aria-hidden="true"></video></div><h3>The Garbage Man</h3><p>Throws garbage at you one line at a time, faster every wave. Beat wave ten for an Arcane Vault, then keep going.</p><span class="bounty">Lives in his own dungeon</span></li>
+            <li class="poster" data-enemy="bandit_king"><div class="portrait"><img width="793" height="900" src="img/enemy_bandit_king.webp" srcset="img/enemy_bandit_king_sm.webp 423w, img/enemy_bandit_king.webp 793w" sizes="200px" alt="The Bandit King, a boss in LDBG" loading="lazy"><video class="clip portrait-clip" data-clip="bandit_king_spin" data-play="hover" poster="clips/bandit_king_spin.webp" style="--h: 1.914; --x: -0.522; --y: -0.242" muted playsinline preload="none" aria-hidden="true"></video></div><h3>Bandit King</h3><p>Switches between arrow rain and a blade spin that cuts your top and bottom rows.</p><span class="bounty">Slain <b data-kills="bandit_king">140</b> times</span></li>
+            <li class="poster" data-enemy="cyclops"><img width="581" height="900" src="img/enemy_cyclops.webp" srcset="img/enemy_cyclops_sm.webp 310w, img/enemy_cyclops.webp 581w" sizes="200px" alt="The Cyclops, a dungeon boss in LDBG" loading="lazy"><h3>Cyclops</h3><p>Knocks blocks loose from the top of your stack, then sets it on fire.</p><span class="bounty">Slain <b data-kills="cyclops">153</b> times</span></li>
+            <li class="poster" data-enemy="punchy"><img width="573" height="900" src="img/enemy_punchy.webp" srcset="img/enemy_punchy_sm.webp 306w, img/enemy_punchy.webp 573w" sizes="200px" alt="Punchy, a red cyclops boss" loading="lazy"><h3>Punchy</h3><p>Slams the ground, and a stone wave sweeps across one of your rows.</p><span class="bounty">Slain <b data-kills="punchy">146</b> times</span></li>
+            <li class="poster" data-enemy="shooty"><div class="portrait"><img width="550" height="900" src="img/enemy_shooty.webp" srcset="img/enemy_shooty_sm.webp 293w, img/enemy_shooty.webp 550w" sizes="200px" alt="Shooty, a green cyclops boss" loading="lazy"><video class="clip portrait-clip" data-clip="shooty_bonk" data-play="hover" poster="clips/shooty_bonk.webp" style="--h: 1.798; --x: -0.861; --y: -0.154" muted playsinline preload="none" aria-hidden="true"></video></div><h3>Shooty</h3><p>Hurls boulders that drop three or four stone blocks onto your board.</p><span class="bounty">Slain <b data-kills="shooty">154</b> times</span></li>
+            <li class="poster" data-enemy="bernie"><img width="545" height="900" src="img/enemy_bernie.webp" srcset="img/enemy_bernie_sm.webp 291w, img/enemy_bernie.webp 545w" sizes="200px" alt="Bernie, a blue fire-casting cyclops boss" loading="lazy"><h3>Bernie</h3><p>A fire-casting cyclops whose fireball spreads along your bottom row.</p><span class="bounty">Slain <b data-kills="bernie">160</b> times</span></li>
+            <li class="poster" data-enemy="cult_leader"><div class="portrait"><img width="638" height="900" src="img/enemy_cult_leader.webp" srcset="img/enemy_cult_leader_sm.webp 340w, img/enemy_cult_leader.webp 638w" sizes="200px" alt="The Cult Leader, the boss at the top of the Cultist Tower" loading="lazy"><video class="clip portrait-clip" data-clip="cult_leader_flex" data-play="hover" poster="clips/cult_leader_flex.webp" style="--h: 1.471; --x: -0.43; --y: -0.079" muted playsinline preload="none" aria-hidden="true"></video></div><h3>Cult Leader</h3><p>Opens portals and hurls fireballs, then shields itself from your next hit.</p><span class="bounty">Slain <b data-kills="cult_leader">96</b> times</span></li>
+            <li class="poster poster-wide" data-enemy="garbage_man"><div class="portrait"><img width="652" height="900" src="img/enemy_garbage_man.webp" srcset="img/enemy_garbage_man_sm.webp 348w, img/enemy_garbage_man.webp 652w" sizes="200px" alt="The Garbage Man, the boss of his own dungeon" loading="lazy"><video class="clip portrait-clip" data-clip="garbage_man_juggle" data-play="hover" poster="clips/garbage_man_juggle.webp" style="--h: 1.093; --x: -0.144; --y: -0.017" muted playsinline preload="none" aria-hidden="true"></video></div><h3>The Garbage Man</h3><p>Throws garbage at you one line at a time, faster every wave. Beat wave ten for an Arcane Vault, then keep going.</p><span class="bounty">Lives in his own dungeon</span></li>
+            <li class="poster poster-wide" data-enemy="slime_king"><img width="810" height="900" src="img/enemy_slime_king.webp" srcset="img/enemy_slime_king_sm.webp 432w, img/enemy_slime_king.webp 810w" sizes="200px" alt="The Slime King, a crowned slime boss" loading="lazy"><h3>The Slime King</h3><p>Walls your board down to four columns, slimes your tower and wraps you up until you shake him off. Beat him and a bigger one comes for you.</p><span class="bounty">Slain <b data-kills="slime_king">528</b> times</span></li>
           </ul>
           <ul class="rabble" aria-label="Lesser foes">
-            <li><img src="img/enemy_zombie.webp" alt="A zombie" loading="lazy"><b>Zombie</b>Swipes a block off your top.</li>
-            <li><img src="img/enemy_super_zombie.webp" alt="A super zombie" loading="lazy"><b>Super Zombie</b>Rakes off two or three.</li>
-            <li><div class="portrait"><img src="img/enemy_slime.webp" alt="A slime" loading="lazy"><video class="clip portrait-clip" data-clip="slime_bounce" data-play="hover" poster="clips/slime_bounce.webp" style="--h: 2.353; --x: -0.474; --y: -0.082" muted playsinline preload="none" aria-hidden="true"></video></div><b>Slime</b>Slimes your piece. No rotating.</li>
-            <li><img src="img/enemy_squirrel.webp" alt="A squirrel" loading="lazy"><b>Squirrel</b>Nips at you. Never your board.</li>
-            <li><img src="img/enemy_bandit.webp" alt="A bandit with a bow" loading="lazy"><b>Bandit</b>Arrows knock out a block.</li>
-            <li><img src="img/enemy_bandit_elite.webp" alt="A bandit elite with a crossbow" loading="lazy"><b>Bandit Elite</b>A tougher bandit, crossbow and all.</li>
-            <li><img src="img/enemy_cultist.webp" alt="A cultist with a kris and a spellbook" loading="lazy"><b>Cultist</b>Fireballs, and a stab at your bottom row.</li>
-            <li><img src="img/enemy_entling.webp" alt="An oak entling" loading="lazy"><b>Oak Entling</b>A stump that refused to stay felled.</li>
+            <li><img width="757" height="900" src="img/enemy_zombie.webp" srcset="img/enemy_zombie_sm.webp 404w, img/enemy_zombie.webp 757w" sizes="100px" alt="A zombie" loading="lazy"><b>Zombie</b>Swipes a block off your top.</li>
+            <li><img width="729" height="900" src="img/enemy_super_zombie.webp" srcset="img/enemy_super_zombie_sm.webp 389w, img/enemy_super_zombie.webp 729w" sizes="100px" alt="A super zombie" loading="lazy"><b>Super Zombie</b>Rakes off two or three.</li>
+            <li><div class="portrait"><img width="867" height="900" src="img/enemy_slime.webp" srcset="img/enemy_slime_sm.webp 462w, img/enemy_slime.webp 867w" sizes="100px" alt="A slime" loading="lazy"><video class="clip portrait-clip" data-clip="slime_bounce" data-play="hover" poster="clips/slime_bounce.webp" style="--h: 2.353; --x: -0.474; --y: -0.082" muted playsinline preload="none" aria-hidden="true"></video></div><b>Slime</b>Slimes your piece. No rotating.</li>
+            <li><img width="841" height="900" src="img/enemy_squirrel.webp" srcset="img/enemy_squirrel_sm.webp 449w, img/enemy_squirrel.webp 841w" sizes="100px" alt="A squirrel" loading="lazy"><b>Squirrel</b>Nips at you. Never your board.</li>
+            <li><img width="803" height="900" src="img/enemy_bandit.webp" srcset="img/enemy_bandit_sm.webp 428w, img/enemy_bandit.webp 803w" sizes="100px" alt="A bandit with a bow" loading="lazy"><b>Bandit</b>Arrows knock out a block.</li>
+            <li><img width="734" height="900" src="img/enemy_bandit_elite.webp" srcset="img/enemy_bandit_elite_sm.webp 391w, img/enemy_bandit_elite.webp 734w" sizes="100px" alt="A bandit elite with a crossbow" loading="lazy"><b>Bandit Elite</b>A tougher bandit, crossbow and all.</li>
+            <li><img width="900" height="809" src="img/enemy_cultist.webp" srcset="img/enemy_cultist_sm.webp 480w, img/enemy_cultist.webp 900w" sizes="100px" alt="A cultist with a kris and a spellbook" loading="lazy"><b>Cultist</b>Fireballs, and a stab at your bottom row.</li>
+            <li><img width="831" height="900" src="img/enemy_entling.webp" srcset="img/enemy_entling_sm.webp 443w, img/enemy_entling.webp 831w" sizes="100px" alt="An oak entling" loading="lazy"><b>Oak Entling</b>A stump that refused to stay felled.</li>
           </ul>
         </div>
       </section>
@@ -540,7 +552,7 @@
         </div>
         <div class="chapter-body">
           <p>In the Hollow Spire you pick your opponent off the board. Look over their gear first, then fight for the win, or put a piece of your gear against a piece of theirs. Every hit you land is a line you cleared, so the better stacker usually walks away richer.</p>
-          <p class="aside-line">Duels won so far: <b data-count="live.duelWins">55</b> &middot; Versus rounds won on the Farm: <b data-count="live.versusWins">159</b></p>
+          <p class="aside-line">Duels won so far: <b data-count="live.duelWins">63</b> &middot; Versus rounds won on the Farm: <b data-count="live.versusWins">207</b></p>
         </div>
       </section>
 
@@ -556,17 +568,17 @@
         </header>
         <div class="chapter-body">
           <div class="ledger">
-            <div class="ledger-item"><img src="img/icons/upgrades.webp" alt="" width="64" height="64" loading="lazy"><b data-count="content.upgrades">103</b><span>upgrades across <span data-count="content.upgradeTrees">3</span> atlases: Combat, Skills and Build</span></div>
+            <div class="ledger-item"><img src="img/icons/upgrades.webp" alt="" width="64" height="64" loading="lazy"><b data-count="content.upgrades">107</b><span>upgrades across <span data-count="content.upgradeTrees">3</span> atlases: Combat, Skills and Build</span></div>
             <div class="ledger-item"><img src="img/icons/greenshore.webp" alt="" width="64" height="64" loading="lazy"><b data-count="content.quests">46</b><span>quests from <span data-count="content.questGivers">7</span> townsfolk</span></div>
-            <div class="ledger-item"><img src="img/icons/market.webp" alt="" width="64" height="64" loading="lazy"><b data-count="content.tasks">72</b><span>daily and weekly tasks that pay out in chests</span></div>
-            <div class="ledger-item"><img src="img/icons/play.webp" alt="" width="64" height="64" loading="lazy"><b data-count="content.feats">4</b><span>Feats: permanent perks for the hardest deeds</span></div>
+            <div class="ledger-item"><img src="img/icons/market.webp" alt="" width="64" height="64" loading="lazy"><b data-count="content.tasks">79</b><span>daily and weekly tasks that pay out in chests</span></div>
+            <div class="ledger-item"><img src="img/icons/play.webp" alt="" width="64" height="64" loading="lazy"><b data-count="content.feats">11</b><span>Feats: permanent perks for the hardest deeds</span></div>
           </div>
           <ul class="chests" aria-label="Reward chests">
-            <li><img src="img/chest_1.webp" alt="" loading="lazy"><b>Wooden</b></li>
-            <li><img src="img/chest_2.webp" alt="" loading="lazy"><b>Reinforced</b></li>
-            <li><img src="img/chest_3.webp" alt="" loading="lazy"><b>Masterwork Vault</b></li>
-            <li><img src="img/chest_4.webp" alt="" loading="lazy"><b>Arcane Vault</b><small>For beating the Garbage Man</small></li>
-            <li class="dark"><img src="img/chest_dark.webp" alt="" loading="lazy"><b>Dark Chest</b><small>Holds gear other players lost</small></li>
+            <li><img width="900" height="593" src="img/chest_1.webp" srcset="img/chest_1_sm.webp 480w, img/chest_1.webp 900w" sizes="150px" alt="" loading="lazy"><b>Wooden</b></li>
+            <li><img width="900" height="593" src="img/chest_2.webp" srcset="img/chest_2_sm.webp 480w, img/chest_2.webp 900w" sizes="150px" alt="" loading="lazy"><b>Reinforced</b></li>
+            <li><img width="900" height="593" src="img/chest_3.webp" srcset="img/chest_3_sm.webp 480w, img/chest_3.webp 900w" sizes="150px" alt="" loading="lazy"><b>Masterwork Vault</b></li>
+            <li><img width="900" height="593" src="img/chest_4.webp" srcset="img/chest_4_sm.webp 480w, img/chest_4.webp 900w" sizes="150px" alt="" loading="lazy"><b>Arcane Vault</b><small>For beating the Garbage Man</small></li>
+            <li class="dark"><img width="900" height="593" src="img/chest_dark.webp" srcset="img/chest_dark_sm.webp 480w, img/chest_dark.webp 900w" sizes="150px" alt="" loading="lazy"><b>Dark Chest</b><small>Holds gear other players lost</small></li>
           </ul>
           <div class="skins">
             <h3>Dress your board</h3>
@@ -602,7 +614,7 @@
             </div>
             <div class="faq-item">
               <dt>Do I need to download anything?</dt>
-              <dd>No. It runs in a desktop browser such as Chrome, Edge or Firefox. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates.</dd>
+              <dd>No. It runs in a desktop browser such as Chrome or Edge. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates; it isn't signed yet, so Windows asks you to confirm before it runs.</dd>
             </div>
             <div class="faq-item">
               <dt>What do I play it with?</dt>
@@ -630,7 +642,7 @@
 
       <!-- ============================ FINALE ============================ -->
       <section class="finale" style="--area: url(img/area_cultist_tower.webp)" aria-labelledby="finale-title">
-        <img class="finale-foe" src="img/enemy_cult_leader.webp" alt="" width="887" height="900" loading="lazy">
+        <img width="638" height="900" class="finale-foe" src="img/enemy_cult_leader.webp" srcset="img/enemy_cult_leader_sm.webp 340w, img/enemy_cult_leader.webp 638w" sizes="(max-width: 720px) 200px, 320px" alt="" loading="lazy">
         <div class="finale-copy">
           <h2 id="finale-title" class="ink">Your adventure starts with one piece</h2>
           <p>No download and no install. Try it as a guest, or Log In to keep everything you earn.</p>
@@ -645,27 +657,27 @@
         <h2 id="realm-title" class="plaque">The Realm So Far</h2>
         <dl class="tally">
           <div><dt>Adventurers</dt><dd data-count="live.players">22</dd></div>
-          <div><dt>Monsters slain</dt><dd data-count="live.monstersSlain">2,097</dd></div>
-          <div><dt>Bosses slain</dt><dd data-count="live.bossesSlain">528</dd></div>
-          <div><dt>Champions felled</dt><dd data-count="live.championsSlain">232</dd></div>
-          <div><dt>Quads cleared</dt><dd data-count="live.quads">720</dd></div>
-          <div><dt>T-spins</dt><dd data-count="live.tSpins">463</dd></div>
-          <div><dt>Items crafted</dt><dd data-count="live.itemsCrafted">308</dd></div>
-          <div><dt>Chests opened</dt><dd data-count="live.chestsOpened">96</dd></div>
-          <div><dt>Farm runs</dt><dd data-count="live.farmRuns">722</dd></div>
+          <div><dt>Monsters slain</dt><dd data-count="live.monstersSlain">4,071</dd></div>
+          <div><dt>Bosses slain</dt><dd data-count="live.bossesSlain">1,377</dd></div>
+          <div><dt>Champions felled</dt><dd data-count="live.championsSlain">417</dd></div>
+          <div><dt>Quads cleared</dt><dd data-count="live.quads">1,562</dd></div>
+          <div><dt>T-spins</dt><dd data-count="live.tSpins">893</dd></div>
+          <div><dt>Items crafted</dt><dd data-count="live.itemsCrafted">1,253</dd></div>
+          <div><dt>Chests opened</dt><dd data-count="live.chestsOpened">185</dd></div>
+          <div><dt>Farm runs</dt><dd data-count="live.farmRuns">929</dd></div>
           <div><dt>Greenshore conquered</dt><dd data-count="live.storyClears">6</dd></div>
         </dl>
-        <p class="tally-when">Tallied from the live game <time data-read-at datetime="2026-10-01T19:30:14.860Z">1 Oct 2026</time></p>
+        <p class="tally-when">Tallied from the live game <time data-read-at datetime="2026-10-21T19:48:38.908Z">21 Oct 2026</time></p>
       </section>
 
 
       <section class="panel" aria-labelledby="new-title">
         <h2 id="new-title" class="plaque">Recently Added</h2>
         <ul class="news" data-news>
-          <li><time datetime="2026-10-19">19 Oct</time><b>Music</b> LDBG has its own soundtrack. A calm loop plays on the title and the menus, and when you step into the Farm or a dungeon the full theme kicks in and keeps going from one activity to the next. Finish a dungeon run and the theme plays out to its ending. Changes always land on the beat. Turn it up or down with the Music slider in Settings.</li>
-          <li><time datetime="2026-10-19">19 Oct</time><b>The Region Log</b> The Endless Dungeon now remembers where you have been. The first time you walk into a region, NEW REGION is stamped over its banner. Open the Region Log from the Endless Dungeon card to see every region: the ones you have found, with who lives there, what they drop and how deep you got, the ones still waiting to be found, and what opens the locked ones. The end-of-run card shows the road you took.</li>
-          <li><time datetime="2026-10-19">19 Oct</time><b>The Endless Dungeon</b> Endless is one dungeon now, made of regions: Greenshore Fields, Bandit Camp, Bandit Town, the Cyclops Arena and the Cultist Tower, plus the Dump once you beat the Garbage Man's third wave and the Slime Grotto once you reach wave 10 of the Slime King's pit. Each region ends in a chest, harder regions hold better chests (the Cultist Tower never pays less than a Masterwork Vault), and the hardest can pay an Arcane Vault or a Royal Chest. The deeper you go, the harder the regions get. The Garbage Man and the Slime King appear as gentler versions of themselves, and deep enemies hit less hard on a messy board. Co-op works too: regions either of you has opened can come up.</li>
-          <li><time datetime="2026-10-14">14 Oct</time><b>Bosses make an entrance</b> Every boss now arrives in style. The Bandit King spins down out of the sky and bounces onto his spot, the Slime King lands with a splat, the Cult Leader whirls out of a burst of dark magic, and the Garbage Man hops in with a bag balanced on his head. Shooty juggles his way on, until the last stone comes down on his head, and Punchy, Bernie and the Cyclops each have a move of their own. The fight starts exactly when it always did.</li>
+          <li><time datetime="2026-10-21">21 Oct</time><b>A faster start</b> The game's first download is about a quarter smaller: the moving picture behind the activity list is gone, and the list now stands in the main menu's tower instead. Craft, your Inventory, Skins and the Collection Log are made ready behind the loading screen, so they open straight away the first time, and fights run smoother on slower computers.</li>
+          <li><time datetime="2026-10-20">20 Oct</time><b>Better chests in the Dark</b> Chests in the Dark Endless Dungeon now come better as well as bigger: half of each chest's chance moves up a tier, so every region's chests are much likelier to be a tier up than they are in Endless, and the Cultist Tower's Royal Chest turns up more than twice as often. They still pay double. Arcane Vaults and Royal Chests stay in the hardest regions.</li>
+          <li><time datetime="2026-10-20">20 Oct</time><b>The Dark Endless Dungeon</b> Dark has moved into the Endless Dungeon. The same regions, at Dark strength: enemies hit twice as hard, every kill rolls its drops three times, and ordinary chests pay double, with Dark chests holding what other players lost. Leave at a checkpoint to keep your haul. Die to a monster and you lose what you found and your gear breaks, and other players can find you between fights. Charts and Omens work here too. Dark Greenshore is retired: Greenshore is its Story now.</li>
+          <li><time datetime="2026-10-20">20 Oct</time><b>Story and Challenges</b> The dungeon list is tidier. STORY holds Greenshore, the Endless Dungeon has a card of its own with Dark Endless beside it, and CHALLENGES holds the Garbage Man and the Slime King, with their fees and bests as before. One OMENS switch sits above the Endless cards, and the Region Log is a single button.</li>
         </ul>
       </section>
 
@@ -682,7 +694,7 @@
       </section>
 
       <a class="panel panel-play" href="https://redredret.github.io/ldbg/">
-        <img src="img/chest_3.webp" alt="" width="180" height="128" loading="lazy">
+        <img width="900" height="593" src="img/chest_3.webp" srcset="img/chest_3_sm.webp 480w, img/chest_3.webp 900w" sizes="180px" alt="" loading="lazy">
         <span class="ink">Claim your first chest</span>
         <span class="stone stone-play">Play Free</span>
       </a>
@@ -693,7 +705,8 @@
 <footer class="footer">
   <img src="ui/ldbg_icon.svg" alt="" width="40" height="40">
   <p>LDBG is a free falling-block RPG in early beta. Everything here was rendered from the game's own models.</p>
-  <p class="footer-small">Made with Godot &middot; Type set in Baloo 2 and Lilita One</p>
+  <p class="footer-small">Made with Godot &middot; Type set in Baloo 2 and Lilita One (<a href="fonts/OFL-Baloo2.txt">licence</a>, <a href="fonts/OFL-LilitaOne.txt">licence</a>)</p>
+  <p class="footer-small">&copy; 2026 <span data-copyright-holder>redredret</span>. All rights reserved.</p>
 </footer>
 
 <script src="main.js" defer></script>

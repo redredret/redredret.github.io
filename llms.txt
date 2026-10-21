@@ -12,12 +12,12 @@ LDBG is a falling-block puzzle game and an RPG at once. You stack falling pieces
 
 ## The game in numbers
 
-- 133 items, including 61 pieces of gear (helmets, armour, swords, bows, staves, bucklers, rings, necklaces), from 96 crafting recipes
+- 143 items, including 61 pieces of gear (helmets, armour, swords, bows, staves, bucklers, rings, necklaces), from 107 crafting recipes
 - 16 kinds of monster, 8 of them bosses
 - 19 fights in the Greenshore story route
-- 103 upgrades across 3 upgrade trees (Combat, Skills and Build)
-- 46 quests from 7 townsfolk, and 72 daily and weekly tasks
-- Live totals, read 2026-10-01: 22 adventurers, 2,097 monsters slain, 528 bosses slain, 720 Quads and 463 T-spins cleared, 722 Farm runs
+- 107 upgrades across 3 upgrade trees (Combat, Skills and Build)
+- 46 quests from 7 townsfolk, and 79 daily and weekly tasks
+- Live totals, read 2026-10-21: 22 adventurers, 4,071 monsters slain, 1,377 bosses slain, 1,562 Quads and 893 T-spins cleared, 929 Farm runs
 
 ## The Farm
 
@@ -29,15 +29,15 @@ The Farm is an endless run. Clear lines and you gather logs, ore, fish and fibre
 
 ## Crafting and gear
 
-Smelt your ore into ingots, weave your fibre into fabric, and work them into 61 pieces of gear across 96 recipes. Everything you wear shows on your character, from helmets and armour to swords, bows, staves, bucklers, rings and necklaces. Trade the rest for Gold with other players on the Market.
+Smelt your ore into ingots, weave your fibre into fabric, and work them into 61 pieces of gear across 107 recipes. Everything you wear shows on your character, from helmets and armour to swords, bows, staves, bucklers, rings and necklaces. Trade the rest for Gold with other players on the Market.
 
 ## Dungeons
 
 Greenshore's story runs 19 fights long, from zombies on the shore to the Cult Leader at the top of the tower. Your lines are your attacks. Theirs land on your board: arrows knock out blocks, fire spreads along the bottom row, and slime costs you a rotation.
 
-- **Story**: One set route through every area and every boss.
-- **Endless**: One dungeon made of regions, each ending in a reward chest. The deeper you go, the harder the regions and the better the chests. Go alone or bring a friend.
-- **Dark**: Enemies at double strength, and other hunters on the loose. Monsters break your gear and you lose what you found; lose to a player and they take what you wear.
+- **Story**: Greenshore's set route, through every area and every boss.
+- **Endless**: One dungeon made of regions, each ending in a reward chest. The deeper you go, the harder the regions and the better the chests. Build the Cartographer's Table to chart a region you've found and steer your run there. Go alone or bring a friend.
+- **Dark Endless**: The Endless Dungeon at Dark strength: enemies hit twice as hard, every kill drops three times over, and chests pay double. Leave at a checkpoint to keep your haul. Die to a monster and you lose it and your gear breaks; lose to another hunter and they take what you wear.
 - **The Garbage Man**: 10 waves of garbage, faster every wave. One top-out ends it.
 - **The Slime King**: A king after every king, alone or with a friend. He walls your board down to four columns until he falls.
 
@@ -50,6 +50,7 @@ Greenshore's story runs 19 fights long, from zombies on the shore to the Cult Le
 - **Bernie**: A fire-casting cyclops whose fireball spreads along your bottom row.
 - **Cult Leader**: Opens portals and hurls fireballs, then shields itself from your next hit.
 - **The Garbage Man**: Throws garbage at you one line at a time, faster every wave. Beat wave ten for an Arcane Vault, then keep going.
+- **The Slime King**: Walls your board down to four columns, slimes your tower and wraps you up until you shake him off. Beat him and a bigger one comes for you.
 
 ## Lesser foes
 
@@ -78,7 +79,7 @@ Yes. LDBG is free and plays in your browser at redredret.github.io/ldbg. Try it 
 
 ### Do I need to download anything?
 
-No. It runs in a desktop browser such as Chrome, Edge or Firefox. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates.
+No. It runs in a desktop browser such as Chrome or Edge. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates; it isn't signed yet, so Windows asks you to confirm before it runs.
 
 ### What do I play it with?
 
@@ -102,14 +103,14 @@ No, it is in early beta and grows every week. New dungeons, bosses, gear and mod
 
 ## Recently added
 
-- 2026-10-19, **Music**: LDBG has its own soundtrack. A calm loop plays on the title and the menus, and when you step into the Farm or a dungeon the full theme kicks in and keeps going from one activity to the next. Finish a dungeon run and the theme plays out to its ending. Changes always land on the beat. Turn it up or down with the Music slider in Settings.
+- 2026-10-21, **A faster start**: The game's first download is about a quarter smaller: the moving picture behind the activity list is gone, and the list now stands in the main menu's tower instead. Craft, your Inventory, Skins and the Collection Log are made ready behind the loading screen, so they open straight away the first time, and fights run smoother on slower computers.
+- 2026-10-20, **Better chests in the Dark**: Chests in the Dark Endless Dungeon now come better as well as bigger: half of each chest's chance moves up a tier, so every region's chests are much likelier to be a tier up than they are in Endless, and the Cultist Tower's Royal Chest turns up more than twice as often. They still pay double. Arcane Vaults and Royal Chests stay in the hardest regions.
+- 2026-10-20, **The Dark Endless Dungeon**: Dark has moved into the Endless Dungeon. The same regions, at Dark strength: enemies hit twice as hard, every kill rolls its drops three times, and ordinary chests pay double, with Dark chests holding what other players lost. Leave at a checkpoint to keep your haul. Die to a monster and you lose what you found and your gear breaks, and other players can find you between fights. Charts and Omens work here too. Dark Greenshore is retired: Greenshore is its Story now.
+- 2026-10-20, **Story and Challenges**: The dungeon list is tidier. STORY holds Greenshore, the Endless Dungeon has a card of its own with Dark Endless beside it, and CHALLENGES holds the Garbage Man and the Slime King, with their fees and bests as before. One OMENS switch sits above the Endless cards, and the Region Log is a single button.
+- 2026-10-20, **Charts**: Build the Cartographer's Table to draw charts for the Endless Dungeon. Put a chart in your new map slot and your run heads for that region: it's there the first time its tier can come up, and keeps turning up more often after. A chart is only used if you actually get there. You can only chart a region you've already found, and each chart is made from what that region drops.
+- 2026-10-20, **A sturdier look**: Buttons, cards and windows stand on cleaner, solid bottoms, the gold dividers meet their diamonds properly, and the panels around a dungeon board are far less see-through. And the Cyclops finally has fists to match Punchy, Shooty and Bernie.
+- 2026-10-19, **Music**: LDBG has its own soundtrack. A calm loop plays on the title and the menus, and when you step into the Farm or a dungeon the full theme kicks in and keeps going from one activity to the next. Finish a dungeon run and the theme plays out to its ending. Top out, die or lose a duel, and it stops dead with a boom, then the calm loop fades back in for your next try. Changes always land on the beat. Turn it up or down with the Music slider in Settings.
 - 2026-10-19, **The Region Log**: The Endless Dungeon now remembers where you have been. The first time you walk into a region, NEW REGION is stamped over its banner. Open the Region Log from the Endless Dungeon card to see every region: the ones you have found, with who lives there, what they drop and how deep you got, the ones still waiting to be found, and what opens the locked ones. The end-of-run card shows the road you took.
-- 2026-10-19, **The Endless Dungeon**: Endless is one dungeon now, made of regions: Greenshore Fields, Bandit Camp, Bandit Town, the Cyclops Arena and the Cultist Tower, plus the Dump once you beat the Garbage Man's third wave and the Slime Grotto once you reach wave 10 of the Slime King's pit. Each region ends in a chest, harder regions hold better chests (the Cultist Tower never pays less than a Masterwork Vault), and the hardest can pay an Arcane Vault or a Royal Chest. The deeper you go, the harder the regions get. The Garbage Man and the Slime King appear as gentler versions of themselves, and deep enemies hit less hard on a messy board. Co-op works too: regions either of you has opened can come up.
-- 2026-10-14, **Bosses make an entrance**: Every boss now arrives in style. The Bandit King spins down out of the sky and bounces onto his spot, the Slime King lands with a splat, the Cult Leader whirls out of a burst of dark magic, and the Garbage Man hops in with a bag balanced on his head. Shooty juggles his way on, until the last stone comes down on his head, and Punchy, Bernie and the Cyclops each have a move of their own. The fight starts exactly when it always did.
-- 2026-10-13, **Gel Packs**: A new block skin for anyone who maxes out a Slime King run, alone or with a friend: keep going until the game tells you the run has reached its limit. Pouches of coloured gel that squash flat when they land, bulge, and wobble back into place. Slam a piece down and the blocks underneath feel it too, and a line clear lands everything above it with a squish. Fights against him, and every fight, also run lighter: the health bars cost far less to draw while they move.
-- 2026-10-13, **Omens, and the Golden Slime King**: Now and then a Slime King walks in golden: beat him for three times his loot and up to 200 coins. And Endless and Dark have Omens. Open 30 chests in Endless or Dark to claim the Omen Seeker feat, then switch Omens on from the Endless and Dark cards. After every third chest an omen takes hold for a few kills: a boon like Wrath, Bounty or Gold Rush, a curse like Frenzy or Thick Hide, or a pact that makes the fight harder and pays far more. Every run with Omens on earns 20% more XP.
-- 2026-10-13, **The Slime King's new look**: The Slime King has a whole new body, crown and scowl, and his idol has a new look too: the Goop Idol is now the Ooze Idol, a hardened lump of his ooze, and the ring it makes is now the Oozing Ring. Anything you already own just changes its name. Royal Jelly now wears a little crown, and Thick Slime sits heavy and bubbling.
-- 2026-10-12, **A longer look round**: New adventurers who finish the tutorial can now ask to be shown more: every place to play, what each menu is for, and a line or two inside each screen that matters, from your gear to the Upgrade trees. Or say you'll figure it out, and go.
 
 ## Data
 

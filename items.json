@@ -1,7 +1,7 @@
 [
  {
   "id": "cultist_amulet",
-  "icon": "cultist_amulet.png",
+  "icon": "cultist_amulet.webp",
   "name": "Cultist's Amulet",
   "rarity": "legendary",
   "type": "accessory",
@@ -9,7 +9,7 @@
  },
  {
   "id": "bandit_crown",
-  "icon": "bandit_crown.png",
+  "icon": "bandit_crown.webp",
   "name": "Bandit Crown",
   "rarity": "legendary",
   "type": "material",
@@ -17,7 +17,7 @@
  },
  {
   "id": "clutched_ring",
-  "icon": "clutched_ring.png",
+  "icon": "clutched_ring.webp",
   "name": "Clutched Ring",
   "rarity": "epic",
   "type": "accessory",
@@ -25,7 +25,7 @@
  },
  {
   "id": "hourglass_amulet",
-  "icon": "hourglass_amulet.png",
+  "icon": "hourglass_amulet.webp",
   "name": "Hourglass Amulet",
   "rarity": "epic",
   "type": "accessory",
@@ -33,15 +33,23 @@
  },
  {
   "id": "kings_amulet",
-  "icon": "kings_amulet.png",
+  "icon": "kings_amulet.webp",
   "name": "King's Amulet",
   "rarity": "epic",
   "type": "accessory",
   "level": 30
  },
  {
+  "id": "ring_of_goop",
+  "icon": "ring_of_goop.webp",
+  "name": "Oozing Ring",
+  "rarity": "epic",
+  "type": "accessory",
+  "level": 40
+ },
+ {
   "id": "recycler_ring",
-  "icon": "recycler_ring.png",
+  "icon": "recycler_ring.webp",
   "name": "Recycler's Ring",
   "rarity": "epic",
   "type": "accessory",
@@ -49,23 +57,15 @@
  },
  {
   "id": "ring_of_garbage",
-  "icon": "ring_of_garbage.png",
+  "icon": "ring_of_garbage.webp",
   "name": "Ring of Garbage",
   "rarity": "epic",
   "type": "accessory",
   "level": 45
  },
  {
-  "id": "ring_of_goop",
-  "icon": "ring_of_goop.png",
-  "name": "Oozing Ring",
-  "rarity": "epic",
-  "type": "accessory",
-  "level": 40
- },
- {
   "id": "ring_of_thorns",
-  "icon": "ring_of_thorns.png",
+  "icon": "ring_of_thorns.webp",
   "name": "Ring of Thorns",
   "rarity": "epic",
   "type": "accessory",
@@ -73,7 +73,7 @@
  },
  {
   "id": "lotus_hat",
-  "icon": "lotus_hat.png",
+  "icon": "lotus_hat.webp",
   "name": "Lotus Hat",
   "rarity": "epic",
   "type": "armor",
@@ -81,7 +81,7 @@
  },
  {
   "id": "lotus_robe",
-  "icon": "lotus_robe.png",
+  "icon": "lotus_robe.webp",
   "name": "Lotus Robe",
   "rarity": "epic",
   "type": "armor",
@@ -89,7 +89,7 @@
  },
  {
   "id": "lotus_tome",
-  "icon": "lotus_tome.png",
+  "icon": "lotus_tome.webp",
   "name": "Lotus Tome",
   "rarity": "epic",
   "type": "armor",
@@ -97,7 +97,7 @@
  },
  {
   "id": "lotus_cap",
-  "icon": "lotus_cap.png",
+  "icon": "lotus_cap.webp",
   "name": "Lotus-Lined Cap",
   "rarity": "epic",
   "type": "armor",
@@ -105,7 +105,7 @@
  },
  {
   "id": "lotus_tunic",
-  "icon": "lotus_tunic.png",
+  "icon": "lotus_tunic.webp",
   "name": "Lotus-Lined Tunic",
   "rarity": "epic",
   "type": "armor",
@@ -113,7 +113,7 @@
  },
  {
   "id": "orichalcum_armor",
-  "icon": "orichalcum_armor.png",
+  "icon": "orichalcum_armor.webp",
   "name": "Orichalcum Armor",
   "rarity": "epic",
   "type": "armor",
@@ -121,7 +121,7 @@
  },
  {
   "id": "orichalcum_buckler",
-  "icon": "orichalcum_buckler.png",
+  "icon": "orichalcum_buckler.webp",
   "name": "Orichalcum Buckler",
   "rarity": "epic",
   "type": "armor",
@@ -129,7 +129,7 @@
  },
  {
   "id": "orichalcum_helmet",
-  "icon": "orichalcum_helmet.png",
+  "icon": "orichalcum_helmet.webp",
   "name": "Orichalcum Helmet",
   "rarity": "epic",
   "type": "armor",
@@ -137,7 +137,7 @@
  },
  {
   "id": "spiked_buckler",
-  "icon": "spiked_buckler.png",
+  "icon": "spiked_buckler.webp",
   "name": "Spiked Buckler",
   "rarity": "epic",
   "type": "armor",
@@ -145,7 +145,7 @@
  },
  {
   "id": "royal_slime_broth",
-  "icon": "royal_slime_broth.png",
+  "icon": "royal_slime_broth.webp",
   "name": "Royal Slime Broth",
   "rarity": "epic",
   "type": "consumable",
@@ -153,7 +153,7 @@
  },
  {
   "id": "cult_idol",
-  "icon": "cult_idol.png",
+  "icon": "cult_idol.webp",
   "name": "Cult Idol",
   "rarity": "epic",
   "type": "material",
@@ -161,7 +161,7 @@
  },
  {
   "id": "darkwood_log",
-  "icon": "darkwood_log.png",
+  "icon": "darkwood_log.webp",
   "name": "Darkwood Log",
   "rarity": "epic",
   "type": "material",
@@ -169,7 +169,7 @@
  },
  {
   "id": "darkwood_plank",
-  "icon": "darkwood_plank.png",
+  "icon": "darkwood_plank.webp",
   "name": "Darkwood Plank",
   "rarity": "epic",
   "type": "material",
@@ -177,7 +177,7 @@
  },
  {
   "id": "duskhide",
-  "icon": "duskhide.png",
+  "icon": "duskhide.webp",
   "name": "Duskhide",
   "rarity": "epic",
   "type": "material",
@@ -185,7 +185,7 @@
  },
  {
   "id": "lotus_cloth",
-  "icon": "lotus_cloth.png",
+  "icon": "lotus_cloth.webp",
   "name": "Lotus Cloth",
   "rarity": "epic",
   "type": "material",
@@ -193,7 +193,7 @@
  },
  {
   "id": "lotus_leaves",
-  "icon": "lotus_leaves.png",
+  "icon": "lotus_leaves.webp",
   "name": "Lotus Leaves",
   "rarity": "epic",
   "type": "material",
@@ -201,7 +201,7 @@
  },
  {
   "id": "orichalcum_ingot",
-  "icon": "orichalcum_ingot.png",
+  "icon": "orichalcum_ingot.webp",
   "name": "Orichalcum Ingot",
   "rarity": "epic",
   "type": "material",
@@ -209,15 +209,23 @@
  },
  {
   "id": "orichalcum_ore",
-  "icon": "orichalcum_ore.png",
+  "icon": "orichalcum_ore.webp",
   "name": "Orichalcum Ore",
   "rarity": "epic",
   "type": "material",
   "level": 1
  },
  {
+  "id": "thick_slime",
+  "icon": "thick_slime.webp",
+  "name": "Thick Slime",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "bandit_blade_a",
-  "icon": "bandit_blade_a.png",
+  "icon": "bandit_blade_a.webp",
   "name": "Bandit Blade (A)",
   "rarity": "epic",
   "type": "weapon",
@@ -225,7 +233,7 @@
  },
  {
   "id": "darkwood_bow",
-  "icon": "darkwood_bow.png",
+  "icon": "darkwood_bow.webp",
   "name": "Darkwood Bow",
   "rarity": "epic",
   "type": "weapon",
@@ -233,7 +241,7 @@
  },
  {
   "id": "darkwood_staff",
-  "icon": "darkwood_staff.png",
+  "icon": "darkwood_staff.webp",
   "name": "Darkwood Staff",
   "rarity": "epic",
   "type": "weapon",
@@ -241,7 +249,7 @@
  },
  {
   "id": "horned_staff",
-  "icon": "horned_staff.png",
+  "icon": "horned_staff.webp",
   "name": "Horned Staff",
   "rarity": "epic",
   "type": "weapon",
@@ -249,7 +257,7 @@
  },
  {
   "id": "orichalcum_sword",
-  "icon": "orichalcum_sword.png",
+  "icon": "orichalcum_sword.webp",
   "name": "Orichalcum Sword",
   "rarity": "epic",
   "type": "weapon",
@@ -257,7 +265,7 @@
  },
  {
   "id": "spiky_bow",
-  "icon": "spiky_bow.png",
+  "icon": "spiky_bow.webp",
   "name": "Spiky Bow",
   "rarity": "epic",
   "type": "weapon",
@@ -265,7 +273,7 @@
  },
  {
   "id": "kamikaze_necklace",
-  "icon": "kamikaze_necklace.png",
+  "icon": "kamikaze_necklace.webp",
   "name": "Kamikaze Necklace",
   "rarity": "rare",
   "type": "accessory",
@@ -273,7 +281,7 @@
  },
  {
   "id": "adamantite_armor",
-  "icon": "adamantite_armor.png",
+  "icon": "adamantite_armor.webp",
   "name": "Adamantite Armor",
   "rarity": "rare",
   "type": "armor",
@@ -281,7 +289,7 @@
  },
  {
   "id": "adamantite_buckler",
-  "icon": "adamantite_buckler.png",
+  "icon": "adamantite_buckler.webp",
   "name": "Adamantite Buckler",
   "rarity": "rare",
   "type": "armor",
@@ -289,7 +297,7 @@
  },
  {
   "id": "adamantite_helmet",
-  "icon": "adamantite_helmet.png",
+  "icon": "adamantite_helmet.webp",
   "name": "Adamantite Helmet",
   "rarity": "rare",
   "type": "armor",
@@ -297,7 +305,7 @@
  },
  {
   "id": "bernie_hat",
-  "icon": "bernie_hat.png",
+  "icon": "bernie_hat.webp",
   "name": "Bernie's Hat",
   "rarity": "rare",
   "type": "armor",
@@ -305,7 +313,7 @@
  },
  {
   "id": "cultist_book",
-  "icon": "cultist_book.png",
+  "icon": "cultist_book.webp",
   "name": "Cultist Book",
   "rarity": "rare",
   "type": "armor",
@@ -313,7 +321,7 @@
  },
  {
   "id": "cultist_robe",
-  "icon": "cultist_robe.png",
+  "icon": "cultist_robe.webp",
   "name": "Cultist Robe",
   "rarity": "rare",
   "type": "armor",
@@ -321,7 +329,7 @@
  },
  {
   "id": "nettle_hat",
-  "icon": "nettle_hat.png",
+  "icon": "nettle_hat.webp",
   "name": "Nettle Hat",
   "rarity": "rare",
   "type": "armor",
@@ -329,7 +337,7 @@
  },
  {
   "id": "nettle_robe",
-  "icon": "nettle_robe.png",
+  "icon": "nettle_robe.webp",
   "name": "Nettle Robe",
   "rarity": "rare",
   "type": "armor",
@@ -337,7 +345,7 @@
  },
  {
   "id": "punchy_hat",
-  "icon": "punchy_hat.png",
+  "icon": "punchy_hat.webp",
   "name": "Punchy's Hat",
   "rarity": "rare",
   "type": "armor",
@@ -345,7 +353,7 @@
  },
  {
   "id": "rugged_cap",
-  "icon": "rugged_cap.png",
+  "icon": "rugged_cap.webp",
   "name": "Rugged Hide Cap",
   "rarity": "rare",
   "type": "armor",
@@ -353,7 +361,7 @@
  },
  {
   "id": "rugged_chest",
-  "icon": "rugged_chest.png",
+  "icon": "rugged_chest.webp",
   "name": "Rugged Hide Cuirass",
   "rarity": "rare",
   "type": "armor",
@@ -361,7 +369,7 @@
  },
  {
   "id": "shooty_hat",
-  "icon": "shooty_hat.png",
+  "icon": "shooty_hat.webp",
   "name": "Shooty's Hat",
   "rarity": "rare",
   "type": "armor",
@@ -369,7 +377,7 @@
  },
  {
   "id": "slime_broth",
-  "icon": "slime_broth.png",
+  "icon": "slime_broth.webp",
   "name": "Slime Broth",
   "rarity": "rare",
   "type": "consumable",
@@ -377,7 +385,7 @@
  },
  {
   "id": "trout_pie",
-  "icon": "trout_pie.png",
+  "icon": "trout_pie.webp",
   "name": "Trout Pie",
   "rarity": "rare",
   "type": "consumable",
@@ -385,7 +393,7 @@
  },
  {
   "id": "adamantite_ingot",
-  "icon": "adamantite_ingot.png",
+  "icon": "adamantite_ingot.webp",
   "name": "Adamantite Ingot",
   "rarity": "rare",
   "type": "material",
@@ -393,7 +401,7 @@
  },
  {
   "id": "adamantite_ore",
-  "icon": "adamantite_ore.png",
+  "icon": "adamantite_ore.webp",
   "name": "Adamantite Ore",
   "rarity": "rare",
   "type": "material",
@@ -401,7 +409,7 @@
  },
  {
   "id": "horn",
-  "icon": "horn.png",
+  "icon": "horn.webp",
   "name": "Broken Horn",
   "rarity": "rare",
   "type": "material",
@@ -409,7 +417,7 @@
  },
  {
   "id": "clutch_idol",
-  "icon": "clutch_idol.png",
+  "icon": "clutch_idol.webp",
   "name": "Clutch Idol",
   "rarity": "rare",
   "type": "material",
@@ -417,23 +425,15 @@
  },
  {
   "id": "garbage_idol",
-  "icon": "garbage_idol.png",
+  "icon": "garbage_idol.webp",
   "name": "Garbage Idol",
   "rarity": "rare",
   "type": "material",
   "level": 1
  },
  {
-  "id": "goop_idol",
-  "icon": "goop_idol.png",
-  "name": "Ooze Idol",
-  "rarity": "rare",
-  "type": "material",
-  "level": 1
- },
- {
   "id": "horn_chunk",
-  "icon": "horn_chunk.png",
+  "icon": "horn_chunk.webp",
   "name": "Horn Chunks",
   "rarity": "rare",
   "type": "material",
@@ -441,7 +441,7 @@
  },
  {
   "id": "ipe_log",
-  "icon": "ipe_log.png",
+  "icon": "ipe_log.webp",
   "name": "Ipe Log",
   "rarity": "rare",
   "type": "material",
@@ -449,7 +449,7 @@
  },
  {
   "id": "ipe_plank",
-  "icon": "ipe_plank.png",
+  "icon": "ipe_plank.webp",
   "name": "Ipe Plank",
   "rarity": "rare",
   "type": "material",
@@ -457,7 +457,7 @@
  },
  {
   "id": "kamikaze_idol",
-  "icon": "kamikaze_idol.png",
+  "icon": "kamikaze_idol.webp",
   "name": "Kamikaze Idol",
   "rarity": "rare",
   "type": "material",
@@ -465,7 +465,7 @@
  },
  {
   "id": "kings_idol",
-  "icon": "kings_idol.png",
+  "icon": "kings_idol.webp",
   "name": "King's Idol",
   "rarity": "rare",
   "type": "material",
@@ -473,7 +473,7 @@
  },
  {
   "id": "nettle",
-  "icon": "nettle.png",
+  "icon": "nettle.webp",
   "name": "Nettle",
   "rarity": "rare",
   "type": "material",
@@ -481,15 +481,23 @@
  },
  {
   "id": "nettle_fabric",
-  "icon": "nettle_fabric.png",
+  "icon": "nettle_fabric.webp",
   "name": "Nettle Fabric",
   "rarity": "rare",
   "type": "material",
   "level": 1
  },
  {
+  "id": "goop_idol",
+  "icon": "goop_idol.webp",
+  "name": "Ooze Idol",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "royal_jelly",
-  "icon": "royal_jelly.png",
+  "icon": "royal_jelly.webp",
   "name": "Royal Jelly",
   "rarity": "rare",
   "type": "material",
@@ -497,7 +505,7 @@
  },
  {
   "id": "rugged_hide",
-  "icon": "rugged_hide.png",
+  "icon": "rugged_hide.webp",
   "name": "Rugged Hide",
   "rarity": "rare",
   "type": "material",
@@ -505,7 +513,7 @@
  },
  {
   "id": "sand_idol",
-  "icon": "sand_idol.png",
+  "icon": "sand_idol.webp",
   "name": "Sand Idol",
   "rarity": "rare",
   "type": "material",
@@ -513,7 +521,7 @@
  },
  {
   "id": "scrap_idol",
-  "icon": "scrap_idol.png",
+  "icon": "scrap_idol.webp",
   "name": "Scrap Idol",
   "rarity": "rare",
   "type": "material",
@@ -521,7 +529,7 @@
  },
  {
   "id": "thorny_idol",
-  "icon": "thorny_idol.png",
+  "icon": "thorny_idol.webp",
   "name": "Thorny Idol",
   "rarity": "rare",
   "type": "material",
@@ -529,7 +537,7 @@
  },
  {
   "id": "adamantite_sword",
-  "icon": "adamantite_sword.png",
+  "icon": "adamantite_sword.webp",
   "name": "Adamantite Sword",
   "rarity": "rare",
   "type": "weapon",
@@ -537,7 +545,7 @@
  },
  {
   "id": "burning_staff",
-  "icon": "burning_staff.png",
+  "icon": "burning_staff.webp",
   "name": "Burning Staff",
   "rarity": "rare",
   "type": "weapon",
@@ -545,7 +553,7 @@
  },
  {
   "id": "ipe_bow",
-  "icon": "ipe_bow.png",
+  "icon": "ipe_bow.webp",
   "name": "Ipe Bow",
   "rarity": "rare",
   "type": "weapon",
@@ -553,7 +561,7 @@
  },
  {
   "id": "kris",
-  "icon": "kris.png",
+  "icon": "kris.webp",
   "name": "Kris",
   "rarity": "rare",
   "type": "weapon",
@@ -561,7 +569,7 @@
  },
  {
   "id": "magic_ring",
-  "icon": "magic_ring.png",
+  "icon": "magic_ring.webp",
   "name": "Magic Ring",
   "rarity": "uncommon",
   "type": "accessory",
@@ -569,7 +577,7 @@
  },
  {
   "id": "cotton_hat",
-  "icon": "cotton_hat.png",
+  "icon": "cotton_hat.webp",
   "name": "Cotton Hat",
   "rarity": "uncommon",
   "type": "armor",
@@ -577,7 +585,7 @@
  },
  {
   "id": "cotton_robe",
-  "icon": "cotton_robe.png",
+  "icon": "cotton_robe.webp",
   "name": "Cotton Robe",
   "rarity": "uncommon",
   "type": "armor",
@@ -585,7 +593,7 @@
  },
  {
   "id": "iron_armor",
-  "icon": "iron_armor.png",
+  "icon": "iron_armor.webp",
   "name": "Iron Armor",
   "rarity": "uncommon",
   "type": "armor",
@@ -593,7 +601,7 @@
  },
  {
   "id": "mithril_armor",
-  "icon": "mithril_armor.png",
+  "icon": "mithril_armor.webp",
   "name": "Mithril Armor",
   "rarity": "uncommon",
   "type": "armor",
@@ -601,7 +609,7 @@
  },
  {
   "id": "mithril_buckler",
-  "icon": "mithril_buckler.png",
+  "icon": "mithril_buckler.webp",
   "name": "Mithril Buckler",
   "rarity": "uncommon",
   "type": "armor",
@@ -609,7 +617,7 @@
  },
  {
   "id": "mithril_helmet",
-  "icon": "mithril_helmet.png",
+  "icon": "mithril_helmet.webp",
   "name": "Mithril Helmet",
   "rarity": "uncommon",
   "type": "armor",
@@ -617,7 +625,7 @@
  },
  {
   "id": "rough_leather_cap",
-  "icon": "rough_leather_cap.png",
+  "icon": "rough_leather_cap.webp",
   "name": "Rough Leather Cap",
   "rarity": "uncommon",
   "type": "armor",
@@ -625,7 +633,7 @@
  },
  {
   "id": "rough_leather_tunic",
-  "icon": "rough_leather_tunic.png",
+  "icon": "rough_leather_tunic.webp",
   "name": "Rough Leather Tunic",
   "rarity": "uncommon",
   "type": "armor",
@@ -633,7 +641,7 @@
  },
  {
   "id": "carrot_stew",
-  "icon": "carrot_stew.png",
+  "icon": "carrot_stew.webp",
   "name": "Carrot Stew",
   "rarity": "uncommon",
   "type": "consumable",
@@ -641,7 +649,7 @@
  },
  {
   "id": "sardine_stew",
-  "icon": "sardine_stew.png",
+  "icon": "sardine_stew.webp",
   "name": "Guppy Stew",
   "rarity": "uncommon",
   "type": "consumable",
@@ -649,7 +657,7 @@
  },
  {
   "id": "minor_healing_potion",
-  "icon": "minor_healing_potion.png",
+  "icon": "minor_healing_potion.webp",
   "name": "Minor Healing Potion",
   "rarity": "uncommon",
   "type": "consumable",
@@ -657,7 +665,7 @@
  },
  {
   "id": "bernie_skin",
-  "icon": "bernie_skin.png",
+  "icon": "bernie_skin.webp",
   "name": "Bernie's Skin",
   "rarity": "uncommon",
   "type": "material",
@@ -665,7 +673,7 @@
  },
  {
   "id": "cotton",
-  "icon": "cotton.png",
+  "icon": "cotton.webp",
   "name": "Cotton",
   "rarity": "uncommon",
   "type": "material",
@@ -673,7 +681,7 @@
  },
  {
   "id": "cotton_fabric",
-  "icon": "cotton_fabric.png",
+  "icon": "cotton_fabric.webp",
   "name": "Cotton Fabric",
   "rarity": "uncommon",
   "type": "material",
@@ -681,7 +689,7 @@
  },
  {
   "id": "eye_ball",
-  "icon": "eye_ball.png",
+  "icon": "eye_ball.webp",
   "name": "Eye Ball",
   "rarity": "uncommon",
   "type": "material",
@@ -689,7 +697,7 @@
  },
  {
   "id": "magic_chain",
-  "icon": "magic_chain.png",
+  "icon": "magic_chain.webp",
   "name": "Magic Chain",
   "rarity": "uncommon",
   "type": "material",
@@ -697,7 +705,7 @@
  },
  {
   "id": "maple_log",
-  "icon": "maple_log.png",
+  "icon": "maple_log.webp",
   "name": "Maple Log",
   "rarity": "uncommon",
   "type": "material",
@@ -705,7 +713,7 @@
  },
  {
   "id": "maple_plank",
-  "icon": "maple_plank.png",
+  "icon": "maple_plank.webp",
   "name": "Maple Plank",
   "rarity": "uncommon",
   "type": "material",
@@ -713,7 +721,7 @@
  },
  {
   "id": "mithril_arrow",
-  "icon": "mithril_arrow.png",
+  "icon": "mithril_arrow.webp",
   "name": "Mithril Arrow",
   "rarity": "uncommon",
   "type": "material",
@@ -721,7 +729,7 @@
  },
  {
   "id": "mithril_ingot",
-  "icon": "mithril_ingot.png",
+  "icon": "mithril_ingot.webp",
   "name": "Mithril Ingot",
   "rarity": "uncommon",
   "type": "material",
@@ -729,7 +737,7 @@
  },
  {
   "id": "mithril_ore",
-  "icon": "mithril_ore.png",
+  "icon": "mithril_ore.webp",
   "name": "Mithril Ore",
   "rarity": "uncommon",
   "type": "material",
@@ -737,7 +745,7 @@
  },
  {
   "id": "punchy_skin",
-  "icon": "punchy_skin.png",
+  "icon": "punchy_skin.webp",
   "name": "Punchy's Skin",
   "rarity": "uncommon",
   "type": "material",
@@ -745,7 +753,7 @@
  },
  {
   "id": "rough_fabric",
-  "icon": "rough_fabric.png",
+  "icon": "rough_fabric.webp",
   "name": "Rough Leather",
   "rarity": "uncommon",
   "type": "material",
@@ -753,7 +761,7 @@
  },
  {
   "id": "shooty_skin",
-  "icon": "shooty_skin.png",
+  "icon": "shooty_skin.webp",
   "name": "Shooty's Skin",
   "rarity": "uncommon",
   "type": "material",
@@ -761,7 +769,7 @@
  },
  {
   "id": "slime_gel",
-  "icon": "slime_gel.png",
+  "icon": "slime_gel.webp",
   "name": "Slime Ball",
   "rarity": "uncommon",
   "type": "material",
@@ -769,7 +777,7 @@
  },
  {
   "id": "raw_trout",
-  "icon": "raw_trout.png",
+  "icon": "raw_trout.webp",
   "name": "Trout",
   "rarity": "uncommon",
   "type": "material",
@@ -777,7 +785,7 @@
  },
  {
   "id": "bandit_blades",
-  "icon": "bandit_blades.png",
+  "icon": "bandit_blades.webp",
   "name": "Bandit Blade",
   "rarity": "uncommon",
   "type": "weapon",
@@ -785,7 +793,7 @@
  },
  {
   "id": "fire_staff",
-  "icon": "fire_staff.png",
+  "icon": "fire_staff.webp",
   "name": "Fire Staff",
   "rarity": "uncommon",
   "type": "weapon",
@@ -793,7 +801,7 @@
  },
  {
   "id": "maple_bow",
-  "icon": "maple_bow.png",
+  "icon": "maple_bow.webp",
   "name": "Maple Bow",
   "rarity": "uncommon",
   "type": "weapon",
@@ -801,7 +809,7 @@
  },
  {
   "id": "mithril_sword",
-  "icon": "mithril_sword.png",
+  "icon": "mithril_sword.webp",
   "name": "Mithril Sword",
   "rarity": "uncommon",
   "type": "weapon",
@@ -809,7 +817,7 @@
  },
  {
   "id": "iron_helmet",
-  "icon": "iron_helmet.png",
+  "icon": "iron_helmet.webp",
   "name": "Iron Helmet",
   "rarity": "common",
   "type": "armor",
@@ -817,7 +825,7 @@
  },
  {
   "id": "leather_cap",
-  "icon": "leather_cap.png",
+  "icon": "leather_cap.webp",
   "name": "Leather Cap",
   "rarity": "common",
   "type": "armor",
@@ -825,7 +833,7 @@
  },
  {
   "id": "leather_tunic",
-  "icon": "leather_tunic.png",
+  "icon": "leather_tunic.webp",
   "name": "Leather Tunic",
   "rarity": "common",
   "type": "armor",
@@ -833,7 +841,7 @@
  },
  {
   "id": "wizard_hat",
-  "icon": "wizard_hat.png",
+  "icon": "wizard_hat.webp",
   "name": "Wizard Hat",
   "rarity": "common",
   "type": "armor",
@@ -841,7 +849,7 @@
  },
  {
   "id": "wizard_robe",
-  "icon": "wizard_robe.png",
+  "icon": "wizard_robe.webp",
   "name": "Wizard Robe",
   "rarity": "common",
   "type": "armor",
@@ -849,7 +857,7 @@
  },
  {
   "id": "wooden_buckler",
-  "icon": "wooden_buckler.png",
+  "icon": "wooden_buckler.webp",
   "name": "Wooden Buckler",
   "rarity": "common",
   "type": "armor",
@@ -857,7 +865,7 @@
  },
  {
   "id": "anglers_compost",
-  "icon": "anglers_compost.png",
+  "icon": "anglers_compost.webp",
   "name": "Angler's Compost",
   "rarity": "common",
   "type": "material",
@@ -865,15 +873,31 @@
  },
  {
   "id": "bandage_roll",
-  "icon": "bandage_roll.png",
+  "icon": "bandage_roll.webp",
   "name": "Bandage Roll",
   "rarity": "common",
   "type": "material",
   "level": 1
  },
  {
+  "id": "blank_chart",
+  "icon": "blank_chart.webp",
+  "name": "Blank Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "bandit_camp_chart",
+  "icon": "bandit_camp_chart.webp",
+  "name": "Camp Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "carrot",
-  "icon": "carrot.png",
+  "icon": "carrot.webp",
   "name": "Carrot",
   "rarity": "common",
   "type": "material",
@@ -881,15 +905,39 @@
  },
  {
   "id": "coal",
-  "icon": "coal.png",
+  "icon": "coal.webp",
   "name": "Coal",
   "rarity": "common",
   "type": "material",
   "level": 1
  },
  {
+  "id": "cultist_tower_chart",
+  "icon": "cultist_tower_chart.webp",
+  "name": "Cultist Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "cyclops_arena_chart",
+  "icon": "cyclops_arena_chart.webp",
+  "name": "Cyclops Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "the_dump_chart",
+  "icon": "the_dump_chart.webp",
+  "name": "Dump Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "farmers_compost",
-  "icon": "farmers_compost.png",
+  "icon": "farmers_compost.webp",
   "name": "Farmer's Compost",
   "rarity": "common",
   "type": "material",
@@ -897,15 +945,23 @@
  },
  {
   "id": "fertiliser",
-  "icon": "fertiliser.png",
+  "icon": "fertiliser.webp",
   "name": "Fertiliser",
   "rarity": "common",
   "type": "material",
   "level": 1
  },
  {
+  "id": "greenshore_fields_chart",
+  "icon": "greenshore_fields_chart.webp",
+  "name": "Fields Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "flax",
-  "icon": "flax.png",
+  "icon": "flax.webp",
   "name": "Flax",
   "rarity": "common",
   "type": "material",
@@ -913,7 +969,7 @@
  },
  {
   "id": "flax_fabric",
-  "icon": "flax_fabric.png",
+  "icon": "flax_fabric.webp",
   "name": "Flax Fabric",
   "rarity": "common",
   "type": "material",
@@ -921,15 +977,23 @@
  },
  {
   "id": "gold_coin",
-  "icon": "gold_coin.png",
+  "icon": "gold_coin.webp",
   "name": "Gold Coin",
   "rarity": "common",
   "type": "material",
   "level": 1
  },
  {
+  "id": "slime_grotto_chart",
+  "icon": "slime_grotto_chart.webp",
+  "name": "Grotto Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "raw_guppy",
-  "icon": "raw_guppy.png",
+  "icon": "raw_guppy.webp",
   "name": "Guppy",
   "rarity": "common",
   "type": "material",
@@ -937,7 +1001,7 @@
  },
  {
   "id": "iron_ingot",
-  "icon": "iron_ingot.png",
+  "icon": "iron_ingot.webp",
   "name": "Iron Ingot",
   "rarity": "common",
   "type": "material",
@@ -945,7 +1009,7 @@
  },
  {
   "id": "iron_ore",
-  "icon": "iron_ore.png",
+  "icon": "iron_ore.webp",
   "name": "Iron Ore",
   "rarity": "common",
   "type": "material",
@@ -953,7 +1017,7 @@
  },
  {
   "id": "leather",
-  "icon": "leather.png",
+  "icon": "leather.webp",
   "name": "Leather",
   "rarity": "common",
   "type": "material",
@@ -961,7 +1025,7 @@
  },
  {
   "id": "miners_compost",
-  "icon": "miners_compost.png",
+  "icon": "miners_compost.webp",
   "name": "Miner's Compost",
   "rarity": "common",
   "type": "material",
@@ -969,7 +1033,7 @@
  },
  {
   "id": "oak_log",
-  "icon": "oak_log.png",
+  "icon": "oak_log.webp",
   "name": "Oak Log",
   "rarity": "common",
   "type": "material",
@@ -977,7 +1041,7 @@
  },
  {
   "id": "oak_plank",
-  "icon": "oak_plank.png",
+  "icon": "oak_plank.webp",
   "name": "Oak Plank",
   "rarity": "common",
   "type": "material",
@@ -985,7 +1049,7 @@
  },
  {
   "id": "provisions_pouch",
-  "icon": "provisions_pouch.png",
+  "icon": "provisions_pouch.webp",
   "name": "Provisions Pouch",
   "rarity": "common",
   "type": "material",
@@ -993,7 +1057,7 @@
  },
  {
   "id": "rich_compost",
-  "icon": "rich_compost.png",
+  "icon": "rich_compost.webp",
   "name": "Rich Compost",
   "rarity": "common",
   "type": "material",
@@ -1001,15 +1065,23 @@
  },
  {
   "id": "rugged_satchel",
-  "icon": "rugged_satchel.png",
+  "icon": "rugged_satchel.webp",
   "name": "Rugged Satchel",
   "rarity": "common",
   "type": "material",
   "level": 1
  },
  {
+  "id": "scrap",
+  "icon": "scrap.webp",
+  "name": "Scrap",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "slime_bag",
-  "icon": "slime_bag.png",
+  "icon": "slime_bag.webp",
   "name": "Slime Bag",
   "rarity": "common",
   "type": "material",
@@ -1017,15 +1089,23 @@
  },
  {
   "id": "super_compost",
-  "icon": "super_compost.png",
+  "icon": "super_compost.webp",
   "name": "Super Compost",
   "rarity": "common",
   "type": "material",
   "level": 1
  },
  {
+  "id": "bandit_town_chart",
+  "icon": "bandit_town_chart.webp",
+  "name": "Town Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "treasure_seal",
-  "icon": "treasure_seal.png",
+  "icon": "treasure_seal.webp",
   "name": "Treasure Seal",
   "rarity": "common",
   "type": "material",
@@ -1033,7 +1113,7 @@
  },
  {
   "id": "wardens_seal",
-  "icon": "wardens_seal.png",
+  "icon": "wardens_seal.webp",
   "name": "Warden's Seal",
   "rarity": "common",
   "type": "material",
@@ -1041,7 +1121,7 @@
  },
  {
   "id": "woodcutters_compost",
-  "icon": "woodcutters_compost.png",
+  "icon": "woodcutters_compost.webp",
   "name": "Woodcutter's Compost",
   "rarity": "common",
   "type": "material",
@@ -1049,7 +1129,7 @@
  },
  {
   "id": "iron_sword",
-  "icon": "iron_sword.png",
+  "icon": "iron_sword.webp",
   "name": "Iron Sword",
   "rarity": "common",
   "type": "weapon",
@@ -1057,7 +1137,7 @@
  },
  {
   "id": "oak_bow",
-  "icon": "oak_bow.png",
+  "icon": "oak_bow.webp",
   "name": "Oak Bow",
   "rarity": "common",
   "type": "weapon",

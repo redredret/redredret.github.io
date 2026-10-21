@@ -6,6 +6,24 @@
  * rank from size. The stones are the slate theme's generated SVGs, nine-sliced
  * with the same margins the Godot theme uses (36 28 36 32), at 0.6 scale.
  */
+/* The page's own fonts (tools/landing/subset_fonts.py): nothing is fetched
+   from Google, so no visitor's address goes there (docs/LEGAL_AUDIT_2.md,
+   L-28). Baloo 2 keeps its weight axis; the page uses 500 to 800. */
+@font-face {
+  font-family: "Baloo 2";
+  src: url(fonts/baloo2-latin.woff2) format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Lilita One";
+  src: url(fonts/lilitaone-latin.woff2) format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg: #182226;
   --bg-deep: #10171a;
@@ -544,6 +562,16 @@ video.banner-pop { bottom: 12px; height: 286px; left: 0; }
 .slot img { width: 84%; height: 84%; object-fit: contain; }
 .slot:hover, .slot:focus-visible { background: var(--card-selected); border-color: var(--rarity); }
 .inventory-caption { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
+/* Folded to a few rows until asked (main.js): every item at once is a wall
+   2,800 px tall on a phone. Without the script the whole list stands. */
+.inventory.folded .inventory-grid {
+  max-height: 404px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent);
+}
+.inventory-more { margin-top: 10px; font-size: 15px; background: transparent; cursor: pointer; }
+.inventory-more[hidden] { display: none; }
 .item-tip {
   position: absolute;
   z-index: 10;

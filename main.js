@@ -222,9 +222,9 @@
     const content = stats.content || {};
     const live = stats.live || {};
     content.regulars = (content.enemies || 0) - (content.bosses || 0);
-    // Farm Solo, Versus and Dark; Story, Endless, Co-op Endless and Dark;
-    // the Garbage Man; the Arena.
-    content.modes = 9;
+    // Farm Solo, Versus and Dark; Story; Endless, Co-op Endless and Dark
+    // Endless; the Garbage Man and the Slime King; the Arena.
+    content.modes = 10;
     live.bossesSlain = Object.values(live.bossKills || {}).reduce((sum, value) => sum + value, 0);
     return stats;
   }
@@ -368,8 +368,30 @@
     tabs.forEach((tab) => tab.addEventListener('click', () => {
       tabs.forEach((other) => other.setAttribute('aria-selected', String(other === tab)));
       show(tab.dataset.filter);
+      fold();
     }));
     show('all');
+
+    // A few rows until the player asks for the rest; a short list (a tab with
+    // few items) is never folded, and the button only shows when it would
+    // reveal something.
+    const more = root.querySelector('.inventory-more');
+    let unfolded = false;
+    function fold() {
+      if (!more) return;
+      root.classList.toggle('folded', !unfolded);
+      const hidden = grid.scrollHeight > grid.clientHeight + 4;
+      if (!unfolded && !hidden) root.classList.remove('folded');
+      more.hidden = unfolded || !hidden;
+    }
+    if (more) {
+      more.addEventListener('click', () => {
+        unfolded = true;
+        more.setAttribute('aria-expanded', 'true');
+        fold();
+      });
+    }
+    fold();
   }
 
   // --- Clips ----------------------------------------------------------------------
