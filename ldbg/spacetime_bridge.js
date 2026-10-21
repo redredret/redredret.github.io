@@ -13419,18 +13419,42 @@ ${ty.variants.map(
     return place(manifest, state.play[index], segment.state, index, 0, segment.end);
   }
   function prefetchPlan(manifest) {
-    const entries = [];
+    const always = alwaysDecoded(manifest);
+    const rest = [...manifest.sections.keys()].filter((id) => !always.includes(id));
+    return [...always.map((id) => ({ id, decode: true })), ...rest.map((id) => ({ id, decode: false }))];
+  }
+  function entryOf(state) {
+    return state.intro ?? state.play[0] ?? null;
+  }
+  function alwaysDecoded(manifest) {
+    const ids = [];
+    const add = (id) => {
+      if (id !== null && !ids.includes(id)) ids.push(id);
+    };
     for (const transition of manifest.transitions) {
-      for (const id of [transition.leadIn, transition.hit]) {
-        if (id !== null && !entries.includes(id)) entries.push(id);
+      add(transition.leadIn);
+      add(transition.hit);
+      if (!transition.immediate) continue;
+      const targets = transition.to ?? [...manifest.states.keys()];
+      for (const name of targets) {
+        const state = manifest.states.get(name);
+        if (state !== void 0) add(entryOf(state));
       }
     }
-    for (const state of manifest.states.values()) {
-      const id = state.intro ?? state.play[0];
-      if (id !== void 0 && !entries.includes(id)) entries.push(id);
+    return ids;
+  }
+  function reachableEntries(manifest, fromSection) {
+    const ids = [];
+    for (const transition of manifest.transitions) {
+      if (transition.immediate || transition.from === null || !transition.from.includes(fromSection)) continue;
+      const targets = transition.to ?? [...manifest.states.keys()];
+      for (const name of targets) {
+        const state = manifest.states.get(name);
+        const id = state === void 0 ? null : entryOf(state);
+        if (id !== null && !ids.includes(id)) ids.push(id);
+      }
     }
-    const rest = [...manifest.sections.keys()].filter((id) => !entries.includes(id));
-    return [...entries.map((id) => ({ id, decode: true })), ...rest.map((id) => ({ id, decode: false }))];
+    return ids;
   }
   function continuesInto(manifest, segment, stateName) {
     if (segment.playIndex < 0) return -1;
@@ -13455,7 +13479,7 @@ ${ty.variants.map(
   var LATE_JOIN_SECONDS = 0.05;
   var PLAN_AHEAD_SECONDS = 1.5;
   var TICK_MS = 250;
-  var DECODED_BUDGET_BYTES = 80 * 1024 * 1024;
+  var DECODE_AHEAD_SECONDS = 12;
   var IDLE_FETCH_DELAY_MS = 2e3;
   var IDLE_FETCH_GAP_MS = 750;
   var PRIMARY_TYPE = 'audio/ogg; codecs="opus"';
@@ -13486,6 +13510,9 @@ ${ty.variants.map(
     // Every transition sound placed and not yet finished. Only one sounds at a
     // time: a player bouncing between the menu and an activity hears one cymbal.
     stingers = [];
+    // Sections and transition sounds that started after the moment they were
+    // placed for (joined part-way): none, in a session whose decodes kept up.
+    lateStarts = 0;
     // Whether the AAC copies are in use (this browser cannot decode the Oggs).
     useFallback = false;
     // Seconds of encoder priming at the start of a decoded fallback that the
@@ -13548,6 +13575,7 @@ ${ty.variants.map(
         now: this.context?.currentTime ?? 0,
         volume: this.volume,
         decodedBytes,
+        lateStarts: this.lateStarts,
         decoded: [...this.decoded.keys()],
         fetched: [...this.bytes.keys()],
         queue: this.queue.map((playing) => ({
@@ -13584,6 +13612,7 @@ ${ty.variants.map(
         return false;
       });
       this.planFollowing();
+      this.keepDecoded();
     }
     loadManifest() {
       if (this.manifestLoad !== null) return this.manifestLoad;
@@ -13739,8 +13768,35 @@ ${ty.variants.map(
       }
       this.schedule(following, buffer);
       if (following.state !== this.active) this.active = following.state;
-      const afterThat = followingSegment(manifest, following);
-      if (afterThat !== null) void this.decode(afterThat.section);
+    }
+    // What must be decoded now: what always must be (alwaysDecoded), every
+    // section queued, the next in line once it is within DECODE_AHEAD_SECONDS of
+    // its bar, and the first section of every state the playing section's
+    // transitions can reach. Each tick decodes what is missing from it and lets
+    // everything else go: the song decoded whole was about 70 MB of samples.
+    needed() {
+      const manifest = this.manifest;
+      const now = this.context.currentTime;
+      const ids = new Set(alwaysDecoded(manifest));
+      for (const playing of this.queue) ids.add(playing.segment.section);
+      const last = this.queue[this.queue.length - 1];
+      if (last !== void 0 && last.cutAt === null && last.segment.end - now <= DECODE_AHEAD_SECONDS) {
+        const following = followingSegment(manifest, last.segment);
+        if (following !== null) ids.add(following.section);
+      }
+      const sounding = this.committed(now)?.segment.section ?? this.lastSection;
+      if (sounding !== null) for (const id of reachableEntries(manifest, sounding)) ids.add(id);
+      return ids;
+    }
+    keepDecoded() {
+      if (this.manifest === null || this.context === null) return;
+      const needed = this.needed();
+      for (const id of needed) {
+        if (!this.decoded.has(id) && !this.failed.has(id)) void this.decode(id);
+      }
+      for (const id of [...this.decoded.keys()]) {
+        if (!needed.has(id)) this.decoded.delete(id);
+      }
     }
     schedule(segment, buffer) {
       const context2 = this.context;
@@ -13756,6 +13812,7 @@ ${ty.variants.map(
       if (start < earliest) {
         offset += earliest - start;
         start = earliest;
+        this.lateStarts++;
       }
       let fade = null;
       if (segment.fadeIn > 0) {
@@ -13777,7 +13834,6 @@ ${ty.variants.map(
       source.onended = () => this.tick();
       source.start(start, offset + this.skipOf(segment.section), segment.end - start);
       this.queue.push(playing);
-      this.evictDecoded();
       return playing;
     }
     // An immediate change (a death): every section still sounding falls away
@@ -13848,6 +13904,7 @@ ${ty.variants.map(
       source.connect(gain);
       gain.connect(this.master);
       const start = Math.max(at, now + LATE_JOIN_SECONDS);
+      if (start > at) this.lateStarts++;
       source.start(start, skip + start - at, buffer.duration - skip - (start - at));
       const stinger = { source, gain, start: at, end, forced };
       this.stingers.push(stinger);
@@ -13990,20 +14047,6 @@ ${ty.variants.map(
       if (state === void 0) return;
       if (state.intro !== null) void this.decode(state.intro);
       if (state.play.length > 0) void this.decode(state.play[0]);
-    }
-    evictDecoded() {
-      let total = 0;
-      for (const buffer of this.decoded.values()) total += buffer.length * buffer.numberOfChannels * 4;
-      if (total <= DECODED_BUDGET_BYTES) return;
-      const keep = new Set(this.queue.map((playing) => playing.segment.section));
-      for (const id of this.manifest.leadIns.keys()) keep.add(id);
-      for (const id of this.stateSections(this.active)) keep.add(id);
-      for (const [id, buffer] of this.decoded) {
-        if (total <= DECODED_BUDGET_BYTES) break;
-        if (keep.has(id)) continue;
-        this.decoded.delete(id);
-        total -= buffer.length * buffer.numberOfChannels * 4;
-      }
     }
     startIdleFetch() {
       if (this.idleFetchStarted || this.deps.timers === false || this.manifest === null) return;
