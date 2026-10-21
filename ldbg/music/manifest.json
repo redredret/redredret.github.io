@@ -7,46 +7,56 @@
   "sections": {
     "intro_loop": {
       "bars": 8,
-      "file": "intro_loop-d6503431fb7e.ogg"
+      "file": "intro_loop-d6503431fb7e.ogg",
+      "fallback": "intro_loop-09a91c0be011.m4a"
     },
     "a": {
       "bars": 24,
-      "file": "a-06046a2f53bd.ogg"
+      "file": "a-06046a2f53bd.ogg",
+      "fallback": "a-b144000a0cde.m4a"
     },
     "b": {
       "bars": 24,
-      "file": "b-d41cdfa9a585.ogg"
+      "file": "b-d41cdfa9a585.ogg",
+      "fallback": "b-af7a4a293957.m4a"
     },
     "a_2": {
       "bars": 16,
-      "file": "a_2-06ec70d4ae94.ogg"
+      "file": "a_2-06ec70d4ae94.ogg",
+      "fallback": "a_2-08723b9ff7e8.m4a"
     },
     "c": {
       "bars": 22,
-      "file": "c-8d94e19d4731.ogg"
+      "file": "c-8d94e19d4731.ogg",
+      "fallback": "c-e864f778a81f.m4a"
     },
     "a_3": {
       "bars": 16,
-      "file": "a_3-b909d8da4c45.ogg"
+      "file": "a_3-b909d8da4c45.ogg",
+      "fallback": "a_3-8b428d378c8d.m4a"
     },
     "outro": {
       "bars": 9,
       "switchEveryBars": 0,
-      "file": "outro-dc993417d2bc.ogg"
+      "file": "outro-dc993417d2bc.ogg",
+      "fallback": "outro-a146938d2de7.m4a"
     },
     "death_ambient": {
       "bars": 6,
       "switchEveryBars": 0,
-      "file": "death_ambient-75b95b0ba2ba.ogg"
+      "file": "death_ambient-75b95b0ba2ba.ogg",
+      "fallback": "death_ambient-a46952fb28c2.m4a"
     }
   },
   "leadIns": {
     "cymbal_lead_up": {
       "file": "cymbal_lead_up-c42b03fa8f1b.ogg",
+      "fallback": "cymbal_lead_up-f63714b51e1f.m4a",
       "beats": 1.5
     },
     "death_boom": {
       "file": "death_boom-1aa5188fc982.ogg",
+      "fallback": "death_boom-68f5a6065535.m4a",
       "beats": 12
     }
   },
@@ -143,5 +153,6 @@
     "dark": "farm",
     "boss": "farm",
     "duel": "farm"
-  }
+  },
+  "fallbackPrimingSamples": 1024
 }

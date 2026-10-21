@@ -13208,6 +13208,11 @@ ${ty.variants.map(
     }
     return value;
   }
+  function fallbackFile(value, where) {
+    if (value == null) return null;
+    if (typeof value !== "string" || !SAFE_FILE.test(value)) fail(`${where} fallback needs a plain file name`);
+    return value;
+  }
   function sectionId(value, sections, where) {
     if (typeof value !== "string" || !sections.has(value)) fail(`${where} names no section: ${String(value)}`);
     return value;
@@ -13234,6 +13239,7 @@ ${ty.variants.map(
       sections.set(id, {
         id,
         file: entry.file,
+        fallback: fallbackFile(entry.fallback, `section ${id}`),
         bars: integer(entry.bars, `section ${id} bars`, 1, 512),
         bpm: sectionBpm,
         beatsPerBar: integer(entry.beatsPerBar ?? beatsPerBar, `section ${id} beatsPerBar`, 1, 16),
@@ -13281,7 +13287,7 @@ ${ty.variants.map(
       if (typeof entry.file !== "string" || !SAFE_FILE.test(entry.file)) fail(`lead-in ${id} needs a plain file name`);
       const beats = entry.beats;
       if (typeof beats !== "number" || !(beats > 0 && beats <= 64)) fail(`lead-in ${id} beats must be above 0 and at most 64`);
-      leadIns.set(id, { id, file: entry.file, beats });
+      leadIns.set(id, { id, file: entry.file, fallback: fallbackFile(entry.fallback, `lead-in ${id}`), beats });
     }
     const transitions = [];
     const rawTransitions = root.transitions ?? [];
@@ -13337,7 +13343,8 @@ ${ty.variants.map(
       }
       fallbacks.set(from, to);
     }
-    return { version, gainDb, sections, leadIns, transitions, states, fallbacks };
+    const priming = integer(root.fallbackPrimingSamples ?? 0, "fallbackPrimingSamples", 0, 8192);
+    return { version, gainDb, fallbackPrimingSamples: priming, sections, leadIns, transitions, states, fallbacks };
   }
   function barSeconds(section) {
     return 60 / section.bpm * section.beatsPerBar;
@@ -13451,6 +13458,8 @@ ${ty.variants.map(
   var DECODED_BUDGET_BYTES = 80 * 1024 * 1024;
   var IDLE_FETCH_DELAY_MS = 2e3;
   var IDLE_FETCH_GAP_MS = 750;
+  var PRIMARY_TYPE = 'audio/ogg; codecs="opus"';
+  var FALLBACK_TYPE = 'audio/mp4; codecs="mp4a.40.2"';
   function startsBy(playing) {
     return playing.leadAt ?? playing.segment.start;
   }
@@ -13477,6 +13486,11 @@ ${ty.variants.map(
     // Every transition sound placed and not yet finished. Only one sounds at a
     // time: a player bouncing between the menu and an activity hears one cymbal.
     stingers = [];
+    // Whether the AAC copies are in use (this browser cannot decode the Oggs).
+    useFallback = false;
+    // Seconds of encoder priming at the start of a decoded fallback that the
+    // browser left in, by id: skipped on every start, so a section is on the beat.
+    priming = /* @__PURE__ */ new Map();
     bytes = /* @__PURE__ */ new Map();
     decoded = /* @__PURE__ */ new Map();
     decoding = /* @__PURE__ */ new Map();
@@ -13580,6 +13594,8 @@ ${ty.variants.map(
           return;
         }
         this.manifest = parseMusicManifest(raw);
+        const hasFallbacks = [...this.manifest.sections.values(), ...this.manifest.leadIns.values()].some((entry) => entry.fallback !== null);
+        this.useFallback = hasFallbacks && this.deps.canPlay !== void 0 && !this.deps.canPlay(PRIMARY_TYPE) && this.deps.canPlay(FALLBACK_TYPE);
         this.context = this.deps.createContext();
         if (this.context === null) {
           this.manifest = null;
@@ -13685,8 +13701,8 @@ ${ty.variants.map(
         }
         if (committed !== null && at < committed.segment.end - 1e-6) this.cut(committed, at);
         const playing = this.schedule(next, buffer);
-        if (leadBuffer !== null && this.playStinger(playing, leadBuffer, at - lead)) playing.leadAt = at - lead;
-        if (hitBuffer !== null && this.playStinger(playing, hitBuffer, at)) playing.hitAt = at;
+        if (leadBuffer !== null && this.playStinger(playing, leadBuffer, at - lead, false, this.skipOf(transition.leadIn))) playing.leadAt = at - lead;
+        if (hitBuffer !== null && this.playStinger(playing, hitBuffer, at, false, this.skipOf(transition.hit))) playing.hitAt = at;
       } else if (committed !== null && at < committed.segment.end - 1e-6) {
         this.cut(committed, at);
       } else if (committed !== null) {
@@ -13759,7 +13775,7 @@ ${ty.variants.map(
       this.lastSection = segment.section;
       if (segment.playIndex < 0) this.introsPlayed.add(segment.state);
       source.onended = () => this.tick();
-      source.start(start, offset, segment.end - start);
+      source.start(start, offset + this.skipOf(segment.section), segment.end - start);
       this.queue.push(playing);
       this.evictDecoded();
       return playing;
@@ -13791,7 +13807,7 @@ ${ty.variants.map(
       };
       const startHit = (hit2) => {
         if (!wanted() || hit2 === null) return;
-        if (this.playStinger(playing, hit2, at, true) && playing !== null) playing.hitAt = at;
+        if (this.playStinger(playing, hit2, at, true, this.skipOf(transition.hit)) && playing !== null) playing.hitAt = at;
       };
       const section = next === null ? null : this.decoded.get(next.section);
       if (section !== void 0) startSection(section);
@@ -13808,11 +13824,11 @@ ${ty.variants.map(
     // one cymbal at a time, however fast the player bounces between screens.
     // A `forced` one (a death's impact) is never skipped: it fades out whatever
     // it would sound over instead.
-    playStinger(playing, buffer, at, forced = false) {
+    playStinger(playing, buffer, at, forced = false, skip = 0) {
       const context2 = this.context;
       const now = context2.currentTime;
       this.stingers = this.stingers.filter((stinger2) => stinger2.end > now);
-      const end = at + buffer.duration;
+      const end = at + buffer.duration - skip;
       const overlapping = this.stingers.filter((stinger2) => stinger2.start < end && at < stinger2.end && (forced || !stinger2.forced));
       if (overlapping.length > 0 && !forced) return false;
       for (const stinger2 of overlapping) {
@@ -13832,7 +13848,7 @@ ${ty.variants.map(
       source.connect(gain);
       gain.connect(this.master);
       const start = Math.max(at, now + LATE_JOIN_SECONDS);
-      source.start(start, start - at, buffer.duration - (start - at));
+      source.start(start, skip + start - at, buffer.duration - skip - (start - at));
       const stinger = { source, gain, start: at, end, forced };
       this.stingers.push(stinger);
       if (playing !== null) playing.stingers.push(stinger);
@@ -13906,7 +13922,8 @@ ${ty.variants.map(
     fetchSection(id) {
       let pending = this.bytes.get(id);
       if (pending === void 0) {
-        const file = this.manifest.sections.get(id)?.file ?? this.manifest.leadIns.get(id).file;
+        const entry = this.manifest.sections.get(id) ?? this.manifest.leadIns.get(id);
+        const file = this.useFallback && entry.fallback !== null ? entry.fallback : entry.file;
         pending = this.deps.fetchBytes(`${this.baseUrl}${file}`);
         this.bytes.set(id, pending);
         pending.catch(() => this.bytes.delete(id));
@@ -13919,17 +13936,47 @@ ${ty.variants.map(
       if (this.failed.has(id)) return Promise.resolve(null);
       let pending = this.decoding.get(id);
       if (pending === void 0) {
-        pending = this.fetchSection(id).then((bytes) => this.context.decodeAudioData(bytes.slice(0))).then((buffer) => {
-          this.decoded.set(id, buffer);
-          return buffer;
-        }).catch((error) => {
-          this.failed.add(id);
-          this.deps.log(`music: section ${id} could not be loaded (${String(error)})`);
-          return null;
-        }).finally(() => this.decoding.delete(id));
+        pending = this.decodeNow(id).finally(() => this.decoding.delete(id));
         this.decoding.set(id, pending);
       }
       return pending;
+    }
+    async decodeNow(id) {
+      const usingFallback = this.useFallback;
+      try {
+        const bytes = await this.fetchSection(id);
+        const buffer = await this.context.decodeAudioData(bytes.slice(0));
+        this.decoded.set(id, buffer);
+        if (usingFallback) this.notePriming(id, buffer);
+        return buffer;
+      } catch (error) {
+        const entry = this.manifest.sections.get(id) ?? this.manifest.leadIns.get(id);
+        if (!usingFallback && entry?.fallback) {
+          this.deps.log(`music: ${id} would not decode (${String(error)}); using the AAC copies`);
+          this.useFallback = true;
+          this.bytes.clear();
+          return this.decodeNow(id);
+        }
+        this.failed.add(id);
+        this.deps.log(`music: section ${id} could not be loaded (${String(error)})`);
+        return null;
+      }
+    }
+    // An AAC file starts with the encoder's priming. A browser that reads the
+    // file's edit list trims it; one that does not leaves it in, and the decoded
+    // buffer is that much longer than the bars it holds. Then it is skipped.
+    notePriming(id, buffer) {
+      const manifest = this.manifest;
+      const priming = manifest.fallbackPrimingSamples / 48e3;
+      if (priming <= 0) return;
+      const section = manifest.sections.get(id);
+      const leadIn = manifest.leadIns.get(id);
+      const expected = section !== void 0 ? section.bars * barSeconds(section) : leadIn.beats * 60 / manifest.sections.values().next().value.bpm;
+      if (buffer.duration - expected >= priming * 0.5) this.priming.set(id, priming);
+      else this.priming.delete(id);
+    }
+    skipOf(id) {
+      return this.priming.get(id) ?? 0;
     }
     stateSections(name) {
       const state = this.manifest?.states.get(name);
@@ -13992,7 +14039,15 @@ ${ty.variants.map(
       fetchBytes: (url) => fetch(url, { cache: url.endsWith("manifest.json") ? "no-cache" : "default" }).then(
         (response) => response.ok ? response.arrayBuffer() : Promise.reject(new Error(`${response.status} ${url}`))
       ),
-      log: (message) => console.info(message)
+      log: (message) => console.info(message),
+      // Safari before it learned Ogg says '' here and gets the AAC copies.
+      canPlay: (type) => {
+        try {
+          return document.createElement("audio").canPlayType(type) !== "";
+        } catch {
+          return true;
+        }
+      }
     });
     const unlock = () => engine.resume();
     for (const eventName of ["pointerdown", "keydown", "touchend"]) {
