@@ -74,6 +74,18 @@
       "switchEveryBars": 1,
       "file": "menu_4-08d3ca62bf99.ogg",
       "fallback": "menu_4-f988f654a65e.m4a"
+    },
+    "slime_chords": {
+      "bars": 24,
+      "switchEveryBars": 1,
+      "file": "slime_chords-9f44384af9d6.ogg",
+      "fallback": "slime_chords-9c16c22a3e09.m4a"
+    },
+    "slime_all": {
+      "bars": 24,
+      "switchEveryBars": 1,
+      "file": "slime_all-0859da93f2c1.ogg",
+      "fallback": "slime_all-f26554f9df22.m4a"
     }
   },
   "leadIns": {
@@ -110,6 +122,48 @@
       ],
       "leadIn": "cymbal_lead_up",
       "switchEveryBars": 1
+    },
+    {
+      "from": [
+        "intro_loop",
+        "a",
+        "b",
+        "a_2",
+        "c",
+        "a_3",
+        "outro",
+        "death_ambient"
+      ],
+      "to": [
+        "slime",
+        "slime_walls"
+      ],
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1,
+      "preload": false
+    },
+    {
+      "from": [
+        "slime_chords",
+        "slime_all"
+      ],
+      "to": [
+        "menu"
+      ],
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1
+    },
+    {
+      "from": [
+        "slime_chords",
+        "slime_all"
+      ],
+      "to": [
+        "farm"
+      ],
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1,
+      "preload": false
     },
     {
       "from": [
@@ -177,6 +231,22 @@
         "menu_2",
         "menu_3",
         "menu_4"
+      ]
+    },
+    "slime": {
+      "play": [
+        "slime_chords"
+      ],
+      "syncFrom": [
+        "slime_all"
+      ]
+    },
+    "slime_walls": {
+      "play": [
+        "slime_all"
+      ],
+      "syncFrom": [
+        "slime_chords"
       ]
     },
     "farm": {

@@ -13516,6 +13516,8 @@ ${ty.variants.map(
       const entry = value ?? {};
       const play = entry.play ?? [];
       if (!Array.isArray(play)) fail(`state ${name} play must be a list`);
+      const syncFrom = entry.syncFrom ?? null;
+      if (syncFrom !== null && (!Array.isArray(syncFrom) || syncFrom.length === 0)) fail(`state ${name} syncFrom must be a list of sections`);
       states.set(name, {
         name,
         intro: entry.intro == null ? null : sectionId(entry.intro, sections, `state ${name} intro`),
@@ -13524,7 +13526,8 @@ ${ty.variants.map(
         then: entry.then == null ? null : String(entry.then),
         thenOverlapBars: integer(entry.thenOverlapBars ?? 0, `state ${name} thenOverlapBars`, 0, 64),
         thenFadeInBars: integer(entry.thenFadeInBars ?? 0, `state ${name} thenFadeInBars`, 0, 64),
-        syncPosition: entry.syncPosition === true
+        syncPosition: entry.syncPosition === true || syncFrom !== null,
+        syncFrom: syncFrom === null ? null : syncFrom.map((id) => sectionId(id, sections, `state ${name} syncFrom`))
       });
     }
     for (const state of states.values()) {
@@ -13587,6 +13590,7 @@ ${ty.variants.map(
       if (release != null && (typeof release !== "number" || !(release >= 0 && release <= 10))) {
         fail(`${where} releaseSeconds must be from 0 to 10`);
       }
+      if (entry.preload != null && typeof entry.preload !== "boolean") fail(`${where} preload must be true or false`);
       transitions.push({
         from,
         to,
@@ -13594,7 +13598,8 @@ ${ty.variants.map(
         hit,
         switchEveryBars: every,
         immediate,
-        releaseSeconds: release == null ? null : release
+        releaseSeconds: release == null ? null : release,
+        preload: entry.preload !== false
       });
     });
     const fallbacks = /* @__PURE__ */ new Map();
@@ -13661,7 +13666,7 @@ ${ty.variants.map(
     }
     if (state.play.length === 0) return state.then === null ? null : enterState(manifest, state.then, at, from);
     let offsetBars = 0;
-    if (state.syncPosition && from !== null && at < from.end - EPSILON) {
+    if (state.syncPosition && from !== null && at < from.end - EPSILON && (state.syncFrom === null || state.syncFrom.includes(from.section))) {
       const fromSection = manifest.sections.get(from.section);
       const reached = Math.round(from.offsetBars + (at - from.start) / barSeconds(fromSection));
       offsetBars = reached % manifest.sections.get(state.play[0]).bars;
@@ -13711,14 +13716,16 @@ ${ty.variants.map(
   }
   function reachableEntries(manifest, fromSection) {
     const ids = [];
-    for (const transition of manifest.transitions) {
-      if (transition.immediate || transition.from === null || !transition.from.includes(fromSection)) continue;
-      const targets = transition.to ?? [...manifest.states.keys()];
-      for (const name of targets) {
-        const state = manifest.states.get(name);
-        const id = state === void 0 ? null : entryOf(state);
-        if (id !== null && !ids.includes(id)) ids.push(id);
-      }
+    for (const [name, state] of manifest.states) {
+      const transition = findTransition(manifest, fromSection, name);
+      if (transition === null || transition.immediate || !transition.preload || transition.from === null) continue;
+      const id = entryOf(state);
+      if (id !== null && !ids.includes(id)) ids.push(id);
+    }
+    for (const state of manifest.states.values()) {
+      if (state.syncFrom === null || !state.syncFrom.includes(fromSection)) continue;
+      const id = entryOf(state);
+      if (id !== null && !ids.includes(id)) ids.push(id);
     }
     return ids;
   }
