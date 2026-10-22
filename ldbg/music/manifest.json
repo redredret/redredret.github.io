@@ -106,6 +106,12 @@
       "fallback": "menu_bloom-f643dd8ac46a.m4a",
       "beats": 12,
       "bpm": 170
+    },
+    "menu_sink": {
+      "file": "menu_sink-303f8a3ce4c8.ogg",
+      "fallback": "menu_sink-136baaaa4e30.m4a",
+      "beats": 12,
+      "bpm": 170
     }
   },
   "transitions": [
@@ -128,7 +134,7 @@
       "hit": "menu_bloom",
       "immediate": true,
       "releaseSeconds": 0.8,
-      "fadeInSeconds": 0.4
+      "fadeInSeconds": 0.03
     },
     {
       "from": [
@@ -140,10 +146,10 @@
       "to": [
         "menu"
       ],
-      "hit": "menu_bloom",
+      "hit": "menu_sink",
       "immediate": true,
-      "releaseSeconds": 0.8,
-      "fadeInSeconds": 0.4
+      "releaseSeconds": 1,
+      "fadeInSeconds": 0.5
     },
     {
       "from": [
