@@ -13591,6 +13591,9 @@ ${ty.variants.map(
         fail(`${where} releaseSeconds must be from 0 to 10`);
       }
       if (entry.preload != null && typeof entry.preload !== "boolean") fail(`${where} preload must be true or false`);
+      const fadeIn = entry.fadeInSeconds ?? 0;
+      if (typeof fadeIn !== "number" || !(fadeIn >= 0 && fadeIn <= 10)) fail(`${where} fadeInSeconds must be from 0 to 10`);
+      if (fadeIn > 0 && !immediate) fail(`${where} fadeInSeconds is for an immediate transition`);
       transitions.push({
         from,
         to,
@@ -13599,7 +13602,8 @@ ${ty.variants.map(
         switchEveryBars: every,
         immediate,
         releaseSeconds: release == null ? null : release,
-        preload: entry.preload !== false
+        preload: entry.preload !== false,
+        fadeInSeconds: fadeIn
       });
     });
     const fallbacks = /* @__PURE__ */ new Map();
@@ -13705,7 +13709,7 @@ ${ty.variants.map(
     for (const transition of manifest.transitions) {
       add(transition.leadIn);
       add(transition.hit);
-      if (!transition.immediate) continue;
+      if (!transition.immediate || transition.from !== null) continue;
       const targets = transition.to ?? [...manifest.states.keys()];
       for (const name of targets) {
         const state = manifest.states.get(name);
@@ -13718,7 +13722,7 @@ ${ty.variants.map(
     const ids = [];
     for (const [name, state] of manifest.states) {
       const transition = findTransition(manifest, fromSection, name);
-      if (transition === null || transition.immediate || !transition.preload || transition.from === null) continue;
+      if (transition === null || !transition.preload || transition.from === null) continue;
       const id = entryOf(state);
       if (id !== null && !ids.includes(id)) ids.push(id);
     }
@@ -14126,6 +14130,7 @@ ${ty.variants.map(
       this.orphan = null;
       this.active = target;
       const next = enterState(manifest, target, at, null, this.introsPlayed);
+      if (next !== null && transition.fadeInSeconds > 0) next.fadeIn = transition.fadeInSeconds;
       let playing = null;
       const wanted = () => resolveState(manifest, this.requested) === target;
       const startSection = (section2) => {

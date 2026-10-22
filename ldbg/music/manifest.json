@@ -100,6 +100,12 @@
       "fallback": "death_boom-68f5a6065535.m4a",
       "beats": 12,
       "bpm": 170
+    },
+    "menu_bloom": {
+      "file": "menu_bloom-4c547120f29a.ogg",
+      "fallback": "menu_bloom-f643dd8ac46a.m4a",
+      "beats": 12,
+      "bpm": 170
     }
   },
   "transitions": [
@@ -117,8 +123,34 @@
         "intro_loop"
       ],
       "to": [
-        "farm",
         "menu_deep"
+      ],
+      "hit": "menu_bloom",
+      "immediate": true,
+      "releaseSeconds": 0.8,
+      "fadeInSeconds": 0.4
+    },
+    {
+      "from": [
+        "menu_1",
+        "menu_2",
+        "menu_3",
+        "menu_4"
+      ],
+      "to": [
+        "menu"
+      ],
+      "hit": "menu_bloom",
+      "immediate": true,
+      "releaseSeconds": 0.8,
+      "fadeInSeconds": 0.4
+    },
+    {
+      "from": [
+        "intro_loop"
+      ],
+      "to": [
+        "farm"
       ],
       "leadIn": "cymbal_lead_up",
       "switchEveryBars": 1
@@ -173,7 +205,6 @@
         "menu_4"
       ],
       "to": [
-        "menu",
         "farm"
       ],
       "leadIn": "cymbal_lead_up",
