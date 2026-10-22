@@ -46,18 +46,48 @@
       "switchEveryBars": 0,
       "file": "death_ambient-75b95b0ba2ba.ogg",
       "fallback": "death_ambient-a46952fb28c2.m4a"
+    },
+    "menu_1": {
+      "bpm": 100,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "menu_1-13c0c2c0fc77.ogg",
+      "fallback": "menu_1-3f7547cab57d.m4a"
+    },
+    "menu_2": {
+      "bpm": 100,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "menu_2-d683baac4cff.ogg",
+      "fallback": "menu_2-dc1f610326ba.m4a"
+    },
+    "menu_3": {
+      "bpm": 100,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "menu_3-8ee06e25be02.ogg",
+      "fallback": "menu_3-ac203ea3b18f.m4a"
+    },
+    "menu_4": {
+      "bpm": 100,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "menu_4-08d3ca62bf99.ogg",
+      "fallback": "menu_4-f988f654a65e.m4a"
     }
   },
   "leadIns": {
     "cymbal_lead_up": {
       "file": "cymbal_lead_up-c42b03fa8f1b.ogg",
       "fallback": "cymbal_lead_up-f63714b51e1f.m4a",
-      "beats": 1.5
+      "beats": 1.5,
+      "bpm": 170
     },
     "death_boom": {
       "file": "death_boom-1aa5188fc982.ogg",
       "fallback": "death_boom-68f5a6065535.m4a",
-      "beats": 12
+      "beats": 12,
+      "bpm": 170
     }
   },
   "transitions": [
@@ -75,6 +105,21 @@
         "intro_loop"
       ],
       "to": [
+        "farm",
+        "menu_deep"
+      ],
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1
+    },
+    {
+      "from": [
+        "menu_1",
+        "menu_2",
+        "menu_3",
+        "menu_4"
+      ],
+      "to": [
+        "menu",
         "farm"
       ],
       "leadIn": "cymbal_lead_up",
@@ -124,6 +169,14 @@
     "menu": {
       "play": [
         "intro_loop"
+      ]
+    },
+    "menu_deep": {
+      "intro": "menu_1",
+      "play": [
+        "menu_2",
+        "menu_3",
+        "menu_4"
       ]
     },
     "farm": {

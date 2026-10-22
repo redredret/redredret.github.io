@@ -898,6 +898,10 @@ ${originalIndentation}`;
     // drops are rolled from, never known before the run has got there. Its own
     // domain, so a seed arriving re-applies nothing else.
     lootReveals: { group: "core", keys: { lootReveals: many("myRunLootReveals") } },
+    // The operator's notice to every player (docs/RELEASE_READINESS_PLAN.md T-4):
+    // maintenance, a wipe, "a new version is live". Anonymous and at most three
+    // rows, so it rides the core subscription and is there from the first patch.
+    serverNotices: { group: "core", keys: { serverNotices: many("serverNotices") } },
     // Named for what was in it first. It is the durable RECORDS domain: the
     // per-account bests and completions that outlive a run, whichever activity
     // set them. A new record table belongs here rather than in a domain of its
@@ -932,9 +936,12 @@ ${originalIndentation}`;
     // and their place in the quick-match queue. All three change because of
     // somebody ELSE -- a partner found, a partner ready, a monster's health -- so
     // they ride the connection. Always all three, so "no party" is an empty row.
+    // The party and its members arrive each as a core and a score view, joined
+    // back into the rows the old views sent (fight_rows.ts).
     party: {
       group: "party",
-      keys: { party: one("myParty"), partyMembers: many("myPartyMembers"), partyQueue: one("myPartyQueue") }
+      observes: ["myPartyCore", "myPartyScore", "myPartyMemberCore", "myPartyMemberScore", "myPartyQueue"],
+      built: ["party", "partyMembers", "partyQueue"]
     },
     // Every kill and chest the party has had, on a domain of its own: it grows
     // through the run, and riding 'party' every monster's health tick re-sent it.
@@ -988,13 +995,12 @@ ${originalIndentation}`;
     // All three always, so "no duel" reads as an empty list rather than as a
     // domain that has not arrived: a screen cannot tell those apart, and one of
     // them means somebody is swinging at you.
+    // The duel arrives as a core and a score view, joined back into the row the
+    // old view sent (fight_rows.ts).
     darkDuel: {
       group: "darkDuel",
-      keys: {
-        darkDuel: many("myDarkDuel"),
-        darkDuelBlows: many("myDarkDuelBlows"),
-        darkDuelHaul: many("myDarkDuelHaul")
-      }
+      observes: ["myDarkDuelCore", "myDarkDuelScore", "myDarkDuelBlows", "myDarkDuelHaul"],
+      built: ["darkDuel", "darkDuelBlows", "darkDuelHaul"]
     },
     // Whether this player is in the hunt, on a domain of its own: it changes as
     // the run goes on, and riding darkDuel it re-sent the duel, every blow of the
@@ -9225,10 +9231,20 @@ ${ty.variants.map(
     reason: t.string()
   };
 
+  // src/module_bindings/operator_clear_notices_reducer.ts
+  var operator_clear_notices_reducer_default = {};
+
   // src/module_bindings/operator_lift_suspension_reducer.ts
   var operator_lift_suspension_reducer_default = {
     displayName: t.string(),
     reason: t.string()
+  };
+
+  // src/module_bindings/operator_post_notice_reducer.ts
+  var operator_post_notice_reducer_default = {
+    text: t.string(),
+    severity: t.string(),
+    minutes: t.u32()
   };
 
   // src/module_bindings/operator_regrade_enhancements_reducer.ts
@@ -9956,6 +9972,56 @@ ${ty.variants.map(
     effects: t.string()
   });
 
+  // src/module_bindings/my_dark_duel_core_table.ts
+  var my_dark_duel_core_table_default = t.row({
+    duelId: t.string().primaryKey().name("duel_id"),
+    playerOne: t.identity().name("player_one"),
+    playerTwo: t.identity().name("player_two"),
+    oneName: t.string().name("one_name"),
+    twoName: t.string().name("two_name"),
+    oneLevel: t.u32().name("one_level"),
+    twoLevel: t.u32().name("two_level"),
+    oneAtEncounter: t.u32().name("one_at_encounter"),
+    twoAtEncounter: t.u32().name("two_at_encounter"),
+    oneHealth: t.u32().name("one_health"),
+    twoHealth: t.u32().name("two_health"),
+    oneEntered: t.bool().name("one_entered"),
+    twoEntered: t.bool().name("two_entered"),
+    oneDamageSent: t.u32().name("one_damage_sent"),
+    twoDamageSent: t.u32().name("two_damage_sent"),
+    state: t.string(),
+    winner: t.identity(),
+    winnerName: t.string().name("winner_name"),
+    outcome: t.string(),
+    matchedAt: t.timestamp().name("matched_at"),
+    startedAt: t.timestamp().name("started_at"),
+    decidedAt: t.timestamp().name("decided_at"),
+    oneRunSeed: t.u32().name("one_run_seed"),
+    twoRunSeed: t.u32().name("two_run_seed"),
+    oneLook: t.string().name("one_look"),
+    twoLook: t.string().name("two_look"),
+    friendly: t.bool(),
+    ground: t.string(),
+    oneRunId: t.string().name("one_run_id"),
+    twoRunId: t.string().name("two_run_id"),
+    oneBlows: t.u32().name("one_blows"),
+    twoBlows: t.u32().name("two_blows"),
+    oneBoardBreaks: t.u32().name("one_board_breaks"),
+    twoBoardBreaks: t.u32().name("two_board_breaks"),
+    oneEntryHealth: t.u32().name("one_entry_health"),
+    twoEntryHealth: t.u32().name("two_entry_health"),
+    onePotions: t.u32().name("one_potions"),
+    twoPotions: t.u32().name("two_potions"),
+    oneEntryPotions: t.u32().name("one_entry_potions"),
+    twoEntryPotions: t.u32().name("two_entry_potions"),
+    oneNecklace: t.u32().name("one_necklace"),
+    twoNecklace: t.u32().name("two_necklace"),
+    oneEntryNecklace: t.u32().name("one_entry_necklace"),
+    twoEntryNecklace: t.u32().name("two_entry_necklace"),
+    oneShielded: t.bool().name("one_shielded"),
+    twoShielded: t.bool().name("two_shielded")
+  });
+
   // src/module_bindings/my_dark_duel_haul_table.ts
   var my_dark_duel_haul_table_default = t.row({
     haulId: t.string().primaryKey().name("haul_id"),
@@ -9967,6 +10033,25 @@ ${ty.variants.map(
     worn: t.bool(),
     createdAt: t.timestamp().name("created_at"),
     instanceId: t.u64().name("instance_id")
+  });
+
+  // src/module_bindings/my_dark_duel_score_table.ts
+  var my_dark_duel_score_table_default = t.row({
+    duelId: t.string().name("duel_id"),
+    oneHealth: t.u32().name("one_health"),
+    twoHealth: t.u32().name("two_health"),
+    oneDamageSent: t.u32().name("one_damage_sent"),
+    twoDamageSent: t.u32().name("two_damage_sent"),
+    oneBlows: t.u32().name("one_blows"),
+    twoBlows: t.u32().name("two_blows"),
+    oneBoardBreaks: t.u32().name("one_board_breaks"),
+    twoBoardBreaks: t.u32().name("two_board_breaks"),
+    onePotions: t.u32().name("one_potions"),
+    twoPotions: t.u32().name("two_potions"),
+    oneNecklace: t.u32().name("one_necklace"),
+    twoNecklace: t.u32().name("two_necklace"),
+    oneShielded: t.bool().name("one_shielded"),
+    twoShielded: t.bool().name("two_shielded")
   });
 
   // src/module_bindings/my_dark_presence_table.ts
@@ -10313,6 +10398,72 @@ ${ty.variants.map(
     enemyShielded: t.bool().name("enemy_shielded")
   });
 
+  // src/module_bindings/my_party_core_table.ts
+  var my_party_core_table_default = t.row({
+    partyId: t.string().primaryKey().name("party_id"),
+    mode: t.string(),
+    dungeonId: t.string().name("dungeon_id"),
+    code: t.string(),
+    state: t.string(),
+    seed: t.u32(),
+    encounterIndex: t.u32().name("encounter_index"),
+    enemyHealth: t.u32().name("enemy_health"),
+    enemyMaxHealth: t.u32().name("enemy_max_health"),
+    phase: t.string(),
+    chestIndex: t.u32().name("chest_index"),
+    soloFromEncounter: t.u32().name("solo_from_encounter"),
+    stepCount: t.u32().name("step_count"),
+    createdAt: t.timestamp().name("created_at"),
+    startedAt: t.timestamp().name("started_at"),
+    updatedAt: t.timestamp().name("updated_at"),
+    attackDueMicros: t.u64().name("attack_due_micros"),
+    attackSetMicros: t.u64().name("attack_set_micros"),
+    attackNumber: t.u32().name("attack_number"),
+    enemyShielded: t.bool().name("enemy_shielded")
+  });
+
+  // src/module_bindings/my_party_member_core_table.ts
+  var my_party_member_core_table_default = t.row({
+    memberId: t.string().primaryKey().name("member_id"),
+    partyId: t.string().name("party_id"),
+    owner: t.identity(),
+    slot: t.u32(),
+    state: t.string(),
+    ready: t.bool(),
+    runId: t.string().name("run_id"),
+    name: t.string(),
+    level: t.u32(),
+    armor: t.u32(),
+    look: t.string(),
+    health: t.u32(),
+    blows: t.u32(),
+    lastBlowDamage: t.u32().name("last_blow_damage"),
+    damageSent: t.u64().name("damage_sent"),
+    necklaceUsed: t.bool().name("necklace_used"),
+    disconnectedMicros: t.u64().name("disconnected_micros"),
+    joinedAt: t.timestamp().name("joined_at"),
+    snapArmed: t.bool().name("snap_armed"),
+    revives: t.u32(),
+    healsSent: t.u32().name("heals_sent"),
+    reviveProgress: t.u32().name("revive_progress"),
+    bandaged: t.bool()
+  });
+
+  // src/module_bindings/my_party_member_score_table.ts
+  var my_party_member_score_table_default = t.row({
+    memberId: t.string().name("member_id"),
+    health: t.u32(),
+    blows: t.u32(),
+    lastBlowDamage: t.u32().name("last_blow_damage"),
+    damageSent: t.u64().name("damage_sent"),
+    snapArmed: t.bool().name("snap_armed"),
+    necklaceUsed: t.bool().name("necklace_used"),
+    revives: t.u32(),
+    healsSent: t.u32().name("heals_sent"),
+    reviveProgress: t.u32().name("revive_progress"),
+    bandaged: t.bool()
+  });
+
   // src/module_bindings/my_party_members_table.ts
   var my_party_members_table_default = t.row({
     memberId: t.string().primaryKey().name("member_id"),
@@ -10372,6 +10523,18 @@ ${ty.variants.map(
     level: t.u32(),
     armor: t.u32(),
     queuedAt: t.timestamp().name("queued_at")
+  });
+
+  // src/module_bindings/my_party_score_table.ts
+  var my_party_score_table_default = t.row({
+    partyId: t.string().name("party_id"),
+    enemyHealth: t.u32().name("enemy_health"),
+    enemyShielded: t.bool().name("enemy_shielded"),
+    attackDueMicros: t.u64().name("attack_due_micros"),
+    attackSetMicros: t.u64().name("attack_set_micros"),
+    attackNumber: t.u32().name("attack_number"),
+    stepCount: t.u32().name("step_count"),
+    updatedAt: t.timestamp().name("updated_at")
   });
 
   // src/module_bindings/my_party_steps_table.ts
@@ -10653,6 +10816,15 @@ ${ty.variants.map(
     detailJson: t.string().name("detail_json")
   });
 
+  // src/module_bindings/server_notices_table.ts
+  var server_notices_table_default = t.row({
+    id: t.u64().primaryKey(),
+    text: t.string(),
+    severity: t.string(),
+    postedAt: t.timestamp().name("posted_at"),
+    until: t.timestamp()
+  });
+
   // src/module_bindings/slime_best_waves_table.ts
   var slime_best_waves_table_default = t.row({
     board: t.string(),
@@ -10783,11 +10955,21 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_dark_duel_blows_table_default),
+    myDarkDuelCore: table({
+      name: "my_dark_duel_core",
+      indexes: [],
+      constraints: []
+    }, my_dark_duel_core_table_default),
     myDarkDuelHaul: table({
       name: "my_dark_duel_haul",
       indexes: [],
       constraints: []
     }, my_dark_duel_haul_table_default),
+    myDarkDuelScore: table({
+      name: "my_dark_duel_score",
+      indexes: [],
+      constraints: []
+    }, my_dark_duel_score_table_default),
     myDarkPresence: table({
       name: "my_dark_presence",
       indexes: [],
@@ -10938,6 +11120,21 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_party_table_default),
+    myPartyCore: table({
+      name: "my_party_core",
+      indexes: [],
+      constraints: []
+    }, my_party_core_table_default),
+    myPartyMemberCore: table({
+      name: "my_party_member_core",
+      indexes: [],
+      constraints: []
+    }, my_party_member_core_table_default),
+    myPartyMemberScore: table({
+      name: "my_party_member_score",
+      indexes: [],
+      constraints: []
+    }, my_party_member_score_table_default),
     myPartyMembers: table({
       name: "my_party_members",
       indexes: [],
@@ -10958,6 +11155,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_party_queue_table_default),
+    myPartyScore: table({
+      name: "my_party_score",
+      indexes: [],
+      constraints: []
+    }, my_party_score_table_default),
     myPartySteps: table({
       name: "my_party_steps",
       indexes: [],
@@ -11083,6 +11285,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, quest_details_table_default),
+    serverNotices: table({
+      name: "server_notices",
+      indexes: [],
+      constraints: []
+    }, server_notices_table_default),
     slimeBestWaves: table({
       name: "slime_best_waves",
       indexes: [],
@@ -11151,7 +11358,9 @@ ${ty.variants.map(
     reducerSchema("operator_chat_set_mode", operator_chat_set_mode_reducer_default),
     reducerSchema("operator_chat_tester", operator_chat_tester_reducer_default),
     reducerSchema("operator_chat_unmute", operator_chat_unmute_reducer_default),
+    reducerSchema("operator_clear_notices", operator_clear_notices_reducer_default),
     reducerSchema("operator_lift_suspension", operator_lift_suspension_reducer_default),
+    reducerSchema("operator_post_notice", operator_post_notice_reducer_default),
     reducerSchema("operator_regrade_enhancements", operator_regrade_enhancements_reducer_default),
     reducerSchema("operator_rename_player", operator_rename_player_reducer_default),
     reducerSchema("operator_set_loot_key", operator_set_loot_key_reducer_default),
@@ -11250,7 +11459,9 @@ ${ty.variants.map(
     "my_dark_death_loss": "myDarkDeathLoss",
     "my_dark_duel": "myDarkDuel",
     "my_dark_duel_blows": "myDarkDuelBlows",
+    "my_dark_duel_core": "myDarkDuelCore",
     "my_dark_duel_haul": "myDarkDuelHaul",
+    "my_dark_duel_score": "myDarkDuelScore",
     "my_dark_presence": "myDarkPresence",
     "my_duel_lobby": "myDuelLobby",
     "my_duel_notices": "myDuelNotices",
@@ -11281,10 +11492,14 @@ ${ty.variants.map(
     "my_market_transactions": "myMarketTransactions",
     "my_onboarding": "myOnboarding",
     "my_party": "myParty",
+    "my_party_core": "myPartyCore",
+    "my_party_member_core": "myPartyMemberCore",
+    "my_party_member_score": "myPartyMemberScore",
     "my_party_members": "myPartyMembers",
     "my_party_partner_boards": "myPartyPartnerBoards",
     "my_party_partner_pieces": "myPartyPartnerPieces",
     "my_party_queue": "myPartyQueue",
+    "my_party_score": "myPartyScore",
     "my_party_steps": "myPartySteps",
     "my_profile": "myProfile",
     "my_profile_preferences": "myProfilePreferences",
@@ -11310,6 +11525,7 @@ ${ty.variants.map(
     "opponent_farm_roster_v1": "opponentFarmRosterV1",
     "quest_catalog": "questCatalog",
     "quest_details": "questDetails",
+    "server_notices": "serverNotices",
     "slime_best_waves": "slimeBestWaves"
   };
   function __withTableAccessorAliases(target, freeze = false) {
@@ -11966,6 +12182,21 @@ ${ty.variants.map(
     };
   }
 
+  // src/fight_rows.ts
+  function joinFightRows(core, score, key, missing = () => {
+  }) {
+    const byKey = /* @__PURE__ */ new Map();
+    for (const row of score) byKey.set(String(row?.[key]), row);
+    return core.map((row) => {
+      const scored = byKey.get(String(row?.[key]));
+      if (scored === void 0) {
+        missing(String(row?.[key]));
+        return row;
+      }
+      return { ...row, ...scored };
+    });
+  }
+
   // src/row_json.ts
   function jsonSafe(value) {
     return convertBigInts(value);
@@ -12009,6 +12240,9 @@ ${ty.variants.map(
   var EMPTY_CONNECTION = {
     db: new Proxy({}, { get: () => ({ iter: () => [] }) })
   };
+  function missingScore(what) {
+    return (key) => emit({ type: "error", command: "snapshot:fightScore", message: `The ${what} ${key} arrived without its score.` });
+  }
   var SNAPSHOT_DOMAINS = Object.keys(DOMAINS);
   var BUILDERS = {
     // The roster says who sits where; the boards are what the room's events
@@ -12017,6 +12251,33 @@ ${ty.variants.map(
       const { boards, pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
       return { farmOpponents: boards, farmOpponentPieces: pieces, ...farmBoardDomainPatch(boards[0]) };
     },
+    // The fight rows: each core row with its score laid over it, the row the old
+    // view sent (spacetimedb/src/domain/fight_split.ts).
+    darkDuel: (activeConnection) => ({
+      darkDuel: joinFightRows(
+        rows(activeConnection.db.myDarkDuelCore),
+        rows(activeConnection.db.myDarkDuelScore),
+        "duelId",
+        missingScore("duel")
+      ),
+      darkDuelBlows: rows(activeConnection.db.myDarkDuelBlows),
+      darkDuelHaul: rows(activeConnection.db.myDarkDuelHaul)
+    }),
+    party: (activeConnection) => ({
+      party: joinFightRows(
+        rows(activeConnection.db.myPartyCore),
+        rows(activeConnection.db.myPartyScore),
+        "partyId",
+        missingScore("party")
+      )[0] ?? null,
+      partyMembers: joinFightRows(
+        rows(activeConnection.db.myPartyMemberCore),
+        rows(activeConnection.db.myPartyMemberScore),
+        "memberId",
+        missingScore("party member")
+      ),
+      partyQueue: rows(activeConnection.db.myPartyQueue)[0] ?? null
+    }),
     // Refreshed only by the room's pose events; the roster it reads is observed
     // for farmBoard.
     farmPiece: (activeConnection) => {
@@ -13287,7 +13548,9 @@ ${ty.variants.map(
       if (typeof entry.file !== "string" || !SAFE_FILE.test(entry.file)) fail(`lead-in ${id} needs a plain file name`);
       const beats = entry.beats;
       if (typeof beats !== "number" || !(beats > 0 && beats <= 64)) fail(`lead-in ${id} beats must be above 0 and at most 64`);
-      leadIns.set(id, { id, file: entry.file, fallback: fallbackFile(entry.fallback, `lead-in ${id}`), beats });
+      const leadInBpm = typeof entry.bpm === "number" ? entry.bpm : bpm;
+      if (!(leadInBpm >= 30 && leadInBpm <= 300)) fail(`lead-in ${id} bpm must be from 30 to 300`);
+      leadIns.set(id, { id, file: entry.file, fallback: fallbackFile(entry.fallback, `lead-in ${id}`), beats, bpm: leadInBpm });
     }
     const transitions = [];
     const rawTransitions = root.transitions ?? [];
@@ -13366,9 +13629,12 @@ ${ty.variants.map(
     }
     return null;
   }
-  function leadInSeconds(manifest, transition, intoSection) {
+  function leadInSeconds(manifest, transition) {
     if (transition === null || transition.leadIn === null) return 0;
-    return manifest.leadIns.get(transition.leadIn).beats * 60 / manifest.sections.get(intoSection).bpm;
+    return soundSeconds(manifest.leadIns.get(transition.leadIn));
+  }
+  function soundSeconds(leadIn) {
+    return leadIn.beats * 60 / leadIn.bpm;
   }
   function nextSwitchTime(manifest, segment, earliest, everyBars = null) {
     const section = manifest.sections.get(segment.section);
@@ -13684,7 +13950,7 @@ ${ty.variants.map(
       const fromSection = committed?.segment.section ?? this.lastSection;
       const probe = committed !== null && committed.segment.state === target ? null : enterState(manifest, target, 0, null, this.introsPlayed);
       const transition = probe === null ? null : findTransition(manifest, fromSection, target);
-      const lead = probe === null ? 0 : leadInSeconds(manifest, transition, probe.section);
+      const lead = probe === null ? 0 : leadInSeconds(manifest, transition);
       if (transition !== null && transition.immediate && probe !== null) {
         this.applyImmediately(manifest, target, transition);
         return;
@@ -14028,7 +14294,7 @@ ${ty.variants.map(
       if (priming <= 0) return;
       const section = manifest.sections.get(id);
       const leadIn = manifest.leadIns.get(id);
-      const expected = section !== void 0 ? section.bars * barSeconds(section) : leadIn.beats * 60 / manifest.sections.values().next().value.bpm;
+      const expected = section !== void 0 ? section.bars * barSeconds(section) : soundSeconds(leadIn);
       if (buffer.duration - expected >= priming * 0.5) this.priming.set(id, priming);
       else this.priming.delete(id);
     }
