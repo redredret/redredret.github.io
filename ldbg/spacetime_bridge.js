@@ -13504,7 +13504,8 @@ ${ty.variants.map(
         bars: integer(entry.bars, `section ${id} bars`, 1, 512),
         bpm: sectionBpm,
         beatsPerBar: integer(entry.beatsPerBar ?? beatsPerBar, `section ${id} beatsPerBar`, 1, 16),
-        switchEveryBars: integer(entry.switchEveryBars ?? switchEvery, `section ${id} switchEveryBars`, 0, 512)
+        switchEveryBars: integer(entry.switchEveryBars ?? switchEvery, `section ${id} switchEveryBars`, 0, 512),
+        pickupBeats: integer(entry.pickupBeats ?? 0, `section ${id} pickupBeats`, 0, 16)
       });
     }
     if (sections.size === 0) fail("no sections");
@@ -13621,6 +13622,9 @@ ${ty.variants.map(
   function barSeconds(section) {
     return 60 / section.bpm * section.beatsPerBar;
   }
+  function pickupSeconds(section) {
+    return 60 / section.bpm * section.pickupBeats;
+  }
   function resolveState(manifest, requested) {
     let name = requested;
     for (let hop = 0; hop < 8; hop++) {
@@ -13652,14 +13656,15 @@ ${ty.variants.map(
     if (every <= 0) return segment.end;
     const bar = barSeconds(section);
     const step = every * bar;
-    const sectionStart = segment.start - segment.offsetBars * bar;
+    const sectionStart = segment.start + segment.pickup - segment.offsetBars * bar;
     const k = Math.max(1, Math.ceil((earliest - sectionStart) / step - EPSILON));
     const at = sectionStart + k * step;
     return at < segment.end - EPSILON ? at : segment.end;
   }
   function place(manifest, section, state, playIndex, offsetBars, start) {
     const info = manifest.sections.get(section);
-    return { section, state, playIndex, offsetBars, start, end: start + (info.bars - offsetBars) * barSeconds(info), fadeIn: 0 };
+    const pickup = offsetBars === 0 ? pickupSeconds(info) : 0;
+    return { section, state, playIndex, offsetBars, pickup, start, end: start + pickup + (info.bars - offsetBars) * barSeconds(info), fadeIn: 0 };
   }
   function enterState(manifest, stateName, at, from, introsPlayed = /* @__PURE__ */ new Set()) {
     if (stateName === SILENCE) return null;
@@ -13672,7 +13677,7 @@ ${ty.variants.map(
     let offsetBars = 0;
     if (state.syncPosition && from !== null && at < from.end - EPSILON && (state.syncFrom === null || state.syncFrom.includes(from.section))) {
       const fromSection = manifest.sections.get(from.section);
-      const reached = Math.round(from.offsetBars + (at - from.start) / barSeconds(fromSection));
+      const reached = Math.round(from.offsetBars + (at - from.start - from.pickup) / barSeconds(fromSection));
       offsetBars = reached % manifest.sections.get(state.play[0]).bars;
     }
     return place(manifest, state.play[0], stateName, 0, offsetBars, at);
@@ -13861,6 +13866,7 @@ ${ty.variants.map(
           start: playing.segment.start,
           end: playing.segment.end,
           offsetBars: playing.segment.offsetBars,
+          pickup: playing.segment.pickup,
           cutAt: playing.cutAt,
           leadAt: playing.leadAt,
           hitAt: playing.hitAt,
@@ -14083,7 +14089,7 @@ ${ty.variants.map(
       source.buffer = buffer;
       source.connect(gain);
       gain.connect(this.master);
-      let offset = segment.offsetBars * barSeconds(section);
+      let offset = segment.offsetBars > 0 ? pickupSeconds(section) + segment.offsetBars * barSeconds(section) : 0;
       let start = segment.start;
       const earliest = context2.currentTime + LATE_JOIN_SECONDS;
       if (start < earliest) {
@@ -14306,7 +14312,7 @@ ${ty.variants.map(
       if (priming <= 0) return;
       const section = manifest.sections.get(id);
       const leadIn = manifest.leadIns.get(id);
-      const expected = section !== void 0 ? section.bars * barSeconds(section) : soundSeconds(leadIn);
+      const expected = section !== void 0 ? pickupSeconds(section) + section.bars * barSeconds(section) : soundSeconds(leadIn);
       if (buffer.duration - expected >= priming * 0.5) this.priming.set(id, priming);
       else this.priming.delete(id);
     }

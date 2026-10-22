@@ -49,10 +49,11 @@
     },
     "menu_1": {
       "bpm": 100,
+      "pickupBeats": 1,
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "menu_1-13c0c2c0fc77.ogg",
-      "fallback": "menu_1-3f7547cab57d.m4a"
+      "file": "menu_1-b8d6dca36c4d.ogg",
+      "fallback": "menu_1-72830183702f.m4a"
     },
     "menu_2": {
       "bpm": 100,
