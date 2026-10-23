@@ -13892,6 +13892,22 @@ ${ty.variants.map(
         }))
       };
     }
+    // The next bar line at the earliest time given, or after, of the section sounding then:
+    // where the tempo test changes step. Null with nothing sounding.
+    nextBarAfter(earliest) {
+      const manifest = this.manifest;
+      if (manifest === null) return null;
+      for (const playing of this.queue) {
+        const end = playing.cutAt ?? playing.segment.end;
+        if (playing.segment.start <= earliest && earliest < end) return nextSwitchTime(manifest, playing.segment, earliest, 1);
+      }
+      return null;
+    }
+    // Every section decoded now, by id: what the tempo test's steps need copies of
+    // when they are switched on mid-song.
+    decodedSections() {
+      return [...this.decoded.entries()].filter(([id]) => this.manifest?.sections.has(id) ?? false);
+    }
     // Moves the queue on: lets finished sections go, and plans the next one.
     tick() {
       if (this.context === null || this.manifest === null) return;
@@ -14309,6 +14325,7 @@ ${ty.variants.map(
         const buffer = await this.context.decodeAudioData(bytes.slice(0));
         this.decoded.set(id, buffer);
         if (usingFallback) this.notePriming(id, buffer);
+        this.deps.onDecoded?.(id, buffer, usingFallback);
         return buffer;
       } catch (error) {
         const entry = this.manifest.sections.get(id) ?? this.manifest.leadIns.get(id);
@@ -14369,18 +14386,486 @@ ${ty.variants.map(
     }
   };
 
+  // src/music_warp.ts
+  var SWAP_FADE_SECONDS = 0.01;
+  var RATE_EPSILON = 1e-4;
+  var WarpParam = class {
+    constructor(warp, real) {
+      this.warp = warp;
+      this.real = real;
+    }
+    // Every change asked for, in song time and the order asked, so a re-anchor
+    // can place the later ones again.
+    events = [];
+    get value() {
+      return this.real.value;
+    }
+    set value(value) {
+      this.real.value = value;
+    }
+    setValueAtTime(value, at) {
+      this.events.push({ kind: "set", value, at });
+      return this.real.setValueAtTime(value, this.warp.toReal(at));
+    }
+    linearRampToValueAtTime(value, at) {
+      this.events.push({ kind: "ramp", value, at });
+      return this.real.linearRampToValueAtTime(value, this.warp.toReal(at));
+    }
+    setValueCurveAtTime(values, at, duration) {
+      this.events.push({ kind: "curve", values, at, duration });
+      const start = this.warp.toReal(at);
+      return this.real.setValueCurveAtTime(values, start, this.warp.toReal(at + duration) - start);
+    }
+    cancelScheduledValues(at) {
+      this.events = this.events.filter((event) => event.at < at);
+      return this.real.cancelScheduledValues(this.warp.toReal(at));
+    }
+    // Whether a ramp or curve is under way across song time `at`.
+    spans(at) {
+      let before = Number.NEGATIVE_INFINITY;
+      for (const event of [...this.events].sort((a, b) => a.at - b.at)) {
+        if (event.kind === "curve" && event.at < at && at < event.at + event.duration) return true;
+        if (event.kind === "ramp" && event.at > at && before < at && before > Number.NEGATIVE_INFINITY) return true;
+        before = event.kind === "curve" ? event.at + event.duration : event.at;
+      }
+      return false;
+    }
+    // Places every change from song time `at` on again, on the clock as it now is.
+    retime(at, real) {
+      this.real.cancelScheduledValues(real);
+      for (const event of this.events) {
+        if (event.at < at) continue;
+        if (event.kind === "set") this.real.setValueAtTime(event.value, this.warp.toReal(event.at));
+        else if (event.kind === "ramp") this.real.linearRampToValueAtTime(event.value, this.warp.toReal(event.at));
+        else {
+          const start = this.warp.toReal(event.at);
+          this.real.setValueCurveAtTime(event.values, start, this.warp.toReal(event.at + event.duration) - start);
+        }
+      }
+    }
+    // Lets go of what is long past.
+    prune(before) {
+      if (this.events.length < 16) return;
+      const last = this.events.filter((event) => event.at < before).pop();
+      this.events = this.events.filter((event) => event.at >= before || event === last);
+    }
+  };
+  var WarpGain = class {
+    constructor(warp, real) {
+      this.warp = warp;
+      this.real = real;
+      this.gain = new WarpParam(warp, real.gain);
+      warp.params.add(this.gain);
+    }
+    gain;
+    connect(node) {
+      return this.real.connect(unwrap(node));
+    }
+    disconnect() {
+      this.real.disconnect();
+      this.warp.params.delete(this.gain);
+    }
+  };
+  function unwrap(node) {
+    return node instanceof WarpGain ? node.real : node;
+  }
+  var WarpSource = class {
+    constructor(warp) {
+      this.warp = warp;
+    }
+    buffer = null;
+    handler = null;
+    target = null;
+    // In song time: when it starts, how far into the original it starts, and
+    // when it stops (null: its buffer's end).
+    startAt = null;
+    offset = 0;
+    stopAt = null;
+    voice = null;
+    finished = false;
+    get onended() {
+      return this.handler;
+    }
+    set onended(handler) {
+      this.handler = handler;
+      if (this.voice !== null) this.voice.node.onended = handler === null ? null : () => this.ended();
+    }
+    connect(node) {
+      this.target = unwrap(node);
+      if (this.voice !== null) this.voice.gain.connect(this.target);
+      return node;
+    }
+    disconnect() {
+      this.target = null;
+      if (this.voice !== null) this.voice.gain.disconnect();
+      this.warp.sources.delete(this);
+    }
+    // Duration is in song seconds, as the engine means it: where it stops.
+    start(when, offset = 0, duration) {
+      this.startAt = when;
+      this.offset = offset;
+      this.stopAt = duration === void 0 ? null : when + duration;
+      this.warp.sources.add(this);
+      this.voice = this.makeVoice(this.warp.rateAt(when), this.warp.toReal(when), offset, false);
+      this.placeStop();
+    }
+    stop(when = 0) {
+      if (this.voice === null) return;
+      const now = this.warp.currentTime;
+      if (when <= now) {
+        this.stopAt = now;
+        this.voice.node.stop(0);
+        return;
+      }
+      this.stopAt = when;
+      this.placeStop();
+    }
+    // Song time `at` on: the clock has been re-anchored there.
+    retime(at, real) {
+      if (this.voice === null || this.startAt === null || this.finished) return;
+      if (this.stopAt !== null && this.stopAt <= at) return;
+      const rate = this.warp.rateAt(at);
+      if (this.startAt >= at) {
+        this.dropVoice(this.voice, null);
+        this.voice = this.makeVoice(rate, this.warp.toReal(this.startAt), this.offset, false);
+        this.placeStop();
+        return;
+      }
+      const content = this.offset + (at - this.startAt);
+      const variant = this.warp.variantOf(this.buffer, rate);
+      if (variant === null && !this.voice.variant) {
+        this.voice.node.playbackRate.cancelScheduledValues(real);
+        this.voice.node.playbackRate.setValueAtTime(rate, real);
+        this.voice.rate = rate;
+        this.placeStop();
+        return;
+      }
+      const old = this.voice;
+      this.voice = this.makeVoice(rate, real, content, true);
+      this.dropVoice(old, real);
+      this.placeStop();
+    }
+    makeVoice(rate, real, content, fadeIn) {
+      const context2 = this.warp.real;
+      const node = context2.createBufferSource();
+      const gain = context2.createGain();
+      const variant = this.warp.variantOf(this.buffer, rate);
+      node.buffer = variant ?? this.buffer;
+      node.playbackRate.value = variant === null ? rate : 1;
+      node.connect(gain);
+      if (this.target !== null) gain.connect(this.target);
+      if (fadeIn) {
+        gain.gain.setValueAtTime(0, real);
+        gain.gain.linearRampToValueAtTime(1, real + SWAP_FADE_SECONDS);
+      }
+      if (this.handler !== null) node.onended = () => this.ended();
+      const into = variant === null ? content : content / rate;
+      const now = context2.currentTime;
+      if (real < now) {
+        node.start(now, into + (now - real) * (variant === null ? rate : 1));
+      } else {
+        node.start(real, into);
+      }
+      return { node, gain, rate, variant: variant !== null };
+    }
+    dropVoice(voice, at) {
+      voice.node.onended = null;
+      if (at === null) {
+        voice.node.stop(0);
+        voice.gain.disconnect();
+        return;
+      }
+      voice.gain.gain.setValueAtTime(1, at);
+      voice.gain.gain.linearRampToValueAtTime(0, at + SWAP_FADE_SECONDS);
+      voice.node.stop(at + SWAP_FADE_SECONDS);
+      voice.node.onended = () => voice.gain.disconnect();
+    }
+    placeStop() {
+      if (this.voice === null || this.stopAt === null) return;
+      this.voice.node.stop(Math.max(this.warp.real.currentTime, this.warp.toReal(this.stopAt)));
+    }
+    ended() {
+      this.finished = true;
+      this.warp.sources.delete(this);
+      this.handler?.();
+    }
+    // The original buffer it plays, while it is sounding after song time `at`.
+    liveAfter(at) {
+      if (this.finished || this.startAt === null) return null;
+      if (this.stopAt !== null && this.stopAt <= at) return null;
+      return this.buffer;
+    }
+  };
+  var MusicWarp = class {
+    constructor(real) {
+      this.real = real;
+      this.anchors = [{ song: real.currentTime, real: real.currentTime, rate: 1 }];
+    }
+    params = /* @__PURE__ */ new Set();
+    sources = /* @__PURE__ */ new Set();
+    anchors;
+    // Original buffer -> its faster copies, by rate (the tempo test's steps).
+    variants = /* @__PURE__ */ new WeakMap();
+    get currentTime() {
+      const now = this.real.currentTime;
+      let anchor = this.anchors[0];
+      for (const candidate of this.anchors) if (candidate.real <= now) anchor = candidate;
+      return anchor.song + (now - anchor.real) * anchor.rate;
+    }
+    get state() {
+      return this.real.state;
+    }
+    get destination() {
+      return this.real.destination;
+    }
+    // The rate the clock runs at now.
+    get rate() {
+      return this.rateAt(this.currentTime);
+    }
+    resume() {
+      return this.real.resume();
+    }
+    decodeAudioData(bytes) {
+      return this.real.decodeAudioData(bytes);
+    }
+    createGain() {
+      return new WarpGain(this, this.real.createGain());
+    }
+    createBufferSource() {
+      return new WarpSource(this);
+    }
+    anchorAt(song) {
+      let anchor = this.anchors[0];
+      for (const candidate of this.anchors) if (candidate.song <= song) anchor = candidate;
+      return anchor;
+    }
+    rateAt(song) {
+      return this.anchorAt(song).rate;
+    }
+    // The real time song time `song` plays at.
+    toReal(song) {
+      const anchor = this.anchorAt(song);
+      return anchor.real + (song - anchor.song) / anchor.rate;
+    }
+    // Registers `original`'s faster copies, by the rate each is made for.
+    setVariants(original, copies) {
+      this.variants.set(original, copies);
+    }
+    variantOf(original, rate) {
+      if (original === null || Math.abs(rate - 1) < RATE_EPSILON) return null;
+      const copies = this.variants.get(original);
+      if (copies === void 0) return null;
+      for (const [made, copy] of copies) if (Math.abs(made - rate) < RATE_EPSILON) return copy;
+      return null;
+    }
+    // The originals sounding after song time `at`: what a step there needs copies of.
+    buffersAfter(at) {
+      const found = [];
+      for (const source of this.sources) {
+        const buffer = source.liveAfter(at);
+        if (buffer !== null && !found.includes(buffer)) found.push(buffer);
+      }
+      return found;
+    }
+    // From song time `at` (now or later) the song runs at `rate`. False, and
+    // nothing changed, when a gain ramp or curve is under way across `at`.
+    setRate(rate, at = this.currentTime + 0.05) {
+      const now = this.currentTime;
+      if (at < now) at = now;
+      if (Math.abs(this.rateAt(at) - rate) < RATE_EPSILON && this.anchors.every((anchor) => anchor.song <= at)) return true;
+      for (const param of this.params) if (param.spans(at)) return false;
+      const real = this.toReal(at);
+      this.anchors = this.anchors.filter((anchor) => anchor.song < at);
+      const realNow = this.real.currentTime;
+      while (this.anchors.length > 1 && this.anchors[1].real <= realNow) this.anchors.shift();
+      this.anchors.push({ song: at, real, rate });
+      for (const param of this.params) {
+        param.retime(at, real);
+        param.prune(now);
+      }
+      for (const source of [...this.sources]) source.retime(at, real);
+      return true;
+    }
+  };
+
+  // src/music_tempo.ts
+  var SMOOTH_MAX_RATE = 1.2;
+  var SMOOTH_GRAIN = 0.02;
+  var STEP_RATES = [1, 1.1, 1.2];
+  var STEP_UP = [0.45, 0.75];
+  var STEP_DOWN = [0.35, 0.65];
+  var STEP_LEAD_SECONDS = 0.15;
+  var RETRY_MS = 120;
+  function parseTempoManifest(raw) {
+    if (raw === null || typeof raw !== "object" || !Array.isArray(raw.steps)) throw new Error("tempo.json has no steps");
+    const steps = raw.steps.map(Number).filter((rate) => Number.isFinite(rate) && rate > 1);
+    const sections = /* @__PURE__ */ new Map();
+    for (const [id, copies] of Object.entries(raw.sections ?? {})) {
+      const byRate = /* @__PURE__ */ new Map();
+      for (const [rate, file] of Object.entries(copies)) {
+        if (!/^[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(file)) throw new Error(`tempo.json: ${id} names an unsafe file`);
+        byRate.set(Number(rate), file);
+      }
+      sections.set(id, byRate);
+    }
+    return { steps, sections };
+  }
+  function stepFor(danger, current) {
+    let step = current;
+    while (step < STEP_UP.length && danger >= STEP_UP[step]) step++;
+    while (step > 0 && danger < STEP_DOWN[step - 1]) step--;
+    return step;
+  }
+  function smoothRateFor(danger) {
+    const rate = 1 + (SMOOTH_MAX_RATE - 1) * Math.min(1, Math.max(0, danger));
+    return Math.round(rate / SMOOTH_GRAIN) * SMOOTH_GRAIN;
+  }
+  var TempoTest = class {
+    constructor(deps) {
+      this.deps = deps;
+    }
+    mode = "off";
+    danger = 0;
+    step = 0;
+    manifest = null;
+    manifestLoad = null;
+    copyBytes = /* @__PURE__ */ new Map();
+    retry = null;
+    // The step waiting for its bar line, and when.
+    pendingStep = null;
+    setMode(mode) {
+      const next = mode === "smooth" || mode === "steps" ? mode : "off";
+      if (next === this.mode) return;
+      this.mode = next;
+      this.step = 0;
+      this.pendingStep = null;
+      if (next === "steps") {
+        void this.loadManifest().then(() => {
+          for (const [id, buffer] of this.deps.decodedSections()) this.attachCopies(id, buffer, false);
+        });
+      }
+      this.apply();
+    }
+    setDanger(value) {
+      const danger = Number(value);
+      this.danger = Number.isFinite(danger) ? Math.min(1, Math.max(0, danger)) : 0;
+      this.apply();
+    }
+    // The engine decoded a section: in steps mode, its faster copies are made ready.
+    onDecoded(id, buffer, fallback) {
+      if (this.mode === "steps") this.attachCopies(id, buffer, fallback);
+    }
+    status() {
+      const warp = this.deps.warp();
+      return {
+        mode: this.mode,
+        danger: this.danger,
+        step: this.step,
+        rate: warp?.rate ?? 1,
+        copies: this.manifest === null ? 0 : this.manifest.sections.size
+      };
+    }
+    apply() {
+      const warp = this.deps.warp();
+      if (warp === null) return;
+      if (this.mode === "smooth") {
+        const rate = smoothRateFor(this.danger);
+        if (Math.abs(rate - warp.rate) < 1e-6) return;
+        if (!warp.setRate(rate)) this.later();
+        return;
+      }
+      const step = this.mode === "steps" ? stepFor(this.danger, this.step) : 0;
+      if (this.mode === "off") {
+        this.step = 0;
+        if (Math.abs(warp.rate - 1) > 1e-6 && !warp.setRate(1)) this.later();
+        return;
+      }
+      if (step === this.step && this.pendingStep === null) return;
+      if (this.pendingStep !== null && this.pendingStep.step === step) return;
+      this.placeStep(step);
+    }
+    // A step lands on the next bar line, once every section sounding past it
+    // has its faster copy ready; otherwise it waits for the bar after.
+    placeStep(step) {
+      const warp = this.deps.warp();
+      const rate = STEP_RATES[step];
+      const bar = this.deps.nextBarAfter(warp.currentTime + STEP_LEAD_SECONDS);
+      const at = bar ?? warp.currentTime + STEP_LEAD_SECONDS;
+      const ready2 = rate === 1 || warp.buffersAfter(at).every((buffer) => warp.variantOf(buffer, rate) !== null);
+      if (ready2 && warp.setRate(rate, at)) {
+        this.step = step;
+        this.pendingStep = null;
+        return;
+      }
+      this.pendingStep = { step, at };
+      this.later(Math.max(RETRY_MS, (at - warp.currentTime) * 1e3));
+    }
+    later(ms = RETRY_MS) {
+      if (this.deps.timers === false || this.retry !== null) return;
+      this.retry = setTimeout(() => {
+        this.retry = null;
+        if (this.pendingStep !== null) {
+          const step = this.mode === "steps" ? stepFor(this.danger, this.step) : 0;
+          this.pendingStep = null;
+          if (this.mode === "steps" && step !== this.step) this.placeStep(step);
+          return;
+        }
+        this.apply();
+      }, ms);
+    }
+    loadManifest() {
+      if (this.manifestLoad !== null) return this.manifestLoad;
+      this.manifestLoad = this.deps.fetchBytes(`${this.deps.baseUrl}tempo.json`).then((bytes) => {
+        this.manifest = parseTempoManifest(JSON.parse(new TextDecoder().decode(bytes)));
+      }).catch((error) => {
+        this.deps.log(`music: tempo steps off (${String(error instanceof Error ? error.message : error)})`);
+        this.manifestLoad = null;
+      });
+      return this.manifestLoad;
+    }
+    // Fetches and decodes `id`'s faster copies, and hands them to the clock. A
+    // section with none (a menu section, a cymbal) plays faster instead.
+    attachCopies(id, buffer, fallback) {
+      const warp = this.deps.warp();
+      if (warp === null || fallback) return;
+      void this.loadManifest().then(async () => {
+        const copies = this.manifest?.sections.get(id);
+        if (copies === void 0) return;
+        const decoded = /* @__PURE__ */ new Map();
+        for (const [rate, file] of copies) {
+          try {
+            let bytes = this.copyBytes.get(file);
+            if (bytes === void 0) {
+              bytes = this.deps.fetchBytes(`${this.deps.baseUrl}${file}`);
+              this.copyBytes.set(file, bytes);
+              bytes.catch(() => this.copyBytes.delete(file));
+            }
+            decoded.set(rate, await warp.decodeAudioData((await bytes).slice(0)));
+          } catch (error) {
+            this.deps.log(`music: ${id}'s ${rate}x copy could not be loaded (${String(error)})`);
+          }
+        }
+        warp.setVariants(buffer, decoded);
+      });
+    }
+  };
+
   // src/music.ts
   function installMusic() {
+    let warp = null;
+    let tempo = null;
     const engine = new MusicEngine({
       createContext: () => {
         const Context = window.AudioContext || window.webkitAudioContext;
         if (!Context) return null;
         try {
-          return new Context({ latencyHint: "playback" });
+          warp = new MusicWarp(new Context({ latencyHint: "playback" }));
+          return warp;
         } catch {
           return null;
         }
       },
+      onDecoded: (id, buffer, fallback) => tempo?.onDecoded(id, buffer, fallback),
       // no-cache revalidates rather than refetches: the manifest is tiny and must
       // be current, and the section files it names carry their content hash.
       fetchBytes: (url) => fetch(url, { cache: url.endsWith("manifest.json") ? "no-cache" : "default" }).then(
@@ -14396,6 +14881,16 @@ ${ty.variants.map(
         }
       }
     });
+    tempo = new TempoTest({
+      warp: () => warp,
+      nextBarAfter: (time) => engine.nextBarAfter(time),
+      decodedSections: () => engine.decodedSections(),
+      fetchBytes: (url) => fetch(url).then(
+        (response) => response.ok ? response.arrayBuffer() : Promise.reject(new Error(`${response.status} ${url}`))
+      ),
+      baseUrl: "music/",
+      log: (message) => console.info(message)
+    });
     const unlock = () => engine.resume();
     for (const eventName of ["pointerdown", "keydown", "touchend"]) {
       window.addEventListener(eventName, unlock, { passive: true });
@@ -14403,7 +14898,9 @@ ${ty.variants.map(
     window.LDBGMusic = {
       setState: (name) => engine.setState(name),
       setVolume: (linear) => engine.setVolume(linear),
-      status: () => JSON.stringify(engine.status())
+      status: () => JSON.stringify({ ...engine.status(), tempo: tempo.status() }),
+      setTempoTest: (mode) => tempo.setMode(mode),
+      setDanger: (danger) => tempo.setDanger(danger)
     };
   }
 
