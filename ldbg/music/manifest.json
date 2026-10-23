@@ -76,17 +76,197 @@
       "file": "menu_4-08d3ca62bf99.ogg",
       "fallback": "menu_4-f988f654a65e.m4a"
     },
-    "slime_chords": {
-      "bars": 24,
+    "slime_nodrums_1": {
+      "bars": 8,
       "switchEveryBars": 1,
-      "file": "slime_chords-9f44384af9d6.ogg",
-      "fallback": "slime_chords-9c16c22a3e09.m4a"
+      "file": "slime_nodrums_1-aaa9f3e7993e.ogg",
+      "fallback": "slime_nodrums_1-065c684e7a64.m4a"
     },
-    "slime_all": {
-      "bars": 24,
+    "slime_nodrums_2": {
+      "bars": 8,
       "switchEveryBars": 1,
-      "file": "slime_all-0859da93f2c1.ogg",
-      "fallback": "slime_all-f26554f9df22.m4a"
+      "file": "slime_nodrums_2-a2c5de732533.ogg",
+      "fallback": "slime_nodrums_2-948a36f7883f.m4a"
+    },
+    "slime_nodrums_3": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_3-a3decca381b7.ogg",
+      "fallback": "slime_nodrums_3-ca10db944a36.m4a"
+    },
+    "slime_nodrums_4": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_4-6746fd1ed90c.ogg",
+      "fallback": "slime_nodrums_4-6b2cfed1d270.m4a"
+    },
+    "slime_nodrums_5": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_5-cc8878601877.ogg",
+      "fallback": "slime_nodrums_5-962c45188deb.m4a"
+    },
+    "slime_nodrums_6": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_6-57d4b7e97e97.ogg",
+      "fallback": "slime_nodrums_6-438c0469db1d.m4a"
+    },
+    "slime_nodrums_7": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_7-7b11012baf29.ogg",
+      "fallback": "slime_nodrums_7-f316c0fd7e6e.m4a"
+    },
+    "slime_nodrums_8": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_8-3ce0c9a5c026.ogg",
+      "fallback": "slime_nodrums_8-22d58ae5f456.m4a"
+    },
+    "slime_nodrums_9": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_9-e4d93fb374cc.ogg",
+      "fallback": "slime_nodrums_9-06f7bce9e67e.m4a"
+    },
+    "slime_nodrums_10": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_10-5f5daf82ccec.ogg",
+      "fallback": "slime_nodrums_10-6d33b3202553.m4a"
+    },
+    "slime_nodrums_11": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_11-03cd7f5a65b8.ogg",
+      "fallback": "slime_nodrums_11-a4d88eac944d.m4a"
+    },
+    "slime_nodrums_12": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_12-5fcbfaa3593b.ogg",
+      "fallback": "slime_nodrums_12-be83978ef64e.m4a"
+    },
+    "slime_nodrums_13": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_13-ede5ce988085.ogg",
+      "fallback": "slime_nodrums_13-cf51926fb3bb.m4a"
+    },
+    "slime_nodrums_14": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_14-bd34e466e8a9.ogg",
+      "fallback": "slime_nodrums_14-a3466d367f46.m4a"
+    },
+    "slime_nodrums_15": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_15-d547f74f3613.ogg",
+      "fallback": "slime_nodrums_15-72038b336998.m4a"
+    },
+    "slime_nodrums_16": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_nodrums_16-98271bdc9bf1.ogg",
+      "fallback": "slime_nodrums_16-777341504359.m4a"
+    },
+    "slime_full_1": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_1-4eecb880082a.ogg",
+      "fallback": "slime_full_1-b29234f1df6e.m4a"
+    },
+    "slime_full_2": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_2-02f78ce27176.ogg",
+      "fallback": "slime_full_2-8d4320c7b4c0.m4a"
+    },
+    "slime_full_3": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_3-d9b84064cb1c.ogg",
+      "fallback": "slime_full_3-28a3aeefddc4.m4a"
+    },
+    "slime_full_4": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_4-e169482eefc2.ogg",
+      "fallback": "slime_full_4-f4ef9fc27f67.m4a"
+    },
+    "slime_full_5": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_5-41a15ccba311.ogg",
+      "fallback": "slime_full_5-ec618b9f9ae1.m4a"
+    },
+    "slime_full_6": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_6-62718bb51a04.ogg",
+      "fallback": "slime_full_6-9b2ed694fe71.m4a"
+    },
+    "slime_full_7": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_7-694aee6e7afd.ogg",
+      "fallback": "slime_full_7-f5b1d78e8a63.m4a"
+    },
+    "slime_full_8": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_8-06af2089f451.ogg",
+      "fallback": "slime_full_8-a4f7ee2c9af6.m4a"
+    },
+    "slime_full_9": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_9-23e8bfd59fca.ogg",
+      "fallback": "slime_full_9-d3b69f48a404.m4a"
+    },
+    "slime_full_10": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_10-bba46a722881.ogg",
+      "fallback": "slime_full_10-8cd8c8775050.m4a"
+    },
+    "slime_full_11": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_11-5afed84ec2b8.ogg",
+      "fallback": "slime_full_11-a5efaa87365b.m4a"
+    },
+    "slime_full_12": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_12-7b9c516cc58f.ogg",
+      "fallback": "slime_full_12-5bded7a57141.m4a"
+    },
+    "slime_full_13": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_13-b01d13f2fa97.ogg",
+      "fallback": "slime_full_13-20a1e5f66adc.m4a"
+    },
+    "slime_full_14": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_14-57f71f38cad7.ogg",
+      "fallback": "slime_full_14-84730b407218.m4a"
+    },
+    "slime_full_15": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_15-5e0151ac6e5b.ogg",
+      "fallback": "slime_full_15-5bfef8490fa7.m4a"
+    },
+    "slime_full_16": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "slime_full_16-345990813801.ogg",
+      "fallback": "slime_full_16-42bfbe96773d.m4a"
     }
   },
   "leadIns": {
@@ -183,8 +363,38 @@
     },
     {
       "from": [
-        "slime_chords",
-        "slime_all"
+        "slime_nodrums_1",
+        "slime_nodrums_2",
+        "slime_nodrums_3",
+        "slime_nodrums_4",
+        "slime_nodrums_5",
+        "slime_nodrums_6",
+        "slime_nodrums_7",
+        "slime_nodrums_8",
+        "slime_nodrums_9",
+        "slime_nodrums_10",
+        "slime_nodrums_11",
+        "slime_nodrums_12",
+        "slime_nodrums_13",
+        "slime_nodrums_14",
+        "slime_nodrums_15",
+        "slime_nodrums_16",
+        "slime_full_1",
+        "slime_full_2",
+        "slime_full_3",
+        "slime_full_4",
+        "slime_full_5",
+        "slime_full_6",
+        "slime_full_7",
+        "slime_full_8",
+        "slime_full_9",
+        "slime_full_10",
+        "slime_full_11",
+        "slime_full_12",
+        "slime_full_13",
+        "slime_full_14",
+        "slime_full_15",
+        "slime_full_16"
       ],
       "to": [
         "menu"
@@ -194,8 +404,38 @@
     },
     {
       "from": [
-        "slime_chords",
-        "slime_all"
+        "slime_nodrums_1",
+        "slime_nodrums_2",
+        "slime_nodrums_3",
+        "slime_nodrums_4",
+        "slime_nodrums_5",
+        "slime_nodrums_6",
+        "slime_nodrums_7",
+        "slime_nodrums_8",
+        "slime_nodrums_9",
+        "slime_nodrums_10",
+        "slime_nodrums_11",
+        "slime_nodrums_12",
+        "slime_nodrums_13",
+        "slime_nodrums_14",
+        "slime_nodrums_15",
+        "slime_nodrums_16",
+        "slime_full_1",
+        "slime_full_2",
+        "slime_full_3",
+        "slime_full_4",
+        "slime_full_5",
+        "slime_full_6",
+        "slime_full_7",
+        "slime_full_8",
+        "slime_full_9",
+        "slime_full_10",
+        "slime_full_11",
+        "slime_full_12",
+        "slime_full_13",
+        "slime_full_14",
+        "slime_full_15",
+        "slime_full_16"
       ],
       "to": [
         "farm"
@@ -273,18 +513,78 @@
     },
     "slime": {
       "play": [
-        "slime_chords"
+        "slime_nodrums_1",
+        "slime_nodrums_2",
+        "slime_nodrums_3",
+        "slime_nodrums_4",
+        "slime_nodrums_5",
+        "slime_nodrums_6",
+        "slime_nodrums_7",
+        "slime_nodrums_8",
+        "slime_nodrums_9",
+        "slime_nodrums_10",
+        "slime_nodrums_11",
+        "slime_nodrums_12",
+        "slime_nodrums_13",
+        "slime_nodrums_14",
+        "slime_nodrums_15",
+        "slime_nodrums_16"
       ],
       "syncFrom": [
-        "slime_all"
+        "slime_full_1",
+        "slime_full_2",
+        "slime_full_3",
+        "slime_full_4",
+        "slime_full_5",
+        "slime_full_6",
+        "slime_full_7",
+        "slime_full_8",
+        "slime_full_9",
+        "slime_full_10",
+        "slime_full_11",
+        "slime_full_12",
+        "slime_full_13",
+        "slime_full_14",
+        "slime_full_15",
+        "slime_full_16"
       ]
     },
     "slime_walls": {
       "play": [
-        "slime_all"
+        "slime_full_1",
+        "slime_full_2",
+        "slime_full_3",
+        "slime_full_4",
+        "slime_full_5",
+        "slime_full_6",
+        "slime_full_7",
+        "slime_full_8",
+        "slime_full_9",
+        "slime_full_10",
+        "slime_full_11",
+        "slime_full_12",
+        "slime_full_13",
+        "slime_full_14",
+        "slime_full_15",
+        "slime_full_16"
       ],
       "syncFrom": [
-        "slime_chords"
+        "slime_nodrums_1",
+        "slime_nodrums_2",
+        "slime_nodrums_3",
+        "slime_nodrums_4",
+        "slime_nodrums_5",
+        "slime_nodrums_6",
+        "slime_nodrums_7",
+        "slime_nodrums_8",
+        "slime_nodrums_9",
+        "slime_nodrums_10",
+        "slime_nodrums_11",
+        "slime_nodrums_12",
+        "slime_nodrums_13",
+        "slime_nodrums_14",
+        "slime_nodrums_15",
+        "slime_nodrums_16"
       ]
     },
     "farm": {

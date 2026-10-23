@@ -13674,13 +13674,25 @@ ${ty.variants.map(
       return place(manifest, state.intro, stateName, -1, 0, at);
     }
     if (state.play.length === 0) return state.then === null ? null : enterState(manifest, state.then, at, from);
-    let offsetBars = 0;
-    if (state.syncPosition && from !== null && at < from.end - EPSILON && (state.syncFrom === null || state.syncFrom.includes(from.section))) {
-      const fromSection = manifest.sections.get(from.section);
-      const reached = Math.round(from.offsetBars + (at - from.start - from.pickup) / barSeconds(fromSection));
-      offsetBars = reached % manifest.sections.get(state.play[0]).bars;
+    const synced = from !== null && state.syncPosition && (state.syncFrom === null ? at < from.end - EPSILON : state.syncFrom.includes(from.section) && at <= from.end + EPSILON);
+    if (!synced) return place(manifest, state.play[0], stateName, 0, 0, at);
+    const total = state.play.reduce((sum, id) => sum + manifest.sections.get(id).bars, 0);
+    let bar = playListBar(manifest, from, at) % total;
+    for (let index = 0; index < state.play.length; index++) {
+      const bars = manifest.sections.get(state.play[index]).bars;
+      if (bar < bars) return place(manifest, state.play[index], stateName, index, bar, at);
+      bar -= bars;
     }
-    return place(manifest, state.play[0], stateName, 0, offsetBars, at);
+    return place(manifest, state.play[0], stateName, 0, 0, at);
+  }
+  function playListBar(manifest, segment, at) {
+    const section = manifest.sections.get(segment.section);
+    const own = Math.round(segment.offsetBars + (at - segment.start - segment.pickup) / barSeconds(section));
+    const state = manifest.states.get(segment.state);
+    if (state === void 0 || segment.playIndex < 0 || state.play[segment.playIndex] !== segment.section) return own;
+    let before = 0;
+    for (let index = 0; index < segment.playIndex; index++) before += manifest.sections.get(state.play[index]).bars;
+    return before + own;
   }
   function followingSegment(manifest, segment) {
     const state = manifest.states.get(segment.state);
@@ -13731,10 +13743,16 @@ ${ty.variants.map(
       const id = entryOf(state);
       if (id !== null && !ids.includes(id)) ids.push(id);
     }
-    for (const state of manifest.states.values()) {
-      if (state.syncFrom === null || !state.syncFrom.includes(fromSection)) continue;
-      const id = entryOf(state);
-      if (id !== null && !ids.includes(id)) ids.push(id);
+    return ids;
+  }
+  function syncedSections(manifest, segment, at) {
+    const ids = [];
+    for (const [name, state] of manifest.states) {
+      if (state.syncFrom === null || !state.syncFrom.includes(segment.section)) continue;
+      for (const when of [Math.min(at, segment.end), segment.end]) {
+        const landed = enterState(manifest, name, when, segment);
+        if (landed !== null && !ids.includes(landed.section)) ids.push(landed.section);
+      }
     }
     return ids;
   }
@@ -14067,8 +14085,10 @@ ${ty.variants.map(
         const following = followingSegment(manifest, last.segment);
         if (following !== null) ids.add(following.section);
       }
-      const sounding = this.committed(now)?.segment.section ?? this.lastSection;
+      const committed = this.committed(now);
+      const sounding = committed?.segment.section ?? this.lastSection;
       if (sounding !== null) for (const id of reachableEntries(manifest, sounding)) ids.add(id);
+      if (committed != null) for (const id of syncedSections(manifest, committed.segment, now)) ids.add(id);
       return ids;
     }
     keepDecoded() {
