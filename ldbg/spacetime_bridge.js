@@ -13583,9 +13583,11 @@ ${ty.variants.map(
       };
       const leadIn = sound("leadIn");
       const hit = sound("hit");
-      if (leadIn === null && hit === null) fail(`${where} plays nothing: give it a leadIn or a hit`);
       const every = entry.switchEveryBars == null ? null : integer(entry.switchEveryBars, `${where} switchEveryBars`, 1, 512);
       const immediate = entry.immediate === true;
+      if (leadIn === null && hit === null && !(immediate && entry.releaseSeconds != null)) {
+        fail(`${where} plays nothing: give it a leadIn or a hit, or make it an immediate crossfade with releaseSeconds`);
+      }
       if (immediate && leadIn !== null) fail(`${where} is immediate, so it has no time for a leadIn; give it a hit`);
       const release = entry.releaseSeconds;
       if (release != null && (typeof release !== "number" || !(release >= 0 && release <= 10))) {
