@@ -1133,6 +1133,9 @@ ${originalIndentation}`;
     "acknowledgeTaskChest",
     "reportDuelBoardBreak",
     "continueDarkRun",
+    // A ward handed to a fight (rules version 65): its answer is the duel row's
+    // shield going up.
+    "claimDuelWard",
     "sendPartyBlow",
     "reportPartyEnemyHeal",
     "openPartyChest",
@@ -8983,6 +8986,11 @@ ${ty.variants.map(
     listingId: t.string()
   };
 
+  // src/module_bindings/claim_duel_ward_reducer.ts
+  var claim_duel_ward_reducer_default = {
+    duelId: t.string()
+  };
+
   // src/module_bindings/claim_feat_reducer.ts
   var claim_feat_reducer_default = {
     featId: t.string()
@@ -11310,6 +11318,7 @@ ${ty.variants.map(
     reducerSchema("cancel_friend_request", cancel_friend_request_reducer_default),
     reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
     reducerSchema("challenge_duel_listing", challenge_duel_listing_reducer_default),
+    reducerSchema("claim_duel_ward", claim_duel_ward_reducer_default),
     reducerSchema("claim_feat", claim_feat_reducer_default),
     reducerSchema("claim_play_session", claim_play_session_reducer_default),
     reducerSchema("claim_quest", claim_quest_reducer_default),
