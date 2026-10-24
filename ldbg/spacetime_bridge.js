@@ -1134,18 +1134,26 @@ ${originalIndentation}`;
     "reportDuelBoardBreak",
     "continueDarkRun",
     // A ward handed to a fight (rules version 65): its answer is the duel row's
-    // shield going up.
+    // shield going up. A Tranquil heal in one (rules version 66): its health.
     "claimDuelWard",
+    "claimDuelTranquil",
     "sendPartyBlow",
     "reportPartyEnemyHeal",
     "openPartyChest",
     "reportPartyHealth",
+    // The blow that says which chance pushbacks came up, and the thorns sent
+    // back (rules version 66): answered by the party's rows.
+    "sendPartyBlowV2",
+    "sendPartyThorns",
     "reportPartyDown",
     "publishPartyBoard",
     "publishPartyPiece",
     "sendPartyHeal",
     "completePartyRevive",
     "reportPartyReviveProgress",
+    // A lobby member's omens wish, sent with READY (rules version 66): READY's own
+    // answer is what the party screen waits on.
+    "setPartyOmens",
     // The echo of the row is the answer, and nobody reads even that past sign-in.
     "saveAccountSettings",
     // Chat: the line, the block or the report arrives as rows. A refusal still
@@ -1232,8 +1240,11 @@ ${originalIndentation}`;
     // A co-op run's clears, the Vampiric drinks its board feeds the party's
     // monster, a chest press, its health and its board: all sent by the fight,
     // not the player, and none worth replaying after a reconnect -- a lost hit
-    // only ever costs the sender, and settlement tolerates it.
+    // only ever costs the sender, and settlement tolerates it. Rules version 66's
+    // blow and the thorns a monster's hit sent back are the same.
     "sendPartyBlow",
+    "sendPartyBlowV2",
+    "sendPartyThorns",
     "reportPartyEnemyHeal",
     "openPartyChest",
     "reportPartyHealth",
@@ -8986,6 +8997,11 @@ ${ty.variants.map(
     listingId: t.string()
   };
 
+  // src/module_bindings/claim_duel_tranquil_reducer.ts
+  var claim_duel_tranquil_reducer_default = {
+    duelId: t.string()
+  };
+
   // src/module_bindings/claim_duel_ward_reducer.ts
   var claim_duel_ward_reducer_default = {
     duelId: t.string()
@@ -9578,6 +9594,20 @@ ${ty.variants.map(
     necklace: t.bool()
   };
 
+  // src/module_bindings/send_party_blow_v_2_reducer.ts
+  var send_party_blow_v_2_reducer_default = {
+    partyId: t.string(),
+    encounterIndex: t.u32(),
+    damage: t.u32(),
+    lines: t.u32(),
+    spinType: t.string(),
+    combo: t.u32(),
+    backToBack: t.bool(),
+    perfectClear: t.bool(),
+    necklace: t.bool(),
+    procs: t.u32()
+  };
+
   // src/module_bindings/send_party_heal_reducer.ts
   var send_party_heal_reducer_default = {
     partyId: t.string(),
@@ -9586,6 +9616,13 @@ ${ty.variants.map(
     pieceKind: t.u32(),
     halfTurn: t.bool(),
     perfectClear: t.bool()
+  };
+
+  // src/module_bindings/send_party_thorns_reducer.ts
+  var send_party_thorns_reducer_default = {
+    partyId: t.string(),
+    encounterIndex: t.u32(),
+    amount: t.u32()
   };
 
   // src/module_bindings/set_display_name_reducer.ts
@@ -9611,6 +9648,11 @@ ${ty.variants.map(
   var set_hair_reducer_default = {
     hairStyle: t.u32(),
     hairColor: t.u32()
+  };
+
+  // src/module_bindings/set_party_omens_reducer.ts
+  var set_party_omens_reducer_default = {
+    on: t.bool()
   };
 
   // src/module_bindings/set_party_ready_reducer.ts
@@ -11318,6 +11360,7 @@ ${ty.variants.map(
     reducerSchema("cancel_friend_request", cancel_friend_request_reducer_default),
     reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
     reducerSchema("challenge_duel_listing", challenge_duel_listing_reducer_default),
+    reducerSchema("claim_duel_tranquil", claim_duel_tranquil_reducer_default),
     reducerSchema("claim_duel_ward", claim_duel_ward_reducer_default),
     reducerSchema("claim_feat", claim_feat_reducer_default),
     reducerSchema("claim_play_session", claim_play_session_reducer_default),
@@ -11418,11 +11461,14 @@ ${ty.variants.map(
     reducerSchema("send_friend_request", send_friend_request_reducer_default),
     reducerSchema("send_friend_request_recent", send_friend_request_recent_reducer_default),
     reducerSchema("send_party_blow", send_party_blow_reducer_default),
+    reducerSchema("send_party_blow_v_2", send_party_blow_v_2_reducer_default),
     reducerSchema("send_party_heal", send_party_heal_reducer_default),
+    reducerSchema("send_party_thorns", send_party_thorns_reducer_default),
     reducerSchema("set_display_name", set_display_name_reducer_default),
     reducerSchema("set_duel_ready", set_duel_ready_reducer_default),
     reducerSchema("set_friend_settings", set_friend_settings_reducer_default),
     reducerSchema("set_hair", set_hair_reducer_default),
+    reducerSchema("set_party_omens", set_party_omens_reducer_default),
     reducerSchema("set_party_ready", set_party_ready_reducer_default),
     reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
     reducerSchema("start_dark_run_insured", start_dark_run_insured_reducer_default),
