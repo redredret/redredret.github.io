@@ -946,6 +946,10 @@ ${originalIndentation}`;
     // Every kill and chest the party has had, on a domain of its own: it grows
     // through the run, and riding 'party' every monster's health tick re-sent it.
     partySteps: { group: "party", keys: { partySteps: many("myPartySteps") } },
+    // A lobby's omens (docs/OMENS.md "Co-op"): each member's say and what the
+    // party would get if it started now. A domain of its own, so a partner
+    // flipping their toggle redraws the preview line and not the whole lobby.
+    partyOmens: { group: "party", keys: { partyOmens: many("myPartyOmens") } },
     // The teammate's board and falling piece, for the mini card.
     partyBoard: {
       group: "party",
@@ -1114,7 +1118,9 @@ ${originalIndentation}`;
     // The whole settings document each time, so only the newest one matters.
     "saveAccountSettings",
     // The friends privacy settings, the same: all four each time.
-    "setFriendSettings"
+    "setFriendSettings",
+    // A lobby member's omens wish: only the last one they toggled to matters.
+    "setPartyOmens"
   ];
   var QUIET_SUCCESS_CALLS = [
     "publishFarmBoard",
@@ -1151,8 +1157,9 @@ ${originalIndentation}`;
     "sendPartyHeal",
     "completePartyRevive",
     "reportPartyReviveProgress",
-    // A lobby member's omens wish, sent with READY (rules version 66): READY's own
-    // answer is what the party screen waits on.
+    // A lobby member's omens wish, sent as the lobby's toggle changes and with
+    // READY (rules version 66): its answer is the my_party_omens preview, and
+    // READY's own answer is what the party screen waits on.
     "setPartyOmens",
     // The echo of the row is the answer, and nobody reads even that past sign-in.
     "saveAccountSettings",
@@ -10541,6 +10548,17 @@ ${ty.variants.map(
     bandaged: t.bool()
   });
 
+  // src/module_bindings/my_party_omens_table.ts
+  var my_party_omens_table_default = t.row({
+    memberId: t.string().name("member_id"),
+    slot: t.u32(),
+    wish: t.string(),
+    seeker: t.bool(),
+    holdout: t.bool(),
+    partyOn: t.bool().name("party_on"),
+    reason: t.string()
+  });
+
   // src/module_bindings/my_party_partner_boards_table.ts
   var my_party_partner_boards_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -11190,6 +11208,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_party_members_table_default),
+    myPartyOmens: table({
+      name: "my_party_omens",
+      indexes: [],
+      constraints: []
+    }, my_party_omens_table_default),
     myPartyPartnerBoards: table({
       name: "my_party_partner_boards",
       indexes: [],
@@ -11551,6 +11574,7 @@ ${ty.variants.map(
     "my_party_member_core": "myPartyMemberCore",
     "my_party_member_score": "myPartyMemberScore",
     "my_party_members": "myPartyMembers",
+    "my_party_omens": "myPartyOmens",
     "my_party_partner_boards": "myPartyPartnerBoards",
     "my_party_partner_pieces": "myPartyPartnerPieces",
     "my_party_queue": "myPartyQueue",
