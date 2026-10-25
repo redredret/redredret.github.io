@@ -12,7 +12,7 @@ LDBG is a falling-block puzzle game and an RPG at once. You stack falling pieces
 
 ## The game in numbers
 
-- 143 items, including 61 pieces of gear (helmets, armour, swords, bows, staves, bucklers, rings, necklaces), from 107 crafting recipes
+- 142 items, including 61 pieces of gear (helmets, armour, swords, bows, staves, bucklers, rings, necklaces), from 106 crafting recipes
 - 16 kinds of monster, 8 of them bosses
 - 19 fights in the Greenshore story route
 - 107 upgrades across 3 upgrade trees (Combat, Skills and Build)
@@ -29,7 +29,7 @@ The Farm is an endless run. Clear lines and you gather logs, ore, fish and fibre
 
 ## Crafting and gear
 
-Smelt your ore into ingots, weave your fibre into fabric, and work them into 61 pieces of gear across 107 recipes. Everything you wear shows on your character, from helmets and armour to swords, bows, staves, bucklers, rings and necklaces. Trade the rest for Gold with other players on the Market.
+Smelt your ore into ingots, weave your fibre into fabric, and work them into 61 pieces of gear across 106 recipes. Everything you wear shows on your character, from helmets and armour to swords, bows, staves, bucklers, rings and necklaces. Trade the rest for Gold with other players on the Market.
 
 ## Dungeons
 

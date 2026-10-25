@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-10-21T19:49:07.203Z",
+  "generatedAt": "2026-10-25T19:28:35.538Z",
   "content": {
-    "items": 143,
+    "items": 142,
     "equipment": 61,
-    "recipes": 107,
+    "recipes": 106,
     "upgrades": 107,
     "upgradeTrees": 3,
     "enemies": 16,
@@ -124,7 +124,6 @@
     "miners_compost",
     "minor_healing_potion",
     "mithril_armor",
-    "mithril_arrow",
     "mithril_buckler",
     "mithril_helmet",
     "mithril_ingot",

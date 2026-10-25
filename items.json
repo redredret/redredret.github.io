@@ -720,14 +720,6 @@
   "level": 1
  },
  {
-  "id": "mithril_arrow",
-  "icon": "mithril_arrow.webp",
-  "name": "Mithril Arrow",
-  "rarity": "uncommon",
-  "type": "material",
-  "level": 1
- },
- {
   "id": "mithril_ingot",
   "icon": "mithril_ingot.webp",
   "name": "Mithril Ingot",
