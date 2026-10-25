@@ -950,11 +950,11 @@ ${originalIndentation}`;
     // party would get if it started now. A domain of its own, so a partner
     // flipping their toggle redraws the preview line and not the whole lobby.
     partyOmens: { group: "party", keys: { partyOmens: many("myPartyOmens") } },
-    // The teammate's board and falling piece, for the mini card.
-    partyBoard: {
-      group: "party",
-      keys: { partyBoards: many("myPartyPartnerBoards"), partyPieces: many("myPartyPartnerPieces") }
-    },
+    // The teammate's board for the mini card, rebuilt from the party's event rows
+    // the Farm's way (party_room.ts, docs/BACKEND_COST_AUDIT_3.md); Godot gets the
+    // rows the old views gave it, with no piece. Refreshed by the events and by
+    // the party's rows moving (party_room.ts follows them), so it observes none.
+    partyBoard: { group: "party", observes: [], built: ["partyBoards", "partyPieces"] },
     // The board itself is the one whole-table projection here, so it is held only
     // while the Duels screen is open, exactly as the storefront is.
     duelBoard: { group: "duelBoard", keys: { duelListings: many("duelListings") } },
@@ -966,11 +966,12 @@ ${originalIndentation}`;
     // rebuilt. Godot gets the rows the old views gave it.
     farmBoard: {
       group: "farm",
-      observes: ["opponentFarmRosterV1"],
+      observes: ["opponentFarmRosterV2"],
       built: ["farmOpponents", "farmOpponentPieces", "opponentFarmBoard", "opponentFarmPiece"]
     },
-    // Refreshed only by the room's pose events; the roster it reads is observed
-    // for farmBoard.
+    // Refreshed by nothing since the room stopped sharing pieces in flight
+    // (docs/BACKEND_COST_AUDIT_3.md); kept so the wire contract and Godot's
+    // handling of it are unchanged. The roster it reads is observed for farmBoard.
     farmPiece: { group: "farm", observes: [], built: ["farmOpponentPieces", "opponentFarmPiece"] },
     farmAttacks: { group: "farm", keys: { farmPvpAttacks: many("myFarmPvpAttacks") } },
     // What this player sent, and who the server landed it on: the only way the
@@ -1114,6 +1115,7 @@ ${originalIndentation}`;
     "publishDuelBoard",
     "publishDuelPiece",
     "publishPartyBoard",
+    "publishPartyBoardV2",
     "publishPartyPiece",
     // The whole settings document each time, so only the newest one matters.
     "saveAccountSettings",
@@ -1153,6 +1155,7 @@ ${originalIndentation}`;
     "sendPartyThorns",
     "reportPartyDown",
     "publishPartyBoard",
+    "publishPartyBoardV2",
     "publishPartyPiece",
     "sendPartyHeal",
     "completePartyRevive",
@@ -1257,6 +1260,7 @@ ${originalIndentation}`;
     "reportPartyHealth",
     "reportPartyDown",
     "publishPartyBoard",
+    "publishPartyBoardV2",
     "publishPartyPiece",
     // The fight's too (rules version 37): a Mending clear's heal for the partner,
     // the revive a met challenge claims -- retried by the screen while the partner
@@ -9375,6 +9379,21 @@ ${ty.variants.map(
     sequence: t.u32()
   };
 
+  // src/module_bindings/publish_party_board_v_2_reducer.ts
+  var publish_party_board_v_2_reducer_default = {
+    partyId: t.string(),
+    cells: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    sequence: t.u32(),
+    lockKind: t.i32(),
+    lockX: t.i32(),
+    lockY: t.i32(),
+    lockRotation: t.u32()
+  };
+
   // src/module_bindings/publish_party_piece_reducer.ts
   var publish_party_piece_reducer_default = {
     partyId: t.string(),
@@ -10862,6 +10881,48 @@ ${ty.variants.map(
     displayName: t.string().name("display_name")
   });
 
+  // src/module_bindings/opponent_farm_roster_v_2_table.ts
+  var opponent_farm_roster_v_2_table_default = t.row({
+    slot: t.u32().primaryKey(),
+    owner: t.identity(),
+    alive: t.bool(),
+    placement: t.u32(),
+    ready: t.bool(),
+    displayName: t.string().name("display_name"),
+    level: t.u32()
+  });
+
+  // src/module_bindings/party_board_event_table.ts
+  var party_board_event_table_default = t.row({
+    room: t.u32(),
+    slot: t.u8(),
+    board: t.byteArray(),
+    activeKind: t.i8().name("active_kind"),
+    activeX: t.i8().name("active_x"),
+    activeY: t.u8().name("active_y"),
+    activeRotation: t.u8().name("active_rotation"),
+    score: t.u32(),
+    lines: t.u16(),
+    toppedOut: t.bool().name("topped_out")
+  });
+
+  // src/module_bindings/party_lock_event_table.ts
+  var party_lock_event_table_default = t.row({
+    room: t.u32(),
+    slot: t.u8(),
+    lockKind: t.u8().name("lock_kind"),
+    lockX: t.i8().name("lock_x"),
+    lockY: t.u8().name("lock_y"),
+    lockRotation: t.u8().name("lock_rotation"),
+    checksum: t.u16(),
+    activeKind: t.i8().name("active_kind"),
+    activeX: t.i8().name("active_x"),
+    activeY: t.u8().name("active_y"),
+    activeRotation: t.u8().name("active_rotation"),
+    score: t.u32(),
+    lines: t.u16()
+  });
+
   // src/module_bindings/quest_catalog_table.ts
   var quest_catalog_table_default = t.row({
     kind: t.string(),
@@ -10933,6 +10994,26 @@ ${ty.variants.map(
       constraints: [],
       event: true
     }, farm_pose_event_table_default),
+    partyBoardEvent: table({
+      name: "party_board_event",
+      indexes: [
+        { accessor: "room", name: "party_board_event_room_idx_btree", algorithm: "btree", columns: [
+          "room"
+        ] }
+      ],
+      constraints: [],
+      event: true
+    }, party_board_event_table_default),
+    partyLockEvent: table({
+      name: "party_lock_event",
+      indexes: [
+        { accessor: "room", name: "party_lock_event_room_idx_btree", algorithm: "btree", columns: [
+          "room"
+        ] }
+      ],
+      constraints: [],
+      event: true
+    }, party_lock_event_table_default),
     darkPlayerCount: table({
       name: "dark_player_count",
       indexes: [],
@@ -11348,6 +11429,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, opponent_farm_roster_v_1_table_default),
+    opponentFarmRosterV2: table({
+      name: "opponent_farm_roster_v2",
+      indexes: [],
+      constraints: []
+    }, opponent_farm_roster_v_2_table_default),
     questCatalog: table({
       name: "quest_catalog",
       indexes: [],
@@ -11447,6 +11533,7 @@ ${ty.variants.map(
     reducerSchema("publish_farm_board_v_2", publish_farm_board_v_2_reducer_default),
     reducerSchema("publish_farm_piece", publish_farm_piece_reducer_default),
     reducerSchema("publish_party_board", publish_party_board_reducer_default),
+    reducerSchema("publish_party_board_v_2", publish_party_board_v_2_reducer_default),
     reducerSchema("publish_party_piece", publish_party_piece_reducer_default),
     reducerSchema("purchase_build_upgrade", purchase_build_upgrade_reducer_default),
     reducerSchema("reach_dark_checkpoint", reach_dark_checkpoint_reducer_default),
@@ -11602,6 +11689,7 @@ ${ty.variants.map(
     "opponent_farm_keyframes_v1": "opponentFarmKeyframesV1",
     "opponent_farm_pieces_compact_v3": "opponentFarmPiecesCompactV3",
     "opponent_farm_roster_v1": "opponentFarmRosterV1",
+    "opponent_farm_roster_v2": "opponentFarmRosterV2",
     "quest_catalog": "questCatalog",
     "quest_details": "questDetails",
     "server_notices": "serverNotices",
@@ -11975,6 +12063,31 @@ ${ty.variants.map(
     }
     return true;
   }
+  function packVisibleCells(cells2) {
+    let skipped = 0;
+    while (skipped < VISIBLE_HEIGHT) {
+      const start = skipped * WIDTH;
+      let empty = true;
+      for (let x = 0; x < WIDTH; x += 1) {
+        if (cells2.charCodeAt(start + x) !== 46) {
+          empty = false;
+          break;
+        }
+      }
+      if (!empty) break;
+      skipped += 1;
+    }
+    const remaining = (VISIBLE_HEIGHT - skipped) * WIDTH;
+    const bytes = new Uint8Array(1 + remaining / 2);
+    bytes[0] = skipped;
+    for (let index = 0; index < remaining; index += 1) {
+      const value = decodeCell(cells2.charCodeAt(skipped * WIDTH + index));
+      const nibble = value < 0 ? 0 : Math.min(value, MAX_CELL_VALUE) + 1;
+      if (index % 2 === 0) bytes[1 + index / 2] = nibble << 4;
+      else bytes[1 + (index - 1) / 2] |= nibble;
+    }
+    return bytes;
+  }
   function unpackVisibleCells(bytes) {
     if (bytes.length < 1) return null;
     const skipped = bytes[0];
@@ -12028,12 +12141,13 @@ ${ty.variants.map(
 
   // src/farm_rival_boards.ts
   var EMPTY_CELLS = ".".repeat(VISIBLE_CELL_COUNT);
+  var NO_PIECE = { activeKind: -1, activeX: 4, activeY: 19, activeRotation: 0 };
   var FarmRivalBoards = class {
     room = -1;
     boards = /* @__PURE__ */ new Map();
     // For a look from the console (window.__ldbgFarmTransport): how the lanes
     // are doing, and above all whether a rebuilt board ever disagreed.
-    stats = { lockEvents: 0, boardEvents: 0, poseEvents: 0, mismatches: 0, keyframes: 0 };
+    stats = { lockEvents: 0, boardEvents: 0, mismatches: 0, keyframes: 0 };
     // A different room forgets every board. The same room keeps them: a
     // reconnect listens again without blanking the cards in front of the player.
     follow(room) {
@@ -12093,17 +12207,6 @@ ${ty.variants.map(
       });
       return true;
     }
-    applyPose(row) {
-      if (row.room !== this.room) return false;
-      this.stats.poseEvents += 1;
-      const board = this.boards.get(row.slot);
-      if (!board) return false;
-      board.activeKind = row.kind;
-      board.activeX = row.x;
-      board.activeY = row.y;
-      board.activeRotation = row.rotation;
-      return true;
-    }
     // The truth as of the snapshot. Events that arrived before it were applied
     // to whatever was held and are simply overwritten.
     applyKeyframe(rows2) {
@@ -12135,12 +12238,7 @@ ${ty.variants.map(
       const pieces = [];
       for (const seat of roster) {
         const board = this.boards.get(Number(seat.slot));
-        const pose = {
-          activeKind: board?.activeKind ?? -1,
-          activeX: board?.activeX ?? 4,
-          activeY: board?.activeY ?? 19,
-          activeRotation: board?.activeRotation ?? 0
-        };
+        const pose = NO_PIECE;
         boards.push({
           owner: seat.owner,
           slot: seat.slot,
@@ -12148,6 +12246,7 @@ ${ty.variants.map(
           placement: seat.placement,
           ready: seat.ready,
           displayName: seat.displayName,
+          level: seat.level ?? 0,
           cells: board?.cells ?? EMPTY_CELLS,
           ...pose,
           score: board?.score ?? 0,
@@ -12201,9 +12300,6 @@ ${ty.variants.map(
     db.farmBoardEvent.onInsert((_ctx, row) => {
       if (farmRivals.applyBoard(row)) scheduleDomain(activeConnection, "farmBoard");
     });
-    db.farmPoseEvent.onInsert((_ctx, row) => {
-      if (farmRivals.applyPose(row)) scheduleDomain(activeConnection, "farmPiece");
-    });
     const follow = () => followFarmRoom(activeConnection);
     db.myFarmPvpMemberV2.onInsert(follow);
     db.myFarmPvpMemberV2.onDelete(follow);
@@ -12225,8 +12321,10 @@ ${ty.variants.map(
       if (live.connection === activeConnection) emit({ type: "error", command: "subscribeFarmEvents", message: String(error) });
     }).subscribe([
       `SELECT * FROM farm_lock_event WHERE room = ${room}`,
-      `SELECT * FROM farm_board_event WHERE room = ${room}`,
-      `SELECT * FROM farm_pose_event WHERE room = ${room}`
+      `SELECT * FROM farm_board_event WHERE room = ${room}`
+      // Not farm_pose_event: the room shares a board when a piece is placed,
+      // never a piece in flight (docs/BACKEND_COST_AUDIT_3.md). A page from
+      // before that still sends poses; the server takes them and sends nothing.
     ]);
     farmEventSubscription = handle;
   }
@@ -12259,6 +12357,152 @@ ${ty.variants.map(
       opponentFarmBoard: opponentBoard ?? null,
       opponentFarmPiece: null
     };
+  }
+
+  // src/party_partner_boards.ts
+  function identityHex(value) {
+    const hex = value?.toHexString;
+    return typeof hex === "function" ? String(hex.call(value)) : String(value ?? "");
+  }
+  function ownSlot(members, selfHex2) {
+    const own = members.find((member) => identityHex(member.owner) === selfHex2);
+    return own ? Number(own.slot) : -1;
+  }
+  function partnerBoardRows(boards, members, selfHex2) {
+    const result = [];
+    for (const member of members) {
+      if (identityHex(member.owner) === selfHex2) continue;
+      const board = boards.boards.get(Number(member.slot));
+      if (!board || board.stale) continue;
+      result.push({
+        owner: identityHex(member.owner),
+        partyId: String(member.partyId),
+        cells: board.cells,
+        activeKind: -1,
+        activeX: 4,
+        activeY: 19,
+        activeRotation: 0
+      });
+    }
+    return result;
+  }
+  function partnerKeyframes(viewRows, members) {
+    const slots = new Map(members.map((member) => [identityHex(member.owner), Number(member.slot)]));
+    const result = [];
+    for (const row of viewRows) {
+      const slot = slots.get(identityHex(row.owner));
+      if (slot === void 0) continue;
+      result.push({
+        slot,
+        board: packVisibleCells(String(row.cells)),
+        activeKind: -1,
+        activeX: 4,
+        activeY: 19,
+        activeRotation: 0,
+        score: 0,
+        linesCleared: 0,
+        toppedOut: false
+      });
+    }
+    return result;
+  }
+
+  // src/party_room.ts
+  var partyEventSubscription = null;
+  var partyEventRoom = -1;
+  var partySnapshotSubscription = null;
+  var partySnapshotAskedAt = 0;
+  var partyRivals = new FarmRivalBoards();
+  function releasePartyRoomHandles() {
+    partyEventSubscription = null;
+    partyEventRoom = -1;
+    partySnapshotSubscription = null;
+  }
+  function stopPartyEvents() {
+    for (const handle of [partyEventSubscription, partySnapshotSubscription]) {
+      if (handle && typeof handle.unsubscribe === "function") {
+        try {
+          handle.unsubscribe();
+        } catch {
+        }
+      }
+    }
+    partyEventSubscription = null;
+    partySnapshotSubscription = null;
+    partyEventRoom = -1;
+  }
+  function partyMembers(activeConnection) {
+    return rows(activeConnection.db.myPartyMemberCore);
+  }
+  function selfHex(activeConnection) {
+    return identityHex(activeConnection.identity);
+  }
+  var partyEventHandlersOn = /* @__PURE__ */ new WeakSet();
+  function watchPartyEvents(activeConnection) {
+    if (partyEventHandlersOn.has(activeConnection)) return;
+    partyEventHandlersOn.add(activeConnection);
+    const db = activeConnection.db;
+    const mine = (slot) => slot === ownSlot(partyMembers(activeConnection), selfHex(activeConnection));
+    db.partyLockEvent.onInsert((_ctx, row) => {
+      if (mine(Number(row.slot))) return;
+      const outcome = partyRivals.applyLock(row);
+      if (outcome === "applied") scheduleDomain(activeConnection, "partyBoard");
+      else if (outcome === "mismatch") requestPartySnapshot(activeConnection);
+    });
+    db.partyBoardEvent.onInsert((_ctx, row) => {
+      if (mine(Number(row.slot))) return;
+      if (partyRivals.applyBoard(row)) scheduleDomain(activeConnection, "partyBoard");
+    });
+    const follow = () => followPartyRoom(activeConnection);
+    for (const handle of [db.myPartyCore, db.myPartyMemberCore]) {
+      handle.onInsert(follow);
+      handle.onDelete(follow);
+      if (typeof handle.onUpdate === "function") handle.onUpdate(follow);
+    }
+  }
+  function followPartyRoom(activeConnection) {
+    if (live.connection !== activeConnection || !groupSubscribed("party")) return;
+    scheduleDomain(activeConnection, "partyBoard");
+    const party = rows(activeConnection.db.myPartyCore)[0];
+    const room = party && party.partyId ? farmRoomKey(String(party.partyId)) : -1;
+    if (room === partyEventRoom && (partyEventSubscription || room < 0)) return;
+    partyRivals.follow(room);
+    stopPartyEvents();
+    partyEventRoom = room;
+    if (room < 0) return;
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (partyEventSubscription !== handle) return;
+      requestPartySnapshot(activeConnection, true);
+    }).onError((_ctx, error) => {
+      if (live.connection === activeConnection) emit({ type: "error", command: "subscribePartyEvents", message: String(error) });
+    }).subscribe([
+      `SELECT * FROM party_lock_event WHERE room = ${room}`,
+      `SELECT * FROM party_board_event WHERE room = ${room}`
+    ]);
+    partyEventSubscription = handle;
+  }
+  function requestPartySnapshot(activeConnection, force = false) {
+    if (live.connection !== activeConnection || !partyEventSubscription || partySnapshotSubscription) return;
+    const now = Date.now();
+    if (!force && now - partySnapshotAskedAt < 2e3) return;
+    partySnapshotAskedAt = now;
+    const room = partyEventRoom;
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (partySnapshotSubscription !== handle) return;
+      if (room === partyEventRoom) {
+        const viewRows = Array.from(activeConnection.db.myPartyPartnerBoards.iter());
+        partyRivals.applyKeyframe(partnerKeyframes(viewRows, partyMembers(activeConnection)));
+        scheduleDomain(activeConnection, "partyBoard");
+      }
+      partySnapshotSubscription = null;
+      try {
+        handle.unsubscribe();
+      } catch {
+      }
+    }).onError(() => {
+      if (partySnapshotSubscription === handle) partySnapshotSubscription = null;
+    }).subscribe([tables.myPartyPartnerBoards]);
+    partySnapshotSubscription = handle;
   }
 
   // src/fight_rows.ts
@@ -12310,6 +12554,7 @@ ${ty.variants.map(
     scopedSubscriptionConnection = null;
     scopedHandles.clear();
     releaseFarmRoomHandles();
+    releasePartyRoomHandles();
   }
   function adoptScopedSubscriptions(activeConnection) {
     if (scopedSubscriptionConnection === activeConnection) return;
@@ -12327,7 +12572,7 @@ ${ty.variants.map(
     // The roster says who sits where; the boards are what the room's events
     // rebuilt. Godot gets the rows the old views gave it.
     farmBoard: (activeConnection) => {
-      const { boards, pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
+      const { boards, pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV2));
       return { farmOpponents: boards, farmOpponentPieces: pieces, ...farmBoardDomainPatch(boards[0]) };
     },
     // The fight rows: each core row with its score laid over it, the row the old
@@ -12357,10 +12602,17 @@ ${ty.variants.map(
       ),
       partyQueue: rows(activeConnection.db.myPartyQueue)[0] ?? null
     }),
-    // Refreshed only by the room's pose events; the roster it reads is observed
-    // for farmBoard.
+    // What the party's events rebuilt (party_room.ts): the partner's board, never
+    // a piece in flight, so no piece rows.
+    partyBoard: (activeConnection) => ({
+      partyBoards: partnerBoardRows(partyRivals, partyMembers(activeConnection), selfHex(activeConnection)),
+      partyPieces: []
+    }),
+    // Refreshed by nothing since the room stopped sharing pieces in flight
+    // (docs/BACKEND_COST_AUDIT_3.md); kept so the wire contract and Godot's
+    // handling of it are unchanged. The roster it reads is observed for farmBoard.
     farmPiece: (activeConnection) => {
-      const { pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV1));
+      const { pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV2));
       return { farmOpponentPieces: pieces, opponentFarmPiece: pieces[0] ?? null };
     }
   };
@@ -12482,7 +12734,7 @@ ${ty.variants.map(
     // same reason: a partner being found, readying up, or killing the monster are
     // all things that happen to a player from somebody else's reducer call. Every
     // view is sender-scoped and small.
-    party: { errorCommand: "subscribeParty" },
+    party: { errorCommand: "subscribeParty", afterObserve: watchPartyEvents, afterApplied: followPartyRoom },
     // Everybody's open listings: a whole-table projection recomputed for every
     // subscriber on the Duels screen every time anybody posts, so it is held only
     // while that screen is open. The server view omits identities. Only the board
