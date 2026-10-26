@@ -9738,6 +9738,14 @@ ${ty.variants.map(
     trace: t.string()
   };
 
+  // src/module_bindings/submit_feedback_reducer.ts
+  var submit_feedback_reducer_default = {
+    category: t.string(),
+    text: t.string(),
+    build: t.string(),
+    diagnostics: t.string()
+  };
+
   // src/module_bindings/unblock_chat_player_reducer.ts
   var unblock_chat_player_reducer_default = {
     blockId: t.string()
@@ -11589,6 +11597,7 @@ ${ty.variants.map(
     reducerSchema("submit_dungeon_run_result_v_1", submit_dungeon_run_result_v_1_reducer_default),
     reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
     reducerSchema("submit_farm_waiting_run_result", submit_farm_waiting_run_result_reducer_default),
+    reducerSchema("submit_feedback", submit_feedback_reducer_default),
     reducerSchema("unblock_chat_player", unblock_chat_player_reducer_default),
     reducerSchema("unequip_boost", unequip_boost_reducer_default),
     reducerSchema("unequip_food", unequip_food_reducer_default),
