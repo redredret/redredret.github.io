@@ -107,6 +107,7 @@ No, it is in early beta and grows every week. New dungeons, bosses, gear and mod
 
 ## Recently added
 
+- 2026-10-26, **Onslaught waits a round longer**: Onslaught now starts a round later, at the 25th fight, on your own, in Dark and with a friend.
 - 2026-10-25, **Tier-four armour finds its place**: Lotus and orichalcum armour has been rebalanced, so every tier-four piece is worth wearing.
 - 2026-10-25, **Rival boards move when a piece lands**: The boards of the other players in Farm Versus, a duel or a co-op run now change when they place a piece, rather than showing their piece falling. You still see every stack, line clear and attack as it happens.
 - 2026-10-24, **Omens with a friend**: Omens now work in co-op Endless, for both of you.
@@ -114,7 +115,6 @@ No, it is in early beta and grows every week. New dungeons, bosses, gear and mod
 - 2026-10-24, **Shields, dodges and parries in duels**: Block, Spin Ward, Dodge and Parry now work when you fight another player. Block and Spin Ward raise a shield that stops your opponent's next hit whole, and a shield you already have up when a duel starts comes into the fight with you. Dodge can take a hit's damage away, and Parry can keep it off your board. In a duel Block, Dodge and Parry each have half their usual chance, and a shield that goes into a duel stays there, so it can't also stop the next monster.
 - 2026-10-24, **Bags that keep what you found, and jewellery in co-op**: When you die in the Dark Endless Dungeon, a Rugged Satchel or Slime Bag now keeps from what you really found: region chests, boss drops and omen drops included. The satchel keeps whatever would sell for the most, so it no longer saves a potion over a weapon. The Garbage Man's dump no longer uses up a Provisions Pouch, since you can't eat there. And with a friend, the Ring of Garbage, the Hourglass Amulet and Tactician now hold the monster's attack back just as they do on your own.
 - 2026-10-24, **A calm before the King, and more Bandit Elites**: The Slime King's pit now opens on a few seconds of calm: build up your board while his music plays softly, then he walks in and his walls bring the drums. With a friend, you both get the same calm. And in the Endless Dungeon the bandits get tougher the deeper you go: Bandit Elites start turning up in the Bandit Camp from your fourth region on, until most of its bandits are elites, and the Bandit Town fields even more of them than before.
-- 2026-10-23, **A funky song for the shops**: The Store, your bag, crafting, the Collection Log and Skins have a song of their own now: a laid-back, funky groove that swells in the moment you open one. Upgrades and Settings keep their calmer tune.
 
 ## Data
 
