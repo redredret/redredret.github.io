@@ -11,6 +11,7 @@
     62
   ],
   "entries": [
+    { "date": "2026-10-26", "title": "Tell us what you'd add", "text": "The main menu has a HELP button. Send us your ideas, anything that feels missing, or a bug, straight from the game. Or open the new How to Play guide." },
     { "date": "2026-10-26", "title": "Onslaught waits a round longer", "text": "Onslaught now starts a round later, at the 25th fight, on your own, in Dark and with a friend.", "rulesVersion": 67 },
     { "date": "2026-10-25", "title": "Tier-four armour finds its place", "text": "Lotus and orichalcum armour has been rebalanced, so every tier-four piece is worth wearing." },
     { "date": "2026-10-25", "title": "Rival boards move when a piece lands", "text": "The boards of the other players in Farm Versus, a duel or a co-op run now change when they place a piece, rather than showing their piece falling. You still see every stack, line clear and attack as it happens." },
