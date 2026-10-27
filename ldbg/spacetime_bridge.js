@@ -9474,6 +9474,11 @@ ${ty.variants.map(
   // src/module_bindings/ready_farm_pvp_round_reducer.ts
   var ready_farm_pvp_round_reducer_default = {};
 
+  // src/module_bindings/reclaim_pet_reducer.ts
+  var reclaim_pet_reducer_default = {
+    petId: t.string()
+  };
+
   // src/module_bindings/refresh_dark_presence_reducer.ts
   var refresh_dark_presence_reducer_default = {
     runId: t.string(),
@@ -9483,6 +9488,11 @@ ${ty.variants.map(
 
   // src/module_bindings/refresh_my_tasks_reducer.ts
   var refresh_my_tasks_reducer_default = {};
+
+  // src/module_bindings/release_pet_reducer.ts
+  var release_pet_reducer_default = {
+    petId: t.string()
+  };
 
   // src/module_bindings/remove_friend_reducer.ts
   var remove_friend_reducer_default = {
@@ -11751,8 +11761,10 @@ ${ty.variants.map(
     reducerSchema("purchase_build_upgrade", purchase_build_upgrade_reducer_default),
     reducerSchema("reach_dark_checkpoint", reach_dark_checkpoint_reducer_default),
     reducerSchema("ready_farm_pvp_round", ready_farm_pvp_round_reducer_default),
+    reducerSchema("reclaim_pet", reclaim_pet_reducer_default),
     reducerSchema("refresh_dark_presence", refresh_dark_presence_reducer_default),
     reducerSchema("refresh_my_tasks", refresh_my_tasks_reducer_default),
+    reducerSchema("release_pet", release_pet_reducer_default),
     reducerSchema("remove_friend", remove_friend_reducer_default),
     reducerSchema("rename_build", rename_build_reducer_default),
     reducerSchema("renew_play_session", renew_play_session_reducer_default),
