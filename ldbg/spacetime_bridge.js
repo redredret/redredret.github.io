@@ -936,6 +936,9 @@ ${originalIndentation}`;
     // other player whose badges were looked up. A handful of rows, changed when a
     // goal is met, a badge is picked or a lookup answers, so they ride core.
     badges: { group: "core", keys: { badges: many("myBadges"), badgeLookup: one("myBadgeLookup") } },
+    // A restricted account (docs/RESTRICTED_ACCOUNTS.md): the one row, or none.
+    // Core, so every screen knows on its first frame what to grey out.
+    restricted: { group: "core", keys: { restrictedAccount: one("myRestrictedAccount") } },
     // The region diaries (docs/DIARIES.md): each task's value, the tiers claimed
     // and the daily charts taken. A row moves when a run settles or a claim pays.
     diaries: {
@@ -9026,6 +9029,9 @@ ${ty.variants.map(
     listingId: t.string()
   };
 
+  // src/module_bindings/choose_restricted_account_reducer.ts
+  var choose_restricted_account_reducer_default = {};
+
   // src/module_bindings/claim_diary_chart_reducer.ts
   var claim_diary_chart_reducer_default = {
     regionId: t.string()
@@ -9258,6 +9264,9 @@ ${ty.variants.map(
 
   // src/module_bindings/leave_party_queue_reducer.ts
   var leave_party_queue_reducer_default = {};
+
+  // src/module_bindings/leave_restricted_account_reducer.ts
+  var leave_restricted_account_reducer_default = {};
 
   // src/module_bindings/look_up_badges_reducer.ts
   var look_up_badges_reducer_default = {
@@ -10040,7 +10049,8 @@ ${ty.variants.map(
     text: t.string(),
     sentAt: t.timestamp().name("sent_at"),
     authorColor: t.u32().name("author_color"),
-    authorBadge: t.string().name("author_badge")
+    authorBadge: t.string().name("author_badge"),
+    authorRestricted: t.bool().name("author_restricted")
   });
 
   // src/module_bindings/my_chat_room_table.ts
@@ -10052,7 +10062,8 @@ ${ty.variants.map(
     text: t.string(),
     sentAt: t.timestamp().name("sent_at"),
     authorColor: t.u32().name("author_color"),
-    authorBadge: t.string().name("author_badge")
+    authorBadge: t.string().name("author_badge"),
+    authorRestricted: t.bool().name("author_restricted")
   });
 
   // src/module_bindings/my_chat_status_table.ts
@@ -10875,6 +10886,12 @@ ${ty.variants.map(
     look: t.string()
   });
 
+  // src/module_bindings/my_restricted_account_table.ts
+  var my_restricted_account_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    chosenAt: t.timestamp().name("chosen_at")
+  });
+
   // src/module_bindings/my_run_loot_reveals_table.ts
   var my_run_loot_reveals_table_default = t.row({
     revealId: t.string().primaryKey().name("reveal_id"),
@@ -11560,6 +11577,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_recent_players_table_default),
+    myRestrictedAccount: table({
+      name: "my_restricted_account",
+      indexes: [],
+      constraints: []
+    }, my_restricted_account_table_default),
     myRunLootReveals: table({
       name: "my_run_loot_reveals",
       indexes: [],
@@ -11685,6 +11707,7 @@ ${ty.variants.map(
     reducerSchema("cancel_friend_request", cancel_friend_request_reducer_default),
     reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
     reducerSchema("challenge_duel_listing", challenge_duel_listing_reducer_default),
+    reducerSchema("choose_restricted_account", choose_restricted_account_reducer_default),
     reducerSchema("claim_diary_chart", claim_diary_chart_reducer_default),
     reducerSchema("claim_diary_tier", claim_diary_tier_reducer_default),
     reducerSchema("claim_duel_tranquil", claim_duel_tranquil_reducer_default),
@@ -11731,6 +11754,7 @@ ${ty.variants.map(
     reducerSchema("leave_farm_match", leave_farm_match_reducer_default),
     reducerSchema("leave_party", leave_party_reducer_default),
     reducerSchema("leave_party_queue", leave_party_queue_reducer_default),
+    reducerSchema("leave_restricted_account", leave_restricted_account_reducer_default),
     reducerSchema("look_up_badges", look_up_badges_reducer_default),
     reducerSchema("mark_tasks_seen", mark_tasks_seen_reducer_default),
     reducerSchema("new_build", new_build_reducer_default),
@@ -11911,6 +11935,7 @@ ${ty.variants.map(
     "my_quest_stats": "myQuestStats",
     "my_quests": "myQuests",
     "my_recent_players": "myRecentPlayers",
+    "my_restricted_account": "myRestrictedAccount",
     "my_run_loot_reveals": "myRunLootReveals",
     "my_satchel_keep": "mySatchelKeep",
     "my_saved_builds": "mySavedBuilds",
