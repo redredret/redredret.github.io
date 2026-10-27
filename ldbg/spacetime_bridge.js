@@ -893,6 +893,10 @@ ${originalIndentation}`;
       keys: { upgradeProgress: one("myUpgradeProgress"), upgradeUnlocks: many("myUpgradeUnlocks") }
     },
     run: { group: "core", keys: { activeRun: one("myActiveRun") } },
+    // Saved loadouts and builds (docs/RESPEC_AND_LOADOUTS.md): a handful of tiny
+    // rows each, changed only when the player saves one, so they ride the core
+    // subscription and are there for the quick swap before a run.
+    loadouts: { group: "core", keys: { loadouts: many("myLoadouts"), savedBuilds: many("mySavedBuilds") } },
     // The loot seeds the server has handed over for the open run, one a kill, chest
     // or vault (rules version 57, docs/SECURITY_FIX_PLAN.md batch 4): what the run's
     // drops are rolled from, never known before the run has got there. Its own
@@ -9088,6 +9092,16 @@ ${ty.variants.map(
     dungeonId: t.string()
   };
 
+  // src/module_bindings/delete_build_reducer.ts
+  var delete_build_reducer_default = {
+    buildId: t.string()
+  };
+
+  // src/module_bindings/delete_loadout_reducer.ts
+  var delete_loadout_reducer_default = {
+    loadoutId: t.string()
+  };
+
   // src/module_bindings/delete_my_data_reducer.ts
   var delete_my_data_reducer_default = {};
 
@@ -9155,6 +9169,11 @@ ${ty.variants.map(
     slot: t.string()
   };
 
+  // src/module_bindings/equip_loadout_reducer.ts
+  var equip_loadout_reducer_default = {
+    planJson: t.string()
+  };
+
   // src/module_bindings/insure_duel_lobby_reducer.ts
   var insure_duel_lobby_reducer_default = {
     listingId: t.string(),
@@ -9217,6 +9236,12 @@ ${ty.variants.map(
 
   // src/module_bindings/mark_tasks_seen_reducer.ts
   var mark_tasks_seen_reducer_default = {};
+
+  // src/module_bindings/new_build_reducer.ts
+  var new_build_reducer_default = {
+    tree: t.string(),
+    name: t.string()
+  };
 
   // src/module_bindings/open_dark_chest_reducer.ts
   var open_dark_chest_reducer_default = {
@@ -9433,6 +9458,12 @@ ${ty.variants.map(
     friendId: t.string()
   };
 
+  // src/module_bindings/rename_build_reducer.ts
+  var rename_build_reducer_default = {
+    buildId: t.string(),
+    name: t.string()
+  };
+
   // src/module_bindings/renew_play_session_reducer.ts
   var renew_play_session_reducer_default = {};
 
@@ -9520,6 +9551,11 @@ ${ty.variants.map(
     taskRowId: t.string()
   };
 
+  // src/module_bindings/respec_tree_reducer.ts
+  var respec_tree_reducer_default = {
+    tree: t.string()
+  };
+
   // src/module_bindings/respond_friend_request_reducer.ts
   var respond_friend_request_reducer_default = {
     requestId: t.string(),
@@ -9556,6 +9592,15 @@ ${ty.variants.map(
   // src/module_bindings/save_account_settings_reducer.ts
   var save_account_settings_reducer_default = {
     payload: t.string()
+  };
+
+  // src/module_bindings/save_loadout_reducer.ts
+  var save_loadout_reducer_default = {
+    loadoutId: t.string(),
+    name: t.string(),
+    slotsJson: t.string(),
+    combatBuildId: t.string(),
+    skillsBuildId: t.string()
   };
 
   // src/module_bindings/sell_gear_instance_reducer.ts
@@ -9691,6 +9736,11 @@ ${ty.variants.map(
     skinTone: t.u32()
   };
 
+  // src/module_bindings/start_builds_reducer.ts
+  var start_builds_reducer_default = {
+    tree: t.string()
+  };
+
   // src/module_bindings/start_dark_run_insured_reducer.ts
   var start_dark_run_insured_reducer_default = {
     dungeonId: t.string(),
@@ -9744,6 +9794,11 @@ ${ty.variants.map(
     text: t.string(),
     build: t.string(),
     diagnostics: t.string()
+  };
+
+  // src/module_bindings/switch_build_reducer.ts
+  var switch_build_reducer_default = {
+    buildId: t.string()
   };
 
   // src/module_bindings/unblock_chat_player_reducer.ts
@@ -10430,6 +10485,18 @@ ${ty.variants.map(
     position: t.u32()
   });
 
+  // src/module_bindings/my_loadouts_table.ts
+  var my_loadouts_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    position: t.u32(),
+    label: t.string(),
+    slotsJson: t.string().name("slots_json"),
+    combatBuildId: t.u64().name("combat_build_id"),
+    skillsBuildId: t.u64().name("skills_build_id"),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
   // src/module_bindings/my_market_sale_notice_table.ts
   var my_market_sale_notice_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -10732,6 +10799,18 @@ ${ty.variants.map(
     itemId: t.string().name("item_id"),
     keptAt: t.timestamp().name("kept_at"),
     instanceId: t.u64().name("instance_id")
+  });
+
+  // src/module_bindings/my_saved_builds_table.ts
+  var my_saved_builds_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    tree: t.string(),
+    position: t.u32(),
+    label: t.string(),
+    ranksJson: t.string().name("ranks_json"),
+    active: t.bool(),
+    savedAt: t.timestamp().name("saved_at")
   });
 
   // src/module_bindings/my_sent_farm_pvp_attacks_table.ts
@@ -11257,6 +11336,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_inventory_order_table_default),
+    myLoadouts: table({
+      name: "my_loadouts",
+      indexes: [],
+      constraints: []
+    }, my_loadouts_table_default),
     myMarketSaleNotice: table({
       name: "my_market_sale_notice",
       indexes: [],
@@ -11367,6 +11451,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_satchel_keep_table_default),
+    mySavedBuilds: table({
+      name: "my_saved_builds",
+      indexes: [],
+      constraints: []
+    }, my_saved_builds_table_default),
     mySentFarmPvpAttacks: table({
       name: "my_sent_farm_pvp_attacks",
       indexes: [],
@@ -11493,6 +11582,8 @@ ${ty.variants.map(
     reducerSchema("create_instance_listing", create_instance_listing_reducer_default),
     reducerSchema("create_market_listing", create_market_listing_reducer_default),
     reducerSchema("create_party_room", create_party_room_reducer_default),
+    reducerSchema("delete_build", delete_build_reducer_default),
+    reducerSchema("delete_loadout", delete_loadout_reducer_default),
     reducerSchema("delete_my_data", delete_my_data_reducer_default),
     reducerSchema("enhance_gear", enhance_gear_reducer_default),
     reducerSchema("enter_dark_duel", enter_dark_duel_reducer_default),
@@ -11504,6 +11595,7 @@ ${ty.variants.map(
     reducerSchema("equip_gear_instance", equip_gear_instance_reducer_default),
     reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
     reducerSchema("equip_inventory_item_to_slot", equip_inventory_item_to_slot_reducer_default),
+    reducerSchema("equip_loadout", equip_loadout_reducer_default),
     reducerSchema("insure_duel_lobby", insure_duel_lobby_reducer_default),
     reducerSchema("invite_friend", invite_friend_reducer_default),
     reducerSchema("join_farm_dark_private", join_farm_dark_private_reducer_default),
@@ -11519,6 +11611,7 @@ ${ty.variants.map(
     reducerSchema("leave_party", leave_party_reducer_default),
     reducerSchema("leave_party_queue", leave_party_queue_reducer_default),
     reducerSchema("mark_tasks_seen", mark_tasks_seen_reducer_default),
+    reducerSchema("new_build", new_build_reducer_default),
     reducerSchema("open_dark_chest", open_dark_chest_reducer_default),
     reducerSchema("open_party_chest", open_party_chest_reducer_default),
     reducerSchema("operator_chat_clear", operator_chat_clear_reducer_default),
@@ -11549,6 +11642,7 @@ ${ty.variants.map(
     reducerSchema("refresh_dark_presence", refresh_dark_presence_reducer_default),
     reducerSchema("refresh_my_tasks", refresh_my_tasks_reducer_default),
     reducerSchema("remove_friend", remove_friend_reducer_default),
+    reducerSchema("rename_build", rename_build_reducer_default),
     reducerSchema("renew_play_session", renew_play_session_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
     reducerSchema("repair_gear", repair_gear_reducer_default),
@@ -11564,6 +11658,7 @@ ${ty.variants.map(
     reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
     reducerSchema("request_duel_rematch", request_duel_rematch_reducer_default),
     reducerSchema("reroll_task", reroll_task_reducer_default),
+    reducerSchema("respec_tree", respec_tree_reducer_default),
     reducerSchema("respond_friend_request", respond_friend_request_reducer_default),
     reducerSchema("respond_invite", respond_invite_reducer_default),
     reducerSchema("restart_tutorial", restart_tutorial_reducer_default),
@@ -11571,6 +11666,7 @@ ${ty.variants.map(
     reducerSchema("salvage_gear_instance", salvage_gear_instance_reducer_default),
     reducerSchema("salvage_item", salvage_item_reducer_default),
     reducerSchema("save_account_settings", save_account_settings_reducer_default),
+    reducerSchema("save_loadout", save_loadout_reducer_default),
     reducerSchema("sell_gear_instance", sell_gear_instance_reducer_default),
     reducerSchema("sell_item", sell_item_reducer_default),
     reducerSchema("send_chat_message", send_chat_message_reducer_default),
@@ -11589,6 +11685,7 @@ ${ty.variants.map(
     reducerSchema("set_party_omens", set_party_omens_reducer_default),
     reducerSchema("set_party_ready", set_party_ready_reducer_default),
     reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
+    reducerSchema("start_builds", start_builds_reducer_default),
     reducerSchema("start_dark_run_insured", start_dark_run_insured_reducer_default),
     reducerSchema("start_farm_run", start_farm_run_reducer_default),
     reducerSchema("start_farm_run_v_2", start_farm_run_v_2_reducer_default),
@@ -11598,6 +11695,7 @@ ${ty.variants.map(
     reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
     reducerSchema("submit_farm_waiting_run_result", submit_farm_waiting_run_result_reducer_default),
     reducerSchema("submit_feedback", submit_feedback_reducer_default),
+    reducerSchema("switch_build", switch_build_reducer_default),
     reducerSchema("unblock_chat_player", unblock_chat_player_reducer_default),
     reducerSchema("unequip_boost", unequip_boost_reducer_default),
     reducerSchema("unequip_food", unequip_food_reducer_default),
@@ -11662,6 +11760,7 @@ ${ty.variants.map(
     "my_gear_insurance": "myGearInsurance",
     "my_inventory": "myInventory",
     "my_inventory_order": "myInventoryOrder",
+    "my_loadouts": "myLoadouts",
     "my_market_sale_notice": "myMarketSaleNotice",
     "my_market_transactions": "myMarketTransactions",
     "my_onboarding": "myOnboarding",
@@ -11684,6 +11783,7 @@ ${ty.variants.map(
     "my_recent_players": "myRecentPlayers",
     "my_run_loot_reveals": "myRunLootReveals",
     "my_satchel_keep": "mySatchelKeep",
+    "my_saved_builds": "mySavedBuilds",
     "my_sent_farm_pvp_attacks": "mySentFarmPvpAttacks",
     "my_skills": "mySkills",
     "my_skin_unlocks": "mySkinUnlocks",
