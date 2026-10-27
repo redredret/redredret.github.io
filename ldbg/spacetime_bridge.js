@@ -932,6 +932,10 @@ ${originalIndentation}`;
       group: "core",
       keys: { collectionLog: many("myCollectionLog"), collectionKills: many("myCollectionKills") }
     },
+    // Account badges (docs/BADGES.md): the ones held, the one shown, and the last
+    // other player whose badges were looked up. A handful of rows, changed when a
+    // goal is met, a badge is picked or a lookup answers, so they ride core.
+    badges: { group: "core", keys: { badges: many("myBadges"), badgeLookup: one("myBadgeLookup") } },
     // The Arena's lobby and this player's duel record: both sender-scoped, both
     // tiny, and both things that HAPPEN to a player -- somebody else takes up
     // their listing -- so they ride the connection rather than a screen.
@@ -9234,6 +9238,12 @@ ${ty.variants.map(
   // src/module_bindings/leave_party_queue_reducer.ts
   var leave_party_queue_reducer_default = {};
 
+  // src/module_bindings/look_up_badges_reducer.ts
+  var look_up_badges_reducer_default = {
+    source: t.string(),
+    id: t.string()
+  };
+
   // src/module_bindings/mark_tasks_seen_reducer.ts
   var mark_tasks_seen_reducer_default = {};
 
@@ -9731,6 +9741,11 @@ ${ty.variants.map(
     ready: t.bool()
   };
 
+  // src/module_bindings/set_shown_badge_reducer.ts
+  var set_shown_badge_reducer_default = {
+    badgeId: t.string()
+  };
+
   // src/module_bindings/set_skin_tone_reducer.ts
   var set_skin_tone_reducer_default = {
     skinTone: t.u32()
@@ -9953,6 +9968,25 @@ ${ty.variants.map(
     partyId: t.string().name("party_id")
   });
 
+  // src/module_bindings/my_badge_lookup_table.ts
+  var my_badge_lookup_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    source: t.string(),
+    sourceId: t.string().name("source_id"),
+    badgeIds: t.string().name("badge_ids"),
+    shown: t.string(),
+    at: t.timestamp()
+  });
+
+  // src/module_bindings/my_badges_table.ts
+  var my_badges_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    badgeId: t.string().name("badge_id"),
+    earnedAt: t.timestamp().name("earned_at"),
+    shown: t.bool()
+  });
+
   // src/module_bindings/my_broken_gear_table.ts
   var my_broken_gear_table_default = t.row({
     instanceId: t.u64().primaryKey().name("instance_id"),
@@ -9974,7 +10008,8 @@ ${ty.variants.map(
     authorLevel: t.u32().name("author_level"),
     text: t.string(),
     sentAt: t.timestamp().name("sent_at"),
-    authorColor: t.u32().name("author_color")
+    authorColor: t.u32().name("author_color"),
+    authorBadge: t.string().name("author_badge")
   });
 
   // src/module_bindings/my_chat_room_table.ts
@@ -9985,7 +10020,8 @@ ${ty.variants.map(
     authorLevel: t.u32().name("author_level"),
     text: t.string(),
     sentAt: t.timestamp().name("sent_at"),
-    authorColor: t.u32().name("author_color")
+    authorColor: t.u32().name("author_color"),
+    authorBadge: t.string().name("author_badge")
   });
 
   // src/module_bindings/my_chat_status_table.ts
@@ -11136,6 +11172,16 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_active_run_table_default),
+    myBadgeLookup: table({
+      name: "my_badge_lookup",
+      indexes: [],
+      constraints: []
+    }, my_badge_lookup_table_default),
+    myBadges: table({
+      name: "my_badges",
+      indexes: [],
+      constraints: []
+    }, my_badges_table_default),
     myBrokenGear: table({
       name: "my_broken_gear",
       indexes: [],
@@ -11610,6 +11656,7 @@ ${ty.variants.map(
     reducerSchema("leave_farm_match", leave_farm_match_reducer_default),
     reducerSchema("leave_party", leave_party_reducer_default),
     reducerSchema("leave_party_queue", leave_party_queue_reducer_default),
+    reducerSchema("look_up_badges", look_up_badges_reducer_default),
     reducerSchema("mark_tasks_seen", mark_tasks_seen_reducer_default),
     reducerSchema("new_build", new_build_reducer_default),
     reducerSchema("open_dark_chest", open_dark_chest_reducer_default),
@@ -11684,6 +11731,7 @@ ${ty.variants.map(
     reducerSchema("set_hair", set_hair_reducer_default),
     reducerSchema("set_party_omens", set_party_omens_reducer_default),
     reducerSchema("set_party_ready", set_party_ready_reducer_default),
+    reducerSchema("set_shown_badge", set_shown_badge_reducer_default),
     reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
     reducerSchema("start_builds", start_builds_reducer_default),
     reducerSchema("start_dark_run_insured", start_dark_run_insured_reducer_default),
@@ -11720,6 +11768,8 @@ ${ty.variants.map(
     "market_price_guide": "marketPriceGuide",
     "my_account_settings": "myAccountSettings",
     "my_active_run": "myActiveRun",
+    "my_badge_lookup": "myBadgeLookup",
+    "my_badges": "myBadges",
     "my_broken_gear": "myBrokenGear",
     "my_chat_blocks": "myChatBlocks",
     "my_chat_global": "myChatGlobal",
