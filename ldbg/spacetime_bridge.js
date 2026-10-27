@@ -936,6 +936,16 @@ ${originalIndentation}`;
     // other player whose badges were looked up. A handful of rows, changed when a
     // goal is met, a badge is picked or a lookup answers, so they ride core.
     badges: { group: "core", keys: { badges: many("myBadges"), badgeLookup: one("myBadgeLookup") } },
+    // The region diaries (docs/DIARIES.md): each task's value, the tiers claimed
+    // and the daily charts taken. A row moves when a run settles or a claim pays.
+    diaries: {
+      group: "core",
+      keys: {
+        diaryTasks: many("myDiaryTasks"),
+        diaryClaims: many("myDiaryClaims"),
+        diaryDailyCharts: many("myDiaryDailyCharts")
+      }
+    },
     // The Arena's lobby and this player's duel record: both sender-scoped, both
     // tiny, and both things that HAPPEN to a player -- somebody else takes up
     // their listing -- so they ride the connection rather than a screen.
@@ -9016,6 +9026,17 @@ ${ty.variants.map(
     listingId: t.string()
   };
 
+  // src/module_bindings/claim_diary_chart_reducer.ts
+  var claim_diary_chart_reducer_default = {
+    regionId: t.string()
+  };
+
+  // src/module_bindings/claim_diary_tier_reducer.ts
+  var claim_diary_tier_reducer_default = {
+    regionId: t.string(),
+    tier: t.string()
+  };
+
   // src/module_bindings/claim_duel_tranquil_reducer.ts
   var claim_duel_tranquil_reducer_default = {
     duelId: t.string()
@@ -10241,6 +10262,33 @@ ${ty.variants.map(
     ground: t.string()
   });
 
+  // src/module_bindings/my_diary_claims_table.ts
+  var my_diary_claims_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    regionId: t.string().name("region_id"),
+    tier: t.string(),
+    claimedAt: t.timestamp().name("claimed_at"),
+    rowsJson: t.string().name("rows_json")
+  });
+
+  // src/module_bindings/my_diary_daily_charts_table.ts
+  var my_diary_daily_charts_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    regionId: t.string().name("region_id"),
+    day: t.u64()
+  });
+
+  // src/module_bindings/my_diary_tasks_table.ts
+  var my_diary_tasks_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    taskId: t.string().name("task_id"),
+    value: t.u64(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
   // src/module_bindings/my_duel_lobby_table.ts
   var my_duel_lobby_table_default = t.row({
     listingId: t.string().primaryKey().name("listing_id"),
@@ -11257,6 +11305,21 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_dark_presence_table_default),
+    myDiaryClaims: table({
+      name: "my_diary_claims",
+      indexes: [],
+      constraints: []
+    }, my_diary_claims_table_default),
+    myDiaryDailyCharts: table({
+      name: "my_diary_daily_charts",
+      indexes: [],
+      constraints: []
+    }, my_diary_daily_charts_table_default),
+    myDiaryTasks: table({
+      name: "my_diary_tasks",
+      indexes: [],
+      constraints: []
+    }, my_diary_tasks_table_default),
     myDuelLobby: table({
       name: "my_duel_lobby",
       indexes: [],
@@ -11612,6 +11675,8 @@ ${ty.variants.map(
     reducerSchema("cancel_friend_request", cancel_friend_request_reducer_default),
     reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
     reducerSchema("challenge_duel_listing", challenge_duel_listing_reducer_default),
+    reducerSchema("claim_diary_chart", claim_diary_chart_reducer_default),
+    reducerSchema("claim_diary_tier", claim_diary_tier_reducer_default),
     reducerSchema("claim_duel_tranquil", claim_duel_tranquil_reducer_default),
     reducerSchema("claim_duel_ward", claim_duel_ward_reducer_default),
     reducerSchema("claim_feat", claim_feat_reducer_default),
@@ -11785,6 +11850,9 @@ ${ty.variants.map(
     "my_dark_duel_haul": "myDarkDuelHaul",
     "my_dark_duel_score": "myDarkDuelScore",
     "my_dark_presence": "myDarkPresence",
+    "my_diary_claims": "myDiaryClaims",
+    "my_diary_daily_charts": "myDiaryDailyCharts",
+    "my_diary_tasks": "myDiaryTasks",
     "my_duel_lobby": "myDuelLobby",
     "my_duel_notices": "myDuelNotices",
     "my_duel_opponent_board": "myDuelOpponentBoard",
