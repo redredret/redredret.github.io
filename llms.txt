@@ -107,6 +107,7 @@ No, it is in early beta and grows every week. New dungeons, bosses, gear and mod
 
 ## Recently added
 
+- 2026-10-27, **Badges**: Finish the whole Collection Log, every feat, every quest, every region of the Endless Dungeon, every challenge skin or every Build node and you earn a badge. Reach level 10 in all three masteries for Grandmaster, and everyone playing now is a Beta Player. Pick one to show in chat beside your level, on your friends' lists and on the duel intro. See all your badges, and how close you are to the rest, on the new BADGES tab of the Collection Log, and look at a friend's from their menu. A finished log page now turns gold with a seal.
 - 2026-10-27, **Loadouts and Respec Orbs**: Save your gear, food and boosts as named loadouts and put one on with a single press, from your bag or right before a run. Any enemy in a dungeon can now drop a Respec Orb. It's very rare, more likely from bosses, champions and the Dark, and more likely the deeper you go. Use one in the Combat or Skills tree to get every point back, or to start a new saved build. You can keep three builds in each tree, and at level 50 the Scrap Forge breaks an orb into ten Respec Shards, one for each switch between them.
 - 2026-10-26, **A Forge roll worth watching**: Rolling at the Scrap Forge is a show now. The glow builds, the modifiers flicker past and land on yours, and the stars climb to its grade, each grade with its own colour and sound. A IV gets the full celebration. Rerolls tell you what you are giving up and whether you went up or down. Click to skip. III and IV gear catches the light in your bag. The odds are exactly as they were.
 - 2026-10-26, **Tell us what you'd add**: The main menu has a HELP button. Send us your ideas, anything that feels missing, or a bug, straight from the game. Or open the new How to Play guide.
@@ -114,7 +115,6 @@ No, it is in early beta and grows every week. New dungeons, bosses, gear and mod
 - 2026-10-25, **Tier-four armour finds its place**: Lotus and orichalcum armour has been rebalanced, so every tier-four piece is worth wearing.
 - 2026-10-25, **Rival boards move when a piece lands**: The boards of the other players in Farm Versus, a duel or a co-op run now change when they place a piece, rather than showing their piece falling. You still see every stack, line clear and attack as it happens.
 - 2026-10-24, **Omens with a friend**: Omens now work in co-op Endless, for both of you.
-- 2026-10-24, **Thorns and staggers with a friend, and healing in duels**: With a friend, the Cultist's Amulet's tentacle, Staggering and Interrupting now hold back or call off the monster's attack just as they do on your own, and the Ring of Thorns and Thorned hurt it back whenever it hits you. Thorns still never land the killing blow. In a duel, Regenerating and Tranquil now heal you, at half their usual amount.
 
 ## Data
 
