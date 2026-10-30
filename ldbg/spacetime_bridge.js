@@ -10270,7 +10270,9 @@ ${ty.variants.map(
     oneEntryNecklace: t.u32().name("one_entry_necklace"),
     twoEntryNecklace: t.u32().name("two_entry_necklace"),
     oneShielded: t.bool().name("one_shielded"),
-    twoShielded: t.bool().name("two_shielded")
+    twoShielded: t.bool().name("two_shielded"),
+    oneBoardBreakCells: t.u32().name("one_board_break_cells"),
+    twoBoardBreakCells: t.u32().name("two_board_break_cells")
   });
 
   // src/module_bindings/my_dark_duel_blows_table.ts
@@ -10341,7 +10343,9 @@ ${ty.variants.map(
     oneEntryNecklace: t.u32().name("one_entry_necklace"),
     twoEntryNecklace: t.u32().name("two_entry_necklace"),
     oneShielded: t.bool().name("one_shielded"),
-    twoShielded: t.bool().name("two_shielded")
+    twoShielded: t.bool().name("two_shielded"),
+    oneBoardBreakCells: t.u32().name("one_board_break_cells"),
+    twoBoardBreakCells: t.u32().name("two_board_break_cells")
   });
 
   // src/module_bindings/my_dark_duel_haul_table.ts
@@ -10373,7 +10377,9 @@ ${ty.variants.map(
     oneNecklace: t.u32().name("one_necklace"),
     twoNecklace: t.u32().name("two_necklace"),
     oneShielded: t.bool().name("one_shielded"),
-    twoShielded: t.bool().name("two_shielded")
+    twoShielded: t.bool().name("two_shielded"),
+    oneBoardBreakCells: t.u32().name("one_board_break_cells"),
+    twoBoardBreakCells: t.u32().name("two_board_break_cells")
   });
 
   // src/module_bindings/my_dark_presence_table.ts
