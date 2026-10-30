@@ -979,6 +979,10 @@ ${originalIndentation}`;
     // The board itself is the one whole-table projection here, so it is held only
     // while the Duels screen is open, exactly as the storefront is.
     duelBoard: { group: "duelBoard", keys: { duelListings: many("duelListings") } },
+    // Kept runs (docs/REPLAYS.md): the list, and the one being watched with its
+    // trace. Held only while the Replays page is open, so nothing about replays is
+    // sent at sign-in and a trace only when it is watched.
+    replays: { group: "replays", keys: { replays: many("myReplays"), watchedReplay: one("myWatchedReplay") } },
     farmSession: {
       group: "farm",
       keys: { farmPvpSession: one("myFarmPvpSession"), farmPvpMember: one("myFarmPvpMemberV2") }
@@ -1076,6 +1080,14 @@ ${originalIndentation}`;
     // every patch of it -- ~48 KB and some two hundred JSON parses in Godot on
     // every run's settlement, for rows that cannot have changed.
     questCatalog: { group: "quests", keys: { questCatalog: many("questCatalog"), questDetails: many("questDetails") } },
+    // Bounties (docs/BOUNTIES.md): the hunter's row (Marks, record, the board's
+    // offers) and the bounty held. Null for a player who never opened the board.
+    // A domain of its own so a run's settlement re-sends these two rows, not the
+    // tasks beside them.
+    bounties: { group: "quests", keys: { bountyState: one("myBountyState"), bounty: one("myBounty") } },
+    // The Bounty shop's catalog and the rank ladder: static, read from no table,
+    // so sent once when the quest subscription applies (like questCatalog).
+    bountyShop: { group: "quests", keys: { bountyShop: many("bountyShop") } },
     // Chat (docs/CHAT_PLAN.md). Global on a domain of its own: it is the one that
     // moves when somebody anywhere speaks, and riding with the room it would
     // re-send the room's lines too. The room's lines and the status (open, muted,
@@ -1104,7 +1116,9 @@ ${originalIndentation}`;
     /** The storefront is subscribed only here. */
     store: "store",
     /** The Duels board is subscribed only here. */
-    duels: "duels"
+    duels: "duels",
+    /** Kept runs are subscribed only here (docs/REPLAYS.md). */
+    replays: "replays"
   };
 
   // src/connection_lifecycle.ts
@@ -9001,6 +9015,12 @@ ${ty.variants.map(
     id: t.string()
   };
 
+  // src/module_bindings/buy_bounty_reward_reducer.ts
+  var buy_bounty_reward_reducer_default = {
+    entryId: t.string(),
+    choice: t.string()
+  };
+
   // src/module_bindings/buy_market_listing_reducer.ts
   var buy_market_listing_reducer_default = {
     listingId: t.string(),
@@ -9031,6 +9051,9 @@ ${ty.variants.map(
 
   // src/module_bindings/choose_restricted_account_reducer.ts
   var choose_restricted_account_reducer_default = {};
+
+  // src/module_bindings/claim_bounty_reducer.ts
+  var claim_bounty_reducer_default = {};
 
   // src/module_bindings/claim_diary_chart_reducer.ts
   var claim_diary_chart_reducer_default = {
@@ -9135,6 +9158,11 @@ ${ty.variants.map(
 
   // src/module_bindings/delete_my_data_reducer.ts
   var delete_my_data_reducer_default = {};
+
+  // src/module_bindings/drop_bounty_reducer.ts
+  var drop_bounty_reducer_default = {
+    keepStreak: t.bool()
+  };
 
   // src/module_bindings/enhance_gear_reducer.ts
   var enhance_gear_reducer_default = {
@@ -9282,6 +9310,9 @@ ${ty.variants.map(
     tree: t.string(),
     name: t.string()
   };
+
+  // src/module_bindings/open_bounty_board_reducer.ts
+  var open_bounty_board_reducer_default = {};
 
   // src/module_bindings/open_dark_chest_reducer.ts
   var open_dark_chest_reducer_default = {
@@ -9596,6 +9627,9 @@ ${ty.variants.map(
     duelId: t.string()
   };
 
+  // src/module_bindings/reroll_bounties_reducer.ts
+  var reroll_bounties_reducer_default = {};
+
   // src/module_bindings/reroll_task_reducer.ts
   var reroll_task_reducer_default = {
     taskRowId: t.string()
@@ -9746,6 +9780,18 @@ ${ty.variants.map(
     amount: t.u32()
   };
 
+  // src/module_bindings/set_bounty_block_reducer.ts
+  var set_bounty_block_reducer_default = {
+    targetId: t.string(),
+    blocked: t.bool()
+  };
+
+  // src/module_bindings/set_bounty_option_reducer.ts
+  var set_bounty_option_reducer_default = {
+    option: t.string(),
+    on: t.bool()
+  };
+
   // src/module_bindings/set_display_name_reducer.ts
   var set_display_name_reducer_default = {
     displayName: t.string()
@@ -9789,6 +9835,12 @@ ${ty.variants.map(
   // src/module_bindings/set_skin_tone_reducer.ts
   var set_skin_tone_reducer_default = {
     skinTone: t.u32()
+  };
+
+  // src/module_bindings/star_replay_reducer.ts
+  var star_replay_reducer_default = {
+    replayId: t.string(),
+    starred: t.bool()
   };
 
   // src/module_bindings/start_builds_reducer.ts
@@ -9856,6 +9908,11 @@ ${ty.variants.map(
     buildId: t.string()
   };
 
+  // src/module_bindings/take_bounty_reducer.ts
+  var take_bounty_reducer_default = {
+    slot: t.u32()
+  };
+
   // src/module_bindings/unblock_chat_player_reducer.ts
   var unblock_chat_player_reducer_default = {
     blockId: t.string()
@@ -9880,11 +9937,29 @@ ${ty.variants.map(
     trace: t.string()
   };
 
+  // src/module_bindings/watch_replay_reducer.ts
+  var watch_replay_reducer_default = {
+    replayId: t.string()
+  };
+
   // src/module_bindings/yield_dark_duel_reducer.ts
   var yield_dark_duel_reducer_default = {
     duelId: t.string(),
     reason: t.string()
   };
+
+  // src/module_bindings/bounty_shop_table.ts
+  var bounty_shop_table_default = t.row({
+    kind: t.string(),
+    id: t.string(),
+    name: t.string(),
+    description: t.string(),
+    cost: t.u32(),
+    rank: t.u32(),
+    maxLevel: t.u32().name("max_level"),
+    requires: t.string(),
+    itemId: t.string().name("item_id")
+  });
 
   // src/module_bindings/dark_player_count_table.ts
   var dark_player_count_table_default = t.row({
@@ -10025,6 +10100,36 @@ ${ty.variants.map(
     badgeId: t.string().name("badge_id"),
     earnedAt: t.timestamp().name("earned_at"),
     shown: t.bool()
+  });
+
+  // src/module_bindings/my_bounty_table.ts
+  var my_bounty_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    targetId: t.string().name("target_id"),
+    count: t.u32(),
+    progress: t.u32(),
+    twist: t.string(),
+    detailJson: t.string().name("detail_json"),
+    bankedXp: t.u64().name("banked_xp"),
+    takenAt: t.timestamp().name("taken_at")
+  });
+
+  // src/module_bindings/my_bounty_state_table.ts
+  var my_bounty_state_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    marks: t.u64(),
+    finished: t.u32(),
+    streak: t.u32(),
+    paidDrops: t.u32().name("paid_drops"),
+    boardCounter: t.u32().name("board_counter"),
+    offersJson: t.string().name("offers_json"),
+    rerollDay: t.u32().name("reroll_day"),
+    rerollsUsed: t.u32().name("rerolls_used"),
+    unlocksJson: t.string().name("unlocks_json"),
+    blocksJson: t.string().name("blocks_json"),
+    twistsOn: t.bool().name("twists_on"),
+    lastRunJson: t.string().name("last_run_json"),
+    updatedAt: t.timestamp().name("updated_at")
   });
 
   // src/module_bindings/my_broken_gear_table.ts
@@ -10886,6 +10991,20 @@ ${ty.variants.map(
     look: t.string()
   });
 
+  // src/module_bindings/my_replays_table.ts
+  var my_replays_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    runId: t.string().name("run_id"),
+    activity: t.string(),
+    kind: t.string(),
+    storyVersion: t.u32().name("story_version"),
+    finishedAt: t.timestamp().name("finished_at"),
+    summaryJson: t.string().name("summary_json"),
+    best: t.string(),
+    starred: t.bool()
+  });
+
   // src/module_bindings/my_restricted_account_table.ts
   var my_restricted_account_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -11019,6 +11138,14 @@ ${ty.variants.map(
     upgradeId: t.string().name("upgrade_id"),
     rank: t.u32(),
     pointCost: t.u32().name("point_cost")
+  });
+
+  // src/module_bindings/my_watched_replay_table.ts
+  var my_watched_replay_table_default = t.row({
+    replayId: t.u64().primaryKey().name("replay_id"),
+    owner: t.identity(),
+    requestJson: t.string().name("request_json"),
+    trace: t.string()
   });
 
   // src/module_bindings/my_welcome_chest_table.ts
@@ -11212,6 +11339,11 @@ ${ty.variants.map(
       constraints: [],
       event: true
     }, party_lock_event_table_default),
+    bountyShop: table({
+      name: "bounty_shop",
+      indexes: [],
+      constraints: []
+    }, bounty_shop_table_default),
     darkPlayerCount: table({
       name: "dark_player_count",
       indexes: [],
@@ -11257,6 +11389,16 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_badges_table_default),
+    myBounty: table({
+      name: "my_bounty",
+      indexes: [],
+      constraints: []
+    }, my_bounty_table_default),
+    myBountyState: table({
+      name: "my_bounty_state",
+      indexes: [],
+      constraints: []
+    }, my_bounty_state_table_default),
     myBrokenGear: table({
       name: "my_broken_gear",
       indexes: [],
@@ -11577,6 +11719,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_recent_players_table_default),
+    myReplays: table({
+      name: "my_replays",
+      indexes: [],
+      constraints: []
+    }, my_replays_table_default),
     myRestrictedAccount: table({
       name: "my_restricted_account",
       indexes: [],
@@ -11642,6 +11789,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_upgrade_unlocks_table_default),
+    myWatchedReplay: table({
+      name: "my_watched_replay",
+      indexes: [],
+      constraints: []
+    }, my_watched_replay_table_default),
     myWelcomeChest: table({
       name: "my_welcome_chest",
       indexes: [],
@@ -11702,12 +11854,14 @@ ${ty.variants.map(
     reducerSchema("advance_tutorial", advance_tutorial_reducer_default),
     reducerSchema("block_chat_author", block_chat_author_reducer_default),
     reducerSchema("block_player", block_player_reducer_default),
+    reducerSchema("buy_bounty_reward", buy_bounty_reward_reducer_default),
     reducerSchema("buy_market_listing", buy_market_listing_reducer_default),
     reducerSchema("buy_shop_item", buy_shop_item_reducer_default),
     reducerSchema("cancel_friend_request", cancel_friend_request_reducer_default),
     reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
     reducerSchema("challenge_duel_listing", challenge_duel_listing_reducer_default),
     reducerSchema("choose_restricted_account", choose_restricted_account_reducer_default),
+    reducerSchema("claim_bounty", claim_bounty_reducer_default),
     reducerSchema("claim_diary_chart", claim_diary_chart_reducer_default),
     reducerSchema("claim_diary_tier", claim_diary_tier_reducer_default),
     reducerSchema("claim_duel_tranquil", claim_duel_tranquil_reducer_default),
@@ -11729,6 +11883,7 @@ ${ty.variants.map(
     reducerSchema("delete_build", delete_build_reducer_default),
     reducerSchema("delete_loadout", delete_loadout_reducer_default),
     reducerSchema("delete_my_data", delete_my_data_reducer_default),
+    reducerSchema("drop_bounty", drop_bounty_reducer_default),
     reducerSchema("enhance_gear", enhance_gear_reducer_default),
     reducerSchema("enter_dark_duel", enter_dark_duel_reducer_default),
     reducerSchema("enter_dark_duel_v_2", enter_dark_duel_v_2_reducer_default),
@@ -11758,6 +11913,7 @@ ${ty.variants.map(
     reducerSchema("look_up_badges", look_up_badges_reducer_default),
     reducerSchema("mark_tasks_seen", mark_tasks_seen_reducer_default),
     reducerSchema("new_build", new_build_reducer_default),
+    reducerSchema("open_bounty_board", open_bounty_board_reducer_default),
     reducerSchema("open_dark_chest", open_dark_chest_reducer_default),
     reducerSchema("open_party_chest", open_party_chest_reducer_default),
     reducerSchema("operator_chat_clear", operator_chat_clear_reducer_default),
@@ -11805,6 +11961,7 @@ ${ty.variants.map(
     reducerSchema("report_player", report_player_reducer_default),
     reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
     reducerSchema("request_duel_rematch", request_duel_rematch_reducer_default),
+    reducerSchema("reroll_bounties", reroll_bounties_reducer_default),
     reducerSchema("reroll_task", reroll_task_reducer_default),
     reducerSchema("respec_tree", respec_tree_reducer_default),
     reducerSchema("respond_friend_request", respond_friend_request_reducer_default),
@@ -11826,6 +11983,8 @@ ${ty.variants.map(
     reducerSchema("send_party_blow_v_2", send_party_blow_v_2_reducer_default),
     reducerSchema("send_party_heal", send_party_heal_reducer_default),
     reducerSchema("send_party_thorns", send_party_thorns_reducer_default),
+    reducerSchema("set_bounty_block", set_bounty_block_reducer_default),
+    reducerSchema("set_bounty_option", set_bounty_option_reducer_default),
     reducerSchema("set_display_name", set_display_name_reducer_default),
     reducerSchema("set_duel_ready", set_duel_ready_reducer_default),
     reducerSchema("set_friend_settings", set_friend_settings_reducer_default),
@@ -11834,6 +11993,7 @@ ${ty.variants.map(
     reducerSchema("set_party_ready", set_party_ready_reducer_default),
     reducerSchema("set_shown_badge", set_shown_badge_reducer_default),
     reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
+    reducerSchema("star_replay", star_replay_reducer_default),
     reducerSchema("start_builds", start_builds_reducer_default),
     reducerSchema("start_dark_run_insured", start_dark_run_insured_reducer_default),
     reducerSchema("start_farm_run", start_farm_run_reducer_default),
@@ -11845,11 +12005,13 @@ ${ty.variants.map(
     reducerSchema("submit_farm_waiting_run_result", submit_farm_waiting_run_result_reducer_default),
     reducerSchema("submit_feedback", submit_feedback_reducer_default),
     reducerSchema("switch_build", switch_build_reducer_default),
+    reducerSchema("take_bounty", take_bounty_reducer_default),
     reducerSchema("unblock_chat_player", unblock_chat_player_reducer_default),
     reducerSchema("unequip_boost", unequip_boost_reducer_default),
     reducerSchema("unequip_food", unequip_food_reducer_default),
     reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default),
     reducerSchema("verify_dark_duel_win", verify_dark_duel_win_reducer_default),
+    reducerSchema("watch_replay", watch_replay_reducer_default),
     reducerSchema("yield_dark_duel", yield_dark_duel_reducer_default)
   );
   var proceduresSchema = procedures();
@@ -11862,6 +12024,7 @@ ${ty.variants.map(
     ...proceduresSchema
   };
   var tableAccessorAliases = {
+    "bounty_shop": "bountyShop",
     "dark_player_count": "darkPlayerCount",
     "duel_listings": "duelListings",
     "farm_player_counts": "farmPlayerCounts",
@@ -11871,6 +12034,8 @@ ${ty.variants.map(
     "my_active_run": "myActiveRun",
     "my_badge_lookup": "myBadgeLookup",
     "my_badges": "myBadges",
+    "my_bounty": "myBounty",
+    "my_bounty_state": "myBountyState",
     "my_broken_gear": "myBrokenGear",
     "my_chat_blocks": "myChatBlocks",
     "my_chat_global": "myChatGlobal",
@@ -11935,6 +12100,7 @@ ${ty.variants.map(
     "my_quest_stats": "myQuestStats",
     "my_quests": "myQuests",
     "my_recent_players": "myRecentPlayers",
+    "my_replays": "myReplays",
     "my_restricted_account": "myRestrictedAccount",
     "my_run_loot_reveals": "myRunLootReveals",
     "my_satchel_keep": "mySatchelKeep",
@@ -11948,6 +12114,7 @@ ${ty.variants.map(
     "my_tasks": "myTasks",
     "my_upgrade_progress": "myUpgradeProgress",
     "my_upgrade_unlocks": "myUpgradeUnlocks",
+    "my_watched_replay": "myWatchedReplay",
     "my_welcome_chest": "myWelcomeChest",
     "opponent_farm_boards_compact_v4": "opponentFarmBoardsCompactV4",
     "opponent_farm_keyframes_v1": "opponentFarmKeyframesV1",
@@ -13006,6 +13173,9 @@ ${ty.variants.map(
     // what tells a player somebody has taken their listing up, and a listing does
     // not expire because they went to look at their inventory.
     duelBoard: { wanted: () => live.clientScreen === CLIENT_SCREENS.duels, errorCommand: "subscribeDuelBoard" },
+    // Kept runs, only while the Replays page is open: the list is small, but a
+    // watched trace is the biggest row a player has, and nothing else needs either.
+    replays: { wanted: () => live.clientScreen === CLIENT_SCREENS.replays, errorCommand: "subscribeReplays" },
     // The counters beside the Farm menu's versus modes. Tiny and shared by every
     // player, so it is subscribed for the whole connection rather than scoped to a
     // screen. Kept out of the core subscription so a server that predates the view
