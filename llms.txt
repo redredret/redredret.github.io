@@ -1,0 +1,123 @@
+# LDBG
+
+> LDBG is a free falling-block RPG you play in your browser. Every line you clear hits a monster. Gather on the Farm, craft gear, fight through Greenshore and duel other players.
+
+LDBG is a falling-block puzzle game and an RPG at once. You stack falling pieces and clear lines as in any competitive stacker, and every line you clear does something in the RPG: on the Farm it gathers materials, in a dungeon it strikes the monster in front of you, and in the Arena it hits another player. Your account keeps your character's level, gear, materials and unlocks between runs. It is made with the Godot engine by an independent developer and is in early beta.
+
+- Play free in a desktop browser: https://redredret.github.io/ldbg/
+- Official site: https://redredret.github.io/
+- Optional Windows app: https://github.com/redredret/redredret.github.io/releases/latest
+- Controls: keyboard or controller, every action rebindable. Built for computers, not phones.
+- Price: free. Guests can try a local demo; logging in keeps progress on the game's servers.
+
+## The game in numbers
+
+- 142 items, including 61 pieces of gear (helmets, armour, swords, bows, staves, bucklers, rings, necklaces), from 106 crafting recipes
+- 16 kinds of monster, 8 of them bosses
+- 19 fights in the Greenshore story route
+- 107 upgrades across 3 upgrade trees (Combat, Skills and Build)
+- 46 quests from 7 townsfolk, and 79 daily and weekly tasks
+- Live totals, read 2026-10-21: 22 adventurers, 4,071 monsters slain, 1,377 bosses slain, 1,562 Quads and 893 T-spins cleared, 929 Farm runs
+
+## The Farm
+
+The Farm is an endless run. Clear lines to gather logs, ore, fish and fibre, then craft with them. Quads, T-spins and combos gather more.
+
+- **Farm Solo**: Just you and the board. Garbage rises every few pieces, so keep clearing.
+- **Farm Versus**: Up to ten players in a room, sending garbage at each other. You keep everything you gather.
+- **Dark Farm**: Versus with stakes. Half of what you gather is on the line, and the winner takes it.
+
+## Crafting and gear
+
+Smelt your ore into ingots, weave your fibre into fabric, and work them into 61 pieces of gear across 106 recipes. Everything you wear shows on your character, from helmets and armour to swords, bows, staves, bucklers, rings and necklaces. Trade the rest for Gold with other players on the Market.
+
+## Dungeons
+
+Greenshore's story runs 19 fights long, from zombies on the shore to the Cult Leader at the top of the tower. Your lines are your attacks. Theirs land on your board: arrows knock out blocks, fire spreads along the bottom row, and slime costs you a rotation.
+
+- **Story**: Greenshore's set route, through every area and every boss.
+- **Endless**: Endless dungeon regions. The deeper you go, the better the rewards.
+- **Dark Endless**: DANGER. A riskier, more rewarding endless dungeon. Fight other players for their gear, and higher monster drop rates, while risking your gear.
+- **The Garbage Man**: 10 waves of garbage, faster every wave. One top-out ends it.
+- **The Slime King**: A king after every king, alone or with a friend. He walls your board down to four columns until he falls.
+
+## Bosses
+
+- **Bandit King**: Switches between arrow rain and a blade spin that cuts your top and bottom rows.
+- **Cyclops**: Knocks blocks loose from the top of your stack, then sets it on fire.
+- **Punchy**: Slams the ground, and a stone wave sweeps across one of your rows.
+- **Shooty**: Hurls boulders that drop three or four stone blocks onto your board.
+- **Bernie**: A fire-casting cyclops whose fireball spreads along your bottom row.
+- **Cult Leader**: Opens portals and hurls fireballs, then shields itself from your next hit.
+- **The Garbage Man**: Throws garbage at you one line at a time, faster every wave. Beat wave ten for an Arcane Vault, then keep going.
+- **The Slime King**: Walls your board down to four columns, slimes your tower and wraps you up until you shake him off. Beat him and a bigger one comes for you.
+
+## Lesser foes
+
+- **Zombie**: Swipes a block off your top.
+- **Super Zombie**: Rakes off two or three.
+- **Slime**: Slimes your piece. No rotating.
+- **Squirrel**: Nips at you. Never your board.
+- **Bandit**: Arrows knock out a block.
+- **Bandit Elite**: A tougher bandit, crossbow and all.
+- **Cultist**: Fireballs, and a stab at your bottom row.
+- **Oak Entling**: A stump that refused to stay felled.
+
+## The Arena
+
+In the Hollow Spire you pick your opponent off the board. Look over their gear first, then fight for the win, or put a piece of your gear against a piece of theirs. Every hit you land is a line you cleared, so the better stacker usually walks away richer.
+
+## Questions
+
+### What is LDBG?
+
+LDBG is a free falling-block RPG you play in your browser. Every line you clear is an attack on the monster in front of you. You gather materials on the Farm, craft gear, fight up the Greenshore dungeons, and duel other players, and your account keeps your levels, gear and loot.
+
+### Is LDBG free to play?
+
+Yes. LDBG is free and plays in your browser at redredret.github.io/ldbg. Try it as a guest, or Log In so everything you earn is kept.
+
+### Do I need to download anything?
+
+No. It runs in a desktop browser such as Chrome, Edge or Firefox. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates; it isn't signed yet, so Windows asks you to confirm before it runs.
+
+### What do I play it with?
+
+A keyboard or a controller, on a computer. Every control can be rebound in Settings, and handling such as auto-repeat and soft drop speed can be tuned the way competitive stackers like it.
+
+### Can I play on my phone?
+
+Not yet. LDBG needs a keyboard or a controller, so play it on a computer. Touch controls are planned.
+
+### How does the RPG side work?
+
+Clearing lines gathers logs, ore, fish and fibre on the Farm, or deals damage in a dungeon. Bigger clears hit harder: Quads, T-spins and combos all pay extra. You earn XP and levels, spend points across 3 upgrade trees, craft and wear gear, finish quests and daily tasks, and open reward chests.
+
+### Can I play with friends?
+
+Yes. Farm Versus seats up to ten players who send garbage at each other, Dark Farm puts half your haul on the line, Endless and the Slime King can be fought with a friend, and the Arena lets you duel another player for the win or for each other's gear.
+
+### Is my progress saved?
+
+Yes. When you Log In, your progress is kept on the game's servers and follows you to any computer, and it stays through the beta: nothing you earn now will be wiped. Guest play is a short local demo, and nothing earned as a guest moves to an account.
+
+### Is LDBG finished?
+
+No, it is in early beta and grows every week. New dungeons, bosses, gear and modes land often; the Recently Added list on this page shows the latest.
+
+## Recently added
+
+- 2026-10-30, **More of your gear works in co-op**: Champion's Lure, Overkill, Retaliation, Shield Bash and the King's Amulet now work in co-op. The party fights on the best Lure anyone brings, so champions turn up more often for everyone. Overkill carries your extra damage into the next monster, Retaliation and Shield Bash hit the party's monster back, and the King's Amulet pays you its coins from every kill you helped with. Region diary tasks count in co-op too: the kills you land, and the fights you get through without being hit.
+- 2026-10-30, **Marked hunts and trophies**: Two new unlocks in the Bounty shop. Target scent makes your bounty's target turn up twice as often. Marked hunts make it more likely to be a champion, and every Marked champion drops a trophy only bounties give: a Grave Tooth, a Slime Core, a Wanted Poster and more, or a Hunter's Trophy from a boss. Trade them, sell them, or turn them in to Rook for Marks. Both work with a friend too.
+- 2026-10-30, **The Bounty shop**: Spend your Marks at Rook's shop. Unlock a second and third offer to choose from, twists that pay more, blocks for targets you never want, longer bounties and a second free new offer a day. Climb the bounty ranks to open more of the shop, and earn the Hunter's Ring tier by tier: it hits champions harder, finds more of them and doubles some loot while you hold a bounty. It can't be traded, and it's never lost in the Dark. Reach rank 10 for the Bounty Hunter badge.
+- 2026-10-29, **Bounties**: Rook has opened a Bounty Board in the QUESTS menu once you finish the Greenshore Story. Take a bounty, hunt its target in the Endless Dungeon, on your own or with a friend. Kills in the Dark count twice. Turn it in for Marks, a chest and some experience, and save the Marks for the Bounty shop. Keep a streak going: every 10th bounty in a row pays three times the Marks and a better chest.
+- 2026-10-29, **Watch your runs again**: Your runs are kept now, so you can watch them back. Open REPLAYS from the main menu, or press WATCH REPLAY on the results card. Play, pause, step one piece at a time, scrub to any fight and change the speed. Your 10 newest runs are kept, plus the run behind each of your records, and you can star up to 5 more to keep. Save a replay as a file to show someone, and load one back to watch it.
+- 2026-10-27, **Pets in co-op and duels**: Your pets now help in co-op too. The boss pets steer the whole party's Endless Dungeon toward their homes, and a Little Slime King anywhere in the party makes golden Slime Kings twice as likely for everyone. The Pet Cultist's portal opens in duels as well, half as often as against monsters. And the Pet Entling and the Little Garbage Man now work in Farm versus rooms.
+- 2026-10-27, **Boss pets do things now**: The three boss pets help now. The Little Slime King leads you to the Slime Grotto more often and makes golden Slime Kings twice as likely. The Little Cyclops brings an extra Eye Ball from every kill that drops them, sometimes doubles a champion's loot, and finds the Cyclops Arena more often. The Little Garbage Man gets you a quarter more Gold from Farm garbage, digs up Scrap from your kills, gets you into his dungeon for 3 Scrap, and finds the Dump more often.
+- 2026-10-27, **Restricted accounts**: Start a new character as a restricted account and make or find everything yourself: no Player Market, friendly Arena fights only, and nothing taken from players you beat in the Dark. A padlock shows beside your name in chat, on friends' lists and in duels, and at level 30 you earn a skin only restricted players get. You can leave any time, but you can't come back.
+
+## Data
+
+- [Live statistics and content counts (JSON)](https://redredret.github.io/stats.json)
+- [Every obtainable item, with rarity and level (JSON)](https://redredret.github.io/items.json)
+- [Everything added to the game, newest first (JSON)](https://redredret.github.io/news.json)

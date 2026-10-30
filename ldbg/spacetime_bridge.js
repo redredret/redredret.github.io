@@ -1,0 +1,15707 @@
+"use strict";
+(() => {
+  var __create = Object.create;
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getProtoOf = Object.getPrototypeOf;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __commonJS = (cb, mod) => function __require() {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
+
+  // node_modules/.pnpm/base64-js@1.5.1/node_modules/base64-js/index.js
+  var require_base64_js = __commonJS({
+    "node_modules/.pnpm/base64-js@1.5.1/node_modules/base64-js/index.js"(exports) {
+      "use strict";
+      exports.byteLength = byteLength;
+      exports.toByteArray = toByteArray;
+      exports.fromByteArray = fromByteArray2;
+      var lookup = [];
+      var revLookup = [];
+      var Arr = typeof Uint8Array !== "undefined" ? Uint8Array : Array;
+      var code = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+      for (i = 0, len = code.length; i < len; ++i) {
+        lookup[i] = code[i];
+        revLookup[code.charCodeAt(i)] = i;
+      }
+      var i;
+      var len;
+      revLookup["-".charCodeAt(0)] = 62;
+      revLookup["_".charCodeAt(0)] = 63;
+      function getLens(b64) {
+        var len2 = b64.length;
+        if (len2 % 4 > 0) {
+          throw new Error("Invalid string. Length must be a multiple of 4");
+        }
+        var validLen = b64.indexOf("=");
+        if (validLen === -1) validLen = len2;
+        var placeHoldersLen = validLen === len2 ? 0 : 4 - validLen % 4;
+        return [validLen, placeHoldersLen];
+      }
+      function byteLength(b64) {
+        var lens = getLens(b64);
+        var validLen = lens[0];
+        var placeHoldersLen = lens[1];
+        return (validLen + placeHoldersLen) * 3 / 4 - placeHoldersLen;
+      }
+      function _byteLength(b64, validLen, placeHoldersLen) {
+        return (validLen + placeHoldersLen) * 3 / 4 - placeHoldersLen;
+      }
+      function toByteArray(b64) {
+        var tmp;
+        var lens = getLens(b64);
+        var validLen = lens[0];
+        var placeHoldersLen = lens[1];
+        var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen));
+        var curByte = 0;
+        var len2 = placeHoldersLen > 0 ? validLen - 4 : validLen;
+        var i2;
+        for (i2 = 0; i2 < len2; i2 += 4) {
+          tmp = revLookup[b64.charCodeAt(i2)] << 18 | revLookup[b64.charCodeAt(i2 + 1)] << 12 | revLookup[b64.charCodeAt(i2 + 2)] << 6 | revLookup[b64.charCodeAt(i2 + 3)];
+          arr[curByte++] = tmp >> 16 & 255;
+          arr[curByte++] = tmp >> 8 & 255;
+          arr[curByte++] = tmp & 255;
+        }
+        if (placeHoldersLen === 2) {
+          tmp = revLookup[b64.charCodeAt(i2)] << 2 | revLookup[b64.charCodeAt(i2 + 1)] >> 4;
+          arr[curByte++] = tmp & 255;
+        }
+        if (placeHoldersLen === 1) {
+          tmp = revLookup[b64.charCodeAt(i2)] << 10 | revLookup[b64.charCodeAt(i2 + 1)] << 4 | revLookup[b64.charCodeAt(i2 + 2)] >> 2;
+          arr[curByte++] = tmp >> 8 & 255;
+          arr[curByte++] = tmp & 255;
+        }
+        return arr;
+      }
+      function tripletToBase64(num) {
+        return lookup[num >> 18 & 63] + lookup[num >> 12 & 63] + lookup[num >> 6 & 63] + lookup[num & 63];
+      }
+      function encodeChunk(uint8, start, end) {
+        var tmp;
+        var output = [];
+        for (var i2 = start; i2 < end; i2 += 3) {
+          tmp = (uint8[i2] << 16 & 16711680) + (uint8[i2 + 1] << 8 & 65280) + (uint8[i2 + 2] & 255);
+          output.push(tripletToBase64(tmp));
+        }
+        return output.join("");
+      }
+      function fromByteArray2(uint8) {
+        var tmp;
+        var len2 = uint8.length;
+        var extraBytes = len2 % 3;
+        var parts = [];
+        var maxChunkLength = 16383;
+        for (var i2 = 0, len22 = len2 - extraBytes; i2 < len22; i2 += maxChunkLength) {
+          parts.push(encodeChunk(uint8, i2, i2 + maxChunkLength > len22 ? len22 : i2 + maxChunkLength));
+        }
+        if (extraBytes === 1) {
+          tmp = uint8[len2 - 1];
+          parts.push(
+            lookup[tmp >> 2] + lookup[tmp << 4 & 63] + "=="
+          );
+        } else if (extraBytes === 2) {
+          tmp = (uint8[len2 - 2] << 8) + uint8[len2 - 1];
+          parts.push(
+            lookup[tmp >> 10] + lookup[tmp >> 4 & 63] + lookup[tmp << 2 & 63] + "="
+          );
+        }
+        return parts.join("");
+      }
+    }
+  });
+
+  // node_modules/.pnpm/safe-stable-stringify@2.5.0/node_modules/safe-stable-stringify/index.js
+  var require_safe_stable_stringify = __commonJS({
+    "node_modules/.pnpm/safe-stable-stringify@2.5.0/node_modules/safe-stable-stringify/index.js"(exports, module) {
+      "use strict";
+      var { hasOwnProperty } = Object.prototype;
+      var stringify3 = configure2();
+      stringify3.configure = configure2;
+      stringify3.stringify = stringify3;
+      stringify3.default = stringify3;
+      exports.stringify = stringify3;
+      exports.configure = configure2;
+      module.exports = stringify3;
+      var strEscapeSequencesRegExp = /[\u0000-\u001f\u0022\u005c\ud800-\udfff]/;
+      function strEscape(str) {
+        if (str.length < 5e3 && !strEscapeSequencesRegExp.test(str)) {
+          return `"${str}"`;
+        }
+        return JSON.stringify(str);
+      }
+      function sort(array, comparator) {
+        if (array.length > 200 || comparator) {
+          return array.sort(comparator);
+        }
+        for (let i = 1; i < array.length; i++) {
+          const currentValue = array[i];
+          let position = i;
+          while (position !== 0 && array[position - 1] > currentValue) {
+            array[position] = array[position - 1];
+            position--;
+          }
+          array[position] = currentValue;
+        }
+        return array;
+      }
+      var typedArrayPrototypeGetSymbolToStringTag = Object.getOwnPropertyDescriptor(
+        Object.getPrototypeOf(
+          Object.getPrototypeOf(
+            new Int8Array()
+          )
+        ),
+        Symbol.toStringTag
+      ).get;
+      function isTypedArrayWithEntries(value) {
+        return typedArrayPrototypeGetSymbolToStringTag.call(value) !== void 0 && value.length !== 0;
+      }
+      function stringifyTypedArray(array, separator, maximumBreadth) {
+        if (array.length < maximumBreadth) {
+          maximumBreadth = array.length;
+        }
+        const whitespace = separator === "," ? "" : " ";
+        let res = `"0":${whitespace}${array[0]}`;
+        for (let i = 1; i < maximumBreadth; i++) {
+          res += `${separator}"${i}":${whitespace}${array[i]}`;
+        }
+        return res;
+      }
+      function getCircularValueOption(options) {
+        if (hasOwnProperty.call(options, "circularValue")) {
+          const circularValue = options.circularValue;
+          if (typeof circularValue === "string") {
+            return `"${circularValue}"`;
+          }
+          if (circularValue == null) {
+            return circularValue;
+          }
+          if (circularValue === Error || circularValue === TypeError) {
+            return {
+              toString() {
+                throw new TypeError("Converting circular structure to JSON");
+              }
+            };
+          }
+          throw new TypeError('The "circularValue" argument must be of type string or the value null or undefined');
+        }
+        return '"[Circular]"';
+      }
+      function getDeterministicOption(options) {
+        let value;
+        if (hasOwnProperty.call(options, "deterministic")) {
+          value = options.deterministic;
+          if (typeof value !== "boolean" && typeof value !== "function") {
+            throw new TypeError('The "deterministic" argument must be of type boolean or comparator function');
+          }
+        }
+        return value === void 0 ? true : value;
+      }
+      function getBooleanOption(options, key) {
+        let value;
+        if (hasOwnProperty.call(options, key)) {
+          value = options[key];
+          if (typeof value !== "boolean") {
+            throw new TypeError(`The "${key}" argument must be of type boolean`);
+          }
+        }
+        return value === void 0 ? true : value;
+      }
+      function getPositiveIntegerOption(options, key) {
+        let value;
+        if (hasOwnProperty.call(options, key)) {
+          value = options[key];
+          if (typeof value !== "number") {
+            throw new TypeError(`The "${key}" argument must be of type number`);
+          }
+          if (!Number.isInteger(value)) {
+            throw new TypeError(`The "${key}" argument must be an integer`);
+          }
+          if (value < 1) {
+            throw new RangeError(`The "${key}" argument must be >= 1`);
+          }
+        }
+        return value === void 0 ? Infinity : value;
+      }
+      function getItemCount(number) {
+        if (number === 1) {
+          return "1 item";
+        }
+        return `${number} items`;
+      }
+      function getUniqueReplacerSet(replacerArray) {
+        const replacerSet = /* @__PURE__ */ new Set();
+        for (const value of replacerArray) {
+          if (typeof value === "string" || typeof value === "number") {
+            replacerSet.add(String(value));
+          }
+        }
+        return replacerSet;
+      }
+      function getStrictOption(options) {
+        if (hasOwnProperty.call(options, "strict")) {
+          const value = options.strict;
+          if (typeof value !== "boolean") {
+            throw new TypeError('The "strict" argument must be of type boolean');
+          }
+          if (value) {
+            return (value2) => {
+              let message = `Object can not safely be stringified. Received type ${typeof value2}`;
+              if (typeof value2 !== "function") message += ` (${value2.toString()})`;
+              throw new Error(message);
+            };
+          }
+        }
+      }
+      function configure2(options) {
+        options = { ...options };
+        const fail2 = getStrictOption(options);
+        if (fail2) {
+          if (options.bigint === void 0) {
+            options.bigint = false;
+          }
+          if (!("circularValue" in options)) {
+            options.circularValue = Error;
+          }
+        }
+        const circularValue = getCircularValueOption(options);
+        const bigint = getBooleanOption(options, "bigint");
+        const deterministic = getDeterministicOption(options);
+        const comparator = typeof deterministic === "function" ? deterministic : void 0;
+        const maximumDepth = getPositiveIntegerOption(options, "maximumDepth");
+        const maximumBreadth = getPositiveIntegerOption(options, "maximumBreadth");
+        function stringifyFnReplacer(key, parent, stack, replacer, spacer, indentation) {
+          let value = parent[key];
+          if (typeof value === "object" && value !== null && typeof value.toJSON === "function") {
+            value = value.toJSON(key);
+          }
+          value = replacer.call(parent, key, value);
+          switch (typeof value) {
+            case "string":
+              return strEscape(value);
+            case "object": {
+              if (value === null) {
+                return "null";
+              }
+              if (stack.indexOf(value) !== -1) {
+                return circularValue;
+              }
+              let res = "";
+              let join = ",";
+              const originalIndentation = indentation;
+              if (Array.isArray(value)) {
+                if (value.length === 0) {
+                  return "[]";
+                }
+                if (maximumDepth < stack.length + 1) {
+                  return '"[Array]"';
+                }
+                stack.push(value);
+                if (spacer !== "") {
+                  indentation += spacer;
+                  res += `
+${indentation}`;
+                  join = `,
+${indentation}`;
+                }
+                const maximumValuesToStringify = Math.min(value.length, maximumBreadth);
+                let i = 0;
+                for (; i < maximumValuesToStringify - 1; i++) {
+                  const tmp2 = stringifyFnReplacer(String(i), value, stack, replacer, spacer, indentation);
+                  res += tmp2 !== void 0 ? tmp2 : "null";
+                  res += join;
+                }
+                const tmp = stringifyFnReplacer(String(i), value, stack, replacer, spacer, indentation);
+                res += tmp !== void 0 ? tmp : "null";
+                if (value.length - 1 > maximumBreadth) {
+                  const removedKeys = value.length - maximumBreadth - 1;
+                  res += `${join}"... ${getItemCount(removedKeys)} not stringified"`;
+                }
+                if (spacer !== "") {
+                  res += `
+${originalIndentation}`;
+                }
+                stack.pop();
+                return `[${res}]`;
+              }
+              let keys = Object.keys(value);
+              const keyLength = keys.length;
+              if (keyLength === 0) {
+                return "{}";
+              }
+              if (maximumDepth < stack.length + 1) {
+                return '"[Object]"';
+              }
+              let whitespace = "";
+              let separator = "";
+              if (spacer !== "") {
+                indentation += spacer;
+                join = `,
+${indentation}`;
+                whitespace = " ";
+              }
+              const maximumPropertiesToStringify = Math.min(keyLength, maximumBreadth);
+              if (deterministic && !isTypedArrayWithEntries(value)) {
+                keys = sort(keys, comparator);
+              }
+              stack.push(value);
+              for (let i = 0; i < maximumPropertiesToStringify; i++) {
+                const key2 = keys[i];
+                const tmp = stringifyFnReplacer(key2, value, stack, replacer, spacer, indentation);
+                if (tmp !== void 0) {
+                  res += `${separator}${strEscape(key2)}:${whitespace}${tmp}`;
+                  separator = join;
+                }
+              }
+              if (keyLength > maximumBreadth) {
+                const removedKeys = keyLength - maximumBreadth;
+                res += `${separator}"...":${whitespace}"${getItemCount(removedKeys)} not stringified"`;
+                separator = join;
+              }
+              if (spacer !== "" && separator.length > 1) {
+                res = `
+${indentation}${res}
+${originalIndentation}`;
+              }
+              stack.pop();
+              return `{${res}}`;
+            }
+            case "number":
+              return isFinite(value) ? String(value) : fail2 ? fail2(value) : "null";
+            case "boolean":
+              return value === true ? "true" : "false";
+            case "undefined":
+              return void 0;
+            case "bigint":
+              if (bigint) {
+                return String(value);
+              }
+            // fallthrough
+            default:
+              return fail2 ? fail2(value) : void 0;
+          }
+        }
+        function stringifyArrayReplacer(key, value, stack, replacer, spacer, indentation) {
+          if (typeof value === "object" && value !== null && typeof value.toJSON === "function") {
+            value = value.toJSON(key);
+          }
+          switch (typeof value) {
+            case "string":
+              return strEscape(value);
+            case "object": {
+              if (value === null) {
+                return "null";
+              }
+              if (stack.indexOf(value) !== -1) {
+                return circularValue;
+              }
+              const originalIndentation = indentation;
+              let res = "";
+              let join = ",";
+              if (Array.isArray(value)) {
+                if (value.length === 0) {
+                  return "[]";
+                }
+                if (maximumDepth < stack.length + 1) {
+                  return '"[Array]"';
+                }
+                stack.push(value);
+                if (spacer !== "") {
+                  indentation += spacer;
+                  res += `
+${indentation}`;
+                  join = `,
+${indentation}`;
+                }
+                const maximumValuesToStringify = Math.min(value.length, maximumBreadth);
+                let i = 0;
+                for (; i < maximumValuesToStringify - 1; i++) {
+                  const tmp2 = stringifyArrayReplacer(String(i), value[i], stack, replacer, spacer, indentation);
+                  res += tmp2 !== void 0 ? tmp2 : "null";
+                  res += join;
+                }
+                const tmp = stringifyArrayReplacer(String(i), value[i], stack, replacer, spacer, indentation);
+                res += tmp !== void 0 ? tmp : "null";
+                if (value.length - 1 > maximumBreadth) {
+                  const removedKeys = value.length - maximumBreadth - 1;
+                  res += `${join}"... ${getItemCount(removedKeys)} not stringified"`;
+                }
+                if (spacer !== "") {
+                  res += `
+${originalIndentation}`;
+                }
+                stack.pop();
+                return `[${res}]`;
+              }
+              stack.push(value);
+              let whitespace = "";
+              if (spacer !== "") {
+                indentation += spacer;
+                join = `,
+${indentation}`;
+                whitespace = " ";
+              }
+              let separator = "";
+              for (const key2 of replacer) {
+                const tmp = stringifyArrayReplacer(key2, value[key2], stack, replacer, spacer, indentation);
+                if (tmp !== void 0) {
+                  res += `${separator}${strEscape(key2)}:${whitespace}${tmp}`;
+                  separator = join;
+                }
+              }
+              if (spacer !== "" && separator.length > 1) {
+                res = `
+${indentation}${res}
+${originalIndentation}`;
+              }
+              stack.pop();
+              return `{${res}}`;
+            }
+            case "number":
+              return isFinite(value) ? String(value) : fail2 ? fail2(value) : "null";
+            case "boolean":
+              return value === true ? "true" : "false";
+            case "undefined":
+              return void 0;
+            case "bigint":
+              if (bigint) {
+                return String(value);
+              }
+            // fallthrough
+            default:
+              return fail2 ? fail2(value) : void 0;
+          }
+        }
+        function stringifyIndent(key, value, stack, spacer, indentation) {
+          switch (typeof value) {
+            case "string":
+              return strEscape(value);
+            case "object": {
+              if (value === null) {
+                return "null";
+              }
+              if (typeof value.toJSON === "function") {
+                value = value.toJSON(key);
+                if (typeof value !== "object") {
+                  return stringifyIndent(key, value, stack, spacer, indentation);
+                }
+                if (value === null) {
+                  return "null";
+                }
+              }
+              if (stack.indexOf(value) !== -1) {
+                return circularValue;
+              }
+              const originalIndentation = indentation;
+              if (Array.isArray(value)) {
+                if (value.length === 0) {
+                  return "[]";
+                }
+                if (maximumDepth < stack.length + 1) {
+                  return '"[Array]"';
+                }
+                stack.push(value);
+                indentation += spacer;
+                let res2 = `
+${indentation}`;
+                const join2 = `,
+${indentation}`;
+                const maximumValuesToStringify = Math.min(value.length, maximumBreadth);
+                let i = 0;
+                for (; i < maximumValuesToStringify - 1; i++) {
+                  const tmp2 = stringifyIndent(String(i), value[i], stack, spacer, indentation);
+                  res2 += tmp2 !== void 0 ? tmp2 : "null";
+                  res2 += join2;
+                }
+                const tmp = stringifyIndent(String(i), value[i], stack, spacer, indentation);
+                res2 += tmp !== void 0 ? tmp : "null";
+                if (value.length - 1 > maximumBreadth) {
+                  const removedKeys = value.length - maximumBreadth - 1;
+                  res2 += `${join2}"... ${getItemCount(removedKeys)} not stringified"`;
+                }
+                res2 += `
+${originalIndentation}`;
+                stack.pop();
+                return `[${res2}]`;
+              }
+              let keys = Object.keys(value);
+              const keyLength = keys.length;
+              if (keyLength === 0) {
+                return "{}";
+              }
+              if (maximumDepth < stack.length + 1) {
+                return '"[Object]"';
+              }
+              indentation += spacer;
+              const join = `,
+${indentation}`;
+              let res = "";
+              let separator = "";
+              let maximumPropertiesToStringify = Math.min(keyLength, maximumBreadth);
+              if (isTypedArrayWithEntries(value)) {
+                res += stringifyTypedArray(value, join, maximumBreadth);
+                keys = keys.slice(value.length);
+                maximumPropertiesToStringify -= value.length;
+                separator = join;
+              }
+              if (deterministic) {
+                keys = sort(keys, comparator);
+              }
+              stack.push(value);
+              for (let i = 0; i < maximumPropertiesToStringify; i++) {
+                const key2 = keys[i];
+                const tmp = stringifyIndent(key2, value[key2], stack, spacer, indentation);
+                if (tmp !== void 0) {
+                  res += `${separator}${strEscape(key2)}: ${tmp}`;
+                  separator = join;
+                }
+              }
+              if (keyLength > maximumBreadth) {
+                const removedKeys = keyLength - maximumBreadth;
+                res += `${separator}"...": "${getItemCount(removedKeys)} not stringified"`;
+                separator = join;
+              }
+              if (separator !== "") {
+                res = `
+${indentation}${res}
+${originalIndentation}`;
+              }
+              stack.pop();
+              return `{${res}}`;
+            }
+            case "number":
+              return isFinite(value) ? String(value) : fail2 ? fail2(value) : "null";
+            case "boolean":
+              return value === true ? "true" : "false";
+            case "undefined":
+              return void 0;
+            case "bigint":
+              if (bigint) {
+                return String(value);
+              }
+            // fallthrough
+            default:
+              return fail2 ? fail2(value) : void 0;
+          }
+        }
+        function stringifySimple(key, value, stack) {
+          switch (typeof value) {
+            case "string":
+              return strEscape(value);
+            case "object": {
+              if (value === null) {
+                return "null";
+              }
+              if (typeof value.toJSON === "function") {
+                value = value.toJSON(key);
+                if (typeof value !== "object") {
+                  return stringifySimple(key, value, stack);
+                }
+                if (value === null) {
+                  return "null";
+                }
+              }
+              if (stack.indexOf(value) !== -1) {
+                return circularValue;
+              }
+              let res = "";
+              const hasLength = value.length !== void 0;
+              if (hasLength && Array.isArray(value)) {
+                if (value.length === 0) {
+                  return "[]";
+                }
+                if (maximumDepth < stack.length + 1) {
+                  return '"[Array]"';
+                }
+                stack.push(value);
+                const maximumValuesToStringify = Math.min(value.length, maximumBreadth);
+                let i = 0;
+                for (; i < maximumValuesToStringify - 1; i++) {
+                  const tmp2 = stringifySimple(String(i), value[i], stack);
+                  res += tmp2 !== void 0 ? tmp2 : "null";
+                  res += ",";
+                }
+                const tmp = stringifySimple(String(i), value[i], stack);
+                res += tmp !== void 0 ? tmp : "null";
+                if (value.length - 1 > maximumBreadth) {
+                  const removedKeys = value.length - maximumBreadth - 1;
+                  res += `,"... ${getItemCount(removedKeys)} not stringified"`;
+                }
+                stack.pop();
+                return `[${res}]`;
+              }
+              let keys = Object.keys(value);
+              const keyLength = keys.length;
+              if (keyLength === 0) {
+                return "{}";
+              }
+              if (maximumDepth < stack.length + 1) {
+                return '"[Object]"';
+              }
+              let separator = "";
+              let maximumPropertiesToStringify = Math.min(keyLength, maximumBreadth);
+              if (hasLength && isTypedArrayWithEntries(value)) {
+                res += stringifyTypedArray(value, ",", maximumBreadth);
+                keys = keys.slice(value.length);
+                maximumPropertiesToStringify -= value.length;
+                separator = ",";
+              }
+              if (deterministic) {
+                keys = sort(keys, comparator);
+              }
+              stack.push(value);
+              for (let i = 0; i < maximumPropertiesToStringify; i++) {
+                const key2 = keys[i];
+                const tmp = stringifySimple(key2, value[key2], stack);
+                if (tmp !== void 0) {
+                  res += `${separator}${strEscape(key2)}:${tmp}`;
+                  separator = ",";
+                }
+              }
+              if (keyLength > maximumBreadth) {
+                const removedKeys = keyLength - maximumBreadth;
+                res += `${separator}"...":"${getItemCount(removedKeys)} not stringified"`;
+              }
+              stack.pop();
+              return `{${res}}`;
+            }
+            case "number":
+              return isFinite(value) ? String(value) : fail2 ? fail2(value) : "null";
+            case "boolean":
+              return value === true ? "true" : "false";
+            case "undefined":
+              return void 0;
+            case "bigint":
+              if (bigint) {
+                return String(value);
+              }
+            // fallthrough
+            default:
+              return fail2 ? fail2(value) : void 0;
+          }
+        }
+        function stringify4(value, replacer, space) {
+          if (arguments.length > 1) {
+            let spacer = "";
+            if (typeof space === "number") {
+              spacer = " ".repeat(Math.min(space, 10));
+            } else if (typeof space === "string") {
+              spacer = space.slice(0, 10);
+            }
+            if (replacer != null) {
+              if (typeof replacer === "function") {
+                return stringifyFnReplacer("", { "": value }, [], replacer, spacer, "");
+              }
+              if (Array.isArray(replacer)) {
+                return stringifyArrayReplacer("", value, [], getUniqueReplacerSet(replacer), spacer, "");
+              }
+            }
+            if (spacer.length !== 0) {
+              return stringifyIndent("", value, [], spacer, "");
+            }
+          }
+          return stringifySimple("", value, []);
+        }
+        return stringify4;
+      }
+    }
+  });
+
+  // src/auth.ts
+  var AUTH_CALLBACK_MESSAGE_TYPE = "ldbg:spacetime-auth-callback";
+  var AUTH_CALLBACK_PARAMETERS = [
+    "code",
+    "state",
+    "error",
+    "error_description",
+    "error_uri",
+    "iss",
+    "session_state"
+  ];
+  var DEFAULT_AUTH_CONFIG = {
+    clientId: "",
+    authorizationEndpoint: "https://auth.spacetimedb.com/oidc/auth",
+    tokenEndpoint: "https://auth.spacetimedb.com/oidc/token",
+    endSessionEndpoint: "https://auth.spacetimedb.com/oidc/session/end",
+    issuer: "https://auth.spacetimedb.com/oidc",
+    // offline_access asks for a refresh token. The identity token lasts only a
+    // short while and every reconnect presents it again, so without one a player
+    // whose connection drops after it has lapsed is signed out mid-match.
+    scopes: "openid profile email offline_access"
+  };
+  function resolveAuthConfig(overrides) {
+    return { ...DEFAULT_AUTH_CONFIG, ...overrides ?? {} };
+  }
+  function browserPageUrl(locationHref) {
+    const url = new URL(locationHref);
+    url.search = "";
+    url.hash = "";
+    return url.toString();
+  }
+  function createAuthCallbackMessage(callbackUrl) {
+    return { type: AUTH_CALLBACK_MESSAGE_TYPE, callbackUrl };
+  }
+  function authCallbackUrlFromMessage(value) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+    const candidate = value;
+    if (candidate.type !== AUTH_CALLBACK_MESSAGE_TYPE || typeof candidate.callbackUrl !== "string") return null;
+    try {
+      const url = new URL(candidate.callbackUrl);
+      if (!url.searchParams.has("code") && !url.searchParams.has("error")) return null;
+      return url.toString();
+    } catch {
+      return null;
+    }
+  }
+  function authCallbackTargetsRedirect(callbackUrl, redirectUri2) {
+    try {
+      const callback = new URL(callbackUrl);
+      const redirect = new URL(redirectUri2);
+      for (const parameter of AUTH_CALLBACK_PARAMETERS) callback.searchParams.delete(parameter);
+      return callback.toString() === redirect.toString();
+    } catch {
+      return false;
+    }
+  }
+  function buildAuthorizationUrl(config, redirectUri2, state, nonce, codeChallenge) {
+    const url = new URL(config.authorizationEndpoint);
+    url.searchParams.set("client_id", config.clientId);
+    url.searchParams.set("redirect_uri", redirectUri2);
+    url.searchParams.set("response_type", "code");
+    url.searchParams.set("scope", config.scopes);
+    url.searchParams.set("state", state);
+    url.searchParams.set("nonce", nonce);
+    url.searchParams.set("code_challenge", codeChallenge);
+    url.searchParams.set("code_challenge_method", "S256");
+    return url.toString();
+  }
+  function buildLogoutUrl(config, idTokenHint, defaultReturnUri) {
+    const url = new URL(config.endSessionEndpoint);
+    url.searchParams.set("client_id", config.clientId);
+    if (idTokenHint) url.searchParams.set("id_token_hint", idTokenHint);
+    const returnUri = config.postLogoutRedirectUri?.trim() || defaultReturnUri;
+    if (returnUri) url.searchParams.set("post_logout_redirect_uri", returnUri);
+    return url.toString();
+  }
+  function decodeJwtClaims(token) {
+    const payload = token.split(".")[1];
+    if (!payload) throw new Error("The identity token is malformed.");
+    const padded = payload.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(payload.length / 4) * 4, "=");
+    const binary = globalThis.atob(padded);
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    const parsed = JSON.parse(new TextDecoder().decode(bytes));
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("The identity token claims are malformed.");
+    }
+    return parsed;
+  }
+  function validateIdTokenClaims(claims, config, expectedNonce, nowSeconds = Math.floor(Date.now() / 1e3)) {
+    if (!claims.sub || typeof claims.sub !== "string") return "The identity token has no subject.";
+    if (claims.iss !== config.issuer) return "The identity token issuer is not trusted.";
+    const audiences = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
+    if (!audiences.includes(config.clientId)) return "The identity token was issued for another client.";
+    if (claims.nonce !== expectedNonce) return "The identity token nonce did not match the login request.";
+    if (typeof claims.exp !== "number" || claims.exp <= nowSeconds - 60) return "The identity token has expired.";
+    return null;
+  }
+  function validateRefreshedIdTokenClaims(claims, previous, config, nowSeconds = Math.floor(Date.now() / 1e3)) {
+    if (!claims.sub || typeof claims.sub !== "string") return "The identity token has no subject.";
+    if (!previous || claims.sub !== previous.sub) return "The renewed sign-in belongs to a different account.";
+    if (claims.iss !== config.issuer) return "The identity token issuer is not trusted.";
+    const audiences = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
+    if (!audiences.includes(config.clientId)) return "The identity token was issued for another client.";
+    if (typeof claims.exp !== "number" || claims.exp <= nowSeconds - 60) return "The identity token has expired.";
+    return null;
+  }
+  var TOKEN_REFRESH_LEAD_SECONDS = 5 * 60;
+  var TOKEN_REFRESH_MIN_DELAY_MS = 15 * 1e3;
+  function tokenRefreshDelayMs(expiresAtSeconds, nowMs = Date.now()) {
+    if (typeof expiresAtSeconds !== "number" || !Number.isFinite(expiresAtSeconds)) return null;
+    const due = (expiresAtSeconds - TOKEN_REFRESH_LEAD_SECONDS) * 1e3 - nowMs;
+    return Math.max(TOKEN_REFRESH_MIN_DELAY_MS, due);
+  }
+  function accountLabel(claims) {
+    if (!claims) return "SpacetimeAuth account";
+    for (const key of ["preferred_username", "name", "email"]) {
+      const value = claims[key];
+      if (typeof value === "string" && value.trim()) return value.trim();
+    }
+    return "SpacetimeAuth account";
+  }
+
+  // src/snapshot_domains.ts
+  function one(view) {
+    return { view, one: true };
+  }
+  function many(view) {
+    return { view, one: false };
+  }
+  var DOMAINS = {
+    profile: { group: "core", keys: { profile: one("myProfile"), profilePreferences: one("myProfilePreferences") } },
+    // The handling, controls, font and skin that follow the account between
+    // devices (docs/ACCOUNT_SETTINGS.md). A domain of its own rather than part of
+    // 'profile': the game reads it once per sign-in, and each save's echo would
+    // otherwise re-apply the whole profile and redraw every screen that shows it.
+    accountSettings: { group: "core", keys: { accountSettings: one("myAccountSettings") } },
+    // A new account's tutorial stage and its welcome vault (docs/ONBOARDING.md).
+    // Core, so the welcome is decided on the first frame after sign-in.
+    onboarding: {
+      group: "core",
+      keys: { onboarding: one("myOnboarding"), welcomeChest: one("myWelcomeChest") }
+    },
+    inventory: {
+      group: "core",
+      keys: {
+        inventory: many("myInventory"),
+        inventoryOrder: many("myInventoryOrder"),
+        equipment: many("myEquipment"),
+        equippedFood: many("myEquippedFood"),
+        equippedBoosts: many("myEquippedBoosts"),
+        // The policy on this player's gear, and what a Rugged Satchel last kept
+        // (rules version 42): both settled by the server, both for the results card.
+        gearInsurance: one("myGearInsurance"),
+        satchelKeep: one("mySatchelKeep"),
+        // And what a Slime Bag last kept (rules version 49): up to three entries.
+        slimeBagKeep: one("mySlimeBagKeep"),
+        // Enhanced pieces (docs/ENHANCEMENT_PLAN.md): one row each, in the bag,
+        // worn or listed, apart from the stacks.
+        gearInstances: many("myGearInstances"),
+        // Which of those pieces are broken, and what the last Dark death a
+        // monster caused did to the gear (repair.ts): the Repair Station's.
+        brokenGear: many("myBrokenGear"),
+        darkDeathLoss: one("myDarkDeathLoss")
+      }
+    },
+    upgrades: {
+      group: "core",
+      keys: { upgradeProgress: one("myUpgradeProgress"), upgradeUnlocks: many("myUpgradeUnlocks") }
+    },
+    run: { group: "core", keys: { activeRun: one("myActiveRun") } },
+    // Saved loadouts and builds (docs/RESPEC_AND_LOADOUTS.md): a handful of tiny
+    // rows each, changed only when the player saves one, so they ride the core
+    // subscription and are there for the quick swap before a run.
+    loadouts: { group: "core", keys: { loadouts: many("myLoadouts"), savedBuilds: many("mySavedBuilds") } },
+    // The loot seeds the server has handed over for the open run, one a kill, chest
+    // or vault (rules version 57, docs/SECURITY_FIX_PLAN.md batch 4): what the run's
+    // drops are rolled from, never known before the run has got there. Its own
+    // domain, so a seed arriving re-applies nothing else.
+    lootReveals: { group: "core", keys: { lootReveals: many("myRunLootReveals") } },
+    // The operator's notice to every player (docs/RELEASE_READINESS_PLAN.md T-4):
+    // maintenance, a wipe, "a new version is live". Anonymous and at most three
+    // rows, so it rides the core subscription and is there from the first patch.
+    serverNotices: { group: "core", keys: { serverNotices: many("serverNotices") } },
+    // Named for what was in it first. It is the durable RECORDS domain: the
+    // per-account bests and completions that outlive a run, whichever activity
+    // set them. A new record table belongs here rather than in a domain of its
+    // own -- they change once a run at most, and they arrive together.
+    dungeonProgress: {
+      group: "core",
+      keys: {
+        dungeonProgress: many("myDungeonProgress"),
+        endlessRecords: many("myEndlessRecords"),
+        farmRecords: many("myFarmRecords"),
+        // The Endless Dungeon's regions this account has been to
+        // (docs/ENDLESS_DUNGEON.md, "Discovery"): the Region Log's rows.
+        endlessRegions: many("myEndlessRegions"),
+        // The challenge skins earned (docs/BLOCK_SKINS_2.md): a record too,
+        // written once by a settlement at most.
+        skinUnlocks: many("mySkinUnlocks")
+      }
+    },
+    // The Collection Log (docs/COLLECTION_LOG_PLAN.md): every item an enemy's kill
+    // has dropped this account, and its kill count of each enemy. Core, because
+    // the in-run card asks it whether a drop is new. Not part of the records
+    // domain: a run that drops anything changes it, where a record changes rarely.
+    collection: {
+      group: "core",
+      keys: { collectionLog: many("myCollectionLog"), collectionKills: many("myCollectionKills") }
+    },
+    // Account badges (docs/BADGES.md): the ones held, the one shown, and the last
+    // other player whose badges were looked up. A handful of rows, changed when a
+    // goal is met, a badge is picked or a lookup answers, so they ride core.
+    badges: { group: "core", keys: { badges: many("myBadges"), badgeLookup: one("myBadgeLookup") } },
+    // A restricted account (docs/RESTRICTED_ACCOUNTS.md): the one row, or none.
+    // Core, so every screen knows on its first frame what to grey out.
+    restricted: { group: "core", keys: { restrictedAccount: one("myRestrictedAccount") } },
+    // The region diaries (docs/DIARIES.md): each task's value, the tiers claimed
+    // and the daily charts taken. A row moves when a run settles or a claim pays.
+    diaries: {
+      group: "core",
+      keys: {
+        diaryTasks: many("myDiaryTasks"),
+        diaryClaims: many("myDiaryClaims"),
+        diaryDailyCharts: many("myDiaryDailyCharts")
+      }
+    },
+    // The Arena's lobby and this player's duel record: both sender-scoped, both
+    // tiny, and both things that HAPPEN to a player -- somebody else takes up
+    // their listing -- so they ride the connection rather than a screen.
+    arenaDuels: { group: "darkDuel", keys: { duelLobby: one("myDuelLobby"), duelRecord: one("myDuelRecord") } },
+    // Co-op (docs/COOP_ENDLESS.md): the party this player is in, everybody in it,
+    // and their place in the quick-match queue. All three change because of
+    // somebody ELSE -- a partner found, a partner ready, a monster's health -- so
+    // they ride the connection. Always all three, so "no party" is an empty row.
+    // The party and its members arrive each as a core and a score view, joined
+    // back into the rows the old views sent (fight_rows.ts).
+    party: {
+      group: "party",
+      observes: ["myPartyCore", "myPartyScore", "myPartyMemberCore", "myPartyMemberScore", "myPartyQueue"],
+      built: ["party", "partyMembers", "partyQueue"]
+    },
+    // Every kill and chest the party has had, on a domain of its own: it grows
+    // through the run, and riding 'party' every monster's health tick re-sent it.
+    partySteps: { group: "party", keys: { partySteps: many("myPartySteps") } },
+    // A lobby's omens (docs/OMENS.md "Co-op"): each member's say and what the
+    // party would get if it started now. A domain of its own, so a partner
+    // flipping their toggle redraws the preview line and not the whole lobby.
+    partyOmens: { group: "party", keys: { partyOmens: many("myPartyOmens") } },
+    // The teammate's board for the mini card, rebuilt from the party's event rows
+    // the Farm's way (party_room.ts, docs/BACKEND_COST_AUDIT_3.md); Godot gets the
+    // rows the old views gave it, with no piece. Refreshed by the events and by
+    // the party's rows moving (party_room.ts follows them), so it observes none.
+    partyBoard: { group: "party", observes: [], built: ["partyBoards", "partyPieces"] },
+    // The board itself is the one whole-table projection here, so it is held only
+    // while the Duels screen is open, exactly as the storefront is.
+    duelBoard: { group: "duelBoard", keys: { duelListings: many("duelListings") } },
+    // Kept runs (docs/REPLAYS.md): the list, and the one being watched with its
+    // trace. Held only while the Replays page is open, so nothing about replays is
+    // sent at sign-in and a trace only when it is watched.
+    replays: { group: "replays", keys: { replays: many("myReplays"), watchedReplay: one("myWatchedReplay") } },
+    farmSession: {
+      group: "farm",
+      keys: { farmPvpSession: one("myFarmPvpSession"), farmPvpMember: one("myFarmPvpMemberV2") }
+    },
+    // The roster says who sits where; the boards are what the room's events
+    // rebuilt. Godot gets the rows the old views gave it.
+    farmBoard: {
+      group: "farm",
+      observes: ["opponentFarmRosterV2"],
+      built: ["farmOpponents", "farmOpponentPieces", "opponentFarmBoard", "opponentFarmPiece"]
+    },
+    // Refreshed by nothing since the room stopped sharing pieces in flight
+    // (docs/BACKEND_COST_AUDIT_3.md); kept so the wire contract and Godot's
+    // handling of it are unchanged. The roster it reads is observed for farmBoard.
+    farmPiece: { group: "farm", observes: [], built: ["farmOpponentPieces", "opponentFarmPiece"] },
+    farmAttacks: { group: "farm", keys: { farmPvpAttacks: many("myFarmPvpAttacks") } },
+    // What this player sent, and who the server landed it on: the only way the
+    // sender's screen can aim its garbage slam at the right rival. Its own domain:
+    // both lists grow through a round, and while they shared one every attack
+    // either way re-sent both, and Godot rebuilt the whole versus model for it.
+    farmSentAttacks: { group: "farm", keys: { farmPvpSentAttacks: many("mySentFarmPvpAttacks") } },
+    farmDarkHaul: { group: "farm", keys: { farmDarkHaul: many("myFarmDarkHaul") } },
+    playerCounts: {
+      group: "playerCounts",
+      keys: { farmPlayerCounts: many("farmPlayerCounts"), darkPlayerCount: many("darkPlayerCount") }
+    },
+    // The Slime King's best waves, solo and co-op (rules version 52): anonymous,
+    // tiny and shared, so it rides the counters' group.
+    slimeBoard: { group: "playerCounts", keys: { slimeBestWaves: many("slimeBestWaves") } },
+    market: { group: "market", keys: { marketListings: many("marketListings") } },
+    marketPrices: { group: "marketPrices", keys: { marketPrices: many("marketPriceGuide") } },
+    marketHistory: {
+      group: "marketHistory",
+      keys: {
+        marketTransactions: many("myMarketTransactions"),
+        // Always an array, so "no notice yet" is told apart from "not loaded".
+        marketSaleNotice: many("myMarketSaleNotice")
+      }
+    },
+    // All three always, so "no duel" reads as an empty list rather than as a
+    // domain that has not arrived: a screen cannot tell those apart, and one of
+    // them means somebody is swinging at you.
+    // The duel arrives as a core and a score view, joined back into the row the
+    // old view sent (fight_rows.ts).
+    darkDuel: {
+      group: "darkDuel",
+      observes: ["myDarkDuelCore", "myDarkDuelScore", "myDarkDuelBlows", "myDarkDuelHaul"],
+      built: ["darkDuel", "darkDuelBlows", "darkDuelHaul"]
+    },
+    // Whether this player is in the hunt, on a domain of its own: it changes as
+    // the run goes on, and riding darkDuel it re-sent the duel, every blow of the
+    // fight and the haul each time.
+    darkPresence: { group: "darkDuel", keys: { darkPresence: many("myDarkPresence") } },
+    // The Dark chests this player's run has drawn out of the pool of lost gear:
+    // the answer to open_dark_chest. A domain of its own so a claim does not
+    // re-send the whole duel.
+    darkChests: { group: "darkDuel", keys: { darkChestClaims: many("myDarkChestClaims") } },
+    // A duel win that was not proven, told to both sides (security batch 5): rare,
+    // and on its own domain so a notice re-sends nothing else.
+    duelNotices: { group: "darkDuel", keys: { duelNotices: many("myDuelNotices") } },
+    // The other player's board (at most one row, and only while a fight is on),
+    // on a domain of its own. It rode the darkDuel domain, so every pose they
+    // published -- up to five a second -- re-sent the duel row, EVERY blow of the
+    // fight so far, the haul and the presence row, and Godot re-applied the lot:
+    // health reconciled, blows re-walked, the combat panel refreshed, for a
+    // falling piece that moved one cell on a thumbnail. Godot still accepts a
+    // board inside a darkDuel patch, so an old bridge and a new client (or the
+    // reverse) agree during a deploy.
+    duelOpponentBoard: { group: "darkDuel", keys: { duelOpponentBoard: many("myDuelOpponentBoard") } },
+    // Their falling piece between board publishes (dark_duel_piece). Godot takes
+    // whichever of the board and this was written last.
+    duelOpponentPiece: { group: "darkDuel", keys: { duelOpponentPiece: many("myDuelOpponentPiece") } },
+    // Tasks and quests: the tasks this player holds, the chests they have turned
+    // in and not yet seen, and where every quest stands. Always all of them, so
+    // "none" reads as empty lists.
+    quests: {
+      group: "quests",
+      keys: {
+        tasks: many("myTasks"),
+        taskChests: many("myTaskChests"),
+        questProgress: many("myQuests"),
+        // What has been seen and what has been swapped: null for a player who has
+        // done neither, which the client reads as "nothing seen, nothing spent".
+        taskState: one("myTaskState"),
+        // When this player turned quests in, and their lifetime counters.
+        questClaims: many("myQuestClaims"),
+        questStats: many("myQuestStats"),
+        // The feats this player has claimed; their progress is questStats.
+        featClaims: many("myFeatClaims")
+      }
+    },
+    // The quest catalog and each quest's details (condition, chest tier, the
+    // experience it pays): static, read from no table, so sent when the quest
+    // subscription is applied and never again. They were in 'quests' and rode
+    // every patch of it -- ~48 KB and some two hundred JSON parses in Godot on
+    // every run's settlement, for rows that cannot have changed.
+    questCatalog: { group: "quests", keys: { questCatalog: many("questCatalog"), questDetails: many("questDetails") } },
+    // Bounties (docs/BOUNTIES.md): the hunter's row (Marks, record, the board's
+    // offers) and the bounty held. Null for a player who never opened the board.
+    // A domain of its own so a run's settlement re-sends these two rows, not the
+    // tasks beside them.
+    bounties: { group: "quests", keys: { bountyState: one("myBountyState"), bounty: one("myBounty") } },
+    // The Bounty shop's catalog and the rank ladder: static, read from no table,
+    // so sent once when the quest subscription applies (like questCatalog).
+    bountyShop: { group: "quests", keys: { bountyShop: many("bountyShop") } },
+    // Chat (docs/CHAT_PLAN.md). Global on a domain of its own: it is the one that
+    // moves when somebody anywhere speaks, and riding with the room it would
+    // re-send the room's lines too. The room's lines and the status (open, muted,
+    // which room) change together when the player walks into or out of a room.
+    // The blocks change when the player blocks somebody, and at no other time.
+    // All empty lists while chat is closed to the player, which the views decide.
+    chatGlobal: { group: "chat", keys: { chatGlobal: many("myChatGlobal") } },
+    chatRoom: { group: "chat", keys: { chatRoom: many("myChatRoom"), chatStatus: one("myChatStatus") } },
+    chatBlocks: { group: "chat", keys: { chatBlocks: many("myChatBlocks") } },
+    // Friends (docs/FRIENDS.md). The list and the player's own settings together:
+    // a friend coming online or changing what they are doing moves the list.
+    // Requests, recent players and invites each on a domain of their own, so an
+    // invite -- the one that moves while a player waits -- re-sends nothing else.
+    friends: { group: "friends", keys: { friends: many("myFriends"), friendSettings: many("myFriendSettings") } },
+    friendRequests: { group: "friends", keys: { friendRequests: many("myFriendRequests") } },
+    recentPlayers: { group: "friends", keys: { recentPlayers: many("myRecentPlayers") } },
+    gameInvites: { group: "friends", keys: { gameInvites: many("myGameInvites") } }
+  };
+  var CLIENT_SCREENS = {
+    /** The screen before Godot has said anything. */
+    title: "title",
+    /** Live Farm play: never idled out, and the Farm group is held. */
+    farm: "farm",
+    /** A finished Farm round: the Farm group is held, and an idle connection is released for good. */
+    farmRoundEnd: "farm_round_end",
+    /** The storefront is subscribed only here. */
+    store: "store",
+    /** The Duels board is subscribed only here. */
+    duels: "duels",
+    /** Kept runs are subscribed only here (docs/REPLAYS.md). */
+    replays: "replays"
+  };
+
+  // src/connection_lifecycle.ts
+  function listed(list, name) {
+    return list.includes(name);
+  }
+  var AFK_DISCONNECT_MS = 10 * 60 * 1e3;
+  var AFK_CHECK_INTERVAL_MS = 30 * 1e3;
+  function shouldEnterAfkIdle(state) {
+    if (!state.connected || !state.accountAuthenticated || state.authBusy) return false;
+    if (state.inactiveForMs < AFK_DISCONNECT_MS) return false;
+    if (state.clientScreen === CLIENT_SCREENS.farm) return false;
+    return true;
+  }
+  function shouldAutoResumeConnection(state) {
+    if (!state.accountAuthenticated || state.authBusy) return false;
+    return state.clientScreen.startsWith("farm") || !state.documentHidden;
+  }
+  var TOKEN_EXPIRY_SKEW_SECONDS = 60;
+  function isAccountTokenExpired(expiresAtSeconds, nowSeconds = Math.floor(Date.now() / 1e3)) {
+    if (typeof expiresAtSeconds !== "number" || !Number.isFinite(expiresAtSeconds)) return false;
+    return expiresAtSeconds <= nowSeconds - TOKEN_EXPIRY_SKEW_SECONDS;
+  }
+  var EXPIRED_SESSION_MESSAGE = "Your login expired. Open Account and log in again to keep playing.";
+  var SUPERSEDABLE_CALLS = [
+    "publishFarmBoard",
+    "publishFarmBoardV2",
+    "publishFarmPiece",
+    "publishDuelBoard",
+    "publishDuelPiece",
+    "publishPartyBoard",
+    "publishPartyBoardV2",
+    "publishPartyPiece",
+    // The whole settings document each time, so only the newest one matters.
+    "saveAccountSettings",
+    // The friends privacy settings, the same: all four each time.
+    "setFriendSettings",
+    // A lobby member's omens wish: only the last one they toggled to matters.
+    "setPartyOmens"
+  ];
+  var QUIET_SUCCESS_CALLS = [
+    "publishFarmBoard",
+    "publishFarmBoardV2",
+    "publishFarmPiece",
+    "publishDuelBoard",
+    "publishDuelPiece",
+    "sendFarmPvpAttack",
+    "sendDarkDuelBlow",
+    "refreshDarkPresence",
+    // Nothing in Godot waits on these succeeding; their answer is the rows they
+    // write. A failure is still reported.
+    "openDarkChest",
+    "refreshMyTasks",
+    "markTasksSeen",
+    "acknowledgeTaskChest",
+    "reportDuelBoardBreak",
+    "continueDarkRun",
+    // A ward handed to a fight (rules version 65): its answer is the duel row's
+    // shield going up. A Tranquil heal in one (rules version 66): its health.
+    "claimDuelWard",
+    "claimDuelTranquil",
+    "sendPartyBlow",
+    "reportPartyEnemyHeal",
+    "openPartyChest",
+    "reportPartyHealth",
+    // The blow that says which chance pushbacks came up, and the thorns sent
+    // back (rules version 66): answered by the party's rows.
+    "sendPartyBlowV2",
+    "sendPartyThorns",
+    "reportPartyDown",
+    "publishPartyBoard",
+    "publishPartyBoardV2",
+    "publishPartyPiece",
+    "sendPartyHeal",
+    "completePartyRevive",
+    "reportPartyReviveProgress",
+    // A lobby member's omens wish, sent as the lobby's toggle changes and with
+    // READY (rules version 66): its answer is the my_party_omens preview, and
+    // READY's own answer is what the party screen waits on.
+    "setPartyOmens",
+    // The echo of the row is the answer, and nobody reads even that past sign-in.
+    "saveAccountSettings",
+    // Chat: the line, the block or the report arrives as rows. A refusal still
+    // reports, and the chat box shows it on the line that was refused.
+    "sendChatMessage",
+    "blockChatAuthor",
+    "unblockChatPlayer",
+    "reportChatMessage",
+    // Friends: every answer is a row in a friends view. A refusal still reports.
+    "sendFriendRequest",
+    "sendFriendRequestRecent",
+    "respondFriendRequest",
+    "cancelFriendRequest",
+    "removeFriend",
+    "blockPlayer",
+    "reportPlayer",
+    "setFriendSettings",
+    "inviteFriend",
+    "respondInvite",
+    // A loot seed's answer is its row in my_run_loot_reveals, or nothing yet.
+    "revealRunLoot",
+    // A duel win's proof (rules version 58): its answer is the bag filling, or a
+    // report. A refusal still reports.
+    "verifyDarkDuelWin",
+    // Reading a duel notice: the notice going is the answer.
+    "acknowledgeDuelNotice"
+  ];
+  function reportsSuccess(name) {
+    return !listed(QUIET_SUCCESS_CALLS, name);
+  }
+  function mergeSnapshotRuns(events) {
+    const merged = [];
+    for (const event of events) {
+      const previous = merged[merged.length - 1];
+      if (event.type === "snapshot" && previous && previous.type === "snapshot") {
+        merged[merged.length - 1] = {
+          ...previous,
+          data: {
+            ...previous.data ?? {},
+            ...event.data ?? {}
+          }
+        };
+        continue;
+      }
+      merged.push(event);
+    }
+    return merged;
+  }
+  var MAX_PENDING_CALLS = 64;
+  var HELD_CALL_TIMEOUT_MS = 2e4;
+  function partitionExpiredCalls(queued, now, timeoutMs = HELD_CALL_TIMEOUT_MS) {
+    const kept = [];
+    const expired = [];
+    for (const call of queued) {
+      (now - call.queuedAt >= timeoutMs ? expired : kept).push(call);
+    }
+    return { kept, expired };
+  }
+  var BACKGROUND_CALLS = [
+    "claimPlaySession",
+    "renewPlaySession",
+    // Sent on the client's own schedule, not because the player did anything.
+    "reportRunSubmissionProblem",
+    "acknowledgeMarketSales",
+    // Freeze and crash reports, sent from the outbox on the client's schedule.
+    "reportClientProblem",
+    // A Dark run announces itself between encounters and swings on every clear.
+    // Every name the walk-in has had. Only the old one was listed once, so
+    // walking into a duel counted as the player being at the keyboard -- and then
+    // V3 (the food slot) went out unlisted and did it again. A new walk-in name
+    // goes on this list the day it is sent.
+    "refreshDarkPresence",
+    "sendDarkDuelBlow",
+    "enterDarkDuel",
+    "enterDarkDuelV2",
+    "enterDarkDuelV3",
+    "enterDarkDuelV4",
+    // The client deals its tasks on connect and at each reset, dismisses a chest's
+    // reveal when it closes, and marks tasks seen when the view shows them: none
+    // of it is the player doing anything.
+    "refreshMyTasks",
+    "acknowledgeTaskChest",
+    "markTasksSeen",
+    // A co-op run's clears, the Vampiric drinks its board feeds the party's
+    // monster, a chest press, its health and its board: all sent by the fight,
+    // not the player, and none worth replaying after a reconnect -- a lost hit
+    // only ever costs the sender, and settlement tolerates it. Rules version 66's
+    // blow and the thorns a monster's hit sent back are the same.
+    "sendPartyBlow",
+    "sendPartyBlowV2",
+    "sendPartyThorns",
+    "reportPartyEnemyHeal",
+    "openPartyChest",
+    "reportPartyHealth",
+    "reportPartyDown",
+    "publishPartyBoard",
+    "publishPartyBoardV2",
+    "publishPartyPiece",
+    // The fight's too (rules version 37): a Mending clear's heal for the partner,
+    // the revive a met challenge claims -- retried by the screen while the partner
+    // is still down -- and the challenge's count for the downed screen.
+    "sendPartyHeal",
+    "completePartyRevive",
+    "reportPartyReviveProgress",
+    // Sent a moment after a setting changes, and once at sign-in for an account
+    // that has never saved any (docs/ACCOUNT_SETTINGS.md): the client's timing.
+    "saveAccountSettings",
+    // A run asking for its loot seeds (rules version 57), on its own timer until
+    // each is answered: the fight's traffic, not the player's.
+    "revealRunLoot",
+    // Sent by the fight's end, not the player (rules version 58).
+    "verifyDarkDuelWin"
+  ];
+  function isBackgroundCall(name) {
+    return listed(BACKGROUND_CALLS, name);
+  }
+  function collapsePendingCalls(queued, maximum = MAX_PENDING_CALLS) {
+    const lastSupersedable = /* @__PURE__ */ new Map();
+    queued.forEach((call, index) => {
+      if (listed(SUPERSEDABLE_CALLS, call.name)) lastSupersedable.set(call.name, index);
+    });
+    const kept = queued.filter(
+      (call, index) => !listed(SUPERSEDABLE_CALLS, call.name) || lastSupersedable.get(call.name) === index
+    );
+    return kept.length <= maximum ? kept : kept.slice(kept.length - maximum);
+  }
+  function buildPatchPart(domain, build, report) {
+    try {
+      build();
+    } catch (error) {
+      report(domain, String(error));
+    }
+  }
+
+  // src/events.ts
+  var pendingEvents = [];
+  var MAX_PENDING_EVENTS = 512;
+  function emit(event) {
+    pendingEvents.push(event);
+    if (pendingEvents.length <= MAX_PENDING_EVENTS) return;
+    const overflow = pendingEvents.length - MAX_PENDING_EVENTS;
+    for (let removed = 0; removed < overflow; removed += 1) {
+      const index = pendingEvents.findIndex((pending) => pending.type !== "snapshot");
+      pendingEvents.splice(index === -1 ? 0 : index, 1);
+    }
+  }
+  function drainEvents() {
+    if (pendingEvents.length === 0) return "";
+    return JSON.stringify(mergeSnapshotRuns(pendingEvents.splice(0, pendingEvents.length)));
+  }
+
+  // src/state.ts
+  var live = {
+    /** The SDK connection whose core subscription is live or opening; null when there is none. */
+    connection: null,
+    /** Bumped by every disconnect, so callbacks from a connection already thrown away are ignored. */
+    connectionEpoch: 0,
+    /** The core subscription has been applied: the barrier every scoped group and held call waits for. */
+    coreSubscriptionReady: false,
+    /** A connection has been asked for and has neither opened nor failed yet. */
+    connectionOpening: false,
+    /** The connection was lost, not left: the next activity (or the backoff) opens it again. */
+    resumeNeeded: false,
+    /** The target Godot last asked to connect to; a resume reconnects to it. */
+    lastBackendRequest: null,
+    /** The screen Godot last reported (`setClientContext`): what the scoped groups follow. */
+    clientScreen: CLIENT_SCREENS.title
+  };
+
+  // node_modules/.pnpm/spacetimedb@2.8.2/node_modules/spacetimedb/dist/index.browser.mjs
+  var import_base64_js = __toESM(require_base64_js(), 1);
+
+  // node_modules/.pnpm/safe-stable-stringify@2.5.0/node_modules/safe-stable-stringify/esm/wrapper.js
+  var import__ = __toESM(require_safe_stable_stringify(), 1);
+  var configure = import__.default.configure;
+  var stringify = import__.default;
+
+  // node_modules/.pnpm/spacetimedb@2.8.2/node_modules/spacetimedb/dist/index.browser.mjs
+  var BinaryReader = class {
+    /**
+     * The DataView used to read values from the binary data.
+     *
+     * Note: The DataView's `byteOffset` is relative to the beginning of the
+     * underlying ArrayBuffer, not the start of the provided Uint8Array input.
+     * This `BinaryReader`'s `#offset` field is used to track the current read position
+     * relative to the start of the provided Uint8Array input.
+     */
+    view;
+    /**
+     * Represents the offset (in bytes) relative to the start of the DataView
+     * and provided Uint8Array input.
+     *
+     * Note: This is *not* the absolute byte offset within the underlying ArrayBuffer.
+     */
+    offset = 0;
+    constructor(input) {
+      this.view = input instanceof DataView ? input : new DataView(input.buffer, input.byteOffset, input.byteLength);
+      this.offset = 0;
+    }
+    reset(input) {
+      this.view = input instanceof DataView ? input : new DataView(input.buffer, input.byteOffset, input.byteLength);
+      this.offset = 0;
+    }
+    get remaining() {
+      return this.view.byteLength - this.offset;
+    }
+    /** Ensure we have at least `n` bytes left to read */
+    #ensure(n) {
+      if (this.offset + n > this.view.byteLength) {
+        throw new RangeError(
+          `Tried to read ${n} byte(s) at relative offset ${this.offset}, but only ${this.remaining} byte(s) remain`
+        );
+      }
+    }
+    readUInt8Array() {
+      const length = this.readU32();
+      this.#ensure(length);
+      return this.readBytes(length).slice();
+    }
+    readBool() {
+      const value = this.view.getUint8(this.offset);
+      this.offset += 1;
+      return value !== 0;
+    }
+    readByte() {
+      const value = this.view.getUint8(this.offset);
+      this.offset += 1;
+      return value;
+    }
+    readBytes(length) {
+      const array = new Uint8Array(
+        this.view.buffer,
+        this.view.byteOffset + this.offset,
+        length
+      );
+      this.offset += length;
+      return array;
+    }
+    readI8() {
+      const value = this.view.getInt8(this.offset);
+      this.offset += 1;
+      return value;
+    }
+    readU8() {
+      return this.readByte();
+    }
+    readI16() {
+      const value = this.view.getInt16(this.offset, true);
+      this.offset += 2;
+      return value;
+    }
+    readU16() {
+      const value = this.view.getUint16(this.offset, true);
+      this.offset += 2;
+      return value;
+    }
+    readI32() {
+      const value = this.view.getInt32(this.offset, true);
+      this.offset += 4;
+      return value;
+    }
+    readU32() {
+      const value = this.view.getUint32(this.offset, true);
+      this.offset += 4;
+      return value;
+    }
+    readI64() {
+      const value = this.view.getBigInt64(this.offset, true);
+      this.offset += 8;
+      return value;
+    }
+    readU64() {
+      const value = this.view.getBigUint64(this.offset, true);
+      this.offset += 8;
+      return value;
+    }
+    readU128() {
+      const lowerPart = this.view.getBigUint64(this.offset, true);
+      const upperPart = this.view.getBigUint64(this.offset + 8, true);
+      this.offset += 16;
+      return (upperPart << BigInt(64)) + lowerPart;
+    }
+    readI128() {
+      const lowerPart = this.view.getBigUint64(this.offset, true);
+      const upperPart = this.view.getBigInt64(this.offset + 8, true);
+      this.offset += 16;
+      return (upperPart << BigInt(64)) + lowerPart;
+    }
+    readU256() {
+      const p0 = this.view.getBigUint64(this.offset, true);
+      const p1 = this.view.getBigUint64(this.offset + 8, true);
+      const p2 = this.view.getBigUint64(this.offset + 16, true);
+      const p3 = this.view.getBigUint64(this.offset + 24, true);
+      this.offset += 32;
+      return (p3 << BigInt(3 * 64)) + (p2 << BigInt(2 * 64)) + (p1 << BigInt(1 * 64)) + p0;
+    }
+    readI256() {
+      const p0 = this.view.getBigUint64(this.offset, true);
+      const p1 = this.view.getBigUint64(this.offset + 8, true);
+      const p2 = this.view.getBigUint64(this.offset + 16, true);
+      const p3 = this.view.getBigInt64(this.offset + 24, true);
+      this.offset += 32;
+      return (p3 << BigInt(3 * 64)) + (p2 << BigInt(2 * 64)) + (p1 << BigInt(1 * 64)) + p0;
+    }
+    readF32() {
+      const value = this.view.getFloat32(this.offset, true);
+      this.offset += 4;
+      return value;
+    }
+    readF64() {
+      const value = this.view.getFloat64(this.offset, true);
+      this.offset += 8;
+      return value;
+    }
+    readString() {
+      const length = this.readU32();
+      this.#ensure(length);
+      const bytes = this.readBytes(length);
+      return new TextDecoder("utf-8").decode(bytes);
+    }
+  };
+  var ArrayBufferPrototypeTransfer = ArrayBuffer.prototype.transfer ?? function(newByteLength) {
+    if (newByteLength === void 0) {
+      return this.slice();
+    } else if (newByteLength <= this.byteLength) {
+      return this.slice(0, newByteLength);
+    } else {
+      const copy = new Uint8Array(newByteLength);
+      copy.set(new Uint8Array(this));
+      return copy.buffer;
+    }
+  };
+  var ResizableBuffer = class {
+    buffer;
+    view;
+    constructor(init) {
+      this.buffer = typeof init === "number" ? new ArrayBuffer(init) : init;
+      this.view = new DataView(this.buffer);
+    }
+    get capacity() {
+      return this.buffer.byteLength;
+    }
+    grow(newSize) {
+      if (newSize <= this.buffer.byteLength) return;
+      this.buffer = ArrayBufferPrototypeTransfer.call(this.buffer, newSize);
+      this.view = new DataView(this.buffer);
+    }
+  };
+  var BinaryWriter = class {
+    buffer;
+    offset = 0;
+    constructor(init) {
+      this.buffer = typeof init === "number" ? new ResizableBuffer(init) : init;
+    }
+    clear() {
+      this.offset = 0;
+    }
+    reset(buffer) {
+      this.buffer = buffer;
+      this.offset = 0;
+    }
+    expandBuffer(additionalCapacity) {
+      const minCapacity = this.offset + additionalCapacity + 1;
+      if (minCapacity <= this.buffer.capacity) return;
+      let newCapacity = this.buffer.capacity * 2;
+      if (newCapacity < minCapacity) newCapacity = minCapacity;
+      this.buffer.grow(newCapacity);
+    }
+    toBase64() {
+      return (0, import_base64_js.fromByteArray)(this.getBuffer());
+    }
+    getBuffer() {
+      return new Uint8Array(this.buffer.buffer, 0, this.offset);
+    }
+    get view() {
+      return this.buffer.view;
+    }
+    writeUInt8Array(value) {
+      const length = value.length;
+      this.expandBuffer(4 + length);
+      this.writeU32(length);
+      new Uint8Array(this.buffer.buffer, this.offset).set(value);
+      this.offset += length;
+    }
+    writeBool(value) {
+      this.expandBuffer(1);
+      this.view.setUint8(this.offset, value ? 1 : 0);
+      this.offset += 1;
+    }
+    writeByte(value) {
+      this.expandBuffer(1);
+      this.view.setUint8(this.offset, value);
+      this.offset += 1;
+    }
+    writeBytes(value) {
+      this.expandBuffer(value.length);
+      new Uint8Array(this.buffer.buffer, this.offset, value.length).set(value);
+      this.offset += value.length;
+    }
+    writeI8(value) {
+      this.expandBuffer(1);
+      this.view.setInt8(this.offset, value);
+      this.offset += 1;
+    }
+    writeU8(value) {
+      this.expandBuffer(1);
+      this.view.setUint8(this.offset, value);
+      this.offset += 1;
+    }
+    writeI16(value) {
+      this.expandBuffer(2);
+      this.view.setInt16(this.offset, value, true);
+      this.offset += 2;
+    }
+    writeU16(value) {
+      this.expandBuffer(2);
+      this.view.setUint16(this.offset, value, true);
+      this.offset += 2;
+    }
+    writeI32(value) {
+      this.expandBuffer(4);
+      this.view.setInt32(this.offset, value, true);
+      this.offset += 4;
+    }
+    writeU32(value) {
+      this.expandBuffer(4);
+      this.view.setUint32(this.offset, value, true);
+      this.offset += 4;
+    }
+    writeI64(value) {
+      this.expandBuffer(8);
+      this.view.setBigInt64(this.offset, value, true);
+      this.offset += 8;
+    }
+    writeU64(value) {
+      this.expandBuffer(8);
+      this.view.setBigUint64(this.offset, value, true);
+      this.offset += 8;
+    }
+    writeU128(value) {
+      this.expandBuffer(16);
+      const lowerPart = value & BigInt("0xFFFFFFFFFFFFFFFF");
+      const upperPart = value >> BigInt(64);
+      this.view.setBigUint64(this.offset, lowerPart, true);
+      this.view.setBigUint64(this.offset + 8, upperPart, true);
+      this.offset += 16;
+    }
+    writeI128(value) {
+      this.expandBuffer(16);
+      const lowerPart = value & BigInt("0xFFFFFFFFFFFFFFFF");
+      const upperPart = value >> BigInt(64);
+      this.view.setBigInt64(this.offset, lowerPart, true);
+      this.view.setBigInt64(this.offset + 8, upperPart, true);
+      this.offset += 16;
+    }
+    writeU256(value) {
+      this.expandBuffer(32);
+      const low_64_mask = BigInt("0xFFFFFFFFFFFFFFFF");
+      const p0 = value & low_64_mask;
+      const p1 = value >> BigInt(64 * 1) & low_64_mask;
+      const p2 = value >> BigInt(64 * 2) & low_64_mask;
+      const p3 = value >> BigInt(64 * 3);
+      this.view.setBigUint64(this.offset + 8 * 0, p0, true);
+      this.view.setBigUint64(this.offset + 8 * 1, p1, true);
+      this.view.setBigUint64(this.offset + 8 * 2, p2, true);
+      this.view.setBigUint64(this.offset + 8 * 3, p3, true);
+      this.offset += 32;
+    }
+    writeI256(value) {
+      this.expandBuffer(32);
+      const low_64_mask = BigInt("0xFFFFFFFFFFFFFFFF");
+      const p0 = value & low_64_mask;
+      const p1 = value >> BigInt(64 * 1) & low_64_mask;
+      const p2 = value >> BigInt(64 * 2) & low_64_mask;
+      const p3 = value >> BigInt(64 * 3);
+      this.view.setBigUint64(this.offset + 8 * 0, p0, true);
+      this.view.setBigUint64(this.offset + 8 * 1, p1, true);
+      this.view.setBigUint64(this.offset + 8 * 2, p2, true);
+      this.view.setBigInt64(this.offset + 8 * 3, p3, true);
+      this.offset += 32;
+    }
+    writeF32(value) {
+      this.expandBuffer(4);
+      this.view.setFloat32(this.offset, value, true);
+      this.offset += 4;
+    }
+    writeF64(value) {
+      this.expandBuffer(8);
+      this.view.setFloat64(this.offset, value, true);
+      this.offset += 8;
+    }
+    writeString(value) {
+      const encoder = new TextEncoder();
+      const encodedString = encoder.encode(value);
+      this.writeUInt8Array(encodedString);
+    }
+  };
+  function deepEqual(obj1, obj2) {
+    if (obj1 === obj2) return true;
+    if (typeof obj1 !== "object" || obj1 === null || typeof obj2 !== "object" || obj2 === null) {
+      return false;
+    }
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length !== keys2.length) return false;
+    for (const key of keys1) {
+      if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key])) {
+        return false;
+      }
+    }
+    return true;
+  }
+  function uint8ArrayToHexString(array) {
+    return Array.prototype.map.call(array.reverse(), (x) => ("00" + x.toString(16)).slice(-2)).join("");
+  }
+  function uint8ArrayToU128(array) {
+    if (array.length != 16) {
+      throw new Error(`Uint8Array is not 16 bytes long: ${array}`);
+    }
+    return new BinaryReader(array).readU128();
+  }
+  function uint8ArrayToU256(array) {
+    if (array.length != 32) {
+      throw new Error(`Uint8Array is not 32 bytes long: [${array}]`);
+    }
+    return new BinaryReader(array).readU256();
+  }
+  function hexStringToUint8Array(str) {
+    if (str.startsWith("0x")) {
+      str = str.slice(2);
+    }
+    const matches = str.match(/.{1,2}/g) || [];
+    const data = Uint8Array.from(
+      matches.map((byte) => parseInt(byte, 16))
+    );
+    return data.reverse();
+  }
+  function hexStringToU128(str) {
+    return uint8ArrayToU128(hexStringToUint8Array(str));
+  }
+  function hexStringToU256(str) {
+    return uint8ArrayToU256(hexStringToUint8Array(str));
+  }
+  function u128ToUint8Array(data) {
+    const writer = new BinaryWriter(16);
+    writer.writeU128(data);
+    return writer.getBuffer();
+  }
+  function u128ToHexString(data) {
+    return uint8ArrayToHexString(u128ToUint8Array(data));
+  }
+  function u256ToUint8Array(data) {
+    const writer = new BinaryWriter(32);
+    writer.writeU256(data);
+    return writer.getBuffer();
+  }
+  function u256ToHexString(data) {
+    return uint8ArrayToHexString(u256ToUint8Array(data));
+  }
+  function coerceToBigInt(value, what) {
+    if (typeof value === "bigint") return value;
+    if (typeof value === "number") return BigInt(value);
+    if (typeof value === "string" && value.trim() !== "") return BigInt(value);
+    throw new TypeError(
+      `Cannot convert ${typeof value} to ${what}: expected bigint, integer number, or decimal string`
+    );
+  }
+  function toPascalCase(s) {
+    const str = toCamelCase(s);
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  function toCamelCase(s) {
+    const str = s.replace(/[-_]+/g, "_").replace(/_([a-zA-Z0-9])/g, (_, c) => c.toUpperCase());
+    return str.charAt(0).toLowerCase() + str.slice(1);
+  }
+  var hasOwn = Object.hasOwn;
+  var TimeDuration = class _TimeDuration {
+    __time_duration_micros__;
+    static MICROS_PER_MILLIS = 1000n;
+    /**
+     * Get the algebraic type representation of the {@link TimeDuration} type.
+     * @returns The algebraic type representation of the type.
+     */
+    static getAlgebraicType() {
+      return AlgebraicType.Product({
+        elements: [
+          {
+            name: "__time_duration_micros__",
+            algebraicType: AlgebraicType.I64
+          }
+        ]
+      });
+    }
+    static isTimeDuration(algebraicType) {
+      if (algebraicType.tag !== "Product") {
+        return false;
+      }
+      const elements = algebraicType.value.elements;
+      if (elements.length !== 1) {
+        return false;
+      }
+      const microsElement = elements[0];
+      return microsElement.name === "__time_duration_micros__" && microsElement.algebraicType.tag === "I64";
+    }
+    get micros() {
+      return this.__time_duration_micros__;
+    }
+    get millis() {
+      return Number(this.micros / _TimeDuration.MICROS_PER_MILLIS);
+    }
+    constructor(micros) {
+      this.__time_duration_micros__ = coerceToBigInt(micros, "TimeDuration");
+    }
+    static fromMillis(millis) {
+      return new _TimeDuration(BigInt(millis) * _TimeDuration.MICROS_PER_MILLIS);
+    }
+    /** This outputs the same string format that we use in the host and in Rust modules */
+    toString() {
+      const micros = this.micros;
+      const sign = micros < 0 ? "-" : "+";
+      const pos = micros < 0 ? -micros : micros;
+      const secs = pos / 1000000n;
+      const micros_remaining = pos % 1000000n;
+      return `${sign}${secs}.${String(micros_remaining).padStart(6, "0")}`;
+    }
+  };
+  var Timestamp = class _Timestamp {
+    __timestamp_micros_since_unix_epoch__;
+    static MICROS_PER_MILLIS = 1000n;
+    get microsSinceUnixEpoch() {
+      return this.__timestamp_micros_since_unix_epoch__;
+    }
+    constructor(micros) {
+      this.__timestamp_micros_since_unix_epoch__ = coerceToBigInt(
+        micros,
+        "Timestamp"
+      );
+    }
+    /**
+     * Get the algebraic type representation of the {@link Timestamp} type.
+     * @returns The algebraic type representation of the type.
+     */
+    static getAlgebraicType() {
+      return AlgebraicType.Product({
+        elements: [
+          {
+            name: "__timestamp_micros_since_unix_epoch__",
+            algebraicType: AlgebraicType.I64
+          }
+        ]
+      });
+    }
+    static isTimestamp(algebraicType) {
+      if (algebraicType.tag !== "Product") {
+        return false;
+      }
+      const elements = algebraicType.value.elements;
+      if (elements.length !== 1) {
+        return false;
+      }
+      const microsElement = elements[0];
+      return microsElement.name === "__timestamp_micros_since_unix_epoch__" && microsElement.algebraicType.tag === "I64";
+    }
+    /**
+     * The Unix epoch, the midnight at the beginning of January 1, 1970, UTC.
+     */
+    static UNIX_EPOCH = new _Timestamp(0n);
+    /**
+     * Get a `Timestamp` representing the execution environment's belief of the current moment in time.
+     */
+    static now() {
+      return _Timestamp.fromDate(/* @__PURE__ */ new Date());
+    }
+    /** Convert to milliseconds since Unix epoch. */
+    toMillis() {
+      return this.microsSinceUnixEpoch / 1000n;
+    }
+    /**
+     * Get a `Timestamp` representing the same point in time as `date`.
+     */
+    static fromDate(date) {
+      const millis = date.getTime();
+      const micros = BigInt(millis) * _Timestamp.MICROS_PER_MILLIS;
+      return new _Timestamp(micros);
+    }
+    /**
+     * Get a `Date` representing approximately the same point in time as `this`.
+     *
+     * This method truncates to millisecond precision,
+     * and throws `RangeError` if the `Timestamp` is outside the range representable as a `Date`.
+     */
+    toDate() {
+      const micros = this.__timestamp_micros_since_unix_epoch__;
+      const millis = micros / _Timestamp.MICROS_PER_MILLIS;
+      if (millis > BigInt(Number.MAX_SAFE_INTEGER) || millis < BigInt(Number.MIN_SAFE_INTEGER)) {
+        throw new RangeError(
+          "Timestamp is outside of the representable range of JS's Date"
+        );
+      }
+      return new Date(Number(millis));
+    }
+    /**
+     * Get an ISO 8601 / RFC 3339 formatted string representation of this timestamp with microsecond precision.
+     *
+     * This method preserves the full microsecond precision of the timestamp,
+     * and throws `RangeError` if the `Timestamp` is outside the range representable in ISO format.
+     *
+     * @returns ISO 8601 formatted string with microsecond precision (e.g., '2025-02-17T10:30:45.123456Z')
+     */
+    toISOString() {
+      const micros = this.__timestamp_micros_since_unix_epoch__;
+      const millis = micros / _Timestamp.MICROS_PER_MILLIS;
+      if (millis > BigInt(Number.MAX_SAFE_INTEGER) || millis < BigInt(Number.MIN_SAFE_INTEGER)) {
+        throw new RangeError(
+          "Timestamp is outside of the representable range for ISO string formatting"
+        );
+      }
+      const date = new Date(Number(millis));
+      const isoBase = date.toISOString();
+      const microsRemainder = Math.abs(Number(micros % 1000000n));
+      const fractionalPart = String(microsRemainder).padStart(6, "0");
+      return isoBase.replace(/\.\d{3}Z$/, `.${fractionalPart}Z`);
+    }
+    since(other) {
+      return new TimeDuration(
+        this.__timestamp_micros_since_unix_epoch__ - other.__timestamp_micros_since_unix_epoch__
+      );
+    }
+  };
+  var Uuid = class _Uuid {
+    __uuid__;
+    /**
+     * The nil UUID (all zeros).
+     *
+     * @example
+     * ```ts
+     * const uuid = Uuid.NIL;
+     * console.assert(
+     *   uuid.toString() === "00000000-0000-0000-0000-000000000000"
+     * );
+     * ```
+     */
+    static NIL = new _Uuid(0n);
+    static MAX_UUID_BIGINT = 0xffffffffffffffffffffffffffffffffn;
+    /**
+     * The max UUID (all ones).
+     *
+     * @example
+     * ```ts
+     * const uuid = Uuid.MAX;
+     * console.assert(
+     *   uuid.toString() === "ffffffff-ffff-ffff-ffff-ffffffffffff"
+     * );
+     * ```
+     */
+    static MAX = new _Uuid(_Uuid.MAX_UUID_BIGINT);
+    /**
+     * Create a UUID from a raw 128-bit value.
+     *
+     * @param u - Unsigned 128-bit integer
+     * @throws {Error} If the value is outside the valid UUID range
+     */
+    constructor(u) {
+      const v = coerceToBigInt(u, "Uuid");
+      if (v < 0n || v > _Uuid.MAX_UUID_BIGINT) {
+        throw new Error("Invalid UUID: must be between 0 and `MAX_UUID_BIGINT`");
+      }
+      this.__uuid__ = v;
+    }
+    /**
+     * Create a UUID `v4` from explicit random bytes.
+     *
+     * This method assumes the bytes are already sufficiently random.
+     * It only sets the appropriate bits for the UUID version and variant.
+     *
+     * @param bytes - Exactly 16 random bytes
+     * @returns A UUID `v4`
+     * @throws {Error} If `bytes.length !== 16`
+     *
+     * @example
+     * ```ts
+     * const randomBytes = new Uint8Array(16);
+     * const uuid = Uuid.fromRandomBytesV4(randomBytes);
+     *
+     * console.assert(
+     *   uuid.toString() === "00000000-0000-4000-8000-000000000000"
+     * );
+     * ```
+     */
+    static fromRandomBytesV4(bytes) {
+      if (bytes.length !== 16) throw new Error("UUID v4 requires 16 bytes");
+      const arr = new Uint8Array(bytes);
+      arr[6] = arr[6] & 15 | 64;
+      arr[8] = arr[8] & 63 | 128;
+      return new _Uuid(_Uuid.bytesToBigInt(arr));
+    }
+    /**
+     * Generate a UUID `v7` using a monotonic counter from `0` to `2^31 - 1`,
+     * a timestamp, and 4 random bytes.
+     *
+     * The counter wraps around on overflow.
+     *
+     * The UUID `v7` is structured as follows:
+     *
+     * ```ascii
+     * ┌───────────────────────────────────────────────┬───────────────────┐
+     * | B0  | B1  | B2  | B3  | B4  | B5              |         B6        |
+     * ├───────────────────────────────────────────────┼───────────────────┤
+     * |                 unix_ts_ms                    |      version 7    |
+     * └───────────────────────────────────────────────┴───────────────────┘
+     * ┌──────────────┬─────────┬──────────────────┬───────────────────────┐
+     * | B7           | B8      | B9  | B10 | B11  | B12 | B13 | B14 | B15 |
+     * ├──────────────┼─────────┼──────────────────┼───────────────────────┤
+     * | counter_high | variant |    counter_low   |        random         |
+     * └──────────────┴─────────┴──────────────────┴───────────────────────┘
+     * ```
+     *
+     * @param counter - Mutable monotonic counter (31-bit)
+     * @param now - Timestamp since the Unix epoch
+     * @param randomBytes - Exactly 4 random bytes
+     * @returns A UUID `v7`
+     *
+     * @throws {Error} If the `counter` is negative
+     * @throws {Error} If the `timestamp` is before the Unix epoch
+     * @throws {Error} If `randomBytes.length !== 4`
+     *
+     * @example
+     * ```ts
+     * const now = Timestamp.fromMillis(1_686_000_000_000n);
+     * const counter = { value: 1 };
+     * const randomBytes = new Uint8Array(4);
+     *
+     * const uuid = Uuid.fromCounterV7(counter, now, randomBytes);
+     *
+     * console.assert(
+     *   uuid.toString() === "0000647e-5180-7000-8000-000200000000"
+     * );
+     * ```
+     */
+    static fromCounterV7(counter, now, randomBytes) {
+      if (randomBytes.length !== 4) {
+        throw new Error("`fromCounterV7` requires `randomBytes.length == 4`");
+      }
+      if (counter.value < 0) {
+        throw new Error("`fromCounterV7` uuid `counter` must be non-negative");
+      }
+      if (now.__timestamp_micros_since_unix_epoch__ < 0) {
+        throw new Error("`fromCounterV7` `timestamp` before unix epoch");
+      }
+      const counterVal = counter.value;
+      counter.value = counterVal + 1 & 2147483647;
+      const tsMs = now.toMillis() & 0xffffffffffffn;
+      const bytes = new Uint8Array(16);
+      bytes[0] = Number(tsMs >> 40n & 0xffn);
+      bytes[1] = Number(tsMs >> 32n & 0xffn);
+      bytes[2] = Number(tsMs >> 24n & 0xffn);
+      bytes[3] = Number(tsMs >> 16n & 0xffn);
+      bytes[4] = Number(tsMs >> 8n & 0xffn);
+      bytes[5] = Number(tsMs & 0xffn);
+      bytes[7] = counterVal >>> 23 & 255;
+      bytes[9] = counterVal >>> 15 & 255;
+      bytes[10] = counterVal >>> 7 & 255;
+      bytes[11] = (counterVal & 127) << 1 & 255;
+      bytes[12] |= randomBytes[0] & 127;
+      bytes[13] = randomBytes[1];
+      bytes[14] = randomBytes[2];
+      bytes[15] = randomBytes[3];
+      bytes[6] = bytes[6] & 15 | 112;
+      bytes[8] = bytes[8] & 63 | 128;
+      return new _Uuid(_Uuid.bytesToBigInt(bytes));
+    }
+    /**
+     * Parse a UUID from a string representation.
+     *
+     * @param s - UUID string
+     * @returns Parsed UUID
+     * @throws {Error} If the string is not a valid UUID
+     *
+     * @example
+     * ```ts
+     * const s = "01888d6e-5c00-7000-8000-000000000000";
+     * const uuid = Uuid.parse(s);
+     *
+     * console.assert(uuid.toString() === s);
+     * ```
+     */
+    static parse(s) {
+      const hex = s.replace(/-/g, "");
+      if (hex.length !== 32) throw new Error("Invalid hex UUID");
+      let v = 0n;
+      for (let i = 0; i < 32; i += 2) {
+        v = v << 8n | BigInt(parseInt(hex.slice(i, i + 2), 16));
+      }
+      return new _Uuid(v);
+    }
+    /** Convert to hex string without a 0x prefix. */
+    toHexString() {
+      return u128ToHexString(this.asBigInt());
+    }
+    /** Convert to string (hyphenated form). */
+    toString() {
+      const hex = this.toHexString();
+      return hex.slice(0, 8) + "-" + hex.slice(8, 12) + "-" + hex.slice(12, 16) + "-" + hex.slice(16, 20) + "-" + hex.slice(20);
+    }
+    /** Convert to bigint (u128). */
+    asBigInt() {
+      return this.__uuid__;
+    }
+    /** Return a `Uint8Array` of 16 bytes. */
+    toBytes() {
+      return _Uuid.bigIntToBytes(this.__uuid__);
+    }
+    static bytesToBigInt(bytes) {
+      let result = 0n;
+      for (const b of bytes) result = result << 8n | BigInt(b);
+      return result;
+    }
+    static bigIntToBytes(value) {
+      const bytes = new Uint8Array(16);
+      for (let i = 15; i >= 0; i--) {
+        bytes[i] = Number(value & 0xffn);
+        value >>= 8n;
+      }
+      return bytes;
+    }
+    /**
+     * Returns the version of this UUID.
+     *
+     * This represents the algorithm used to generate the value.
+     *
+     * @returns A `UuidVersion`
+     * @throws {Error} If the version field is not recognized
+     */
+    getVersion() {
+      const version = this.toBytes()[6] >> 4 & 15;
+      switch (version) {
+        case 4:
+          return "V4";
+        case 7:
+          return "V7";
+        default:
+          if (this == _Uuid.NIL) {
+            return "Nil";
+          }
+          if (this == _Uuid.MAX) {
+            return "Max";
+          }
+          throw new Error(`Unsupported UUID version: ${version}`);
+      }
+    }
+    /**
+     * Extract the monotonic counter from a UUIDv7.
+     *
+     * Intended for testing and diagnostics.
+     * Behavior is undefined if called on a non-V7 UUID.
+     *
+     * @returns 31-bit counter value
+     */
+    getCounter() {
+      const bytes = this.toBytes();
+      const high = bytes[7];
+      const mid1 = bytes[9];
+      const mid2 = bytes[10];
+      const low = bytes[11] >>> 1;
+      return high << 23 | mid1 << 15 | mid2 << 7 | low | 0;
+    }
+    compareTo(other) {
+      if (this.__uuid__ < other.__uuid__) return -1;
+      if (this.__uuid__ > other.__uuid__) return 1;
+      return 0;
+    }
+    static getAlgebraicType() {
+      return AlgebraicType.Product({
+        elements: [
+          {
+            name: "__uuid__",
+            algebraicType: AlgebraicType.U128
+          }
+        ]
+      });
+    }
+  };
+  var Identity = class _Identity {
+    __identity__;
+    /**
+     * Creates a new `Identity`.
+     *
+     * `data` can be a hexadecimal string or a `bigint`.
+     */
+    constructor(data) {
+      this.__identity__ = typeof data === "string" ? hexStringToU256(data) : coerceToBigInt(data, "Identity");
+    }
+    /**
+     * Get the algebraic type representation of the {@link Identity} type.
+     * @returns The algebraic type representation of the type.
+     */
+    static getAlgebraicType() {
+      return AlgebraicType.Product({
+        elements: [{ name: "__identity__", algebraicType: AlgebraicType.U256 }]
+      });
+    }
+    /**
+     * Check if two identities are equal.
+     */
+    isEqual(other) {
+      return this.toHexString() === other.toHexString();
+    }
+    /**
+     * Check if two identities are equal.
+     */
+    equals(other) {
+      return this.isEqual(other);
+    }
+    /**
+     * Print the identity as a hexadecimal string.
+     */
+    toHexString() {
+      return u256ToHexString(this.__identity__);
+    }
+    /**
+     * Convert the address to a Uint8Array.
+     */
+    toUint8Array() {
+      return u256ToUint8Array(this.__identity__);
+    }
+    /**
+     * Parse an Identity from a hexadecimal string.
+     */
+    static fromString(str) {
+      return new _Identity(str);
+    }
+    /**
+     * Zero identity (0x0000000000000000000000000000000000000000000000000000000000000000)
+     */
+    static zero() {
+      return new _Identity(0n);
+    }
+    toString() {
+      return this.toHexString();
+    }
+  };
+  var SERIALIZERS = /* @__PURE__ */ new Map();
+  var DESERIALIZERS = /* @__PURE__ */ new Map();
+  var AlgebraicType = {
+    Ref: (value) => ({ tag: "Ref", value }),
+    Sum: (value) => ({
+      tag: "Sum",
+      value
+    }),
+    Product: (value) => ({
+      tag: "Product",
+      value
+    }),
+    Array: (value) => ({
+      tag: "Array",
+      value
+    }),
+    String: { tag: "String" },
+    Bool: { tag: "Bool" },
+    I8: { tag: "I8" },
+    U8: { tag: "U8" },
+    I16: { tag: "I16" },
+    U16: { tag: "U16" },
+    I32: { tag: "I32" },
+    U32: { tag: "U32" },
+    I64: { tag: "I64" },
+    U64: { tag: "U64" },
+    I128: { tag: "I128" },
+    U128: { tag: "U128" },
+    I256: { tag: "I256" },
+    U256: { tag: "U256" },
+    F32: { tag: "F32" },
+    F64: { tag: "F64" },
+    makeSerializer(ty, typespace) {
+      if (ty.tag === "Ref") {
+        if (!typespace)
+          throw new Error("cannot serialize refs without a typespace");
+        while (ty.tag === "Ref") ty = typespace.types[ty.value];
+      }
+      switch (ty.tag) {
+        case "Product":
+          return ProductType.makeSerializer(ty.value, typespace);
+        case "Sum":
+          return SumType.makeSerializer(ty.value, typespace);
+        case "Array":
+          if (ty.value.tag === "U8") {
+            return serializeUint8Array;
+          } else {
+            const serialize = AlgebraicType.makeSerializer(ty.value, typespace);
+            return (writer, value) => {
+              writer.writeU32(value.length);
+              for (const elem of value) {
+                serialize(writer, elem);
+              }
+            };
+          }
+        default:
+          return primitiveSerializers[ty.tag];
+      }
+    },
+    /** @deprecated Use `makeSerializer` instead. */
+    serializeValue(writer, ty, value, typespace) {
+      AlgebraicType.makeSerializer(ty, typespace)(writer, value);
+    },
+    makeDeserializer(ty, typespace) {
+      if (ty.tag === "Ref") {
+        if (!typespace)
+          throw new Error("cannot deserialize refs without a typespace");
+        while (ty.tag === "Ref") ty = typespace.types[ty.value];
+      }
+      switch (ty.tag) {
+        case "Product":
+          return ProductType.makeDeserializer(ty.value, typespace);
+        case "Sum":
+          return SumType.makeDeserializer(ty.value, typespace);
+        case "Array":
+          if (ty.value.tag === "U8") {
+            return deserializeUint8Array;
+          } else {
+            const deserialize = AlgebraicType.makeDeserializer(
+              ty.value,
+              typespace
+            );
+            return (reader) => {
+              const length = reader.readU32();
+              const result = Array(length);
+              for (let i = 0; i < length; i++) {
+                result[i] = deserialize(reader);
+              }
+              return result;
+            };
+          }
+        default:
+          return primitiveDeserializers[ty.tag];
+      }
+    },
+    /** @deprecated Use `makeDeserializer` instead. */
+    deserializeValue(reader, ty, typespace) {
+      return AlgebraicType.makeDeserializer(ty, typespace)(reader);
+    },
+    /**
+     * Convert a value of the algebraic type into something that can be used as a key in a map.
+     * There are no guarantees about being able to order it.
+     * This is only guaranteed to be comparable to other values of the same type.
+     * @param value A value of the algebraic type
+     * @returns Something that can be used as a key in a map.
+     */
+    intoMapKey: function(ty, value) {
+      switch (ty.tag) {
+        case "U8":
+        case "U16":
+        case "U32":
+        case "U64":
+        case "U128":
+        case "U256":
+        case "I8":
+        case "I16":
+        case "I32":
+        case "I64":
+        case "I128":
+        case "I256":
+        case "F32":
+        case "F64":
+        case "String":
+        case "Bool":
+          return value;
+        case "Product":
+          return ProductType.intoMapKey(ty.value, value);
+        default: {
+          const writer = new BinaryWriter(10);
+          AlgebraicType.serializeValue(writer, ty, value);
+          return writer.toBase64();
+        }
+      }
+    }
+  };
+  function bindCall(f) {
+    return Function.prototype.call.bind(f);
+  }
+  var primitiveSerializers = {
+    Bool: bindCall(BinaryWriter.prototype.writeBool),
+    I8: bindCall(BinaryWriter.prototype.writeI8),
+    U8: bindCall(BinaryWriter.prototype.writeU8),
+    I16: bindCall(BinaryWriter.prototype.writeI16),
+    U16: bindCall(BinaryWriter.prototype.writeU16),
+    I32: bindCall(BinaryWriter.prototype.writeI32),
+    U32: bindCall(BinaryWriter.prototype.writeU32),
+    I64: bindCall(BinaryWriter.prototype.writeI64),
+    U64: bindCall(BinaryWriter.prototype.writeU64),
+    I128: bindCall(BinaryWriter.prototype.writeI128),
+    U128: bindCall(BinaryWriter.prototype.writeU128),
+    I256: bindCall(BinaryWriter.prototype.writeI256),
+    U256: bindCall(BinaryWriter.prototype.writeU256),
+    F32: bindCall(BinaryWriter.prototype.writeF32),
+    F64: bindCall(BinaryWriter.prototype.writeF64),
+    String: bindCall(BinaryWriter.prototype.writeString)
+  };
+  Object.freeze(primitiveSerializers);
+  var serializeUint8Array = bindCall(BinaryWriter.prototype.writeUInt8Array);
+  var primitiveDeserializers = {
+    Bool: bindCall(BinaryReader.prototype.readBool),
+    I8: bindCall(BinaryReader.prototype.readI8),
+    U8: bindCall(BinaryReader.prototype.readU8),
+    I16: bindCall(BinaryReader.prototype.readI16),
+    U16: bindCall(BinaryReader.prototype.readU16),
+    I32: bindCall(BinaryReader.prototype.readI32),
+    U32: bindCall(BinaryReader.prototype.readU32),
+    I64: bindCall(BinaryReader.prototype.readI64),
+    U64: bindCall(BinaryReader.prototype.readU64),
+    I128: bindCall(BinaryReader.prototype.readI128),
+    U128: bindCall(BinaryReader.prototype.readU128),
+    I256: bindCall(BinaryReader.prototype.readI256),
+    U256: bindCall(BinaryReader.prototype.readU256),
+    F32: bindCall(BinaryReader.prototype.readF32),
+    F64: bindCall(BinaryReader.prototype.readF64),
+    String: bindCall(BinaryReader.prototype.readString)
+  };
+  Object.freeze(primitiveDeserializers);
+  var deserializeUint8Array = bindCall(BinaryReader.prototype.readUInt8Array);
+  var primitiveSizes = {
+    Bool: 1,
+    I8: 1,
+    U8: 1,
+    I16: 2,
+    U16: 2,
+    I32: 4,
+    U32: 4,
+    I64: 8,
+    U64: 8,
+    I128: 16,
+    U128: 16,
+    I256: 32,
+    U256: 32,
+    F32: 4,
+    F64: 8
+  };
+  var fixedSizePrimitives = new Set(Object.keys(primitiveSizes));
+  var isFixedSizeProduct = (ty) => ty.elements.every(
+    ({ algebraicType }) => fixedSizePrimitives.has(algebraicType.tag)
+  );
+  var productSize = (ty) => ty.elements.reduce(
+    (acc, { algebraicType }) => acc + primitiveSizes[algebraicType.tag],
+    0
+  );
+  var primitiveJSName = {
+    Bool: "Uint8",
+    I8: "Int8",
+    U8: "Uint8",
+    I16: "Int16",
+    U16: "Uint16",
+    I32: "Int32",
+    U32: "Uint32",
+    I64: "BigInt64",
+    U64: "BigUint64",
+    F32: "Float32",
+    F64: "Float64"
+  };
+  var specialProductDeserializers = {
+    __time_duration_micros__: (reader) => new TimeDuration(reader.readI64()),
+    __timestamp_micros_since_unix_epoch__: (reader) => new Timestamp(reader.readI64()),
+    __identity__: (reader) => new Identity(reader.readU256()),
+    __connection_id__: (reader) => new ConnectionId(reader.readU128()),
+    __uuid__: (reader) => new Uuid(reader.readU128())
+  };
+  Object.freeze(specialProductDeserializers);
+  var unitDeserializer = () => ({});
+  var getElementInitializer = (element) => {
+    let init;
+    switch (element.algebraicType.tag) {
+      case "String":
+        init = "''";
+        break;
+      case "Bool":
+        init = "false";
+        break;
+      case "I8":
+      case "U8":
+      case "I16":
+      case "U16":
+      case "I32":
+      case "U32":
+        init = "0";
+        break;
+      case "I64":
+      case "U64":
+      case "I128":
+      case "U128":
+      case "I256":
+      case "U256":
+        init = "0n";
+        break;
+      case "F32":
+      case "F64":
+        init = "0.0";
+        break;
+      default:
+        init = "undefined";
+    }
+    return `${element.name}: ${init}`;
+  };
+  var ProductType = {
+    makeSerializer(ty, typespace) {
+      let serializer = SERIALIZERS.get(ty);
+      if (serializer != null) return serializer;
+      if (isFixedSizeProduct(ty)) {
+        const size = productSize(ty);
+        const body2 = `"use strict";
+writer.expandBuffer(${size});
+const view = writer.view;
+${ty.elements.map(
+          ({ name, algebraicType: { tag } }) => tag in primitiveJSName ? `view.set${primitiveJSName[tag]}(writer.offset, value.${name}, ${primitiveSizes[tag] > 1 ? "true" : ""});
+writer.offset += ${primitiveSizes[tag]};` : `writer.write${tag}(value.${name});`
+        ).join("\n")}`;
+        serializer = Function("writer", "value", body2);
+        SERIALIZERS.set(ty, serializer);
+        return serializer;
+      }
+      const serializers = {};
+      const body = '"use strict";\n' + ty.elements.map(
+        (element) => `this.${element.name}(writer, value.${element.name});`
+      ).join("\n");
+      serializer = Function("writer", "value", body).bind(
+        serializers
+      );
+      SERIALIZERS.set(ty, serializer);
+      for (const { name, algebraicType } of ty.elements) {
+        serializers[name] = AlgebraicType.makeSerializer(
+          algebraicType,
+          typespace
+        );
+      }
+      Object.freeze(serializers);
+      return serializer;
+    },
+    /** @deprecated Use `makeSerializer` instead. */
+    serializeValue(writer, ty, value, typespace) {
+      ProductType.makeSerializer(ty, typespace)(writer, value);
+    },
+    makeDeserializer(ty, typespace) {
+      switch (ty.elements.length) {
+        case 0:
+          return unitDeserializer;
+        case 1: {
+          const fieldName = ty.elements[0].name;
+          if (hasOwn(specialProductDeserializers, fieldName))
+            return specialProductDeserializers[fieldName];
+        }
+      }
+      let deserializer = DESERIALIZERS.get(ty);
+      if (deserializer != null) return deserializer;
+      if (isFixedSizeProduct(ty)) {
+        const body = `"use strict";
+const result = { ${ty.elements.map(getElementInitializer).join(", ")} };
+const view = reader.view;
+${ty.elements.map(
+          ({ name, algebraicType: { tag } }) => tag in primitiveJSName ? tag === "Bool" ? `result.${name} = view.getUint8(reader.offset) !== 0;
+reader.offset += 1;` : `result.${name} = view.get${primitiveJSName[tag]}(reader.offset, ${primitiveSizes[tag] > 1 ? "true" : ""});
+reader.offset += ${primitiveSizes[tag]};` : `result.${name} = reader.read${tag}();`
+        ).join("\n")}
+return result;`;
+        deserializer = Function("reader", body);
+        DESERIALIZERS.set(ty, deserializer);
+        return deserializer;
+      }
+      const deserializers = {};
+      deserializer = Function(
+        "reader",
+        `"use strict";
+const result = { ${ty.elements.map(getElementInitializer).join(", ")} };
+${ty.elements.map(({ name }) => `result.${name} = this.${name}(reader);`).join("\n")}
+return result;`
+      ).bind(deserializers);
+      DESERIALIZERS.set(ty, deserializer);
+      for (const { name, algebraicType } of ty.elements) {
+        deserializers[name] = AlgebraicType.makeDeserializer(
+          algebraicType,
+          typespace
+        );
+      }
+      Object.freeze(deserializers);
+      return deserializer;
+    },
+    /** @deprecated Use `makeDeserializer` instead. */
+    deserializeValue(reader, ty, typespace) {
+      return ProductType.makeDeserializer(ty, typespace)(reader);
+    },
+    intoMapKey(ty, value) {
+      if (ty.elements.length === 1) {
+        const fieldName = ty.elements[0].name;
+        if (hasOwn(specialProductDeserializers, fieldName)) {
+          return value[fieldName];
+        }
+      }
+      const writer = new BinaryWriter(10);
+      AlgebraicType.serializeValue(writer, AlgebraicType.Product(ty), value);
+      return writer.toBase64();
+    }
+  };
+  var SumType = {
+    makeSerializer(ty, typespace) {
+      if (ty.variants.length == 2 && ty.variants[0].name === "some" && ty.variants[1].name === "none") {
+        const serialize = AlgebraicType.makeSerializer(
+          ty.variants[0].algebraicType,
+          typespace
+        );
+        return (writer, value) => {
+          if (value !== null && value !== void 0) {
+            writer.writeByte(0);
+            serialize(writer, value);
+          } else {
+            writer.writeByte(1);
+          }
+        };
+      } else if (ty.variants.length == 2 && ty.variants[0].name === "ok" && ty.variants[1].name === "err") {
+        const serializeOk = AlgebraicType.makeSerializer(
+          ty.variants[0].algebraicType,
+          typespace
+        );
+        const serializeErr = AlgebraicType.makeSerializer(
+          ty.variants[0].algebraicType,
+          typespace
+        );
+        return (writer, value) => {
+          if ("ok" in value) {
+            writer.writeU8(0);
+            serializeOk(writer, value.ok);
+          } else if ("err" in value) {
+            writer.writeU8(1);
+            serializeErr(writer, value.err);
+          } else {
+            throw new TypeError(
+              "could not serialize result: object had neither a `ok` nor an `err` field"
+            );
+          }
+        };
+      } else {
+        let serializer = SERIALIZERS.get(ty);
+        if (serializer != null) return serializer;
+        const serializers = {};
+        const body = `switch (value.tag) {
+${ty.variants.map(
+          ({ name }, i) => `  case ${JSON.stringify(name)}:
+    writer.writeByte(${i});
+    return this.${name}(writer, value.value);`
+        ).join("\n")}
+  default:
+    throw new TypeError(
+      \`Could not serialize sum type; unknown tag \${value.tag}\`
+    )
+}
+`;
+        serializer = Function("writer", "value", body).bind(
+          serializers
+        );
+        SERIALIZERS.set(ty, serializer);
+        for (const { name, algebraicType } of ty.variants) {
+          serializers[name] = AlgebraicType.makeSerializer(
+            algebraicType,
+            typespace
+          );
+        }
+        Object.freeze(serializers);
+        return serializer;
+      }
+    },
+    /** @deprecated Use `makeSerializer` instead. */
+    serializeValue(writer, ty, value, typespace) {
+      SumType.makeSerializer(ty, typespace)(writer, value);
+    },
+    makeDeserializer(ty, typespace) {
+      if (ty.variants.length == 2 && ty.variants[0].name === "some" && ty.variants[1].name === "none") {
+        const deserialize = AlgebraicType.makeDeserializer(
+          ty.variants[0].algebraicType,
+          typespace
+        );
+        return (reader) => {
+          const tag = reader.readU8();
+          if (tag === 0) {
+            return deserialize(reader);
+          } else if (tag === 1) {
+            return void 0;
+          } else {
+            throw `Can't deserialize an option type, couldn't find ${tag} tag`;
+          }
+        };
+      } else if (ty.variants.length == 2 && ty.variants[0].name === "ok" && ty.variants[1].name === "err") {
+        const deserializeOk = AlgebraicType.makeDeserializer(
+          ty.variants[0].algebraicType,
+          typespace
+        );
+        const deserializeErr = AlgebraicType.makeDeserializer(
+          ty.variants[1].algebraicType,
+          typespace
+        );
+        return (reader) => {
+          const tag = reader.readByte();
+          if (tag === 0) {
+            return { ok: deserializeOk(reader) };
+          } else if (tag === 1) {
+            return { err: deserializeErr(reader) };
+          } else {
+            throw `Can't deserialize a result type, couldn't find ${tag} tag`;
+          }
+        };
+      } else {
+        let deserializer = DESERIALIZERS.get(ty);
+        if (deserializer != null) return deserializer;
+        const deserializers = {};
+        deserializer = Function(
+          "reader",
+          `switch (reader.readU8()) {
+${ty.variants.map(
+            ({ name }, i) => `case ${i}: return { tag: ${JSON.stringify(name)}, value: this.${name}(reader) };`
+          ).join("\n")} }`
+        ).bind(deserializers);
+        DESERIALIZERS.set(ty, deserializer);
+        for (const { name, algebraicType } of ty.variants) {
+          deserializers[name] = AlgebraicType.makeDeserializer(
+            algebraicType,
+            typespace
+          );
+        }
+        Object.freeze(deserializers);
+        return deserializer;
+      }
+    },
+    /** @deprecated Use `makeDeserializer` instead. */
+    deserializeValue(reader, ty, typespace) {
+      return SumType.makeDeserializer(ty, typespace)(reader);
+    }
+  };
+  var ConnectionId = class _ConnectionId {
+    __connection_id__;
+    /**
+     * Creates a new `ConnectionId`.
+     */
+    constructor(data) {
+      this.__connection_id__ = coerceToBigInt(data, "ConnectionId");
+    }
+    /**
+     * Get the algebraic type representation of the {@link ConnectionId} type.
+     * @returns The algebraic type representation of the type.
+     */
+    static getAlgebraicType() {
+      return AlgebraicType.Product({
+        elements: [
+          { name: "__connection_id__", algebraicType: AlgebraicType.U128 }
+        ]
+      });
+    }
+    isZero() {
+      return this.__connection_id__ === BigInt(0);
+    }
+    static nullIfZero(addr) {
+      if (addr.isZero()) {
+        return null;
+      } else {
+        return addr;
+      }
+    }
+    static random() {
+      function randomU8() {
+        return Math.floor(Math.random() * 255);
+      }
+      let result = BigInt(0);
+      for (let i = 0; i < 16; i++) {
+        result = result << BigInt(8) | BigInt(randomU8());
+      }
+      return new _ConnectionId(result);
+    }
+    /**
+     * Compare two connection IDs for equality.
+     */
+    isEqual(other) {
+      return this.__connection_id__ == other.__connection_id__;
+    }
+    /**
+     * Check if two connection IDs are equal.
+     */
+    equals(other) {
+      return this.isEqual(other);
+    }
+    /**
+     * Print the connection ID as a hexadecimal string.
+     */
+    toHexString() {
+      return u128ToHexString(this.__connection_id__);
+    }
+    /**
+     * Convert the connection ID to a Uint8Array.
+     */
+    toUint8Array() {
+      return u128ToUint8Array(this.__connection_id__);
+    }
+    /**
+     * Parse a connection ID from a hexadecimal string.
+     */
+    static fromString(str) {
+      return new _ConnectionId(hexStringToU128(str));
+    }
+    static fromStringOrNull(str) {
+      const addr = _ConnectionId.fromString(str);
+      if (addr.isZero()) {
+        return null;
+      } else {
+        return addr;
+      }
+    }
+  };
+  var SenderError = class extends Error {
+    constructor(message) {
+      super(message);
+    }
+    get name() {
+      return "SenderError";
+    }
+  };
+  var InternalError = class extends Error {
+    constructor(message) {
+      super(message);
+    }
+    get name() {
+      return "InternalError";
+    }
+  };
+  var ScheduleAt = {
+    interval(value) {
+      return Interval(value);
+    },
+    time(value) {
+      return Time(value);
+    },
+    getAlgebraicType() {
+      return AlgebraicType.Sum({
+        variants: [
+          {
+            name: "Interval",
+            algebraicType: TimeDuration.getAlgebraicType()
+          },
+          { name: "Time", algebraicType: Timestamp.getAlgebraicType() }
+        ]
+      });
+    },
+    isScheduleAt(algebraicType) {
+      if (algebraicType.tag !== "Sum") {
+        return false;
+      }
+      const variants = algebraicType.value.variants;
+      if (variants.length !== 2) {
+        return false;
+      }
+      const intervalVariant = variants.find((v) => v.name === "Interval");
+      const timeVariant = variants.find((v) => v.name === "Time");
+      if (!intervalVariant || !timeVariant) {
+        return false;
+      }
+      return TimeDuration.isTimeDuration(intervalVariant.algebraicType) && Timestamp.isTimestamp(timeVariant.algebraicType);
+    }
+  };
+  var Interval = (micros) => ({
+    tag: "Interval",
+    value: new TimeDuration(micros)
+  });
+  var Time = (microsSinceUnixEpoch) => ({
+    tag: "Time",
+    value: new Timestamp(microsSinceUnixEpoch)
+  });
+  var schedule_at_default = ScheduleAt;
+  var Option = {
+    getAlgebraicType(innerType) {
+      return AlgebraicType.Sum({
+        variants: [
+          { name: "some", algebraicType: innerType },
+          {
+            name: "none",
+            algebraicType: AlgebraicType.Product({ elements: [] })
+          }
+        ]
+      });
+    }
+  };
+  var Result = {
+    getAlgebraicType(okType, errType) {
+      return AlgebraicType.Sum({
+        variants: [
+          { name: "ok", algebraicType: okType },
+          { name: "err", algebraicType: errType }
+        ]
+      });
+    }
+  };
+  var QueryBrand = Symbol("QueryBrand");
+  var isRowTypedQuery = (val) => !!val && typeof val === "object" && QueryBrand in val;
+  function toSql(q) {
+    return q.toSql();
+  }
+  var SemijoinImpl = class _SemijoinImpl {
+    constructor(sourceQuery, filterQuery, joinCondition) {
+      this.sourceQuery = sourceQuery;
+      this.filterQuery = filterQuery;
+      this.joinCondition = joinCondition;
+      if (sourceQuery.table.sourceName === filterQuery.table.sourceName) {
+        throw new Error("Cannot semijoin a table to itself");
+      }
+    }
+    [QueryBrand] = true;
+    type = "semijoin";
+    build() {
+      return this;
+    }
+    where(predicate) {
+      const nextSourceQuery = this.sourceQuery.where(predicate);
+      return new _SemijoinImpl(
+        nextSourceQuery,
+        this.filterQuery,
+        this.joinCondition
+      );
+    }
+    toSql() {
+      const left = this.filterQuery;
+      const right = this.sourceQuery;
+      const leftTable = quoteIdentifier(left.table.sourceName);
+      const rightTable = quoteIdentifier(right.table.sourceName);
+      let sql = `SELECT ${rightTable}.* FROM ${leftTable} JOIN ${rightTable} ON ${booleanExprToSql(this.joinCondition)}`;
+      const clauses = [];
+      if (left.whereClause) {
+        clauses.push(booleanExprToSql(left.whereClause));
+      }
+      if (right.whereClause) {
+        clauses.push(booleanExprToSql(right.whereClause));
+      }
+      if (clauses.length > 0) {
+        const whereSql = clauses.length === 1 ? clauses[0] : clauses.map(wrapInParens).join(" AND ");
+        sql += ` WHERE ${whereSql}`;
+      }
+      return sql;
+    }
+  };
+  var FromBuilder = class _FromBuilder {
+    constructor(table2, whereClause) {
+      this.table = table2;
+      this.whereClause = whereClause;
+    }
+    [QueryBrand] = true;
+    where(predicate) {
+      const newCondition = normalizePredicateExpr(predicate(this.table.cols));
+      const nextWhere = this.whereClause ? this.whereClause.and(newCondition) : newCondition;
+      return new _FromBuilder(this.table, nextWhere);
+    }
+    rightSemijoin(right, on) {
+      const sourceQuery = new _FromBuilder(right);
+      const joinCondition = on(
+        this.table.indexedCols,
+        right.indexedCols
+      );
+      return new SemijoinImpl(sourceQuery, this, joinCondition);
+    }
+    leftSemijoin(right, on) {
+      const filterQuery = new _FromBuilder(right);
+      const joinCondition = on(
+        this.table.indexedCols,
+        right.indexedCols
+      );
+      return new SemijoinImpl(this, filterQuery, joinCondition);
+    }
+    toSql() {
+      return renderSelectSqlWithJoins(this.table, this.whereClause);
+    }
+    build() {
+      return this;
+    }
+  };
+  var TableRefImpl = class {
+    [QueryBrand] = true;
+    type = "table";
+    sourceName;
+    accessorName;
+    cols;
+    indexedCols;
+    tableDef;
+    // Delegate UntypedTableDef properties from tableDef so this can be used as a table def.
+    get columns() {
+      return this.tableDef.columns;
+    }
+    get indexes() {
+      return this.tableDef.indexes;
+    }
+    get rowType() {
+      return this.tableDef.rowType;
+    }
+    get constraints() {
+      return this.tableDef.constraints;
+    }
+    constructor(tableDef) {
+      this.sourceName = tableDef.sourceName;
+      this.accessorName = tableDef.accessorName;
+      this.cols = createRowExpr(tableDef);
+      this.indexedCols = this.cols;
+      this.tableDef = tableDef;
+      Object.freeze(this);
+    }
+    asFrom() {
+      return new FromBuilder(this);
+    }
+    rightSemijoin(other, on) {
+      return this.asFrom().rightSemijoin(other, on);
+    }
+    leftSemijoin(other, on) {
+      return this.asFrom().leftSemijoin(other, on);
+    }
+    build() {
+      return this.asFrom().build();
+    }
+    toSql() {
+      return this.asFrom().toSql();
+    }
+    where(predicate) {
+      return this.asFrom().where(predicate);
+    }
+  };
+  function createTableRefFromDef(tableDef) {
+    return new TableRefImpl(tableDef);
+  }
+  function makeQueryBuilder(schema2) {
+    const qb = /* @__PURE__ */ Object.create(null);
+    for (const table2 of Object.values(schema2.tables)) {
+      const ref = createTableRefFromDef(
+        table2
+      );
+      qb[table2.accessorName] = ref;
+    }
+    return Object.freeze(qb);
+  }
+  function makeFromBuilder(tables2) {
+    const result = /* @__PURE__ */ Object.create(null);
+    const namespaces = /* @__PURE__ */ Object.create(
+      null
+    );
+    for (const table2 of Object.values(tables2)) {
+      const dotIdx = table2.sourceName.indexOf(".");
+      if (dotIdx === -1) {
+        result[table2.accessorName] = createTableRefFromDef(table2);
+      } else {
+        const ns = table2.sourceName.slice(0, dotIdx);
+        const key = table2.sourceName.slice(dotIdx + 1);
+        (namespaces[ns] ??= /* @__PURE__ */ Object.create(null))[key] = createTableRefFromDef(
+          table2
+        );
+      }
+    }
+    for (const [ns, nsTables] of Object.entries(namespaces)) {
+      result[ns] = Object.freeze(nsTables);
+    }
+    return Object.freeze(result);
+  }
+  function createRowExpr(tableDef) {
+    const row = {};
+    for (const columnName of Object.keys(tableDef.columns)) {
+      const columnBuilder = tableDef.columns[columnName];
+      const column = new ColumnExpression(
+        tableDef.sourceName,
+        columnName,
+        columnBuilder.typeBuilder.algebraicType,
+        columnBuilder.columnMetadata.name
+      );
+      row[columnName] = Object.freeze(column);
+    }
+    return Object.freeze(row);
+  }
+  function renderSelectSqlWithJoins(table2, where, extraClauses = []) {
+    const quotedTable = quoteIdentifier(table2.sourceName);
+    const sql = `SELECT * FROM ${quotedTable}`;
+    const clauses = [];
+    if (where) clauses.push(booleanExprToSql(where));
+    clauses.push(...extraClauses);
+    if (clauses.length === 0) return sql;
+    const whereSql = clauses.length === 1 ? clauses[0] : clauses.map(wrapInParens).join(" AND ");
+    return `${sql} WHERE ${whereSql}`;
+  }
+  var ColumnExpression = class {
+    type = "column";
+    // This is the column accessor
+    column;
+    // The name of the column in the database.
+    columnName;
+    table;
+    // phantom: actual runtime value is undefined
+    tsValueType;
+    spacetimeType;
+    constructor(table2, column, spacetimeType, columnName) {
+      this.table = table2;
+      this.column = column;
+      this.columnName = columnName || column;
+      this.spacetimeType = spacetimeType;
+    }
+    eq(x) {
+      return new BooleanExpr({
+        type: "eq",
+        left: this,
+        right: normalizeValue(x)
+      });
+    }
+    ne(x) {
+      return new BooleanExpr({
+        type: "ne",
+        left: this,
+        right: normalizeValue(x)
+      });
+    }
+    lt(x) {
+      return new BooleanExpr({
+        type: "lt",
+        left: this,
+        right: normalizeValue(x)
+      });
+    }
+    lte(x) {
+      return new BooleanExpr({
+        type: "lte",
+        left: this,
+        right: normalizeValue(x)
+      });
+    }
+    gt(x) {
+      return new BooleanExpr({
+        type: "gt",
+        left: this,
+        right: normalizeValue(x)
+      });
+    }
+    gte(x) {
+      return new BooleanExpr({
+        type: "gte",
+        left: this,
+        right: normalizeValue(x)
+      });
+    }
+  };
+  function literal(value) {
+    return { type: "literal", value };
+  }
+  function normalizeValue(val) {
+    if (val.type === "literal")
+      return val;
+    if (typeof val === "object" && val != null && "type" in val && val.type === "column") {
+      return val;
+    }
+    return literal(val);
+  }
+  function normalizePredicateExpr(value) {
+    if (value instanceof BooleanExpr) return value;
+    if (typeof value === "boolean") {
+      return new BooleanExpr({
+        type: "eq",
+        left: literal(value),
+        right: literal(true)
+      });
+    }
+    return new BooleanExpr({
+      type: "eq",
+      left: value,
+      right: literal(true)
+    });
+  }
+  var BooleanExpr = class _BooleanExpr {
+    constructor(data) {
+      this.data = data;
+    }
+    and(other) {
+      return new _BooleanExpr({
+        type: "and",
+        clauses: [this.data, other.data]
+      });
+    }
+    or(other) {
+      return new _BooleanExpr({
+        type: "or",
+        clauses: [this.data, other.data]
+      });
+    }
+    not() {
+      return new _BooleanExpr({ type: "not", clause: this.data });
+    }
+  };
+  function booleanExprToSql(expr, tableAlias) {
+    const data = expr instanceof BooleanExpr ? expr.data : expr;
+    switch (data.type) {
+      case "eq":
+        return `${valueExprToSql(data.left)} = ${valueExprToSql(data.right)}`;
+      case "ne":
+        return `${valueExprToSql(data.left)} <> ${valueExprToSql(data.right)}`;
+      case "gt":
+        return `${valueExprToSql(data.left)} > ${valueExprToSql(data.right)}`;
+      case "gte":
+        return `${valueExprToSql(data.left)} >= ${valueExprToSql(data.right)}`;
+      case "lt":
+        return `${valueExprToSql(data.left)} < ${valueExprToSql(data.right)}`;
+      case "lte":
+        return `${valueExprToSql(data.left)} <= ${valueExprToSql(data.right)}`;
+      case "and":
+        return data.clauses.map((c) => booleanExprToSql(c)).map(wrapInParens).join(" AND ");
+      case "or":
+        return data.clauses.map((c) => booleanExprToSql(c)).map(wrapInParens).join(" OR ");
+      case "not":
+        return `NOT ${wrapInParens(booleanExprToSql(data.clause))}`;
+    }
+  }
+  function wrapInParens(sql) {
+    return `(${sql})`;
+  }
+  function valueExprToSql(expr, tableAlias) {
+    if (isLiteralExpr(expr)) {
+      return literalValueToSql(expr.value);
+    }
+    const table2 = expr.table;
+    return `${quoteIdentifier(table2)}.${quoteIdentifier(expr.columnName)}`;
+  }
+  function literalValueToSql(value) {
+    if (value === null || value === void 0) {
+      return "NULL";
+    }
+    if (value instanceof Identity || value instanceof ConnectionId || value instanceof Uuid) {
+      return `0x${value.toHexString()}`;
+    }
+    if (value instanceof Timestamp) {
+      return `'${value.toISOString()}'`;
+    }
+    switch (typeof value) {
+      case "number":
+      case "bigint":
+        return String(value);
+      case "boolean":
+        return value ? "TRUE" : "FALSE";
+      case "string":
+        return `'${value.replace(/'/g, "''")}'`;
+      default:
+        return `'${JSON.stringify(value).replace(/'/g, "''")}'`;
+    }
+  }
+  function quoteIdentifier(name) {
+    return name.split(".").map((part) => `"${part.replace(/"/g, '""')}"`).join(".");
+  }
+  function isLiteralExpr(expr) {
+    return expr.type === "literal";
+  }
+  function set(x, t2) {
+    return { ...x, ...t2 };
+  }
+  var TypeBuilder = class {
+    /**
+     * The TypeScript phantom type. This is not stored at runtime,
+     * but is visible to the compiler
+     */
+    type;
+    /**
+     * The SpacetimeDB algebraic type (run‑time value). In addition to storing
+     * the runtime representation of the `AlgebraicType`, it also captures
+     * the TypeScript type information of the `AlgebraicType`. That is to say
+     * the value is not merely an `AlgebraicType`, but is constructed to be
+     * the corresponding concrete `AlgebraicType` for the TypeScript type `Type`.
+     *
+     * e.g. `string` corresponds to `AlgebraicType.String`
+     */
+    algebraicType;
+    constructor(algebraicType) {
+      this.algebraicType = algebraicType;
+    }
+    optional() {
+      return new OptionBuilder(this);
+    }
+    serialize(writer, value) {
+      const serialize = this.serialize = AlgebraicType.makeSerializer(
+        this.algebraicType
+      );
+      serialize(writer, value);
+    }
+    deserialize(reader) {
+      const deserialize = this.deserialize = AlgebraicType.makeDeserializer(
+        this.algebraicType
+      );
+      return deserialize(reader);
+    }
+  };
+  var U8Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.U8);
+    }
+    index(algorithm = "btree") {
+      return new U8ColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new U8ColumnBuilder(this, set(defaultMetadata, { isUnique: true }));
+    }
+    primaryKey() {
+      return new U8ColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new U8ColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new U8ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new U8ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var U16Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.U16);
+    }
+    index(algorithm = "btree") {
+      return new U16ColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new U16ColumnBuilder(this, set(defaultMetadata, { isUnique: true }));
+    }
+    primaryKey() {
+      return new U16ColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new U16ColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new U16ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new U16ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var U32Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.U32);
+    }
+    index(algorithm = "btree") {
+      return new U32ColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new U32ColumnBuilder(this, set(defaultMetadata, { isUnique: true }));
+    }
+    primaryKey() {
+      return new U32ColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new U32ColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new U32ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new U32ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var U64Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.U64);
+    }
+    index(algorithm = "btree") {
+      return new U64ColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new U64ColumnBuilder(this, set(defaultMetadata, { isUnique: true }));
+    }
+    primaryKey() {
+      return new U64ColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new U64ColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new U64ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new U64ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var U128Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.U128);
+    }
+    index(algorithm = "btree") {
+      return new U128ColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new U128ColumnBuilder(
+        this,
+        set(defaultMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new U128ColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new U128ColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new U128ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new U128ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var U256Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.U256);
+    }
+    index(algorithm = "btree") {
+      return new U256ColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new U256ColumnBuilder(
+        this,
+        set(defaultMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new U256ColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new U256ColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new U256ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new U256ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var I8Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.I8);
+    }
+    index(algorithm = "btree") {
+      return new I8ColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new I8ColumnBuilder(this, set(defaultMetadata, { isUnique: true }));
+    }
+    primaryKey() {
+      return new I8ColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new I8ColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new I8ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new I8ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var I16Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.I16);
+    }
+    index(algorithm = "btree") {
+      return new I16ColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new I16ColumnBuilder(this, set(defaultMetadata, { isUnique: true }));
+    }
+    primaryKey() {
+      return new I16ColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new I16ColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new I16ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new I16ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var I32Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.I32);
+    }
+    index(algorithm = "btree") {
+      return new I32ColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new I32ColumnBuilder(this, set(defaultMetadata, { isUnique: true }));
+    }
+    primaryKey() {
+      return new I32ColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new I32ColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new I32ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new I32ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var I64Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.I64);
+    }
+    index(algorithm = "btree") {
+      return new I64ColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new I64ColumnBuilder(this, set(defaultMetadata, { isUnique: true }));
+    }
+    primaryKey() {
+      return new I64ColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new I64ColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new I64ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new I64ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var I128Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.I128);
+    }
+    index(algorithm = "btree") {
+      return new I128ColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new I128ColumnBuilder(
+        this,
+        set(defaultMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new I128ColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new I128ColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new I128ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new I128ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var I256Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.I256);
+    }
+    index(algorithm = "btree") {
+      return new I256ColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new I256ColumnBuilder(
+        this,
+        set(defaultMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new I256ColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new I256ColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new I256ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new I256ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var F32Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.F32);
+    }
+    default(value) {
+      return new F32ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new F32ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var F64Builder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.F64);
+    }
+    default(value) {
+      return new F64ColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new F64ColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var BoolBuilder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.Bool);
+    }
+    index(algorithm = "btree") {
+      return new BoolColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new BoolColumnBuilder(
+        this,
+        set(defaultMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new BoolColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    default(value) {
+      return new BoolColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new BoolColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var StringBuilder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.String);
+    }
+    index(algorithm = "btree") {
+      return new StringColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new StringColumnBuilder(
+        this,
+        set(defaultMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new StringColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    default(value) {
+      return new StringColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new StringColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var ArrayBuilder = class extends TypeBuilder {
+    element;
+    constructor(element) {
+      super(AlgebraicType.Array(element.algebraicType));
+      this.element = element;
+    }
+    default(value) {
+      return new ArrayColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new ArrayColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var ByteArrayBuilder = class extends TypeBuilder {
+    constructor() {
+      super(AlgebraicType.Array(AlgebraicType.U8));
+    }
+    default(value) {
+      return new ByteArrayColumnBuilder(
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new ByteArrayColumnBuilder(set(defaultMetadata, { name }));
+    }
+  };
+  var OptionBuilder = class extends TypeBuilder {
+    value;
+    constructor(value) {
+      super(Option.getAlgebraicType(value.algebraicType));
+      this.value = value;
+    }
+    default(value) {
+      return new OptionColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new OptionColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var ProductBuilder = class extends TypeBuilder {
+    typeName;
+    elements;
+    constructor(elements, name) {
+      function elementsArrayFromElementsObj(obj) {
+        return Object.keys(obj).map((key) => ({
+          name: key,
+          // Lazily resolve the underlying object's algebraicType.
+          // This will call obj[key].algebraicType only when someone
+          // actually reads this property.
+          get algebraicType() {
+            return obj[key].algebraicType;
+          }
+        }));
+      }
+      super(
+        AlgebraicType.Product({
+          elements: elementsArrayFromElementsObj(elements)
+        })
+      );
+      this.typeName = name;
+      this.elements = elements;
+    }
+    default(value) {
+      return new ProductColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new ProductColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var ResultBuilder = class extends TypeBuilder {
+    ok;
+    err;
+    constructor(ok, err) {
+      super(Result.getAlgebraicType(ok.algebraicType, err.algebraicType));
+      this.ok = ok;
+      this.err = err;
+    }
+    default(value) {
+      return new ResultColumnBuilder(this, set(defaultMetadata, { defaultValue: value }));
+    }
+  };
+  var UnitBuilder = class extends TypeBuilder {
+    constructor() {
+      super({ tag: "Product", value: { elements: [] } });
+    }
+  };
+  var RowBuilder = class extends TypeBuilder {
+    row;
+    typeName;
+    constructor(row, name) {
+      const mappedRow = Object.fromEntries(
+        Object.entries(row).map(([colName, builder]) => [
+          colName,
+          builder instanceof ColumnBuilder ? builder : new ColumnBuilder(builder, {})
+        ])
+      );
+      const elements = Object.keys(mappedRow).map((name2) => ({
+        name: name2,
+        get algebraicType() {
+          return mappedRow[name2].typeBuilder.algebraicType;
+        }
+      }));
+      super(AlgebraicType.Product({ elements }));
+      this.row = mappedRow;
+      this.typeName = name;
+    }
+  };
+  var SumBuilderImpl = class extends TypeBuilder {
+    variants;
+    typeName;
+    constructor(variants, name) {
+      function variantsArrayFromVariantsObj(variants2) {
+        return Object.keys(variants2).map((key) => ({
+          name: key,
+          // Lazily resolve the underlying object's algebraicType.
+          // This will call obj[key].algebraicType only when someone
+          // actually reads this property.
+          get algebraicType() {
+            return variants2[key].algebraicType;
+          }
+        }));
+      }
+      super(
+        AlgebraicType.Sum({
+          variants: variantsArrayFromVariantsObj(variants)
+        })
+      );
+      this.variants = variants;
+      this.typeName = name;
+      for (const key of Object.keys(variants)) {
+        const desc = Object.getOwnPropertyDescriptor(variants, key);
+        const isAccessor = !!desc && (typeof desc.get === "function" || typeof desc.set === "function");
+        let isUnit2 = false;
+        if (!isAccessor) {
+          const variant = variants[key];
+          isUnit2 = variant instanceof UnitBuilder;
+        }
+        if (isUnit2) {
+          const constant = this.create(key);
+          Object.defineProperty(this, key, {
+            value: constant,
+            writable: false,
+            enumerable: true,
+            configurable: false
+          });
+        } else {
+          const fn = ((value) => this.create(key, value));
+          Object.defineProperty(this, key, {
+            value: fn,
+            writable: false,
+            enumerable: true,
+            configurable: false
+          });
+        }
+      }
+    }
+    create(tag, value) {
+      return value === void 0 ? { tag } : { tag, value };
+    }
+    default(value) {
+      return new SumColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new SumColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+    index(algorithm = "btree") {
+      return new SumColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    primaryKey() {
+      return new SumColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+  };
+  var SumBuilder = SumBuilderImpl;
+  var SimpleSumBuilderImpl = class extends SumBuilderImpl {
+    index(algorithm = "btree") {
+      return new SimpleSumColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    primaryKey() {
+      return new SimpleSumColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+  };
+  var ScheduleAtBuilder = class extends TypeBuilder {
+    constructor() {
+      super(schedule_at_default.getAlgebraicType());
+    }
+    default(value) {
+      return new ScheduleAtColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new ScheduleAtColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var IdentityBuilder = class extends TypeBuilder {
+    constructor() {
+      super(Identity.getAlgebraicType());
+    }
+    index(algorithm = "btree") {
+      return new IdentityColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new IdentityColumnBuilder(
+        this,
+        set(defaultMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new IdentityColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new IdentityColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new IdentityColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new IdentityColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var ConnectionIdBuilder = class extends TypeBuilder {
+    constructor() {
+      super(ConnectionId.getAlgebraicType());
+    }
+    index(algorithm = "btree") {
+      return new ConnectionIdColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new ConnectionIdColumnBuilder(
+        this,
+        set(defaultMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new ConnectionIdColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new ConnectionIdColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new ConnectionIdColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new ConnectionIdColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var TimestampBuilder = class extends TypeBuilder {
+    constructor() {
+      super(Timestamp.getAlgebraicType());
+    }
+    index(algorithm = "btree") {
+      return new TimestampColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new TimestampColumnBuilder(
+        this,
+        set(defaultMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new TimestampColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new TimestampColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new TimestampColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new TimestampColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var TimeDurationBuilder = class extends TypeBuilder {
+    constructor() {
+      super(TimeDuration.getAlgebraicType());
+    }
+    index(algorithm = "btree") {
+      return new TimeDurationColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new TimeDurationColumnBuilder(
+        this,
+        set(defaultMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new TimeDurationColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new TimeDurationColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new TimeDurationColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new TimeDurationColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var UuidBuilder = class extends TypeBuilder {
+    constructor() {
+      super(Uuid.getAlgebraicType());
+    }
+    index(algorithm = "btree") {
+      return new UuidColumnBuilder(
+        this,
+        set(defaultMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new UuidColumnBuilder(
+        this,
+        set(defaultMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new UuidColumnBuilder(
+        this,
+        set(defaultMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new UuidColumnBuilder(
+        this,
+        set(defaultMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new UuidColumnBuilder(
+        this,
+        set(defaultMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new UuidColumnBuilder(this, set(defaultMetadata, { name }));
+    }
+  };
+  var defaultMetadata = {};
+  var ColumnBuilder = class {
+    typeBuilder;
+    columnMetadata;
+    constructor(typeBuilder, metadata) {
+      this.typeBuilder = typeBuilder;
+      this.columnMetadata = metadata;
+    }
+    serialize(writer, value) {
+      this.typeBuilder.serialize(writer, value);
+    }
+    deserialize(reader) {
+      return this.typeBuilder.deserialize(reader);
+    }
+  };
+  var U8ColumnBuilder = class _U8ColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _U8ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _U8ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _U8ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new _U8ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new _U8ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _U8ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var U16ColumnBuilder = class _U16ColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _U16ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _U16ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _U16ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new _U16ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new _U16ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _U16ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var U32ColumnBuilder = class _U32ColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _U32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _U32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _U32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new _U32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new _U32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _U32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var U64ColumnBuilder = class _U64ColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _U64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _U64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _U64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new _U64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new _U64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _U64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var U128ColumnBuilder = class _U128ColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _U128ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _U128ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _U128ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new _U128ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new _U128ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _U128ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var U256ColumnBuilder = class _U256ColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _U256ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _U256ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _U256ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new _U256ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new _U256ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _U256ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var I8ColumnBuilder = class _I8ColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _I8ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _I8ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _I8ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new _I8ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new _I8ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _I8ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var I16ColumnBuilder = class _I16ColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _I16ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _I16ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _I16ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new _I16ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new _I16ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _I16ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var I32ColumnBuilder = class _I32ColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _I32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _I32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _I32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new _I32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new _I32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _I32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var I64ColumnBuilder = class _I64ColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _I64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _I64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _I64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new _I64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new _I64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _I64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var I128ColumnBuilder = class _I128ColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _I128ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _I128ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _I128ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new _I128ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new _I128ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _I128ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var I256ColumnBuilder = class _I256ColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _I256ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _I256ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _I256ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    autoInc() {
+      return new _I256ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isAutoIncrement: true })
+      );
+    }
+    default(value) {
+      return new _I256ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _I256ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var F32ColumnBuilder = class _F32ColumnBuilder extends ColumnBuilder {
+    default(value) {
+      return new _F32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _F32ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var F64ColumnBuilder = class _F64ColumnBuilder extends ColumnBuilder {
+    default(value) {
+      return new _F64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _F64ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var BoolColumnBuilder = class _BoolColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _BoolColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _BoolColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _BoolColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    default(value) {
+      return new _BoolColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _BoolColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var StringColumnBuilder = class _StringColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _StringColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _StringColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _StringColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    default(value) {
+      return new _StringColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _StringColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var ArrayColumnBuilder = class _ArrayColumnBuilder extends ColumnBuilder {
+    default(value) {
+      return new _ArrayColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _ArrayColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var ByteArrayColumnBuilder = class _ByteArrayColumnBuilder extends ColumnBuilder {
+    constructor(metadata) {
+      super(new TypeBuilder(AlgebraicType.Array(AlgebraicType.U8)), metadata);
+    }
+    default(value) {
+      return new _ByteArrayColumnBuilder(
+        set(this.columnMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new _ByteArrayColumnBuilder(set(this.columnMetadata, { name }));
+    }
+  };
+  var OptionColumnBuilder = class _OptionColumnBuilder extends ColumnBuilder {
+    default(value) {
+      return new _OptionColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+    name(name) {
+      return new _OptionColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var ResultColumnBuilder = class _ResultColumnBuilder extends ColumnBuilder {
+    constructor(typeBuilder, metadata) {
+      super(typeBuilder, metadata);
+    }
+    default(value) {
+      return new _ResultColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, {
+          defaultValue: value
+        })
+      );
+    }
+  };
+  var ProductColumnBuilder = class _ProductColumnBuilder extends ColumnBuilder {
+    default(value) {
+      return new _ProductColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new _ProductColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var SumColumnBuilder = class _SumColumnBuilder extends ColumnBuilder {
+    default(value) {
+      return new _SumColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new _SumColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+    index(algorithm = "btree") {
+      return new _SumColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    primaryKey() {
+      return new _SumColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+  };
+  var SimpleSumColumnBuilder = class _SimpleSumColumnBuilder extends SumColumnBuilder {
+    index(algorithm = "btree") {
+      return new _SimpleSumColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    primaryKey() {
+      return new _SimpleSumColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+  };
+  var ScheduleAtColumnBuilder = class _ScheduleAtColumnBuilder extends ColumnBuilder {
+    default(value) {
+      return new _ScheduleAtColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new _ScheduleAtColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var IdentityColumnBuilder = class _IdentityColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _IdentityColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _IdentityColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _IdentityColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    default(value) {
+      return new _IdentityColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new _IdentityColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var ConnectionIdColumnBuilder = class _ConnectionIdColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _ConnectionIdColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _ConnectionIdColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _ConnectionIdColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    default(value) {
+      return new _ConnectionIdColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new _ConnectionIdColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var TimestampColumnBuilder = class _TimestampColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _TimestampColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _TimestampColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _TimestampColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    default(value) {
+      return new _TimestampColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new _TimestampColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var TimeDurationColumnBuilder = class _TimeDurationColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _TimeDurationColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _TimeDurationColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _TimeDurationColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    default(value) {
+      return new _TimeDurationColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new _TimeDurationColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var UuidColumnBuilder = class _UuidColumnBuilder extends ColumnBuilder {
+    index(algorithm = "btree") {
+      return new _UuidColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { indexType: algorithm })
+      );
+    }
+    unique() {
+      return new _UuidColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isUnique: true })
+      );
+    }
+    primaryKey() {
+      return new _UuidColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isPrimaryKey: true })
+      );
+    }
+    default(value) {
+      return new _UuidColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { defaultValue: value })
+      );
+    }
+    name(name) {
+      return new _UuidColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { name })
+      );
+    }
+  };
+  var RefBuilder = class extends TypeBuilder {
+    ref;
+    /** The phantom type of the pointee of this ref. */
+    __spacetimeType;
+    constructor(ref) {
+      super(AlgebraicType.Ref(ref));
+      this.ref = ref;
+    }
+  };
+  var enumImpl = ((nameOrObj, maybeObj) => {
+    let obj = nameOrObj;
+    let name = void 0;
+    if (typeof nameOrObj === "string") {
+      if (!maybeObj) {
+        throw new TypeError(
+          "When providing a name, you must also provide the variants object or array."
+        );
+      }
+      obj = maybeObj;
+      name = nameOrObj;
+    }
+    if (Array.isArray(obj)) {
+      const simpleVariantsObj = {};
+      for (const variant of obj) {
+        simpleVariantsObj[variant] = new UnitBuilder();
+      }
+      return new SimpleSumBuilderImpl(simpleVariantsObj, name);
+    }
+    return new SumBuilder(obj, name);
+  });
+  var t = {
+    /**
+     * Creates a new `Bool` {@link AlgebraicType} to be used in table definitions
+     * Represented as `boolean` in TypeScript.
+     * @returns A new {@link BoolBuilder} instance
+     */
+    bool: () => new BoolBuilder(),
+    /**
+     * Creates a new `String` {@link AlgebraicType} to be used in table definitions
+     * Represented as `string` in TypeScript.
+     * @returns A new {@link StringBuilder} instance
+     */
+    string: () => new StringBuilder(),
+    /**
+     * Creates a new `F64` {@link AlgebraicType} to be used in table definitions
+     * Represented as `number` in TypeScript.
+     * @returns A new {@link F64Builder} instance
+     */
+    number: () => new F64Builder(),
+    /**
+     * Creates a new `I8` {@link AlgebraicType} to be used in table definitions
+     * Represented as `number` in TypeScript.
+     * @returns A new {@link I8Builder} instance
+     */
+    i8: () => new I8Builder(),
+    /**
+     * Creates a new `U8` {@link AlgebraicType} to be used in table definitions
+     * Represented as `number` in TypeScript.
+     * @returns A new {@link U8Builder} instance
+     */
+    u8: () => new U8Builder(),
+    /**
+     * Creates a new `I16` {@link AlgebraicType} to be used in table definitions
+     * Represented as `number` in TypeScript.
+     * @returns A new {@link I16Builder} instance
+     */
+    i16: () => new I16Builder(),
+    /**
+     * Creates a new `U16` {@link AlgebraicType} to be used in table definitions
+     * Represented as `number` in TypeScript.
+     * @returns A new {@link U16Builder} instance
+     */
+    u16: () => new U16Builder(),
+    /**
+     * Creates a new `I32` {@link AlgebraicType} to be used in table definitions
+     * Represented as `number` in TypeScript.
+     * @returns A new {@link I32Builder} instance
+     */
+    i32: () => new I32Builder(),
+    /**
+     * Creates a new `U32` {@link AlgebraicType} to be used in table definitions
+     * Represented as `number` in TypeScript.
+     * @returns A new {@link U32Builder} instance
+     */
+    u32: () => new U32Builder(),
+    /**
+     * Creates a new `I64` {@link AlgebraicType} to be used in table definitions
+     * Represented as `bigint` in TypeScript.
+     * @returns A new {@link I64Builder} instance
+     */
+    i64: () => new I64Builder(),
+    /**
+     * Creates a new `U64` {@link AlgebraicType} to be used in table definitions
+     * Represented as `bigint` in TypeScript.
+     * @returns A new {@link U64Builder} instance
+     */
+    u64: () => new U64Builder(),
+    /**
+     * Creates a new `I128` {@link AlgebraicType} to be used in table definitions
+     * Represented as `bigint` in TypeScript.
+     * @returns A new {@link I128Builder} instance
+     */
+    i128: () => new I128Builder(),
+    /**
+     * Creates a new `U128` {@link AlgebraicType} to be used in table definitions
+     * Represented as `bigint` in TypeScript.
+     * @returns A new {@link U128Builder} instance
+     */
+    u128: () => new U128Builder(),
+    /**
+     * Creates a new `I256` {@link AlgebraicType} to be used in table definitions
+     * Represented as `bigint` in TypeScript.
+     * @returns A new {@link I256Builder} instance
+     */
+    i256: () => new I256Builder(),
+    /**
+     * Creates a new `U256` {@link AlgebraicType} to be used in table definitions
+     * Represented as `bigint` in TypeScript.
+     * @returns A new {@link U256Builder} instance
+     */
+    u256: () => new U256Builder(),
+    /**
+     * Creates a new `F32` {@link AlgebraicType} to be used in table definitions
+     * Represented as `number` in TypeScript.
+     * @returns A new {@link F32Builder} instance
+     */
+    f32: () => new F32Builder(),
+    /**
+     * Creates a new `F64` {@link AlgebraicType} to be used in table definitions
+     * Represented as `number` in TypeScript.
+     * @returns A new {@link F64Builder} instance
+     */
+    f64: () => new F64Builder(),
+    /**
+     * Creates a new `Product` {@link AlgebraicType} to be used in table definitions. Product types in SpacetimeDB
+     * are essentially the same as objects in JavaScript/TypeScript.
+     * Properties of the object must also be {@link TypeBuilder}s.
+     * Represented as an object with specific properties in TypeScript.
+     *
+     * @param name (optional) A display name for the product type. If omitted, an anonymous product type is created.
+     * @param obj The object defining the properties of the type, whose property
+     * values must be {@link TypeBuilder}s.
+     * @returns A new {@link ProductBuilder} instance.
+     */
+    object: ((nameOrObj, maybeObj) => {
+      if (typeof nameOrObj === "string") {
+        if (!maybeObj) {
+          throw new TypeError(
+            "When providing a name, you must also provide the object."
+          );
+        }
+        return new ProductBuilder(maybeObj, nameOrObj);
+      }
+      return new ProductBuilder(nameOrObj, void 0);
+    }),
+    /**
+     * Creates a new `Row` {@link AlgebraicType} to be used in table definitions. Row types in SpacetimeDB
+     * are similar to `Product` types, but are specifically used to define the schema of a table row.
+     * Properties of the object must also be {@link TypeBuilder} or {@link ColumnBuilder}s.
+     *
+     * You can represent a `Row` as either a {@link RowObj} or an {@link RowBuilder} type when
+     * defining a table schema.
+     *
+     * The {@link RowBuilder} type is useful when you want to create a type which can be used anywhere
+     * a {@link TypeBuilder} is accepted, such as in nested objects or arrays, or as the argument
+     * to a scheduled function.
+     *
+     * @param obj The object defining the properties of the row, whose property
+     * values must be {@link TypeBuilder}s or {@link ColumnBuilder}s.
+     * @returns A new {@link RowBuilder} instance
+     */
+    row: ((nameOrObj, maybeObj) => {
+      const [obj, name] = typeof nameOrObj === "string" ? [maybeObj, nameOrObj] : [nameOrObj, void 0];
+      return new RowBuilder(obj, name);
+    }),
+    /**
+     * Creates a new `Array` {@link AlgebraicType} to be used in table definitions.
+     * Represented as an array in TypeScript.
+     * @param element The element type of the array, which must be a `TypeBuilder`.
+     * @returns A new {@link ArrayBuilder} instance
+     */
+    array(e) {
+      return new ArrayBuilder(e);
+    },
+    enum: enumImpl,
+    /**
+     * This is a special helper function for conveniently creating `Product` type columns with no fields.
+     *
+     * @returns A new {@link ProductBuilder} instance with no fields.
+     */
+    unit() {
+      return new UnitBuilder();
+    },
+    /**
+     * Creates a lazily-evaluated {@link TypeBuilder}. This is useful for creating
+     * recursive types, such as a tree or linked list.
+     * @param thunk A function that returns a {@link TypeBuilder}.
+     * @returns A proxy {@link TypeBuilder} that evaluates the thunk on first access.
+     */
+    lazy(thunk) {
+      let cached = null;
+      const get = () => cached ??= thunk();
+      const proxy = new Proxy({}, {
+        get(_t, prop, recv) {
+          const target = get();
+          const val = Reflect.get(target, prop, recv);
+          return typeof val === "function" ? val.bind(target) : val;
+        },
+        set(_t, prop, value, recv) {
+          return Reflect.set(get(), prop, value, recv);
+        },
+        has(_t, prop) {
+          return prop in get();
+        },
+        ownKeys() {
+          return Reflect.ownKeys(get());
+        },
+        getOwnPropertyDescriptor(_t, prop) {
+          return Object.getOwnPropertyDescriptor(get(), prop);
+        },
+        getPrototypeOf() {
+          return Object.getPrototypeOf(get());
+        }
+      });
+      return proxy;
+    },
+    /**
+     * This is a special helper function for conveniently creating {@link ScheduleAt} type columns.
+     * @returns A new ColumnBuilder instance with the {@link ScheduleAt} type.
+     */
+    scheduleAt: () => {
+      return new ScheduleAtBuilder();
+    },
+    /**
+     * This is a convenience method for creating a column with the {@link Option} type.
+     * You can create a column of the same type by constructing an enum with a `some` and `none` variant.
+     * @param value The type of the value contained in the `some` variant of the `Option`.
+     * @returns A new {@link OptionBuilder} instance with the {@link Option} type.
+     */
+    option(value) {
+      return new OptionBuilder(value);
+    },
+    /**
+     * This is a convenience method for creating a column with the {@link Result} type.
+     * You can create a column of the same type by constructing an enum with an `ok` and `err` variant.
+     * @param ok The type of the value contained in the `ok` variant of the `Result`.
+     * @param err The type of the value contained in the `err` variant of the `Result`.
+     * @returns A new {@link ResultBuilder} instance with the {@link Result} type.
+     */
+    result(ok, err) {
+      return new ResultBuilder(ok, err);
+    },
+    /**
+     * This is a convenience method for creating a column with the {@link Identity} type.
+     * You can create a column of the same type by constructing an `object` with a single `__identity__` element.
+     * @returns A new {@link TypeBuilder} instance with the {@link Identity} type.
+     */
+    identity: () => {
+      return new IdentityBuilder();
+    },
+    /**
+     * This is a convenience method for creating a column with the {@link ConnectionId} type.
+     * You can create a column of the same type by constructing an `object` with a single `__connection_id__` element.
+     * @returns A new {@link TypeBuilder} instance with the {@link ConnectionId} type.
+     */
+    connectionId: () => {
+      return new ConnectionIdBuilder();
+    },
+    /**
+     * This is a convenience method for creating a column with the {@link Timestamp} type.
+     * You can create a column of the same type by constructing an `object` with a single `__timestamp_micros_since_unix_epoch__` element.
+     * @returns A new {@link TypeBuilder} instance with the {@link Timestamp} type.
+     */
+    timestamp: () => {
+      return new TimestampBuilder();
+    },
+    /**
+     * This is a convenience method for creating a column with the {@link TimeDuration} type.
+     * You can create a column of the same type by constructing an `object` with a single `__time_duration_micros__` element.
+     * @returns A new {@link TypeBuilder} instance with the {@link TimeDuration} type.
+     */
+    timeDuration: () => {
+      return new TimeDurationBuilder();
+    },
+    /**
+     * This is a convenience method for creating a column with the {@link Uuid} type.
+     * You can create a column of the same type by constructing an `object` with a single `__uuid__` element.
+     * @returns A new {@link TypeBuilder} instance with the {@link Uuid} type.
+     */
+    uuid: () => {
+      return new UuidBuilder();
+    },
+    /**
+     * This is a convenience method for creating a column with the `ByteArray` type.
+     * You can create a column of the same type by constructing an `array` of `u8`.
+     * The TypeScript representation is {@link Uint8Array}.
+     * @returns A new {@link ByteArrayBuilder} instance with the `ByteArray` type.
+     */
+    byteArray: () => {
+      return new ByteArrayBuilder();
+    }
+  };
+  var BsatnRowList = t.object("BsatnRowList", {
+    get sizeHint() {
+      return RowSizeHint;
+    },
+    rowsData: t.byteArray()
+  });
+  var CallProcedure = t.object("CallProcedure", {
+    requestId: t.u32(),
+    flags: t.u8(),
+    procedure: t.string(),
+    args: t.byteArray()
+  });
+  var CallReducer = t.object("CallReducer", {
+    requestId: t.u32(),
+    flags: t.u8(),
+    reducer: t.string(),
+    args: t.byteArray()
+  });
+  var ClientMessage = t.enum("ClientMessage", {
+    get Subscribe() {
+      return Subscribe;
+    },
+    get Unsubscribe() {
+      return Unsubscribe;
+    },
+    get OneOffQuery() {
+      return OneOffQuery;
+    },
+    get CallReducer() {
+      return CallReducer;
+    },
+    get CallProcedure() {
+      return CallProcedure;
+    }
+  });
+  var EventTableRows = t.object("EventTableRows", {
+    get events() {
+      return BsatnRowList;
+    }
+  });
+  var InitialConnection = t.object("InitialConnection", {
+    identity: t.identity(),
+    connectionId: t.connectionId(),
+    token: t.string()
+  });
+  var OneOffQuery = t.object("OneOffQuery", {
+    requestId: t.u32(),
+    queryString: t.string()
+  });
+  var OneOffQueryResult = t.object("OneOffQueryResult", {
+    requestId: t.u32(),
+    get result() {
+      return t.result(QueryRows, t.string());
+    }
+  });
+  var PersistentTableRows = t.object("PersistentTableRows", {
+    get inserts() {
+      return BsatnRowList;
+    },
+    get deletes() {
+      return BsatnRowList;
+    }
+  });
+  var ProcedureResult = t.object("ProcedureResult", {
+    get status() {
+      return ProcedureStatus;
+    },
+    timestamp: t.timestamp(),
+    totalHostExecutionDuration: t.timeDuration(),
+    requestId: t.u32()
+  });
+  var ProcedureStatus = t.enum("ProcedureStatus", {
+    Returned: t.byteArray(),
+    InternalError: t.string()
+  });
+  var QueryRows = t.object("QueryRows", {
+    get tables() {
+      return t.array(SingleTableRows);
+    }
+  });
+  var QuerySetId = t.object("QuerySetId", {
+    id: t.u32()
+  });
+  var QuerySetUpdate = t.object("QuerySetUpdate", {
+    get querySetId() {
+      return QuerySetId;
+    },
+    get tables() {
+      return t.array(TableUpdate);
+    }
+  });
+  var ReducerOk = t.object("ReducerOk", {
+    retValue: t.byteArray(),
+    get transactionUpdate() {
+      return TransactionUpdate;
+    }
+  });
+  var ReducerOutcome = t.enum("ReducerOutcome", {
+    get Ok() {
+      return ReducerOk;
+    },
+    OkEmpty: t.unit(),
+    Err: t.byteArray(),
+    InternalError: t.string()
+  });
+  var ReducerResult = t.object("ReducerResult", {
+    requestId: t.u32(),
+    timestamp: t.timestamp(),
+    get result() {
+      return ReducerOutcome;
+    }
+  });
+  var RowSizeHint = t.enum("RowSizeHint", {
+    FixedSize: t.u16(),
+    RowOffsets: t.array(t.u64())
+  });
+  var ServerMessage = t.enum("ServerMessage", {
+    get InitialConnection() {
+      return InitialConnection;
+    },
+    get SubscribeApplied() {
+      return SubscribeApplied;
+    },
+    get UnsubscribeApplied() {
+      return UnsubscribeApplied;
+    },
+    get SubscriptionError() {
+      return SubscriptionError;
+    },
+    get TransactionUpdate() {
+      return TransactionUpdate;
+    },
+    get OneOffQueryResult() {
+      return OneOffQueryResult;
+    },
+    get ReducerResult() {
+      return ReducerResult;
+    },
+    get ProcedureResult() {
+      return ProcedureResult;
+    }
+  });
+  var SingleTableRows = t.object("SingleTableRows", {
+    table: t.string(),
+    get rows() {
+      return BsatnRowList;
+    }
+  });
+  var Subscribe = t.object("Subscribe", {
+    requestId: t.u32(),
+    get querySetId() {
+      return QuerySetId;
+    },
+    queryStrings: t.array(t.string())
+  });
+  var SubscribeApplied = t.object("SubscribeApplied", {
+    requestId: t.u32(),
+    get querySetId() {
+      return QuerySetId;
+    },
+    get rows() {
+      return QueryRows;
+    }
+  });
+  var SubscriptionError = t.object("SubscriptionError", {
+    requestId: t.option(t.u32()),
+    get querySetId() {
+      return QuerySetId;
+    },
+    error: t.string()
+  });
+  var TableUpdate = t.object("TableUpdate", {
+    tableName: t.string(),
+    get rows() {
+      return t.array(TableUpdateRows);
+    }
+  });
+  var TableUpdateRows = t.enum("TableUpdateRows", {
+    get PersistentTable() {
+      return PersistentTableRows;
+    },
+    get EventTable() {
+      return EventTableRows;
+    }
+  });
+  var TransactionUpdate = t.object("TransactionUpdate", {
+    get querySets() {
+      return t.array(QuerySetUpdate);
+    }
+  });
+  var Unsubscribe = t.object("Unsubscribe", {
+    requestId: t.u32(),
+    get querySetId() {
+      return QuerySetId;
+    },
+    get flags() {
+      return UnsubscribeFlags;
+    }
+  });
+  var UnsubscribeApplied = t.object("UnsubscribeApplied", {
+    requestId: t.u32(),
+    get querySetId() {
+      return QuerySetId;
+    },
+    get rows() {
+      return t.option(QueryRows);
+    }
+  });
+  var UnsubscribeFlags = t.enum("UnsubscribeFlags", {
+    Default: t.unit(),
+    SendDroppedRows: t.unit()
+  });
+  var EventEmitter = class {
+    #events = /* @__PURE__ */ new Map();
+    on(event, callback) {
+      let callbacks = this.#events.get(event);
+      if (!callbacks) {
+        callbacks = /* @__PURE__ */ new Set();
+        this.#events.set(event, callbacks);
+      }
+      callbacks.add(callback);
+    }
+    off(event, callback) {
+      const callbacks = this.#events.get(event);
+      if (!callbacks) {
+        return;
+      }
+      callbacks.delete(callback);
+    }
+    emit(event, ...args) {
+      const callbacks = this.#events.get(event);
+      if (!callbacks) {
+        return;
+      }
+      for (const callback of callbacks) {
+        callback(...args);
+      }
+    }
+  };
+  var LogLevelIdentifierIcon = {
+    component: "\u{1F4E6}",
+    info: "\u2139\uFE0F",
+    warn: "\u26A0\uFE0F",
+    error: "\u274C",
+    debug: "\u{1F41B}",
+    trace: "\u{1F50D}"
+  };
+  var LogStyle = {
+    component: "color: #fff; background-color: #8D6FDD; padding: 2px 5px; border-radius: 3px;",
+    info: "color: #fff; background-color: #007bff; padding: 2px 5px; border-radius: 3px;",
+    warn: "color: #fff; background-color: #ffc107; padding: 2px 5px; border-radius: 3px;",
+    error: "color: #fff; background-color: #dc3545; padding: 2px 5px; border-radius: 3px;",
+    debug: "color: #fff; background-color: #28a745; padding: 2px 5px; border-radius: 3px;",
+    trace: "color: #fff; background-color: #17a2b8; padding: 2px 5px; border-radius: 3px;"
+  };
+  var LogTextStyle = {
+    component: "color: #8D6FDD;",
+    info: "color: #007bff;",
+    warn: "color: #ffc107;",
+    error: "color: #dc3545;",
+    debug: "color: #28a745;",
+    trace: "color: #17a2b8;"
+  };
+  var LogLevelRank = {
+    error: 0,
+    warn: 1,
+    info: 2,
+    debug: 3,
+    trace: 4
+  };
+  var globalLogLevel = "info";
+  var shouldLog = (level) => LogLevelRank[level] <= LogLevelRank[globalLogLevel];
+  var resolveLazy = (v) => typeof v === "function" ? v() : v;
+  var toHex = (bytes) => Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+  var ARRAY_TRUNCATION_THRESHOLD = 25;
+  var ARRAY_PREVIEW_COUNT = 10;
+  var SENSITIVE_KEYS = /* @__PURE__ */ new Set([
+    "token",
+    "authToken",
+    "authorization",
+    "accessToken",
+    "refreshToken"
+  ]);
+  var stringify2 = (value) => stringify(value, (key, current) => {
+    if (SENSITIVE_KEYS.has(key)) {
+      return "[REDACTED]";
+    }
+    if (current && typeof current === "object" && "__identity__" in current && typeof current.__identity__ === "bigint") {
+      return u256ToHexString(
+        current.__identity__
+      );
+    }
+    if (current && typeof current === "object" && "__connection_id__" in current && typeof current.__connection_id__ === "bigint") {
+      return u128ToHexString(
+        current.__connection_id__
+      );
+    }
+    if (current instanceof Uint8Array) {
+      if (current.length < 25) {
+        return `0x${toHex(current)}`;
+      }
+      const head = current.subarray(0, 10);
+      return `Uint8Array(len=${current.length}, head=0x${toHex(head)})`;
+    }
+    if (Array.isArray(current) && current.length >= ARRAY_TRUNCATION_THRESHOLD) {
+      const head = stringify(current.slice(0, ARRAY_PREVIEW_COUNT));
+      return `Array(len=${current.length}, head=${head ?? "[]"})`;
+    }
+    return current;
+  });
+  var stdbLogger = (level, message, ...args) => {
+    if (!shouldLog(level)) {
+      return;
+    }
+    const resolvedMessage = resolveLazy(message);
+    const resolvedArgs = args.map(resolveLazy);
+    console.log(
+      `%c${LogLevelIdentifierIcon[level]} ${level.toUpperCase()}%c ${resolvedMessage}`,
+      LogStyle[level],
+      LogTextStyle[level],
+      ...resolvedArgs
+    );
+  };
+  var scalarCompare = (x, y) => {
+    if (x === y) return 0;
+    return x < y ? -1 : 1;
+  };
+  var TableCacheImpl = class {
+    hasPrimaryKey;
+    rows;
+    tableDef;
+    emitter;
+    /**
+     * @param name the table name
+     * @param primaryKeyCol column index designated as `#[primarykey]`
+     * @param primaryKey column name designated as `#[primarykey]`
+     * @param entityClass the entityClass
+     */
+    constructor(tableDef) {
+      this.tableDef = tableDef;
+      this.rows = /* @__PURE__ */ new Map();
+      this.emitter = new EventEmitter();
+      this.hasPrimaryKey = Object.values(this.tableDef.columns).some(
+        (col) => col.columnMetadata.isPrimaryKey === true
+      );
+      for (const idxDef of this.tableDef.resolvedIndexes) {
+        const index = this.#makeReadonlyIndex(this.tableDef, idxDef);
+        this[idxDef.name] = index;
+      }
+    }
+    // TODO: this just scans the whole table; we should build proper index structures
+    #makeReadonlyIndex(tableDef, idx) {
+      if (idx.algorithm !== "btree") {
+        throw new Error("Only btree indexes are supported in TableCacheImpl");
+      }
+      const columns = idx.columns;
+      const getKey = (row) => columns.map((c) => row[c]);
+      const matchRange = (row, rangeArg) => {
+        const key = getKey(row);
+        const arr = Array.isArray(rangeArg) ? rangeArg : [rangeArg];
+        const prefixLen = Math.max(0, arr.length - 1);
+        for (let i = 0; i < prefixLen; i++) {
+          if (!deepEqual(key[i], arr[i])) return false;
+        }
+        const lastProvided = arr[arr.length - 1];
+        const kLast = key[prefixLen];
+        if (lastProvided && typeof lastProvided === "object" && "from" in lastProvided && "to" in lastProvided) {
+          const from = lastProvided.from;
+          const to = lastProvided.to;
+          if (from.tag !== "unbounded") {
+            const c = scalarCompare(kLast, from.value);
+            if (c < 0) return false;
+            if (c === 0 && from.tag === "excluded") return false;
+          }
+          if (to.tag !== "unbounded") {
+            const c = scalarCompare(kLast, to.value);
+            if (c > 0) return false;
+            if (c === 0 && to.tag === "excluded") return false;
+          }
+          return true;
+        } else {
+          if (!deepEqual(kLast, lastProvided)) return false;
+          return true;
+        }
+      };
+      const isUnique = tableDef.constraints.some((constraint) => {
+        if (constraint.constraint !== "unique") {
+          return false;
+        }
+        return deepEqual(constraint.columns, idx.columns);
+      });
+      const self = this;
+      if (isUnique) {
+        const impl = {
+          find: (colVal) => {
+            const expected = Array.isArray(colVal) ? colVal : [colVal];
+            for (const row of self.iter()) {
+              if (deepEqual(getKey(row), expected)) return row;
+            }
+            return null;
+          }
+        };
+        return impl;
+      } else {
+        const impl = {
+          *filter(range) {
+            for (const row of self.iter()) {
+              if (matchRange(row, range)) yield row;
+            }
+          }
+        };
+        return impl;
+      }
+    }
+    /**
+     * @returns number of rows in the table
+     */
+    count() {
+      return BigInt(this.rows.size);
+    }
+    /**
+     * @returns The values of the rows in the table
+     */
+    iter() {
+      function* generator(rows2) {
+        for (const [row] of rows2.values()) {
+          yield row;
+        }
+      }
+      return generator(this.rows);
+    }
+    /**
+     * Allows iteration over the rows in the table
+     * @returns An iterator over the rows in the table
+     */
+    [Symbol.iterator]() {
+      return this.iter();
+    }
+    applyOperations = (operations, ctx) => {
+      const pendingCallbacks = [];
+      if (this.tableDef.isEvent) {
+        for (const op of operations) {
+          if (op.type === "insert") {
+            pendingCallbacks.push({
+              type: "insert",
+              table: this.tableDef.sourceName,
+              cb: () => {
+                this.emitter.emit("insert", ctx, op.row);
+              }
+            });
+          }
+        }
+        return pendingCallbacks;
+      }
+      if (this.hasPrimaryKey) {
+        const insertMap = /* @__PURE__ */ new Map();
+        const deleteMap = /* @__PURE__ */ new Map();
+        for (const op of operations) {
+          if (op.type === "insert") {
+            const [_, prevCount] = insertMap.get(op.rowId) || [op, 0];
+            insertMap.set(op.rowId, [op, prevCount + 1]);
+          } else {
+            const [_, prevCount] = deleteMap.get(op.rowId) || [op, 0];
+            deleteMap.set(op.rowId, [op, prevCount + 1]);
+          }
+        }
+        for (const [primaryKey, [insertOp, refCount]] of insertMap) {
+          const deleteEntry = deleteMap.get(primaryKey);
+          if (deleteEntry) {
+            const [_, deleteCount] = deleteEntry;
+            const refCountDelta = refCount - deleteCount;
+            const maybeCb = this.update(
+              ctx,
+              primaryKey,
+              insertOp.row,
+              refCountDelta
+            );
+            if (maybeCb) {
+              pendingCallbacks.push(maybeCb);
+            }
+            deleteMap.delete(primaryKey);
+          } else {
+            const maybeCb = this.insert(ctx, insertOp, refCount);
+            if (maybeCb) {
+              pendingCallbacks.push(maybeCb);
+            }
+          }
+        }
+        for (const [deleteOp, refCount] of deleteMap.values()) {
+          const maybeCb = this.delete(ctx, deleteOp, refCount);
+          if (maybeCb) {
+            pendingCallbacks.push(maybeCb);
+          }
+        }
+      } else {
+        for (const op of operations) {
+          if (op.type === "insert") {
+            const maybeCb = this.insert(ctx, op);
+            if (maybeCb) {
+              pendingCallbacks.push(maybeCb);
+            }
+          } else {
+            const maybeCb = this.delete(ctx, op);
+            if (maybeCb) {
+              pendingCallbacks.push(maybeCb);
+            }
+          }
+        }
+      }
+      return pendingCallbacks;
+    };
+    update = (ctx, rowId, newRow, refCountDelta = 0) => {
+      const existingEntry = this.rows.get(rowId);
+      if (!existingEntry) {
+        stdbLogger(
+          "error",
+          `Updating a row that was not present in the cache. Table: ${this.tableDef.sourceName}, RowId: ${rowId}`
+        );
+        return void 0;
+      }
+      const [oldRow, previousCount] = existingEntry;
+      const refCount = Math.max(1, previousCount + refCountDelta);
+      if (previousCount + refCountDelta <= 0) {
+        stdbLogger(
+          "error",
+          `Negative reference count for in table ${this.tableDef.sourceName} row ${rowId} (${previousCount} + ${refCountDelta})`
+        );
+        return void 0;
+      }
+      this.rows.set(rowId, [newRow, refCount]);
+      if (previousCount === 0) {
+        stdbLogger(
+          "error",
+          `Updating a row id in table ${this.tableDef.sourceName} which was not present in the cache (rowId: ${rowId})`
+        );
+        return {
+          type: "insert",
+          table: this.tableDef.sourceName,
+          cb: () => {
+            this.emitter.emit("insert", ctx, newRow);
+          }
+        };
+      }
+      return {
+        type: "update",
+        table: this.tableDef.sourceName,
+        cb: () => {
+          this.emitter.emit("update", ctx, oldRow, newRow);
+        }
+      };
+    };
+    insert = (ctx, operation, count = 1) => {
+      const [_, previousCount] = this.rows.get(operation.rowId) || [
+        operation.row,
+        0
+      ];
+      this.rows.set(operation.rowId, [operation.row, previousCount + count]);
+      if (previousCount === 0) {
+        return {
+          type: "insert",
+          table: this.tableDef.sourceName,
+          cb: () => {
+            this.emitter.emit("insert", ctx, operation.row);
+          }
+        };
+      }
+      return void 0;
+    };
+    delete = (ctx, operation, count = 1) => {
+      const [_, previousCount] = this.rows.get(operation.rowId) || [
+        operation.row,
+        0
+      ];
+      if (previousCount === 0) {
+        stdbLogger("warn", "Deleting a row that was not present in the cache");
+        return void 0;
+      }
+      if (previousCount <= count) {
+        this.rows.delete(operation.rowId);
+        return {
+          type: "delete",
+          table: this.tableDef.sourceName,
+          cb: () => {
+            this.emitter.emit("delete", ctx, operation.row);
+          }
+        };
+      }
+      this.rows.set(operation.rowId, [operation.row, previousCount - count]);
+      return void 0;
+    };
+    /**
+     * Register a callback for when a row is newly inserted into the database.
+     *
+     * ```ts
+     * ctx.db.user.onInsert((reducerEvent, user) => {
+     *   if (reducerEvent) {
+     *      console.log("New user on reducer", reducerEvent, user);
+     *   } else {
+     *      console.log("New user received during subscription update on insert", user);
+     *  }
+     * });
+     * ```
+     *
+     * @param cb Callback to be called when a new row is inserted
+     */
+    onInsert = (cb) => {
+      this.emitter.on("insert", cb);
+    };
+    /**
+     * Register a callback for when a row is deleted from the database.
+     *
+     * ```ts
+     * ctx.db.user.onDelete((reducerEvent, user) => {
+     *   if (reducerEvent) {
+     *      console.log("Deleted user on reducer", reducerEvent, user);
+     *   } else {
+     *      console.log("Deleted user received during subscription update on update", user);
+     *  }
+     * });
+     * ```
+     *
+     * @param cb Callback to be called when a new row is inserted
+     */
+    onDelete = (cb) => {
+      this.emitter.on("delete", cb);
+    };
+    /**
+     * Register a callback for when a row is updated into the database.
+     *
+     * ```ts
+     * ctx.db.user.onInsert((reducerEvent, oldUser, user) => {
+     *   if (reducerEvent) {
+     *      console.log("Updated user on reducer", reducerEvent, user);
+     *   } else {
+     *      console.log("Updated user received during subscription update on delete", user);
+     *  }
+     * });
+     * ```
+     *
+     * @param cb Callback to be called when a new row is inserted
+     */
+    onUpdate = (cb) => {
+      this.emitter.on("update", cb);
+    };
+    /**
+     * Remove a callback for when a row is newly inserted into the database.
+     *
+     * @param cb Callback to be removed
+     */
+    removeOnInsert = (cb) => {
+      this.emitter.off("insert", cb);
+    };
+    /**
+     * Remove a callback for when a row is deleted from the database.
+     *
+     * @param cb Callback to be removed
+     */
+    removeOnDelete = (cb) => {
+      this.emitter.off("delete", cb);
+    };
+    /**
+     * Remove a callback for when a row is updated into the database.
+     *
+     * @param cb Callback to be removed
+     */
+    removeOnUpdate = (cb) => {
+      this.emitter.off("update", cb);
+    };
+  };
+  var TableMap = class {
+    map = /* @__PURE__ */ new Map();
+    get(key) {
+      return this.map.get(key);
+    }
+    set(key, value) {
+      this.map.set(key, value);
+      return this;
+    }
+    has(key) {
+      return this.map.has(key);
+    }
+    delete(key) {
+      return this.map.delete(key);
+    }
+    // optional: iteration stays broadly typed (cannot express per-key relation here)
+    keys() {
+      return this.map.keys();
+    }
+    values() {
+      return this.map.values();
+    }
+    entries() {
+      return this.map.entries();
+    }
+    [Symbol.iterator]() {
+      return this.entries();
+    }
+  };
+  var ClientCache = class {
+    /**
+     * The tables in the database.
+     */
+    tables = new TableMap();
+    /**
+     * Returns the table with the given name.
+     * - If SchemaDef is a concrete schema, `name` is constrained to known table names,
+     *   and the return type matches that table.
+     * - If SchemaDef is undefined, `name` is string and the return type is untyped.
+     */
+    getTable(name) {
+      const table2 = this.tables.get(name);
+      if (!table2) {
+        console.error(
+          "The table has not been registered for this client. Please register the table before using it. If you have registered global tables using the SpacetimeDBClient.registerTables() or `registerTable()` method, please make sure that is executed first!"
+        );
+        throw new Error(`Table ${String(name)} does not exist`);
+      }
+      return table2;
+    }
+    /**
+     * Returns the table with the given name, creating it if needed.
+     * - Typed mode: `tableTypeInfo.tableName` is constrained to known names and
+     *   the return type matches that table.
+     * - Untyped mode: accepts any string and returns an untyped TableCache.
+     */
+    getOrCreateTable(tableDef) {
+      const name = tableDef.accessorName;
+      const table2 = this.tables.get(name);
+      if (table2) {
+        return table2;
+      }
+      const newTable = new TableCacheImpl(
+        tableDef
+      );
+      this.tables.set(name, newTable);
+      return newTable;
+    }
+  };
+  function comparePreReleases(a, b) {
+    const len = Math.min(a.length, b.length);
+    for (let i = 0; i < len; i++) {
+      const aPart = a[i];
+      const bPart = b[i];
+      if (aPart === bPart) continue;
+      if (typeof aPart === "number" && typeof bPart === "number") {
+        return aPart - bPart;
+      }
+      if (typeof aPart === "string" && typeof bPart === "string") {
+        return aPart.localeCompare(bPart);
+      }
+      return typeof aPart === "string" ? 1 : -1;
+    }
+    return a.length - b.length;
+  }
+  var SemanticVersion = class _SemanticVersion {
+    major;
+    minor;
+    patch;
+    preRelease;
+    buildInfo;
+    constructor(major, minor, patch, preRelease = null, buildInfo = null) {
+      this.major = major;
+      this.minor = minor;
+      this.patch = patch;
+      this.preRelease = preRelease;
+      this.buildInfo = buildInfo;
+    }
+    toString() {
+      let versionString = `${this.major}.${this.minor}.${this.patch}`;
+      if (this.preRelease) {
+        versionString += `-${this.preRelease.join(".")}`;
+      }
+      if (this.buildInfo) {
+        versionString += `+${this.buildInfo}`;
+      }
+      return versionString;
+    }
+    compare(other) {
+      if (this.major !== other.major) {
+        return this.major - other.major;
+      }
+      if (this.minor !== other.minor) {
+        return this.minor - other.minor;
+      }
+      if (this.patch !== other.patch) {
+        return this.patch - other.patch;
+      }
+      if (this.preRelease && other.preRelease) {
+        return comparePreReleases(this.preRelease, other.preRelease);
+      }
+      if (this.preRelease) {
+        return -1;
+      }
+      if (other.preRelease) {
+        return -1;
+      }
+      return 0;
+    }
+    clone() {
+      return new _SemanticVersion(
+        this.major,
+        this.minor,
+        this.patch,
+        this.preRelease ? [...this.preRelease] : null,
+        this.buildInfo
+      );
+    }
+    static parseVersionString(version) {
+      const regex = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([\da-zA-Z-]+(?:\.[\da-zA-Z-]+)*))?(?:\+([\da-zA-Z-]+(?:\.[\da-zA-Z-]+)*))?$/;
+      const match = version.match(regex);
+      if (!match) {
+        throw new Error(`Invalid version string: ${version}`);
+      }
+      const major = parseInt(match[1], 10);
+      const minor = parseInt(match[2], 10);
+      const patch = parseInt(match[3], 10);
+      const preRelease = match[4] ? match[4].split(".").map((id) => isNaN(Number(id)) ? id : Number(id)) : null;
+      const buildInfo = match[5] || null;
+      return new _SemanticVersion(major, minor, patch, preRelease, buildInfo);
+    }
+  };
+  var _MINIMUM_CLI_VERSION = new SemanticVersion(
+    1,
+    4,
+    0
+  );
+  function ensureMinimumVersionOrThrow(versionString) {
+    if (versionString === void 0) {
+      throw new Error(versionErrorMessage(versionString));
+    }
+    const version = SemanticVersion.parseVersionString(versionString);
+    if (version.compare(_MINIMUM_CLI_VERSION) < 0) {
+      throw new Error(versionErrorMessage(versionString));
+    }
+  }
+  function versionErrorMessage(incompatibleVersion) {
+    return `Module code was generated with an incompatible version of the spacetimedb cli (${incompatibleVersion}). Update the cli version to at least ${_MINIMUM_CLI_VERSION.toString()} and regenerate the bindings. You can upgrade to the latest cli version by running: spacetime version upgrade`;
+  }
+  async function decompress(buffer, type, chunkSize = 128 * 1024) {
+    let offset = 0;
+    const readableStream = new ReadableStream({
+      pull(controller) {
+        if (offset < buffer.length) {
+          const chunk = buffer.subarray(
+            offset,
+            Math.min(offset + chunkSize, buffer.length)
+          );
+          controller.enqueue(chunk);
+          offset += chunkSize;
+        } else {
+          controller.close();
+        }
+      }
+    });
+    const decompressionStream = new DecompressionStream(type);
+    const decompressedStream = readableStream.pipeThrough(decompressionStream);
+    const reader = decompressedStream.getReader();
+    const chunks = [];
+    let totalLength = 0;
+    let result;
+    while (!(result = await reader.read()).done) {
+      chunks.push(result.value);
+      totalLength += result.value.length;
+    }
+    const decompressedArray = new Uint8Array(totalLength);
+    let chunkOffset = 0;
+    for (const chunk of chunks) {
+      decompressedArray.set(chunk, chunkOffset);
+      chunkOffset += chunk.length;
+    }
+    return decompressedArray;
+  }
+  async function resolveWS() {
+    if (typeof WebSocket !== "undefined") {
+      return WebSocket;
+    }
+    const dynamicImport = new Function("m", "return import(m)");
+    try {
+      const { WebSocket: UndiciWS } = await dynamicImport("undici");
+      return UndiciWS;
+    } catch (err) {
+      stdbLogger(
+        "warn",
+        "[spacetimedb-sdk] No global WebSocket found. On Node 18\u201321, please install `undici` (npm install undici) to enable WebSocket support."
+      );
+      throw err;
+    }
+  }
+  async function openWebSocket({
+    url,
+    nameOrAddress,
+    wsProtocol,
+    authToken,
+    compression,
+    lightMode,
+    confirmedReads
+  }) {
+    const headers = new Headers();
+    const WS = await resolveWS();
+    let temporaryAuthToken;
+    if (authToken) {
+      headers.set("Authorization", `Bearer ${authToken}`);
+      const tokenUrl = new URL("v1/identity/websocket-token", url);
+      tokenUrl.protocol = url.protocol === "wss:" ? "https:" : "http:";
+      const response = await fetch(tokenUrl, { method: "POST", headers });
+      if (response.ok) {
+        const { token } = await response.json();
+        temporaryAuthToken = token;
+      } else {
+        throw new Error(`Failed to verify token: ${response.statusText}`);
+      }
+    }
+    const databaseUrl = new URL(`v1/database/${nameOrAddress}/subscribe`, url);
+    if (temporaryAuthToken) {
+      databaseUrl.searchParams.set("token", temporaryAuthToken);
+    }
+    databaseUrl.searchParams.set(
+      "compression",
+      { gzip: "Gzip", brotli: "Brotli", none: "None" }[compression] ?? "None"
+    );
+    if (lightMode) {
+      databaseUrl.searchParams.set("light", "true");
+    }
+    if (confirmedReads !== void 0) {
+      databaseUrl.searchParams.set("confirmed", confirmedReads.toString());
+    }
+    const ws = new WS(databaseUrl.toString(), wsProtocol);
+    ws.binaryType = "arraybuffer";
+    return ws;
+  }
+  var WebsocketDecompressAdapter = class _WebsocketDecompressAdapter {
+    get protocol() {
+      return this.#ws.protocol;
+    }
+    get readyState() {
+      return this.#ws.readyState;
+    }
+    set onclose(handler) {
+      this.#ws.onclose = handler;
+    }
+    set onopen(handler) {
+      this.#ws.onopen = handler;
+    }
+    set onmessage(handler) {
+      this.#ws.onmessage = async (msg) => {
+        let data;
+        try {
+          data = await this.#decompress(new Uint8Array(msg.data));
+        } catch (e) {
+          console.error(
+            "[SpacetimeDB] WebSocket decompress failed, closing socket:",
+            e
+          );
+          this.#ws.close();
+          return;
+        }
+        handler({ data });
+      };
+    }
+    set onerror(handler) {
+      this.#ws.onerror = handler;
+    }
+    #ws;
+    async #decompress(buffer) {
+      const tag = buffer[0];
+      const data = buffer.subarray(1);
+      switch (tag) {
+        case 0:
+          return data;
+        case 1:
+          return await decompress(data, "brotli");
+        case 2:
+          return await decompress(data, "gzip");
+        default:
+          throw new Error(
+            "Unexpected Compression Algorithm. Please use `gzip` or `none`"
+          );
+      }
+    }
+    send(msg) {
+      this.#ws.send(msg);
+    }
+    close() {
+      this.#ws.close();
+    }
+    constructor(ws) {
+      this.#ws = ws;
+    }
+    static async openWebSocket(args) {
+      return new _WebsocketDecompressAdapter(await openWebSocket(args));
+    }
+  };
+  var DbConnectionBuilder = class {
+    /**
+     * Creates a new `DbConnectionBuilder` database client and set the initial parameters.
+     *
+     * Users are not expected to call this constructor directly. Instead, use the static method `DbConnection.builder()`.
+     *
+     * @param remoteModule The remote module to use to connect to the SpacetimeDB server.
+     * @param dbConnectionConstructor The constructor to use to create a new `DbConnection`.
+     */
+    constructor(remoteModule, dbConnectionCtor) {
+      this.remoteModule = remoteModule;
+      this.dbConnectionCtor = dbConnectionCtor;
+      this.#createWSFn = WebsocketDecompressAdapter.openWebSocket;
+    }
+    #uri;
+    #nameOrAddress;
+    #identity;
+    #token;
+    #emitter = new EventEmitter();
+    #compression = "gzip";
+    #lightMode = false;
+    #confirmedReads;
+    #createWSFn;
+    /**
+     * Set the URI of the SpacetimeDB server to connect to.
+     *
+     * @param uri The URI of the SpacetimeDB server to connect to.
+     *
+     **/
+    withUri(uri) {
+      this.#uri = new URL(uri);
+      return this;
+    }
+    /**
+     * Set the name or Identity of the remote database to connect to.
+     *
+     * @param nameOrAddress
+     *
+     * @returns The `DbConnectionBuilder` instance.
+     */
+    withDatabaseName(nameOrAddress) {
+      this.#nameOrAddress = nameOrAddress;
+      return this;
+    }
+    /**
+     * Set the identity of the client to connect to the database.
+     *
+     * @param token The credentials to use to authenticate with SpacetimeDB. This
+     * is optional. You can store the token returned by the `onConnect` callback
+     * to use in future connections.
+     *
+     * @returns The `DbConnectionBuilder` instance.
+     */
+    withToken(token) {
+      this.#token = token;
+      return this;
+    }
+    withWSFn(createWSFn) {
+      this.#createWSFn = createWSFn;
+      return this;
+    }
+    /**
+     * Set the compression algorithm to use for the connection.
+     *
+     * @param compression The compression algorithm to use for the connection.
+     */
+    withCompression(compression) {
+      if (compression === "brotli") {
+        try {
+          new DecompressionStream("brotli");
+        } catch (e) {
+          throw new TypeError(
+            `Brotli compression is not supported by the runtime. Please choose a different compression method.`,
+            { cause: e }
+          );
+        }
+      }
+      this.#compression = compression;
+      return this;
+    }
+    /**
+     * Sets the connection to operate in light mode.
+     *
+     * Light mode is a mode that reduces the amount of data sent over the network.
+     *
+     * @param lightMode The light mode for the connection.
+     */
+    withLightMode(lightMode) {
+      this.#lightMode = lightMode;
+      return this;
+    }
+    /**
+     * Sets the connection to use confirmed reads.
+     *
+     * When enabled, the server will send query results only after they are
+     * confirmed to be durable.
+     *
+     * What durable means depends on the server configuration: a single node
+     * server may consider a transaction durable once it is `fsync`'ed to disk,
+     * whereas a cluster may require that some number of replicas have
+     * acknowledge that they have stored the transactions.
+     *
+     * Note that enabling confirmed reads will increase the latency between a
+     * reducer call and the corresponding subscription update arriving at the
+     * client.
+     *
+     * If this method is not called, not preference is sent to the server, and
+     * the server will choose the default.
+     *
+     * @param confirmedReads `true` to enable confirmed reads, `false` to disable.
+     */
+    withConfirmedReads(confirmedReads) {
+      this.#confirmedReads = confirmedReads;
+      return this;
+    }
+    /**
+     * Register a callback to be invoked upon authentication with the database.
+     *
+     * @param identity A unique identifier for a client connected to a database.
+     * @param token The credentials to use to authenticate with SpacetimeDB.
+     *
+     * @returns The `DbConnectionBuilder` instance.
+     *
+     * The callback will be invoked with the `Identity` and private authentication `token` provided by the database to identify this connection.
+     *
+     * If credentials were supplied to connect, those passed to the callback will be equivalent to the ones used to connect.
+     *
+     * If the initial connection was anonymous, a new set of credentials will be generated by the database to identify this user.
+     *
+     * The credentials passed to the callback can be saved and used to authenticate the same user in future connections.
+     *
+     * @example
+     *
+     * ```ts
+     * DbConnection.builder().onConnect((ctx, identity, token) => {
+     *  console.log("Connected to SpacetimeDB with identity:", identity.toHexString());
+     * });
+     * ```
+     */
+    onConnect(callback) {
+      this.#emitter.on("connect", callback);
+      return this;
+    }
+    /**
+     * Register a callback to be invoked upon an error.
+     *
+     * @example
+     *
+     * ```ts
+     * DbConnection.builder().onConnectError((ctx, error) => {
+     *   console.log("Error connecting to SpacetimeDB:", error);
+     * });
+     * ```
+     */
+    onConnectError(callback) {
+      this.#emitter.on("connectError", callback);
+      return this;
+    }
+    /**
+     * Registers a callback to run when a {@link DbConnection} whose connection initially succeeded
+     * is disconnected, either after a {@link DbConnection.disconnect()} call or due to an error.
+     *
+     * If the connection ended because of an error, the error is passed to the callback.
+     *
+     * The `callback` will be installed on the `DbConnection` created by `build`
+     * before initiating the connection, ensuring there's no opportunity for the disconnect to happen
+     * before the callback is installed.
+     *
+     * Note that this does not trigger if `build` fails
+     * or in cases where {@link DbConnectionBuilder.onConnectError} would trigger.
+     * This callback only triggers if the connection closes after `build` returns successfully
+     * and {@link DbConnectionBuilder.onConnect} is invoked, i.e., after the initial connection
+     * message is received.
+     *
+     * To simplify SDK implementation, at most one such callback can be registered.
+     * Calling `onDisconnect` on the same `DbConnectionBuilder` multiple times throws an error.
+     *
+     * Unlike callbacks registered via {@link DbConnection},
+     * no mechanism is provided to unregister the provided callback.
+     * This is a concession to ergonomics; there's no clean place to return a `CallbackId` from this method
+     * or from `build`.
+     *
+     * @param {function(error?: Error): void} callback - The callback to invoke upon disconnection.
+     * @throws {Error} Throws an error if called multiple times on the same `DbConnectionBuilder`.
+     */
+    onDisconnect(callback) {
+      this.#emitter.on("disconnect", callback);
+      return this;
+    }
+    getUri() {
+      return this.#uri?.toString() ?? "";
+    }
+    getModuleName() {
+      return this.#nameOrAddress ?? "";
+    }
+    /**
+     * Builds a new `DbConnection` with the parameters set on this `DbConnectionBuilder` and attempts to connect to the SpacetimeDB server.
+     *
+     * @returns A new `DbConnection` with the parameters set on this `DbConnectionBuilder`.
+     *
+     * @example
+     *
+     * ```ts
+     * const host = "http://localhost:3000";
+     * const name_or_address = "database_name"
+     * const auth_token = undefined;
+     * DbConnection.builder().withUri(host).withDatabaseName(name_or_address).withToken(auth_token).build();
+     * ```
+     */
+    build() {
+      if (!this.#uri) {
+        throw new Error("URI is required to connect to SpacetimeDB");
+      }
+      if (!this.#nameOrAddress) {
+        throw new Error(
+          "Database name or address is required to connect to SpacetimeDB"
+        );
+      }
+      ensureMinimumVersionOrThrow(this.remoteModule.versionInfo?.cliVersion);
+      return this.dbConnectionCtor({
+        uri: this.#uri,
+        nameOrAddress: this.#nameOrAddress,
+        identity: this.#identity,
+        token: this.#token,
+        emitter: this.#emitter,
+        compression: this.#compression,
+        lightMode: this.#lightMode,
+        confirmedReads: this.#confirmedReads,
+        createWSFn: this.#createWSFn,
+        remoteModule: this.remoteModule
+      });
+    }
+  };
+  var INTERNAL_REMOTE_MODULE = Symbol("INTERNAL_REMOTE_MODULE");
+  var SubscriptionBuilderImpl = class {
+    constructor(db) {
+      this.db = db;
+    }
+    #onApplied = void 0;
+    #onError = void 0;
+    /**
+     * Registers `callback` to run when this query is successfully added to our subscribed set,
+     * I.e. when its `SubscriptionApplied` message is received.
+     *
+     * The database state exposed via the `&EventContext` argument
+     * includes all the rows added to the client cache as a result of the new subscription.
+     *
+     * The event in the `&EventContext` argument is `Event::SubscribeApplied`.
+     *
+     * Multiple `on_applied` callbacks for the same query may coexist.
+     * No mechanism for un-registering `on_applied` callbacks is exposed.
+     *
+     * @param cb - Callback to run when the subscription is applied.
+     * @returns The current `SubscriptionBuilder` instance.
+     */
+    onApplied(cb) {
+      this.#onApplied = cb;
+      return this;
+    }
+    /**
+     * Registers `callback` to run when this query either:
+     * - Fails to be added to our subscribed set.
+     * - Is unexpectedly removed from our subscribed set.
+     *
+     * If the subscription had previously started and has been unexpectedly removed,
+     * the database state exposed via the `&EventContext` argument contains no rows
+     * from any subscriptions removed within the same error event.
+     * As proposed, it must therefore contain no rows.
+     *
+     * The event in the `&EventContext` argument is `Event::SubscribeError`,
+     * containing a dynamic error object with a human-readable description of the error
+     * for diagnostic purposes.
+     *
+     * Multiple `on_error` callbacks for the same query may coexist.
+     * No mechanism for un-registering `on_error` callbacks is exposed.
+     *
+     * @param cb - Callback to run when there is an error in subscription.
+     * @returns The current `SubscriptionBuilder` instance.
+     */
+    onError(cb) {
+      this.#onError = cb;
+      return this;
+    }
+    subscribe(query_sql) {
+      let queries;
+      if (typeof query_sql === "function") {
+        const tables2 = this.db.getFromBuilder();
+        const result = query_sql(tables2);
+        queries = Array.isArray(result) ? result : [result];
+      } else {
+        queries = Array.isArray(query_sql) ? query_sql : [query_sql];
+      }
+      if (queries.length === 0) {
+        throw new Error("Subscriptions must have at least one query");
+      }
+      const queryStrings = queries.map((q) => {
+        if (typeof q === "string") return q;
+        if (isRowTypedQuery(q)) return toSql(q);
+        throw new Error("Subscriptions must be SQL strings or typed queries");
+      });
+      return new SubscriptionHandleImpl(
+        this.db,
+        queryStrings,
+        this.#onApplied,
+        this.#onError
+      );
+    }
+    /**
+     * Subscribes to all rows from all tables.
+     *
+     * This method is intended as a convenience
+     * for applications where client-side memory use and network bandwidth are not concerns.
+     * Applications where these resources are a constraint
+     * should register more precise queries via `subscribe`
+     * in order to replicate only the subset of data which the client needs to function.
+     *
+     * This method should not be combined with `subscribe` on the same `DbConnection`.
+     * A connection may either `subscribe` to particular queries,
+     * or `subscribeToAllTables`, but not both.
+     * Attempting to call `subscribe`
+     * on a `DbConnection` that has previously used `subscribeToAllTables`,
+     * or vice versa, may misbehave in any number of ways,
+     * including dropping subscriptions, corrupting the client cache, or throwing errors.
+     */
+    subscribeToAllTables() {
+      const remoteModule = this.db[INTERNAL_REMOTE_MODULE]();
+      const queries = Object.values(remoteModule.tables).map(
+        (table2) => `SELECT * FROM ${table2.sourceName}`
+      );
+      this.subscribe(queries);
+    }
+  };
+  var SubscriptionManager = class {
+    subscriptions = /* @__PURE__ */ new Map();
+  };
+  var SubscriptionHandleImpl = class {
+    constructor(db, querySql, onApplied, onError) {
+      this.db = db;
+      this.#emitter.on(
+        "applied",
+        (ctx) => {
+          this.#activeState = true;
+          if (onApplied) {
+            onApplied(ctx);
+          }
+        }
+      );
+      this.#emitter.on(
+        "error",
+        (ctx, error) => {
+          this.#activeState = false;
+          this.#endedState = true;
+          if (onError) {
+            onError(ctx, error);
+          }
+        }
+      );
+      this.#querySetId = this.db.registerSubscription(
+        this,
+        this.#emitter,
+        querySql
+      );
+    }
+    #querySetId;
+    #unsubscribeCalled = false;
+    #endedState = false;
+    #activeState = false;
+    #emitter = new EventEmitter();
+    /**
+     * Consumes self and issues an `Unsubscribe` message,
+     * removing this query from the client's set of subscribed queries.
+     * It is only valid to call this method if `is_active()` is `true`.
+     */
+    unsubscribe() {
+      if (this.#unsubscribeCalled) {
+        throw new Error("Unsubscribe has already been called");
+      }
+      this.#unsubscribeCalled = true;
+      this.db.unregisterSubscription(this.#querySetId);
+      this.#emitter.on(
+        "end",
+        (_ctx) => {
+          this.#endedState = true;
+          this.#activeState = false;
+        }
+      );
+    }
+    /**
+     * Unsubscribes and also registers a callback to run upon success.
+     * I.e. when an `UnsubscribeApplied` message is received.
+     *
+     * If `Unsubscribe` returns an error,
+     * or if the `on_error` callback(s) are invoked before this subscription would end normally,
+     * the `on_end` callback is not invoked.
+     *
+     * @param onEnd - Callback to run upon successful unsubscribe.
+     */
+    unsubscribeThen(onEnd) {
+      if (this.#endedState) {
+        throw new Error("Subscription has already ended");
+      }
+      if (this.#unsubscribeCalled) {
+        throw new Error("Unsubscribe has already been called");
+      }
+      this.#unsubscribeCalled = true;
+      this.db.unregisterSubscription(this.#querySetId);
+      this.#emitter.on(
+        "end",
+        (ctx) => {
+          this.#endedState = true;
+          this.#activeState = false;
+          onEnd(ctx);
+        }
+      );
+    }
+    /**
+     * True if this `SubscriptionHandle` has ended,
+     * either due to an error or a call to `unsubscribe`.
+     *
+     * This is initially false, and becomes true when either the `on_end` or `on_error` callback is invoked.
+     * A subscription which has not yet been applied is not active, but is also not ended.
+     */
+    isEnded() {
+      return this.#endedState;
+    }
+    /**
+     * True if this `SubscriptionHandle` is active, meaning it has been successfully applied
+     * and has not since ended, either due to an error or a complete `unsubscribe` request-response pair.
+     *
+     * This corresponds exactly to the interval bounded at the start by the `on_applied` callback
+     * and at the end by either the `on_end` or `on_error` callback.
+     */
+    isActive() {
+      return this.#activeState;
+    }
+  };
+  var V2_WS_PROTOCOL = "v2.bsatn.spacetimedb";
+  var V3_WS_PROTOCOL = "v3.bsatn.spacetimedb";
+  var PREFERRED_WS_PROTOCOLS = [V3_WS_PROTOCOL, V2_WS_PROTOCOL];
+  function normalizeWsProtocol(protocol) {
+    if (protocol === V3_WS_PROTOCOL) {
+      return V3_WS_PROTOCOL;
+    }
+    if (protocol === "" || protocol === V2_WS_PROTOCOL) {
+      return V2_WS_PROTOCOL;
+    }
+    stdbLogger(
+      "warn",
+      `Unexpected websocket subprotocol "${protocol}", falling back to ${V2_WS_PROTOCOL}.`
+    );
+    return V2_WS_PROTOCOL;
+  }
+  var EMPTY_V3_PAYLOAD_ERR = "v3 websocket payloads must contain at least one message";
+  function ensureMessages(messages) {
+    if (messages.length === 0) {
+      throw new RangeError(EMPTY_V3_PAYLOAD_ERR);
+    }
+  }
+  function ensureMessageCount(messages, messageCount) {
+    ensureMessages(messages);
+    if (messageCount < 1 || messageCount > messages.length) {
+      throw new RangeError(
+        `v3 websocket payload requested ${messageCount} messages from ${messages.length}`
+      );
+    }
+  }
+  function concatenateMessagesV3(writer, messages, messageCount = messages.length) {
+    ensureMessageCount(messages, messageCount);
+    writer.clear();
+    for (let i = 0; i < messageCount; i++) {
+      writer.writeBytes(messages[i]);
+    }
+    return writer.getBuffer();
+  }
+  function countClientMessagesForV3Frame(messages, maxFrameBytes) {
+    ensureMessages(messages);
+    const firstMessage = messages[0];
+    if (firstMessage.length > maxFrameBytes) {
+      return 1;
+    }
+    let count = 1;
+    let frameSize = firstMessage.length;
+    while (count < messages.length) {
+      const nextMessage = messages[count];
+      const nextFrameSize = frameSize + nextMessage.length;
+      if (nextFrameSize > maxFrameBytes) {
+        break;
+      }
+      frameSize = nextFrameSize;
+      count += 1;
+    }
+    return count;
+  }
+  function encodeClientMessagesV3(writer, messages, messageCount = messages.length) {
+    return concatenateMessagesV3(writer, messages, messageCount);
+  }
+  function forEachServerMessageV3(reader, data, visit) {
+    reader.reset(data);
+    if (reader.remaining === 0) {
+      throw new RangeError(EMPTY_V3_PAYLOAD_ERR);
+    }
+    let count = 0;
+    while (reader.remaining > 0) {
+      visit(ServerMessage.deserialize(reader));
+      count += 1;
+    }
+    return count;
+  }
+  var TEXT_ENCODER = new TextEncoder();
+  function createDeferred() {
+    let resolve;
+    let reject;
+    const promise = new Promise((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  }
+  function getClientMessageVariantTag(name) {
+    if (ClientMessage.algebraicType.tag !== "Sum") {
+      throw new TypeError("ClientMessage must be a sum type");
+    }
+    const tag = ClientMessage.algebraicType.value.variants.findIndex(
+      (variant) => variant.name === name
+    );
+    if (tag === -1) {
+      throw new RangeError(`Unknown ClientMessage variant: ${name}`);
+    }
+    return tag;
+  }
+  var CLIENT_MESSAGE_CALL_REDUCER_TAG = getClientMessageVariantTag("CallReducer");
+  var CLIENT_MESSAGE_CALL_PROCEDURE_TAG = getClientMessageVariantTag("CallProcedure");
+  var MAX_V3_OUTBOUND_FRAME_BYTES = 256 * 1024;
+  var WS_READY_STATE_CLOSING = 2;
+  var WS_READY_STATE_CLOSED = 3;
+  var DbConnectionImpl = class {
+    /**
+     * Whether or not the connection is active.
+     */
+    isActive = false;
+    /**
+     * Whether `disconnect()` has been called on this connection.
+     * Once requested, the connection will not be reused: managed environments
+     * (such as the React `SpacetimeDBProvider`) use this to avoid reconnecting
+     * after an intentional disconnect.
+     */
+    isDisconnectRequested = false;
+    /**
+     * Whether the underlying websocket has entered `CLOSING` (2) or `CLOSED`
+     * (3). This becomes true even when the browser never delivered an
+     * `onclose` event, for example if the socket was torn down while the tab was
+     * frozen or the machine was asleep. The `ConnectionManager` uses this to detect
+     * such "zombie" connections when the page resumes and to force a reconnect.
+     *
+     * Returns false while the socket is still `CONNECTING`/`OPEN`, or before
+     * the socket has been created.
+     */
+    get isSocketClosed() {
+      const ws = this.ws;
+      if (!ws) {
+        return false;
+      }
+      return ws.readyState === WS_READY_STATE_CLOSING || ws.readyState === WS_READY_STATE_CLOSED;
+    }
+    /**
+     * This connection's public identity.
+     */
+    identity = void 0;
+    /**
+     * This connection's private authentication token.
+     */
+    token = void 0;
+    /** @internal */
+    [INTERNAL_REMOTE_MODULE]() {
+      return this.#remoteModule;
+    }
+    /**
+     * The accessor field to access the tables in the database and associated
+     * callback functions.
+     */
+    db;
+    /**
+     * The accessor field to access the reducers in the database.
+     */
+    reducers;
+    /**
+     * The accessor field to access the procedures in the database.
+     */
+    procedures;
+    /**
+     * The `ConnectionId` of the connection to to the database.
+     */
+    connectionId = ConnectionId.random();
+    #connectionIdHex = this.connectionId.toHexString();
+    // These fields are meant to be strictly private.
+    #queryId = 0;
+    #requestId = 0;
+    #eventId = 0;
+    #emitter;
+    #inboundQueue = [];
+    #inboundQueueOffset = 0;
+    #isDrainingInboundQueue = false;
+    #outboundQueue = [];
+    #isOutboundFlushScheduled = false;
+    #negotiatedWsProtocol = V2_WS_PROTOCOL;
+    #subscriptionManager = new SubscriptionManager();
+    #remoteModule;
+    #reducerCallbacks = /* @__PURE__ */ new Map();
+    #reducerCallInfo = /* @__PURE__ */ new Map();
+    #procedureCallbacks = /* @__PURE__ */ new Map();
+    #rowDeserializers;
+    #rowIdMetadata;
+    #reducerArgsSerializers;
+    #procedureSerializers;
+    #reducerNameBytes;
+    #procedureNameBytes;
+    #sourceNameToTableDef;
+    #messageReader = new BinaryReader(new Uint8Array());
+    #rowListReader = new BinaryReader(new Uint8Array());
+    #clientFrameEncoder = new BinaryWriter(1024);
+    #boundSubscriptionBuilder;
+    #boundDisconnect;
+    // These fields are not part of the public API, but in a pinch you
+    // could use JavaScript to access them by bypassing TypeScript's
+    // private fields.
+    // We use them in testing.
+    clientCache;
+    ws;
+    wsPromise;
+    constructor({
+      uri,
+      nameOrAddress,
+      identity,
+      token,
+      emitter,
+      remoteModule,
+      createWSFn,
+      compression,
+      lightMode,
+      confirmedReads
+    }) {
+      stdbLogger("info", "Connecting to SpacetimeDB WS...");
+      const url = new URL(uri.toString());
+      if (!/^wss?:/.test(uri.protocol)) {
+        url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+      }
+      this.identity = identity;
+      this.token = token;
+      this.#remoteModule = remoteModule;
+      this.#emitter = emitter;
+      this.#boundSubscriptionBuilder = this.subscriptionBuilder.bind(this);
+      this.#boundDisconnect = this.disconnect.bind(this);
+      this.#rowDeserializers = /* @__PURE__ */ Object.create(null);
+      this.#rowIdMetadata = /* @__PURE__ */ Object.create(null);
+      this.#sourceNameToTableDef = /* @__PURE__ */ Object.create(null);
+      for (const table2 of Object.values(remoteModule.tables)) {
+        this.#rowDeserializers[table2.sourceName] = ProductType.makeDeserializer(
+          table2.rowType
+        );
+        this.#sourceNameToTableDef[table2.sourceName] = table2;
+        const primaryKeyColumn = Object.entries(table2.columns).find(
+          ([, column]) => column.columnMetadata.isPrimaryKey
+        );
+        this.#rowIdMetadata[table2.sourceName] = primaryKeyColumn ? {
+          primaryKeyColName: primaryKeyColumn[0],
+          primaryKeyColType: primaryKeyColumn[1].typeBuilder.algebraicType
+        } : {};
+      }
+      this.#reducerArgsSerializers = /* @__PURE__ */ Object.create(null);
+      this.#reducerNameBytes = /* @__PURE__ */ Object.create(null);
+      for (const reducer of remoteModule.reducers) {
+        this.#reducerArgsSerializers[reducer.name] = {
+          serialize: ProductType.makeSerializer(reducer.paramsType),
+          deserialize: ProductType.makeDeserializer(reducer.paramsType)
+        };
+        this.#reducerNameBytes[reducer.name] = TEXT_ENCODER.encode(reducer.name);
+      }
+      this.#procedureSerializers = /* @__PURE__ */ Object.create(null);
+      this.#procedureNameBytes = /* @__PURE__ */ Object.create(null);
+      for (const procedure of remoteModule.procedures) {
+        this.#procedureSerializers[procedure.name] = {
+          serializeArgs: ProductType.makeSerializer(
+            new ProductBuilder(procedure.params).algebraicType.value
+          ),
+          deserializeReturn: AlgebraicType.makeDeserializer(
+            procedure.returnType.algebraicType
+          )
+        };
+        this.#procedureNameBytes[procedure.name] = TEXT_ENCODER.encode(
+          procedure.name
+        );
+      }
+      url.searchParams.set("connection_id", this.#connectionIdHex);
+      this.clientCache = new ClientCache();
+      this.db = this.#makeDbView();
+      this.reducers = this.#makeReducers(remoteModule);
+      this.procedures = this.#makeProcedures(remoteModule);
+      this.wsPromise = createWSFn({
+        url,
+        nameOrAddress,
+        wsProtocol: [...PREFERRED_WS_PROTOCOLS],
+        authToken: token,
+        compression,
+        lightMode,
+        confirmedReads
+      }).then((v) => {
+        this.ws = v;
+        this.ws.onclose = () => {
+          this.isActive = false;
+          this.#emitter.emit("disconnect", this);
+        };
+        this.ws.onerror = (e) => {
+          this.isActive = false;
+          this.#emitter.emit("connectError", this, e);
+        };
+        this.ws.onopen = this.#handleOnOpen.bind(this);
+        this.ws.onmessage = this.#handleOnMessage.bind(this);
+        return v;
+      }).catch((e) => {
+        stdbLogger("error", "Error connecting to SpacetimeDB WS");
+        this.#emitter.emit("connectError", this, e);
+        return void 0;
+      });
+    }
+    #getNextQueryId = () => {
+      const queryId = this.#queryId;
+      this.#queryId += 1;
+      return queryId;
+    };
+    #getNextRequestId = () => this.#requestId++;
+    #makeDbView() {
+      const view = /* @__PURE__ */ Object.create(null);
+      for (const tbl of Object.values(this.#sourceNameToTableDef)) {
+        const key = tbl.accessorName;
+        Object.defineProperty(view, key, {
+          enumerable: true,
+          configurable: false,
+          get: () => this.clientCache.getOrCreateTable(tbl)
+        });
+      }
+      return view;
+    }
+    #makeReducers(def) {
+      const out = {};
+      for (const reducer of def.reducers) {
+        const reducerName = reducer.name;
+        const encodedReducerName = this.#reducerNameBytes[reducerName];
+        const key = reducer.accessorName;
+        const { serialize: serializeArgs } = this.#reducerArgsSerializers[reducerName];
+        out[key] = (params) => {
+          const writer = this.#reducerArgsEncoder;
+          writer.clear();
+          serializeArgs(writer, params);
+          const argsBuffer = writer.getBuffer();
+          return this.#callReducerWithEncodedName(
+            reducerName,
+            encodedReducerName,
+            argsBuffer,
+            params
+          );
+        };
+      }
+      return out;
+    }
+    #makeProcedures(def) {
+      const out = {};
+      const writer = new BinaryWriter(1024);
+      for (const procedure of def.procedures) {
+        const procedureName = procedure.name;
+        const encodedProcedureName = this.#procedureNameBytes[procedureName];
+        const key = procedure.accessorName;
+        const { serializeArgs, deserializeReturn } = this.#procedureSerializers[procedureName];
+        out[key] = (params) => {
+          writer.clear();
+          serializeArgs(writer, params);
+          const argsBuffer = writer.getBuffer();
+          return this.#callProcedureWithEncodedName(
+            procedureName,
+            encodedProcedureName,
+            argsBuffer
+          ).then((returnBuf) => {
+            return deserializeReturn(new BinaryReader(returnBuf));
+          });
+        };
+      }
+      return out;
+    }
+    #makeEventContext(event) {
+      return {
+        db: this.db,
+        reducers: this.reducers,
+        isActive: this.isActive,
+        subscriptionBuilder: this.#boundSubscriptionBuilder,
+        disconnect: this.#boundDisconnect,
+        event
+      };
+    }
+    // NOTE: This is very important!!! This is the actual function that
+    // gets called when you call `connection.subscriptionBuilder()`.
+    // The `subscriptionBuilder` function which is generated, just shadows
+    // this function in the type system, but not the actual implementation!
+    // Do not remove this function, or shoot yourself in the foot please.
+    // It's not clear what would be a better way to do this at this exact
+    // moment.
+    subscriptionBuilder = () => {
+      return new SubscriptionBuilderImpl(this);
+    };
+    getFromBuilder() {
+      return makeFromBuilder(
+        this.#remoteModule.tables
+      );
+    }
+    registerSubscription(handle, handleEmitter, querySql) {
+      const querySetId = this.#getNextQueryId();
+      this.#subscriptionManager.subscriptions.set(querySetId, {
+        handle,
+        emitter: handleEmitter
+      });
+      const requestId = this.#getNextRequestId();
+      this.#sendMessage(
+        ClientMessage.Subscribe({
+          queryStrings: querySql,
+          querySetId: { id: querySetId },
+          requestId
+        })
+      );
+      return querySetId;
+    }
+    unregisterSubscription(querySetId) {
+      const requestId = this.#getNextRequestId();
+      this.#sendMessage(
+        ClientMessage.Unsubscribe({
+          querySetId: { id: querySetId },
+          requestId,
+          flags: UnsubscribeFlags.SendDroppedRows
+        })
+      );
+    }
+    #parseRowList(type, tableName, rowList) {
+      const buffer = rowList.rowsData;
+      const reader = this.#rowListReader;
+      reader.reset(buffer);
+      const rows2 = [];
+      const deserializeRow = this.#rowDeserializers[tableName];
+      const { primaryKeyColName, primaryKeyColType } = this.#rowIdMetadata[tableName];
+      let previousOffset = 0;
+      while (reader.remaining > 0) {
+        const row = deserializeRow(reader);
+        let rowId = void 0;
+        if (primaryKeyColName !== void 0 && primaryKeyColType !== void 0) {
+          rowId = AlgebraicType.intoMapKey(
+            primaryKeyColType,
+            row[primaryKeyColName]
+          );
+        } else {
+          const rowBytes = buffer.subarray(previousOffset, reader.offset);
+          const asBase64 = (0, import_base64_js.fromByteArray)(rowBytes);
+          rowId = asBase64;
+        }
+        previousOffset = reader.offset;
+        rows2.push({
+          type,
+          rowId,
+          row
+        });
+      }
+      return rows2;
+    }
+    // Take a bunch of table updates and ensure that there is at most one update per table.
+    #mergeTableUpdates(updates) {
+      const merged = /* @__PURE__ */ new Map();
+      for (const update of updates) {
+        const ops = merged.get(update.tableName);
+        if (ops) {
+          for (const op of update.operations) ops.push(op);
+        } else {
+          merged.set(update.tableName, update.operations.slice());
+        }
+      }
+      return Array.from(merged, ([tableName, operations]) => ({
+        tableName,
+        operations
+      }));
+    }
+    #queryRowsToTableUpdates(rows2, opType) {
+      const updates = [];
+      for (const tableRows of rows2.tables) {
+        updates.push({
+          tableName: tableRows.table,
+          operations: this.#parseRowList(opType, tableRows.table, tableRows.rows)
+        });
+      }
+      return this.#mergeTableUpdates(updates);
+    }
+    #tableUpdateRowsToOperations(tableName, rows2) {
+      if (rows2.tag === "PersistentTable") {
+        const inserts = this.#parseRowList(
+          "insert",
+          tableName,
+          rows2.value.inserts
+        );
+        const deletes = this.#parseRowList(
+          "delete",
+          tableName,
+          rows2.value.deletes
+        );
+        return inserts.concat(deletes);
+      }
+      if (rows2.tag === "EventTable") {
+        return this.#parseRowList("insert", tableName, rows2.value.events);
+      }
+      return [];
+    }
+    #querySetUpdateToTableUpdates(querySetUpdate) {
+      const updates = [];
+      for (const tableUpdate of querySetUpdate.tables) {
+        let operations = [];
+        for (const rows2 of tableUpdate.rows) {
+          operations = operations.concat(
+            this.#tableUpdateRowsToOperations(tableUpdate.tableName, rows2)
+          );
+        }
+        updates.push({
+          tableName: tableUpdate.tableName,
+          operations
+        });
+      }
+      return this.#mergeTableUpdates(updates);
+    }
+    #flushOutboundQueue(wsResolved) {
+      if (this.#negotiatedWsProtocol === V3_WS_PROTOCOL) {
+        this.#flushOutboundQueueV3(wsResolved);
+        return;
+      }
+      this.#flushOutboundQueueV2(wsResolved);
+    }
+    #flushOutboundQueueV2(wsResolved) {
+      const pending = this.#outboundQueue.splice(0);
+      for (const message of pending) {
+        wsResolved.send(message);
+      }
+    }
+    #flushOutboundQueueV3(wsResolved) {
+      if (this.#outboundQueue.length === 0) {
+        return;
+      }
+      const batchSize = countClientMessagesForV3Frame(
+        this.#outboundQueue,
+        MAX_V3_OUTBOUND_FRAME_BYTES
+      );
+      wsResolved.send(
+        encodeClientMessagesV3(
+          this.#clientFrameEncoder,
+          this.#outboundQueue,
+          batchSize
+        )
+      );
+      if (batchSize === this.#outboundQueue.length) {
+        this.#outboundQueue.length = 0;
+        return;
+      }
+      this.#outboundQueue.copyWithin(0, batchSize);
+      this.#outboundQueue.length -= batchSize;
+      if (this.#outboundQueue.length > 0) {
+        this.#scheduleDeferredOutboundFlush();
+      }
+    }
+    #scheduleOutboundFlush() {
+      this.#scheduleOutboundFlushWith("microtask");
+    }
+    #scheduleDeferredOutboundFlush() {
+      this.#scheduleOutboundFlushWith("next-task");
+    }
+    #scheduleOutboundFlushWith(schedule) {
+      if (this.#isOutboundFlushScheduled) {
+        return;
+      }
+      this.#isOutboundFlushScheduled = true;
+      const flush = () => {
+        this.#isOutboundFlushScheduled = false;
+        if (this.ws && this.isActive) {
+          this.#flushOutboundQueue(this.ws);
+        }
+      };
+      if (schedule === "next-task") {
+        setTimeout(flush, 0);
+      } else {
+        queueMicrotask(flush);
+      }
+    }
+    #reducerArgsEncoder = new BinaryWriter(1024);
+    #clientMessageEncoder = new BinaryWriter(1024);
+    #sendEncodedMessage(encoded, describe) {
+      stdbLogger("trace", describe);
+      if (this.ws && this.isActive) {
+        if (this.#negotiatedWsProtocol === V2_WS_PROTOCOL) {
+          if (this.#outboundQueue.length) this.#flushOutboundQueue(this.ws);
+          this.ws.send(encoded);
+          return;
+        }
+        this.#outboundQueue.push(encoded.slice());
+        this.#scheduleOutboundFlush();
+      } else {
+        this.#outboundQueue.push(encoded.slice());
+      }
+    }
+    #sendMessage(message) {
+      const writer = this.#clientMessageEncoder;
+      writer.clear();
+      ClientMessage.serialize(writer, message);
+      const encoded = writer.getBuffer();
+      const isLive = !!(this.ws && this.isActive);
+      this.#sendEncodedMessage(
+        encoded,
+        () => isLive ? `Sending message to server: ${stringify2(message)}` : `Queuing message to server: ${stringify2(message)}`
+      );
+    }
+    #sendCallReducerMessage(requestId, reducerNameBytes, argsBuffer) {
+      const writer = this.#clientMessageEncoder;
+      writer.clear();
+      writer.writeByte(CLIENT_MESSAGE_CALL_REDUCER_TAG);
+      writer.writeU32(requestId);
+      writer.writeU8(0);
+      writer.writeUInt8Array(reducerNameBytes);
+      writer.writeUInt8Array(argsBuffer);
+      const encoded = writer.getBuffer();
+      this.#sendEncodedMessage(
+        encoded,
+        () => `Sending reducer call message to server: requestId=${requestId}`
+      );
+    }
+    #sendCallProcedureMessage(requestId, procedureNameBytes, argsBuffer) {
+      const writer = this.#clientMessageEncoder;
+      writer.clear();
+      writer.writeByte(CLIENT_MESSAGE_CALL_PROCEDURE_TAG);
+      writer.writeU32(requestId);
+      writer.writeU8(0);
+      writer.writeUInt8Array(procedureNameBytes);
+      writer.writeUInt8Array(argsBuffer);
+      const encoded = writer.getBuffer();
+      this.#sendEncodedMessage(
+        encoded,
+        () => `Sending procedure call message to server: requestId=${requestId}`
+      );
+    }
+    #setConnectionId(connectionId) {
+      this.connectionId = connectionId;
+      this.#connectionIdHex = connectionId.toHexString();
+    }
+    #nextEventId() {
+      this.#eventId += 1;
+      return `${this.#connectionIdHex}:${this.#eventId}`;
+    }
+    /**
+     * Handles WebSocket onOpen event.
+     */
+    #handleOnOpen() {
+      if (this.ws) {
+        this.#negotiatedWsProtocol = normalizeWsProtocol(this.ws.protocol);
+      }
+      this.isActive = true;
+      if (this.ws) {
+        this.#flushOutboundQueue(this.ws);
+      }
+    }
+    #applyTableUpdates(tableUpdates, eventContext) {
+      const pendingCallbacks = [];
+      for (const tableUpdate of tableUpdates) {
+        const tableName = tableUpdate.tableName;
+        const tableDef = this.#sourceNameToTableDef[tableName];
+        const table2 = this.clientCache.getOrCreateTable(tableDef);
+        const newCallbacks = table2.applyOperations(
+          tableUpdate.operations,
+          eventContext
+        );
+        for (const callback of newCallbacks) {
+          pendingCallbacks.push(callback);
+        }
+      }
+      return pendingCallbacks;
+    }
+    #applyTransactionUpdates(eventContext, tu) {
+      const allUpdates = [];
+      for (const querySetUpdate of tu.querySets) {
+        const tableUpdates = this.#querySetUpdateToTableUpdates(querySetUpdate);
+        for (const update of tableUpdates) {
+          allUpdates.push(update);
+        }
+      }
+      return this.#applyTableUpdates(
+        this.#mergeTableUpdates(allUpdates),
+        eventContext
+      );
+    }
+    #dispatchPendingCallbacks(callbacks) {
+      stdbLogger(
+        "trace",
+        () => `Calling ${callbacks.length} triggered row callbacks`
+      );
+      for (const callback of callbacks) {
+        callback.cb();
+      }
+    }
+    #processServerMessage(serverMessage) {
+      stdbLogger(
+        "trace",
+        () => `Processing server message: ${stringify2(serverMessage)}`
+      );
+      switch (serverMessage.tag) {
+        case "InitialConnection": {
+          this.identity = serverMessage.value.identity;
+          if (!this.token && serverMessage.value.token) {
+            this.token = serverMessage.value.token;
+          }
+          this.#setConnectionId(serverMessage.value.connectionId);
+          this.#emitter.emit("connect", this, this.identity, this.token);
+          break;
+        }
+        case "SubscribeApplied": {
+          const querySetId = serverMessage.value.querySetId.id;
+          const subscription = this.#subscriptionManager.subscriptions.get(querySetId);
+          if (!subscription) {
+            stdbLogger(
+              "error",
+              `Received SubscribeApplied for unknown querySetId ${querySetId}.`
+            );
+            return;
+          }
+          const event = {
+            id: this.#nextEventId(),
+            tag: "SubscribeApplied"
+          };
+          const eventContext = this.#makeEventContext(event);
+          const tableUpdates = this.#queryRowsToTableUpdates(
+            serverMessage.value.rows,
+            "insert"
+          );
+          const callbacks = this.#applyTableUpdates(tableUpdates, eventContext);
+          const { event: _, ...subscriptionEventContext } = eventContext;
+          subscription.emitter.emit("applied", subscriptionEventContext);
+          this.#dispatchPendingCallbacks(callbacks);
+          break;
+        }
+        case "UnsubscribeApplied": {
+          const querySetId = serverMessage.value.querySetId.id;
+          const subscription = this.#subscriptionManager.subscriptions.get(querySetId);
+          if (!subscription) {
+            stdbLogger(
+              "error",
+              `Received UnsubscribeApplied for unknown querySetId ${querySetId}.`
+            );
+            return;
+          }
+          const event = {
+            id: this.#nextEventId(),
+            tag: "UnsubscribeApplied"
+          };
+          const eventContext = this.#makeEventContext(event);
+          const tableUpdates = serverMessage.value.rows ? this.#queryRowsToTableUpdates(serverMessage.value.rows, "delete") : [];
+          const callbacks = this.#applyTableUpdates(tableUpdates, eventContext);
+          const { event: _, ...subscriptionEventContext } = eventContext;
+          subscription.emitter.emit("end", subscriptionEventContext);
+          this.#subscriptionManager.subscriptions.delete(querySetId);
+          this.#dispatchPendingCallbacks(callbacks);
+          break;
+        }
+        case "SubscriptionError": {
+          const querySetId = serverMessage.value.querySetId.id;
+          const requestId = serverMessage.value.requestId;
+          const error = Error(serverMessage.value.error);
+          const event = {
+            id: this.#nextEventId(),
+            tag: "Error",
+            value: error
+          };
+          const eventContext = this.#makeEventContext(event);
+          const errorContext = {
+            ...eventContext,
+            event: error
+          };
+          if (requestId == null) {
+            stdbLogger(
+              "error",
+              `Disconnecting due to error for a previously applied subscription: ${serverMessage.value.error}`
+            );
+            this.disconnect();
+            break;
+          }
+          const subscription = this.#subscriptionManager.subscriptions.get(querySetId);
+          if (subscription) {
+            subscription.emitter.emit("error", errorContext, error);
+            this.#subscriptionManager.subscriptions.delete(querySetId);
+          } else {
+            stdbLogger(
+              "error",
+              `Received SubscriptionError for unknown querySetId ${querySetId}:`,
+              error
+            );
+          }
+          break;
+        }
+        case "TransactionUpdate": {
+          const event = {
+            id: this.#nextEventId(),
+            tag: "Transaction"
+          };
+          const eventContext = this.#makeEventContext(event);
+          const callbacks = this.#applyTransactionUpdates(
+            eventContext,
+            serverMessage.value
+          );
+          this.#dispatchPendingCallbacks(callbacks);
+          break;
+        }
+        case "ReducerResult": {
+          const { requestId, result } = serverMessage.value;
+          if (result.tag === "Ok") {
+            const reducerInfo = this.#reducerCallInfo.get(requestId);
+            const eventId = this.#nextEventId();
+            const event = reducerInfo ? {
+              id: eventId,
+              tag: "Reducer",
+              value: {
+                timestamp: serverMessage.value.timestamp,
+                outcome: result,
+                reducer: {
+                  name: reducerInfo.name,
+                  args: reducerInfo.args
+                }
+              }
+            } : {
+              id: eventId,
+              tag: "Transaction"
+            };
+            const eventContext = this.#makeEventContext(event);
+            const callbacks = this.#applyTransactionUpdates(
+              eventContext,
+              result.value.transactionUpdate
+            );
+            this.#dispatchPendingCallbacks(callbacks);
+          }
+          this.#reducerCallInfo.delete(requestId);
+          const cb = this.#reducerCallbacks.get(requestId);
+          this.#reducerCallbacks.delete(requestId);
+          cb?.(result);
+          break;
+        }
+        case "ProcedureResult": {
+          const { status, requestId } = serverMessage.value;
+          const result = status.tag === "Returned" ? { tag: "Ok", value: status.value } : { tag: "Err", value: status.value };
+          const cb = this.#procedureCallbacks.get(requestId);
+          this.#procedureCallbacks.delete(requestId);
+          cb?.(result);
+          break;
+        }
+        case "OneOffQueryResult": {
+          stdbLogger(
+            "warn",
+            "Received OneOffQueryResult but SDK does not expose one-off query APIs yet."
+          );
+          break;
+        }
+      }
+    }
+    #processV2Message(data) {
+      const reader = this.#messageReader;
+      reader.reset(data);
+      this.#processServerMessage(ServerMessage.deserialize(reader));
+    }
+    #processMessage(data) {
+      if (this.#negotiatedWsProtocol !== V3_WS_PROTOCOL) {
+        this.#processV2Message(data);
+        return;
+      }
+      const messageCount = forEachServerMessageV3(
+        this.#messageReader,
+        data,
+        (serverMessage) => {
+          this.#processServerMessage(serverMessage);
+        }
+      );
+      stdbLogger(
+        "trace",
+        () => `Processing server v3 payload with ${messageCount} message(s)`
+      );
+    }
+    /**
+     * Handles WebSocket onMessage event.
+     * @param wsMessage MessageEvent object.
+     */
+    #handleOnMessage(wsMessage) {
+      this.#inboundQueue.push(wsMessage.data);
+      if (this.#isDrainingInboundQueue) {
+        return;
+      }
+      this.#isDrainingInboundQueue = true;
+      try {
+        while (this.#inboundQueueOffset < this.#inboundQueue.length) {
+          const data = this.#inboundQueue[this.#inboundQueueOffset];
+          this.#inboundQueueOffset += 1;
+          if (data) {
+            this.#processMessage(data);
+          }
+        }
+      } finally {
+        if (this.#inboundQueueOffset >= this.#inboundQueue.length) {
+          this.#inboundQueue.length = 0;
+        } else if (this.#inboundQueueOffset > 0) {
+          this.#inboundQueue = this.#inboundQueue.slice(this.#inboundQueueOffset);
+        }
+        this.#inboundQueueOffset = 0;
+        this.#isDrainingInboundQueue = false;
+      }
+    }
+    /**
+     * Call a reducer on your SpacetimeDB module.
+     *
+     * @param reducerName The name of the reducer to call
+     * @param argsSerializer The arguments to pass to the reducer
+     */
+    callReducer(reducerName, argsBuffer, reducerArgs) {
+      const encodedReducerName = this.#reducerNameBytes[reducerName];
+      if (encodedReducerName) {
+        return this.#callReducerWithEncodedName(
+          reducerName,
+          encodedReducerName,
+          argsBuffer,
+          reducerArgs
+        );
+      }
+      return this.#callReducerGeneric(reducerName, argsBuffer, reducerArgs);
+    }
+    #callReducerWithEncodedName(reducerName, encodedReducerName, argsBuffer, reducerArgs) {
+      const { promise, resolve, reject } = createDeferred();
+      const requestId = this.#getNextRequestId();
+      this.#sendCallReducerMessage(requestId, encodedReducerName, argsBuffer);
+      if (reducerArgs) {
+        this.#reducerCallInfo.set(requestId, {
+          name: reducerName,
+          args: reducerArgs
+        });
+      }
+      this.#reducerCallbacks.set(requestId, (result) => {
+        if (result.tag === "Ok" || result.tag === "OkEmpty") {
+          resolve();
+        } else {
+          if (result.tag === "Err") {
+            const reader = new BinaryReader(result.value);
+            const errorString = reader.readString();
+            reject(new SenderError(errorString));
+          } else if (result.tag === "InternalError") {
+            reject(new InternalError(result.value));
+          } else {
+            reject(new Error("Unexpected reducer result"));
+          }
+        }
+      });
+      return promise;
+    }
+    #callReducerGeneric(reducerName, argsBuffer, reducerArgs) {
+      const { promise, resolve, reject } = createDeferred();
+      const requestId = this.#getNextRequestId();
+      const message = ClientMessage.CallReducer({
+        reducer: reducerName,
+        args: argsBuffer,
+        requestId,
+        flags: 0
+      });
+      this.#sendMessage(message);
+      if (reducerArgs) {
+        this.#reducerCallInfo.set(requestId, {
+          name: reducerName,
+          args: reducerArgs
+        });
+      }
+      this.#reducerCallbacks.set(requestId, (result) => {
+        if (result.tag === "Ok" || result.tag === "OkEmpty") {
+          resolve();
+        } else {
+          if (result.tag === "Err") {
+            const reader = new BinaryReader(result.value);
+            const errorString = reader.readString();
+            reject(new SenderError(errorString));
+          } else if (result.tag === "InternalError") {
+            reject(new InternalError(result.value));
+          } else {
+            reject(new Error("Unexpected reducer result"));
+          }
+        }
+      });
+      return promise;
+    }
+    /**
+     * Call a reducer on your SpacetimeDB module with typed arguments.
+     * @param reducerSchema The schema of the reducer to call
+     * @param callReducerFlags The flags for the reducer call
+     * @param params The arguments to pass to the reducer
+     */
+    callReducerWithParams(reducerName, _paramsType, params) {
+      const writer = this.#reducerArgsEncoder;
+      writer.clear();
+      this.#reducerArgsSerializers[reducerName].serialize(writer, params);
+      const argsBuffer = writer.getBuffer();
+      return this.callReducer(reducerName, argsBuffer, params);
+    }
+    /**
+     * Call a reducer on your SpacetimeDB module.
+     *
+     * @param procedureName The name of the reducer to call
+     * @param argsBuffer The arguments to pass to the reducer
+     */
+    callProcedure(procedureName, argsBuffer) {
+      const encodedProcedureName = this.#procedureNameBytes[procedureName];
+      if (encodedProcedureName) {
+        return this.#callProcedureWithEncodedName(
+          procedureName,
+          encodedProcedureName,
+          argsBuffer
+        );
+      }
+      return this.#callProcedureGeneric(procedureName, argsBuffer);
+    }
+    #callProcedureWithEncodedName(procedureName, encodedProcedureName, argsBuffer) {
+      const { promise, resolve, reject } = createDeferred();
+      const requestId = this.#getNextRequestId();
+      this.#sendCallProcedureMessage(requestId, encodedProcedureName, argsBuffer);
+      this.#procedureCallbacks.set(requestId, (result) => {
+        if (result.tag === "Ok") {
+          resolve(result.value);
+        } else {
+          reject(result.value);
+        }
+      });
+      return promise;
+    }
+    #callProcedureGeneric(procedureName, argsBuffer) {
+      const { promise, resolve, reject } = createDeferred();
+      const requestId = this.#getNextRequestId();
+      const message = ClientMessage.CallProcedure({
+        procedure: procedureName,
+        args: argsBuffer,
+        requestId,
+        // reserved for future use - 0 is the only valid value
+        flags: 0
+      });
+      this.#sendMessage(message);
+      this.#procedureCallbacks.set(requestId, (result) => {
+        if (result.tag === "Ok") {
+          resolve(result.value);
+        } else {
+          reject(result.value);
+        }
+      });
+      return promise;
+    }
+    /**
+     * Call a reducer on your SpacetimeDB module with typed arguments.
+     * @param reducerSchema The schema of the reducer to call
+     * @param callReducerFlags The flags for the reducer call
+     * @param params The arguments to pass to the reducer
+     */
+    callProcedureWithParams(procedureName, _paramsType, params, _returnType) {
+      const writer = new BinaryWriter(1024);
+      const { serializeArgs, deserializeReturn } = this.#procedureSerializers[procedureName];
+      serializeArgs(writer, params);
+      const argsBuffer = writer.getBuffer();
+      return this.callProcedure(procedureName, argsBuffer).then((returnBuf) => {
+        return deserializeReturn(new BinaryReader(returnBuf));
+      });
+    }
+    /**
+     * Close the current connection.
+     *
+     * @example
+     *
+     * ```ts
+     * const connection = DbConnection.builder().build();
+     * connection.disconnect()
+     * ```
+     */
+    disconnect() {
+      this.isDisconnectRequested = true;
+      this.wsPromise.then((ws) => ws?.close());
+    }
+    on(eventName, callback) {
+      this.#emitter.on(eventName, callback);
+    }
+    off(eventName, callback) {
+      this.#emitter.off(eventName, callback);
+    }
+    onConnect(callback) {
+      this.#emitter.on("connect", callback);
+    }
+    onDisconnect(callback) {
+      this.#emitter.on("disconnect", callback);
+    }
+    onConnectError(callback) {
+      this.#emitter.on("connectError", callback);
+    }
+    removeOnConnect(callback) {
+      this.#emitter.off("connect", callback);
+    }
+    removeOnDisconnect(callback) {
+      this.#emitter.off("disconnect", callback);
+    }
+    removeOnConnectError(callback) {
+      this.#emitter.off("connectError", callback);
+    }
+  };
+  function tablesToSchema(ctx, tables2) {
+    const tableDefs = /* @__PURE__ */ Object.create(null);
+    for (const [accName, schema2] of Object.entries(tables2)) {
+      tableDefs[accName] = tableToSchema(
+        accName,
+        schema2,
+        schema2.tableDef(ctx, accName)
+      );
+    }
+    return {
+      tables: tableDefs
+    };
+  }
+  function tableToSchema(accName, schema2, tableDef) {
+    const getColName = (i) => schema2.rowType.algebraicType.value.elements[i].name;
+    const resolvedIndexes = tableDef.indexes.map(
+      (idx) => {
+        const accessorName = idx.accessorName;
+        if (typeof accessorName !== "string" || accessorName.length === 0) {
+          throw new TypeError(
+            `Index '${idx.sourceName ?? "<unknown>"}' on table '${tableDef.sourceName}' is missing accessor name`
+          );
+        }
+        const columnIds = idx.algorithm.tag === "Direct" ? [idx.algorithm.value] : idx.algorithm.value;
+        const unique = tableDef.constraints.some(
+          (c) => c.data.tag === "Unique" && c.data.value.columns.every((col) => columnIds.includes(col))
+        );
+        const algorithm = {
+          BTree: "btree",
+          Hash: "hash",
+          Direct: "direct"
+        }[idx.algorithm.tag];
+        return {
+          name: accessorName,
+          unique,
+          algorithm,
+          columns: columnIds.map(getColName)
+        };
+      }
+    );
+    return {
+      // For client,`schama.tableName` will always be there as canonical name.
+      // For module, if explicit name is not provided via `name`, accessor name will
+      // be used, it is stored as alias in database, hence works in query builder.
+      sourceName: schema2.tableName || accName,
+      accessorName: accName,
+      columns: schema2.rowType.row,
+      // typed as T[i]['rowType']['row'] under TablesToSchema<T>
+      rowType: schema2.rowSpacetimeType,
+      // Keep declarative indexes in their original shape for type-level consumers.
+      indexes: schema2.idxs,
+      constraints: tableDef.constraints.map((c) => ({
+        name: c.sourceName,
+        constraint: "unique",
+        columns: c.data.value.columns.map(getColName)
+      })),
+      // Expose resolved runtime indexes separately so runtime users don't have to
+      // reinterpret `indexes` with unsafe casts.
+      resolvedIndexes,
+      tableDef,
+      ...tableDef.isEvent ? { isEvent: true } : {}
+    };
+  }
+  var ModuleContext = class {
+    #compoundTypes = /* @__PURE__ */ new Map();
+    /**
+     * The global module definition that gets populated by calls to `reducer()` and lifecycle hooks.
+     */
+    #moduleDef = {
+      typespace: { types: [] },
+      tables: [],
+      reducers: [],
+      types: [],
+      rowLevelSecurity: [],
+      schedules: [],
+      procedures: [],
+      views: [],
+      viewPrimaryKeys: [],
+      lifeCycleReducers: [],
+      httpHandlers: [],
+      httpRoutes: [],
+      caseConversionPolicy: { tag: "SnakeCase" },
+      explicitNames: {
+        entries: []
+      },
+      submodules: []
+    };
+    get moduleDef() {
+      return this.#moduleDef;
+    }
+    rawModuleDefV10() {
+      const sections = [];
+      const push = (s) => {
+        if (s) sections.push(s);
+      };
+      const module = this.#moduleDef;
+      push(module.typespace && { tag: "Typespace", value: module.typespace });
+      push(module.types && { tag: "Types", value: module.types });
+      push(module.tables && { tag: "Tables", value: module.tables });
+      push(module.reducers && { tag: "Reducers", value: module.reducers });
+      push(module.procedures && { tag: "Procedures", value: module.procedures });
+      push(module.views && { tag: "Views", value: module.views });
+      push(
+        module.viewPrimaryKeys && {
+          tag: "ViewPrimaryKeys",
+          value: module.viewPrimaryKeys
+        }
+      );
+      push(module.schedules && { tag: "Schedules", value: module.schedules });
+      push(
+        module.lifeCycleReducers && {
+          tag: "LifeCycleReducers",
+          value: module.lifeCycleReducers
+        }
+      );
+      push(
+        module.httpHandlers && {
+          tag: "HttpHandlers",
+          value: module.httpHandlers
+        }
+      );
+      push(
+        module.httpRoutes && {
+          tag: "HttpRoutes",
+          value: module.httpRoutes
+        }
+      );
+      push(
+        module.rowLevelSecurity && {
+          tag: "RowLevelSecurity",
+          value: module.rowLevelSecurity
+        }
+      );
+      push(
+        module.explicitNames && {
+          tag: "ExplicitNames",
+          value: module.explicitNames
+        }
+      );
+      push(
+        module.caseConversionPolicy && {
+          tag: "CaseConversionPolicy",
+          value: module.caseConversionPolicy
+        }
+      );
+      push(
+        module.submodules && {
+          tag: "Submodules",
+          value: module.submodules
+        }
+      );
+      return { sections };
+    }
+    addSubmodule(submodule) {
+      this.#moduleDef.submodules.push(submodule);
+    }
+    /**
+     * Set the case conversion policy for this module.
+     * Called by the settings mechanism.
+     */
+    setCaseConversionPolicy(policy) {
+      this.#moduleDef.caseConversionPolicy = policy;
+    }
+    get typespace() {
+      return this.#moduleDef.typespace;
+    }
+    /**
+     * Resolves the actual type of a TypeBuilder by following its references until it reaches a non-ref type.
+     * @param typespace The typespace to resolve types against.
+     * @param typeBuilder The TypeBuilder to resolve.
+     * @returns The resolved algebraic type.
+     */
+    resolveType(typeBuilder) {
+      let ty = typeBuilder.algebraicType;
+      while (ty.tag === "Ref") {
+        ty = this.typespace.types[ty.value];
+      }
+      return ty;
+    }
+    /**
+     * Adds a type to the module definition's typespace as a `Ref` if it is a named compound type (Product or Sum).
+     * Otherwise, returns the type as is.
+     * @param name
+     * @param ty
+     * @returns
+     */
+    registerTypesRecursively(typeBuilder) {
+      if (typeBuilder instanceof ProductBuilder && !isUnit(typeBuilder) || typeBuilder instanceof SumBuilder || typeBuilder instanceof RowBuilder) {
+        return this.#registerCompoundTypeRecursively(typeBuilder);
+      } else if (typeBuilder instanceof OptionBuilder) {
+        return new OptionBuilder(
+          this.registerTypesRecursively(typeBuilder.value)
+        );
+      } else if (typeBuilder instanceof ResultBuilder) {
+        return new ResultBuilder(
+          this.registerTypesRecursively(typeBuilder.ok),
+          this.registerTypesRecursively(typeBuilder.err)
+        );
+      } else if (typeBuilder instanceof ArrayBuilder) {
+        return new ArrayBuilder(
+          this.registerTypesRecursively(typeBuilder.element)
+        );
+      } else {
+        return typeBuilder;
+      }
+    }
+    #registerCompoundTypeRecursively(typeBuilder) {
+      const ty = typeBuilder.algebraicType;
+      const name = typeBuilder.typeName;
+      if (name === void 0) {
+        throw new Error(
+          `Missing type name for ${typeBuilder.constructor.name ?? "TypeBuilder"} ${JSON.stringify(typeBuilder)}`
+        );
+      }
+      let r = this.#compoundTypes.get(ty);
+      if (r != null) {
+        return r;
+      }
+      const newTy = typeBuilder instanceof RowBuilder || typeBuilder instanceof ProductBuilder ? {
+        tag: "Product",
+        value: { elements: [] }
+      } : {
+        tag: "Sum",
+        value: { variants: [] }
+      };
+      r = new RefBuilder(this.#moduleDef.typespace.types.length);
+      this.#moduleDef.typespace.types.push(newTy);
+      this.#compoundTypes.set(ty, r);
+      if (typeBuilder instanceof RowBuilder) {
+        for (const [name2, elem] of Object.entries(typeBuilder.row)) {
+          newTy.value.elements.push({
+            name: name2,
+            algebraicType: this.registerTypesRecursively(elem.typeBuilder).algebraicType
+          });
+        }
+      } else if (typeBuilder instanceof ProductBuilder) {
+        for (const [name2, elem] of Object.entries(typeBuilder.elements)) {
+          newTy.value.elements.push({
+            name: name2,
+            algebraicType: this.registerTypesRecursively(elem).algebraicType
+          });
+        }
+      } else if (typeBuilder instanceof SumBuilder) {
+        for (const [name2, variant] of Object.entries(typeBuilder.variants)) {
+          newTy.value.variants.push({
+            name: name2,
+            algebraicType: this.registerTypesRecursively(variant).algebraicType
+          });
+        }
+      }
+      this.#moduleDef.types.push({
+        sourceName: splitName(name),
+        ty: r.ref,
+        customOrdering: true
+      });
+      return r;
+    }
+  };
+  function isUnit(typeBuilder) {
+    return typeBuilder.typeName == null && typeBuilder.algebraicType.value.elements.length === 0;
+  }
+  function splitName(name) {
+    const scope = name.split(".");
+    return { sourceName: scope.pop(), scope };
+  }
+  var Tables = class {
+    constructor(schemaType) {
+      this.schemaType = schemaType;
+    }
+  };
+  function schema(tables2) {
+    const ctx = new ModuleContext();
+    return new Tables(tablesToSchema(ctx, tables2));
+  }
+  function convertToAccessorMap(arr) {
+    return Object.fromEntries(
+      arr.map((v) => [v.accessorName, v])
+    );
+  }
+  var AlgebraicType2 = t.enum("AlgebraicType", {
+    Ref: t.u32(),
+    get Sum() {
+      return SumType2;
+    },
+    get Product() {
+      return ProductType2;
+    },
+    get Array() {
+      return AlgebraicType2;
+    },
+    String: t.unit(),
+    Bool: t.unit(),
+    I8: t.unit(),
+    U8: t.unit(),
+    I16: t.unit(),
+    U16: t.unit(),
+    I32: t.unit(),
+    U32: t.unit(),
+    I64: t.unit(),
+    U64: t.unit(),
+    I128: t.unit(),
+    U128: t.unit(),
+    I256: t.unit(),
+    U256: t.unit(),
+    F32: t.unit(),
+    F64: t.unit()
+  });
+  var CaseConversionPolicy = t.enum("CaseConversionPolicy", {
+    None: t.unit(),
+    SnakeCase: t.unit()
+  });
+  var ExplicitNameEntry = t.enum("ExplicitNameEntry", {
+    get Table() {
+      return NameMapping;
+    },
+    get Function() {
+      return NameMapping;
+    },
+    get Index() {
+      return NameMapping;
+    }
+  });
+  var ExplicitNames = t.object("ExplicitNames", {
+    get entries() {
+      return t.array(ExplicitNameEntry);
+    }
+  });
+  var FunctionVisibility = t.enum("FunctionVisibility", {
+    Private: t.unit(),
+    ClientCallable: t.unit()
+  });
+  var HttpHeaderPair = t.object("HttpHeaderPair", {
+    name: t.string(),
+    value: t.byteArray()
+  });
+  var HttpHeaders = t.object("HttpHeaders", {
+    get entries() {
+      return t.array(HttpHeaderPair);
+    }
+  });
+  var HttpMethod = t.enum("HttpMethod", {
+    Get: t.unit(),
+    Head: t.unit(),
+    Post: t.unit(),
+    Put: t.unit(),
+    Delete: t.unit(),
+    Connect: t.unit(),
+    Options: t.unit(),
+    Trace: t.unit(),
+    Patch: t.unit(),
+    Extension: t.string()
+  });
+  t.object("HttpRequest", {
+    get method() {
+      return HttpMethod;
+    },
+    get headers() {
+      return HttpHeaders;
+    },
+    timeout: t.option(t.timeDuration()),
+    uri: t.string(),
+    get version() {
+      return HttpVersion;
+    }
+  });
+  t.object("HttpResponse", {
+    get headers() {
+      return HttpHeaders;
+    },
+    get version() {
+      return HttpVersion;
+    },
+    code: t.u16()
+  });
+  var HttpVersion = t.enum("HttpVersion", {
+    Http09: t.unit(),
+    Http10: t.unit(),
+    Http11: t.unit(),
+    Http2: t.unit(),
+    Http3: t.unit()
+  });
+  var IndexType = t.enum("IndexType", {
+    BTree: t.unit(),
+    Hash: t.unit()
+  });
+  var Lifecycle = t.enum("Lifecycle", {
+    Init: t.unit(),
+    OnConnect: t.unit(),
+    OnDisconnect: t.unit()
+  });
+  var MethodOrAny = t.enum("MethodOrAny", {
+    Any: t.unit(),
+    get Method() {
+      return HttpMethod;
+    }
+  });
+  var MiscModuleExport = t.enum("MiscModuleExport", {
+    get TypeAlias() {
+      return TypeAlias;
+    }
+  });
+  var NameMapping = t.object("NameMapping", {
+    sourceName: t.string(),
+    canonicalName: t.string()
+  });
+  var ProductType2 = t.object("ProductType", {
+    get elements() {
+      return t.array(ProductTypeElement);
+    }
+  });
+  var ProductTypeElement = t.object("ProductTypeElement", {
+    name: t.option(t.string()),
+    get algebraicType() {
+      return AlgebraicType2;
+    }
+  });
+  var RawColumnDefV8 = t.object("RawColumnDefV8", {
+    colName: t.string(),
+    get colType() {
+      return AlgebraicType2;
+    }
+  });
+  var RawColumnDefaultValueV10 = t.object("RawColumnDefaultValueV10", {
+    colId: t.u16(),
+    value: t.byteArray()
+  });
+  var RawColumnDefaultValueV9 = t.object("RawColumnDefaultValueV9", {
+    table: t.string(),
+    colId: t.u16(),
+    value: t.byteArray()
+  });
+  var RawConstraintDataV9 = t.enum("RawConstraintDataV9", {
+    get Unique() {
+      return RawUniqueConstraintDataV9;
+    }
+  });
+  var RawConstraintDefV10 = t.object("RawConstraintDefV10", {
+    sourceName: t.option(t.string()),
+    get data() {
+      return RawConstraintDataV9;
+    }
+  });
+  var RawConstraintDefV8 = t.object("RawConstraintDefV8", {
+    constraintName: t.string(),
+    constraints: t.u8(),
+    columns: t.array(t.u16())
+  });
+  var RawConstraintDefV9 = t.object("RawConstraintDefV9", {
+    name: t.option(t.string()),
+    get data() {
+      return RawConstraintDataV9;
+    }
+  });
+  var RawHttpHandlerDefV10 = t.object("RawHttpHandlerDefV10", {
+    sourceName: t.string()
+  });
+  var RawHttpRouteDefV10 = t.object("RawHttpRouteDefV10", {
+    handlerFunction: t.string(),
+    get method() {
+      return MethodOrAny;
+    },
+    path: t.string()
+  });
+  var RawIndexAlgorithm = t.enum("RawIndexAlgorithm", {
+    BTree: t.array(t.u16()),
+    Hash: t.array(t.u16()),
+    Direct: t.u16()
+  });
+  var RawIndexDefV10 = t.object("RawIndexDefV10", {
+    sourceName: t.option(t.string()),
+    accessorName: t.option(t.string()),
+    get algorithm() {
+      return RawIndexAlgorithm;
+    }
+  });
+  var RawIndexDefV8 = t.object("RawIndexDefV8", {
+    indexName: t.string(),
+    isUnique: t.bool(),
+    get indexType() {
+      return IndexType;
+    },
+    columns: t.array(t.u16())
+  });
+  var RawIndexDefV9 = t.object("RawIndexDefV9", {
+    name: t.option(t.string()),
+    accessorName: t.option(t.string()),
+    get algorithm() {
+      return RawIndexAlgorithm;
+    }
+  });
+  var RawLifeCycleReducerDefV10 = t.object(
+    "RawLifeCycleReducerDefV10",
+    {
+      get lifecycleSpec() {
+        return Lifecycle;
+      },
+      functionName: t.string()
+    }
+  );
+  var RawMiscModuleExportV9 = t.enum("RawMiscModuleExportV9", {
+    get ColumnDefaultValue() {
+      return RawColumnDefaultValueV9;
+    },
+    get Procedure() {
+      return RawProcedureDefV9;
+    },
+    get View() {
+      return RawViewDefV9;
+    }
+  });
+  t.enum("RawModuleDef", {
+    get V8BackCompat() {
+      return RawModuleDefV8;
+    },
+    get V9() {
+      return RawModuleDefV9;
+    },
+    get V10() {
+      return RawModuleDefV10;
+    }
+  });
+  var RawModuleDefV10 = t.object("RawModuleDefV10", {
+    get sections() {
+      return t.array(RawModuleDefV10Section);
+    }
+  });
+  var RawModuleDefV10Section = t.enum("RawModuleDefV10Section", {
+    get Typespace() {
+      return Typespace;
+    },
+    get Types() {
+      return t.array(RawTypeDefV10);
+    },
+    get Tables() {
+      return t.array(RawTableDefV10);
+    },
+    get Reducers() {
+      return t.array(RawReducerDefV10);
+    },
+    get Procedures() {
+      return t.array(RawProcedureDefV10);
+    },
+    get Views() {
+      return t.array(RawViewDefV10);
+    },
+    get Schedules() {
+      return t.array(RawScheduleDefV10);
+    },
+    get LifeCycleReducers() {
+      return t.array(RawLifeCycleReducerDefV10);
+    },
+    get RowLevelSecurity() {
+      return t.array(RawRowLevelSecurityDefV9);
+    },
+    get CaseConversionPolicy() {
+      return CaseConversionPolicy;
+    },
+    get ExplicitNames() {
+      return ExplicitNames;
+    },
+    get HttpHandlers() {
+      return t.array(RawHttpHandlerDefV10);
+    },
+    get HttpRoutes() {
+      return t.array(RawHttpRouteDefV10);
+    },
+    get ViewPrimaryKeys() {
+      return t.array(RawViewPrimaryKeyDefV10);
+    },
+    get Submodules() {
+      return t.array(RawSubmoduleV10);
+    }
+  });
+  var RawModuleDefV8 = t.object("RawModuleDefV8", {
+    get typespace() {
+      return Typespace;
+    },
+    get tables() {
+      return t.array(TableDesc);
+    },
+    get reducers() {
+      return t.array(ReducerDef);
+    },
+    get miscExports() {
+      return t.array(MiscModuleExport);
+    }
+  });
+  var RawModuleDefV9 = t.object("RawModuleDefV9", {
+    get typespace() {
+      return Typespace;
+    },
+    get tables() {
+      return t.array(RawTableDefV9);
+    },
+    get reducers() {
+      return t.array(RawReducerDefV9);
+    },
+    get types() {
+      return t.array(RawTypeDefV9);
+    },
+    get miscExports() {
+      return t.array(RawMiscModuleExportV9);
+    },
+    get rowLevelSecurity() {
+      return t.array(RawRowLevelSecurityDefV9);
+    }
+  });
+  var RawProcedureDefV10 = t.object("RawProcedureDefV10", {
+    sourceName: t.string(),
+    get params() {
+      return ProductType2;
+    },
+    get returnType() {
+      return AlgebraicType2;
+    },
+    get visibility() {
+      return FunctionVisibility;
+    }
+  });
+  var RawProcedureDefV9 = t.object("RawProcedureDefV9", {
+    name: t.string(),
+    get params() {
+      return ProductType2;
+    },
+    get returnType() {
+      return AlgebraicType2;
+    }
+  });
+  var RawReducerDefV10 = t.object("RawReducerDefV10", {
+    sourceName: t.string(),
+    get params() {
+      return ProductType2;
+    },
+    get visibility() {
+      return FunctionVisibility;
+    },
+    get okReturnType() {
+      return AlgebraicType2;
+    },
+    get errReturnType() {
+      return AlgebraicType2;
+    }
+  });
+  var RawReducerDefV9 = t.object("RawReducerDefV9", {
+    name: t.string(),
+    get params() {
+      return ProductType2;
+    },
+    get lifecycle() {
+      return t.option(Lifecycle);
+    }
+  });
+  var RawRowLevelSecurityDefV9 = t.object("RawRowLevelSecurityDefV9", {
+    sql: t.string()
+  });
+  var RawScheduleDefV10 = t.object("RawScheduleDefV10", {
+    sourceName: t.option(t.string()),
+    tableName: t.string(),
+    scheduleAtCol: t.u16(),
+    functionName: t.string()
+  });
+  var RawScheduleDefV9 = t.object("RawScheduleDefV9", {
+    name: t.option(t.string()),
+    reducerName: t.string(),
+    scheduledAtColumn: t.u16()
+  });
+  var RawScopedTypeNameV10 = t.object("RawScopedTypeNameV10", {
+    scope: t.array(t.string()),
+    sourceName: t.string()
+  });
+  var RawScopedTypeNameV9 = t.object("RawScopedTypeNameV9", {
+    scope: t.array(t.string()),
+    name: t.string()
+  });
+  var RawSequenceDefV10 = t.object("RawSequenceDefV10", {
+    sourceName: t.option(t.string()),
+    column: t.u16(),
+    start: t.option(t.i128()),
+    minValue: t.option(t.i128()),
+    maxValue: t.option(t.i128()),
+    increment: t.i128()
+  });
+  var RawSequenceDefV8 = t.object("RawSequenceDefV8", {
+    sequenceName: t.string(),
+    colPos: t.u16(),
+    increment: t.i128(),
+    start: t.option(t.i128()),
+    minValue: t.option(t.i128()),
+    maxValue: t.option(t.i128()),
+    allocated: t.i128()
+  });
+  var RawSequenceDefV9 = t.object("RawSequenceDefV9", {
+    name: t.option(t.string()),
+    column: t.u16(),
+    start: t.option(t.i128()),
+    minValue: t.option(t.i128()),
+    maxValue: t.option(t.i128()),
+    increment: t.i128()
+  });
+  var RawSubmoduleV10 = t.object("RawSubmoduleV10", {
+    namespace: t.string(),
+    get module() {
+      return RawModuleDefV10;
+    }
+  });
+  var RawTableDefV10 = t.object("RawTableDefV10", {
+    sourceName: t.string(),
+    productTypeRef: t.u32(),
+    primaryKey: t.array(t.u16()),
+    get indexes() {
+      return t.array(RawIndexDefV10);
+    },
+    get constraints() {
+      return t.array(RawConstraintDefV10);
+    },
+    get sequences() {
+      return t.array(RawSequenceDefV10);
+    },
+    get tableType() {
+      return TableType;
+    },
+    get tableAccess() {
+      return TableAccess;
+    },
+    get defaultValues() {
+      return t.array(RawColumnDefaultValueV10);
+    },
+    isEvent: t.bool()
+  });
+  var RawTableDefV8 = t.object("RawTableDefV8", {
+    tableName: t.string(),
+    get columns() {
+      return t.array(RawColumnDefV8);
+    },
+    get indexes() {
+      return t.array(RawIndexDefV8);
+    },
+    get constraints() {
+      return t.array(RawConstraintDefV8);
+    },
+    get sequences() {
+      return t.array(RawSequenceDefV8);
+    },
+    tableType: t.string(),
+    tableAccess: t.string(),
+    scheduled: t.option(t.string())
+  });
+  var RawTableDefV9 = t.object("RawTableDefV9", {
+    name: t.string(),
+    productTypeRef: t.u32(),
+    primaryKey: t.array(t.u16()),
+    get indexes() {
+      return t.array(RawIndexDefV9);
+    },
+    get constraints() {
+      return t.array(RawConstraintDefV9);
+    },
+    get sequences() {
+      return t.array(RawSequenceDefV9);
+    },
+    get schedule() {
+      return t.option(RawScheduleDefV9);
+    },
+    get tableType() {
+      return TableType;
+    },
+    get tableAccess() {
+      return TableAccess;
+    }
+  });
+  var RawTypeDefV10 = t.object("RawTypeDefV10", {
+    get sourceName() {
+      return RawScopedTypeNameV10;
+    },
+    ty: t.u32(),
+    customOrdering: t.bool()
+  });
+  var RawTypeDefV9 = t.object("RawTypeDefV9", {
+    get name() {
+      return RawScopedTypeNameV9;
+    },
+    ty: t.u32(),
+    customOrdering: t.bool()
+  });
+  var RawUniqueConstraintDataV9 = t.object(
+    "RawUniqueConstraintDataV9",
+    {
+      columns: t.array(t.u16())
+    }
+  );
+  var RawViewDefV10 = t.object("RawViewDefV10", {
+    sourceName: t.string(),
+    index: t.u32(),
+    isPublic: t.bool(),
+    isAnonymous: t.bool(),
+    get params() {
+      return ProductType2;
+    },
+    get returnType() {
+      return AlgebraicType2;
+    }
+  });
+  var RawViewDefV9 = t.object("RawViewDefV9", {
+    name: t.string(),
+    index: t.u32(),
+    isPublic: t.bool(),
+    isAnonymous: t.bool(),
+    get params() {
+      return ProductType2;
+    },
+    get returnType() {
+      return AlgebraicType2;
+    }
+  });
+  var RawViewPrimaryKeyDefV10 = t.object("RawViewPrimaryKeyDefV10", {
+    viewSourceName: t.string(),
+    columns: t.array(t.string())
+  });
+  var ReducerDef = t.object("ReducerDef", {
+    name: t.string(),
+    get args() {
+      return t.array(ProductTypeElement);
+    }
+  });
+  var SumType2 = t.object("SumType", {
+    get variants() {
+      return t.array(SumTypeVariant);
+    }
+  });
+  var SumTypeVariant = t.object("SumTypeVariant", {
+    name: t.option(t.string()),
+    get algebraicType() {
+      return AlgebraicType2;
+    }
+  });
+  var TableAccess = t.enum("TableAccess", {
+    Public: t.unit(),
+    Private: t.unit()
+  });
+  var TableDesc = t.object("TableDesc", {
+    get schema() {
+      return RawTableDefV8;
+    },
+    data: t.u32()
+  });
+  var TableType = t.enum("TableType", {
+    System: t.unit(),
+    User: t.unit()
+  });
+  var TypeAlias = t.object("TypeAlias", {
+    name: t.string(),
+    ty: t.u32()
+  });
+  var Typespace = t.object("Typespace", {
+    get types() {
+      return t.array(AlgebraicType2);
+    }
+  });
+  t.enum("ViewResultHeader", {
+    RowData: t.unit(),
+    RawSql: t.string()
+  });
+  function table(opts, row, ..._) {
+    const {
+      name,
+      public: isPublic = false,
+      indexes: userIndexes = [],
+      scheduled,
+      event: isEvent = false
+    } = opts;
+    const colIds = /* @__PURE__ */ new Map();
+    const colNameList = [];
+    if (!(row instanceof RowBuilder)) {
+      row = new RowBuilder(row);
+    }
+    row.algebraicType.value.elements.forEach((elem, i) => {
+      colIds.set(elem.name, i);
+      colNameList.push(elem.name);
+    });
+    const pk = [];
+    const indexes = [];
+    const constraints = [];
+    const sequences = [];
+    let scheduleAtCol;
+    const defaultValues = [];
+    for (const [name2, builder] of Object.entries(row.row)) {
+      const meta = builder.columnMetadata;
+      if (meta.isPrimaryKey) {
+        pk.push(colIds.get(name2));
+      }
+      const isUnique = meta.isUnique || meta.isPrimaryKey;
+      if (meta.indexType || isUnique) {
+        const algo = meta.indexType ?? "btree";
+        const id = colIds.get(name2);
+        let algorithm;
+        switch (algo) {
+          case "btree":
+            algorithm = RawIndexAlgorithm.BTree([id]);
+            break;
+          case "hash":
+            algorithm = RawIndexAlgorithm.Hash([id]);
+            break;
+          case "direct":
+            algorithm = RawIndexAlgorithm.Direct(id);
+            break;
+        }
+        indexes.push({
+          sourceName: void 0,
+          // Unnamed indexes will be assigned a globally unique name
+          accessorName: name2,
+          algorithm
+        });
+      }
+      if (isUnique) {
+        constraints.push({
+          sourceName: void 0,
+          data: { tag: "Unique", value: { columns: [colIds.get(name2)] } }
+        });
+      }
+      if (meta.isAutoIncrement) {
+        sequences.push({
+          sourceName: void 0,
+          start: void 0,
+          minValue: void 0,
+          maxValue: void 0,
+          column: colIds.get(name2),
+          increment: 1n
+        });
+      }
+      if (Object.prototype.hasOwnProperty.call(meta, "defaultValue")) {
+        const writer = new BinaryWriter(16);
+        builder.serialize(writer, meta.defaultValue);
+        defaultValues.push({
+          colId: colIds.get(name2),
+          value: writer.getBuffer()
+        });
+      }
+      const algebraicType = builder.typeBuilder.algebraicType;
+      if (schedule_at_default.isScheduleAt(algebraicType)) {
+        scheduleAtCol = colIds.get(name2);
+      }
+    }
+    for (const indexOpts of userIndexes ?? []) {
+      const accessor = indexOpts.accessor;
+      if (typeof accessor !== "string" || accessor.length === 0) {
+        const tableLabel = name ?? "<unnamed>";
+        const indexLabel = indexOpts.name ?? "<unnamed>";
+        throw new TypeError(
+          `Index '${indexLabel}' on table '${tableLabel}' must define a non-empty 'accessor'`
+        );
+      }
+      let algorithm;
+      switch (indexOpts.algorithm) {
+        case "btree":
+          algorithm = {
+            tag: "BTree",
+            value: indexOpts.columns.map((c) => colIds.get(c))
+          };
+          break;
+        case "hash":
+          algorithm = {
+            tag: "Hash",
+            value: indexOpts.columns.map((c) => colIds.get(c))
+          };
+          break;
+        case "direct":
+          algorithm = { tag: "Direct", value: colIds.get(indexOpts.column) };
+          break;
+      }
+      indexes.push({
+        sourceName: void 0,
+        accessorName: accessor,
+        algorithm,
+        canonicalName: indexOpts.name
+      });
+    }
+    for (const constraintOpts of opts.constraints ?? []) {
+      if (constraintOpts.constraint === "unique") {
+        const data = {
+          tag: "Unique",
+          value: { columns: constraintOpts.columns.map((c) => colIds.get(c)) }
+        };
+        constraints.push({ sourceName: constraintOpts.name, data });
+        continue;
+      }
+    }
+    const productType = row.algebraicType.value;
+    const schedule = scheduled && scheduleAtCol !== void 0 ? { scheduleAtCol, reducer: scheduled } : void 0;
+    return {
+      rowType: row,
+      tableName: name,
+      rowSpacetimeType: productType,
+      tableDef: (ctx, accName) => {
+        const tableName = name ?? accName;
+        if (row.typeName === void 0) {
+          row.typeName = toPascalCase(tableName);
+        }
+        for (const index of indexes) {
+          const cols = index.algorithm.tag === "Direct" ? [index.algorithm.value] : index.algorithm.value;
+          const colS = cols.map((i) => colNameList[i]).join("_");
+          const sourceName = index.sourceName = `${accName}_${colS}_idx_${index.algorithm.tag.toLowerCase()}`;
+          const { canonicalName } = index;
+          if (canonicalName !== void 0) {
+            ctx.moduleDef.explicitNames.entries.push(
+              ExplicitNameEntry.Index({ sourceName, canonicalName })
+            );
+          }
+        }
+        return {
+          sourceName: accName,
+          productTypeRef: ctx.registerTypesRecursively(row).ref,
+          primaryKey: pk,
+          indexes,
+          constraints,
+          sequences,
+          tableType: { tag: "User" },
+          tableAccess: { tag: isPublic ? "Public" : "Private" },
+          defaultValues,
+          isEvent
+        };
+      },
+      // Preserve the declared index options as runtime data so `tableToSchema`
+      // can expose them without type-smuggling.
+      idxs: userIndexes,
+      constraints,
+      scheduleAtCol,
+      schedule
+    };
+  }
+  var Reducers = class {
+    reducersType;
+    constructor(handles) {
+      this.reducersType = reducersToSchema(handles);
+    }
+  };
+  function reducersToSchema(reducers22) {
+    const mapped = reducers22.map((r) => {
+      const paramsRow = r.params.row;
+      return {
+        name: r.reducerName,
+        // Prefer the schema's own accessorName if present at runtime; otherwise derive it.
+        accessorName: r.accessorName,
+        params: paramsRow,
+        paramsType: r.paramsSpacetimeType
+      };
+    });
+    const result = { reducers: mapped };
+    return result;
+  }
+  function reducers(...args) {
+    const handles = args.length === 1 && Array.isArray(args[0]) ? args[0] : args;
+    return new Reducers(handles);
+  }
+  function reducerSchema(name, params) {
+    const paramType = {
+      elements: Object.entries(params).map(([n, c]) => ({
+        name: n,
+        algebraicType: "typeBuilder" in c ? c.typeBuilder.algebraicType : c.algebraicType
+      }))
+    };
+    return {
+      reducerName: name,
+      accessorName: toCamelCase(name),
+      params: new RowBuilder(params),
+      paramsSpacetimeType: paramType,
+      reducerDef: {
+        name,
+        params: paramType,
+        lifecycle: void 0
+      }
+    };
+  }
+  function procedures(...args) {
+    const procedures22 = args.length === 1 && Array.isArray(args[0]) ? args[0] : args;
+    return { procedures: procedures22 };
+  }
+
+  // src/module_bindings/abandon_run_reducer.ts
+  var abandon_run_reducer_default = {
+    runId: t.string()
+  };
+
+  // src/module_bindings/acknowledge_duel_notice_reducer.ts
+  var acknowledge_duel_notice_reducer_default = {
+    noticeId: t.string()
+  };
+
+  // src/module_bindings/acknowledge_market_sales_reducer.ts
+  var acknowledge_market_sales_reducer_default = {
+    throughId: t.string()
+  };
+
+  // src/module_bindings/acknowledge_task_chest_reducer.ts
+  var acknowledge_task_chest_reducer_default = {
+    chestId: t.string()
+  };
+
+  // src/module_bindings/acknowledge_welcome_chest_reducer.ts
+  var acknowledge_welcome_chest_reducer_default = {};
+
+  // src/module_bindings/advance_tutorial_reducer.ts
+  var advance_tutorial_reducer_default = {
+    stage: t.u32()
+  };
+
+  // src/module_bindings/block_chat_author_reducer.ts
+  var block_chat_author_reducer_default = {
+    lineId: t.string()
+  };
+
+  // src/module_bindings/block_player_reducer.ts
+  var block_player_reducer_default = {
+    kind: t.string(),
+    id: t.string()
+  };
+
+  // src/module_bindings/buy_bounty_reward_reducer.ts
+  var buy_bounty_reward_reducer_default = {
+    entryId: t.string(),
+    choice: t.string()
+  };
+
+  // src/module_bindings/buy_market_listing_reducer.ts
+  var buy_market_listing_reducer_default = {
+    listingId: t.string(),
+    quantity: t.u32()
+  };
+
+  // src/module_bindings/buy_shop_item_reducer.ts
+  var buy_shop_item_reducer_default = {
+    shopId: t.string(),
+    itemId: t.string(),
+    quantity: t.u32()
+  };
+
+  // src/module_bindings/cancel_friend_request_reducer.ts
+  var cancel_friend_request_reducer_default = {
+    requestId: t.string()
+  };
+
+  // src/module_bindings/cancel_market_listing_reducer.ts
+  var cancel_market_listing_reducer_default = {
+    listingId: t.string()
+  };
+
+  // src/module_bindings/challenge_duel_listing_reducer.ts
+  var challenge_duel_listing_reducer_default = {
+    listingId: t.string()
+  };
+
+  // src/module_bindings/choose_restricted_account_reducer.ts
+  var choose_restricted_account_reducer_default = {};
+
+  // src/module_bindings/claim_bounty_reducer.ts
+  var claim_bounty_reducer_default = {};
+
+  // src/module_bindings/claim_diary_chart_reducer.ts
+  var claim_diary_chart_reducer_default = {
+    regionId: t.string()
+  };
+
+  // src/module_bindings/claim_diary_tier_reducer.ts
+  var claim_diary_tier_reducer_default = {
+    regionId: t.string(),
+    tier: t.string()
+  };
+
+  // src/module_bindings/claim_duel_tranquil_reducer.ts
+  var claim_duel_tranquil_reducer_default = {
+    duelId: t.string()
+  };
+
+  // src/module_bindings/claim_duel_ward_reducer.ts
+  var claim_duel_ward_reducer_default = {
+    duelId: t.string()
+  };
+
+  // src/module_bindings/claim_feat_reducer.ts
+  var claim_feat_reducer_default = {
+    featId: t.string()
+  };
+
+  // src/module_bindings/claim_play_session_reducer.ts
+  var claim_play_session_reducer_default = {
+    force: t.bool()
+  };
+
+  // src/module_bindings/claim_quest_reducer.ts
+  var claim_quest_reducer_default = {
+    questId: t.string()
+  };
+
+  // src/module_bindings/claim_task_reducer.ts
+  var claim_task_reducer_default = {
+    taskRowId: t.string()
+  };
+
+  // src/module_bindings/claim_welcome_chest_reducer.ts
+  var claim_welcome_chest_reducer_default = {};
+
+  // src/module_bindings/complete_party_revive_reducer.ts
+  var complete_party_revive_reducer_default = {
+    partyId: t.string()
+  };
+
+  // src/module_bindings/consume_item_reducer.ts
+  var consume_item_reducer_default = {
+    itemId: t.string(),
+    quantity: t.u32()
+  };
+
+  // src/module_bindings/continue_dark_run_reducer.ts
+  var continue_dark_run_reducer_default = {
+    runId: t.string(),
+    encounter: t.u32()
+  };
+
+  // src/module_bindings/craft_item_reducer.ts
+  var craft_item_reducer_default = {
+    recipeId: t.string(),
+    quantity: t.u32()
+  };
+
+  // src/module_bindings/create_farm_dark_private_reducer.ts
+  var create_farm_dark_private_reducer_default = {};
+
+  // src/module_bindings/create_farm_private_reducer.ts
+  var create_farm_private_reducer_default = {};
+
+  // src/module_bindings/create_instance_listing_reducer.ts
+  var create_instance_listing_reducer_default = {
+    instanceId: t.string(),
+    pricePer: t.u32()
+  };
+
+  // src/module_bindings/create_market_listing_reducer.ts
+  var create_market_listing_reducer_default = {
+    itemId: t.string(),
+    quantity: t.u32(),
+    pricePer: t.u32()
+  };
+
+  // src/module_bindings/create_party_room_reducer.ts
+  var create_party_room_reducer_default = {
+    dungeonId: t.string()
+  };
+
+  // src/module_bindings/delete_build_reducer.ts
+  var delete_build_reducer_default = {
+    buildId: t.string()
+  };
+
+  // src/module_bindings/delete_loadout_reducer.ts
+  var delete_loadout_reducer_default = {
+    loadoutId: t.string()
+  };
+
+  // src/module_bindings/delete_my_data_reducer.ts
+  var delete_my_data_reducer_default = {};
+
+  // src/module_bindings/drop_bounty_reducer.ts
+  var drop_bounty_reducer_default = {
+    keepStreak: t.bool()
+  };
+
+  // src/module_bindings/enhance_gear_reducer.ts
+  var enhance_gear_reducer_default = {
+    itemId: t.string(),
+    instanceId: t.string(),
+    slot: t.string()
+  };
+
+  // src/module_bindings/enter_dark_duel_reducer.ts
+  var enter_dark_duel_reducer_default = {
+    duelId: t.string(),
+    health: t.u32()
+  };
+
+  // src/module_bindings/enter_dark_duel_v_2_reducer.ts
+  var enter_dark_duel_v_2_reducer_default = {
+    duelId: t.string(),
+    health: t.u32(),
+    encountersCleared: t.u32()
+  };
+
+  // src/module_bindings/enter_dark_duel_v_3_reducer.ts
+  var enter_dark_duel_v_3_reducer_default = {
+    duelId: t.string(),
+    health: t.u32(),
+    encountersCleared: t.u32(),
+    potions: t.u32()
+  };
+
+  // src/module_bindings/enter_dark_duel_v_4_reducer.ts
+  var enter_dark_duel_v_4_reducer_default = {
+    duelId: t.string(),
+    health: t.u32(),
+    encountersCleared: t.u32(),
+    potions: t.u32(),
+    necklace: t.u32()
+  };
+
+  // src/module_bindings/equip_boost_reducer.ts
+  var equip_boost_reducer_default = {
+    itemId: t.string()
+  };
+
+  // src/module_bindings/equip_food_reducer.ts
+  var equip_food_reducer_default = {
+    itemId: t.string()
+  };
+
+  // src/module_bindings/equip_gear_instance_reducer.ts
+  var equip_gear_instance_reducer_default = {
+    instanceId: t.string(),
+    slot: t.string()
+  };
+
+  // src/module_bindings/equip_inventory_item_reducer.ts
+  var equip_inventory_item_reducer_default = {
+    itemId: t.string()
+  };
+
+  // src/module_bindings/equip_inventory_item_to_slot_reducer.ts
+  var equip_inventory_item_to_slot_reducer_default = {
+    itemId: t.string(),
+    slot: t.string()
+  };
+
+  // src/module_bindings/equip_loadout_reducer.ts
+  var equip_loadout_reducer_default = {
+    planJson: t.string()
+  };
+
+  // src/module_bindings/insure_duel_lobby_reducer.ts
+  var insure_duel_lobby_reducer_default = {
+    listingId: t.string(),
+    slot: t.string()
+  };
+
+  // src/module_bindings/invite_friend_reducer.ts
+  var invite_friend_reducer_default = {
+    friendId: t.string()
+  };
+
+  // src/module_bindings/join_farm_dark_private_reducer.ts
+  var join_farm_dark_private_reducer_default = {
+    code: t.string()
+  };
+
+  // src/module_bindings/join_farm_dark_public_reducer.ts
+  var join_farm_dark_public_reducer_default = {};
+
+  // src/module_bindings/join_farm_private_reducer.ts
+  var join_farm_private_reducer_default = {
+    code: t.string()
+  };
+
+  // src/module_bindings/join_farm_public_reducer.ts
+  var join_farm_public_reducer_default = {};
+
+  // src/module_bindings/join_party_queue_reducer.ts
+  var join_party_queue_reducer_default = {
+    dungeonId: t.string()
+  };
+
+  // src/module_bindings/join_party_room_reducer.ts
+  var join_party_room_reducer_default = {
+    code: t.string()
+  };
+
+  // src/module_bindings/learn_skill_reducer.ts
+  var learn_skill_reducer_default = {
+    skillId: t.string()
+  };
+
+  // src/module_bindings/leave_dark_run_reducer.ts
+  var leave_dark_run_reducer_default = {
+    runId: t.string(),
+    encounter: t.u32()
+  };
+
+  // src/module_bindings/leave_duel_listing_reducer.ts
+  var leave_duel_listing_reducer_default = {};
+
+  // src/module_bindings/leave_farm_match_reducer.ts
+  var leave_farm_match_reducer_default = {};
+
+  // src/module_bindings/leave_party_reducer.ts
+  var leave_party_reducer_default = {};
+
+  // src/module_bindings/leave_party_queue_reducer.ts
+  var leave_party_queue_reducer_default = {};
+
+  // src/module_bindings/leave_restricted_account_reducer.ts
+  var leave_restricted_account_reducer_default = {};
+
+  // src/module_bindings/look_up_badges_reducer.ts
+  var look_up_badges_reducer_default = {
+    source: t.string(),
+    id: t.string()
+  };
+
+  // src/module_bindings/mark_tasks_seen_reducer.ts
+  var mark_tasks_seen_reducer_default = {};
+
+  // src/module_bindings/new_build_reducer.ts
+  var new_build_reducer_default = {
+    tree: t.string(),
+    name: t.string()
+  };
+
+  // src/module_bindings/open_bounty_board_reducer.ts
+  var open_bounty_board_reducer_default = {};
+
+  // src/module_bindings/open_dark_chest_reducer.ts
+  var open_dark_chest_reducer_default = {
+    runId: t.string(),
+    chestIndex: t.u32()
+  };
+
+  // src/module_bindings/open_party_chest_reducer.ts
+  var open_party_chest_reducer_default = {
+    partyId: t.string(),
+    chestIndex: t.u32()
+  };
+
+  // src/module_bindings/operator_chat_clear_reducer.ts
+  var operator_chat_clear_reducer_default = {
+    channel: t.string(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/operator_chat_delete_reducer.ts
+  var operator_chat_delete_reducer_default = {
+    lineId: t.u64(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/operator_chat_mute_reducer.ts
+  var operator_chat_mute_reducer_default = {
+    displayName: t.string(),
+    hours: t.u32(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/operator_chat_set_mode_reducer.ts
+  var operator_chat_set_mode_reducer_default = {
+    mode: t.string()
+  };
+
+  // src/module_bindings/operator_chat_tester_reducer.ts
+  var operator_chat_tester_reducer_default = {
+    displayName: t.string(),
+    allowed: t.bool()
+  };
+
+  // src/module_bindings/operator_chat_unmute_reducer.ts
+  var operator_chat_unmute_reducer_default = {
+    displayName: t.string(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/operator_clear_notices_reducer.ts
+  var operator_clear_notices_reducer_default = {};
+
+  // src/module_bindings/operator_lift_suspension_reducer.ts
+  var operator_lift_suspension_reducer_default = {
+    displayName: t.string(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/operator_post_notice_reducer.ts
+  var operator_post_notice_reducer_default = {
+    text: t.string(),
+    severity: t.string(),
+    minutes: t.u32()
+  };
+
+  // src/module_bindings/operator_regrade_enhancements_reducer.ts
+  var operator_regrade_enhancements_reducer_default = {};
+
+  // src/module_bindings/operator_rename_player_reducer.ts
+  var operator_rename_player_reducer_default = {
+    displayName: t.string(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/operator_set_loot_key_reducer.ts
+  var operator_set_loot_key_reducer_default = {
+    key: t.string()
+  };
+
+  // src/module_bindings/operator_suspend_account_reducer.ts
+  var operator_suspend_account_reducer_default = {
+    displayName: t.string(),
+    hours: t.u32(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/post_duel_listing_reducer.ts
+  var post_duel_listing_reducer_default = {
+    stake: t.string()
+  };
+
+  // src/module_bindings/publish_duel_board_reducer.ts
+  var publish_duel_board_reducer_default = {
+    duelId: t.string(),
+    cells: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    sequence: t.u32()
+  };
+
+  // src/module_bindings/publish_duel_piece_reducer.ts
+  var publish_duel_piece_reducer_default = {
+    duelId: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    sequence: t.u32()
+  };
+
+  // src/module_bindings/publish_farm_board_reducer.ts
+  var publish_farm_board_reducer_default = {
+    cells: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    score: t.u32(),
+    linesCleared: t.u32(),
+    toppedOut: t.bool(),
+    sequence: t.u32()
+  };
+
+  // src/module_bindings/publish_farm_board_v_2_reducer.ts
+  var publish_farm_board_v_2_reducer_default = {
+    cells: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    score: t.u32(),
+    linesCleared: t.u32(),
+    toppedOut: t.bool(),
+    sequence: t.u32(),
+    lockKind: t.i32(),
+    lockX: t.i32(),
+    lockY: t.i32(),
+    lockRotation: t.u32()
+  };
+
+  // src/module_bindings/publish_farm_piece_reducer.ts
+  var publish_farm_piece_reducer_default = {
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    sequence: t.u32()
+  };
+
+  // src/module_bindings/publish_party_board_reducer.ts
+  var publish_party_board_reducer_default = {
+    partyId: t.string(),
+    cells: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    sequence: t.u32()
+  };
+
+  // src/module_bindings/publish_party_board_v_2_reducer.ts
+  var publish_party_board_v_2_reducer_default = {
+    partyId: t.string(),
+    cells: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    sequence: t.u32(),
+    lockKind: t.i32(),
+    lockX: t.i32(),
+    lockY: t.i32(),
+    lockRotation: t.u32()
+  };
+
+  // src/module_bindings/publish_party_piece_reducer.ts
+  var publish_party_piece_reducer_default = {
+    partyId: t.string(),
+    activeKind: t.i32(),
+    activeX: t.i32(),
+    activeY: t.i32(),
+    activeRotation: t.u32(),
+    sequence: t.u32()
+  };
+
+  // src/module_bindings/purchase_build_upgrade_reducer.ts
+  var purchase_build_upgrade_reducer_default = {
+    upgradeId: t.string()
+  };
+
+  // src/module_bindings/reach_dark_checkpoint_reducer.ts
+  var reach_dark_checkpoint_reducer_default = {
+    runId: t.string(),
+    encounter: t.u32()
+  };
+
+  // src/module_bindings/ready_farm_pvp_round_reducer.ts
+  var ready_farm_pvp_round_reducer_default = {};
+
+  // src/module_bindings/reclaim_pet_reducer.ts
+  var reclaim_pet_reducer_default = {
+    petId: t.string()
+  };
+
+  // src/module_bindings/refresh_dark_presence_reducer.ts
+  var refresh_dark_presence_reducer_default = {
+    runId: t.string(),
+    encountersCleared: t.u32(),
+    health: t.u32()
+  };
+
+  // src/module_bindings/refresh_my_tasks_reducer.ts
+  var refresh_my_tasks_reducer_default = {};
+
+  // src/module_bindings/release_pet_reducer.ts
+  var release_pet_reducer_default = {
+    petId: t.string()
+  };
+
+  // src/module_bindings/remove_friend_reducer.ts
+  var remove_friend_reducer_default = {
+    friendId: t.string()
+  };
+
+  // src/module_bindings/rename_build_reducer.ts
+  var rename_build_reducer_default = {
+    buildId: t.string(),
+    name: t.string()
+  };
+
+  // src/module_bindings/renew_play_session_reducer.ts
+  var renew_play_session_reducer_default = {};
+
+  // src/module_bindings/reorder_inventory_item_reducer.ts
+  var reorder_inventory_item_reducer_default = {
+    itemId: t.string(),
+    targetIndex: t.u32()
+  };
+
+  // src/module_bindings/repair_gear_reducer.ts
+  var repair_gear_reducer_default = {
+    instanceId: t.string()
+  };
+
+  // src/module_bindings/report_chat_message_reducer.ts
+  var report_chat_message_reducer_default = {
+    lineId: t.string(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/report_client_problem_reducer.ts
+  var report_client_problem_reducer_default = {
+    kind: t.string(),
+    signature: t.string(),
+    build: t.string(),
+    payload: t.string()
+  };
+
+  // src/module_bindings/report_duel_board_break_reducer.ts
+  var report_duel_board_break_reducer_default = {
+    duelId: t.string(),
+    emptyCells: t.u32()
+  };
+
+  // src/module_bindings/report_farm_pvp_top_out_reducer.ts
+  var report_farm_pvp_top_out_reducer_default = {};
+
+  // src/module_bindings/report_party_down_reducer.ts
+  var report_party_down_reducer_default = {
+    partyId: t.string()
+  };
+
+  // src/module_bindings/report_party_enemy_heal_reducer.ts
+  var report_party_enemy_heal_reducer_default = {
+    partyId: t.string(),
+    encounterIndex: t.u32(),
+    amount: t.u32()
+  };
+
+  // src/module_bindings/report_party_health_reducer.ts
+  var report_party_health_reducer_default = {
+    partyId: t.string(),
+    health: t.u32()
+  };
+
+  // src/module_bindings/report_party_revive_progress_reducer.ts
+  var report_party_revive_progress_reducer_default = {
+    partyId: t.string(),
+    progress: t.u32()
+  };
+
+  // src/module_bindings/report_player_reducer.ts
+  var report_player_reducer_default = {
+    kind: t.string(),
+    id: t.string(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/report_run_submission_problem_reducer.ts
+  var report_run_submission_problem_reducer_default = {
+    runId: t.string(),
+    kind: t.string(),
+    command: t.string(),
+    message: t.string(),
+    detailsJson: t.string()
+  };
+
+  // src/module_bindings/request_duel_rematch_reducer.ts
+  var request_duel_rematch_reducer_default = {
+    duelId: t.string()
+  };
+
+  // src/module_bindings/reroll_bounties_reducer.ts
+  var reroll_bounties_reducer_default = {};
+
+  // src/module_bindings/reroll_task_reducer.ts
+  var reroll_task_reducer_default = {
+    taskRowId: t.string()
+  };
+
+  // src/module_bindings/respec_tree_reducer.ts
+  var respec_tree_reducer_default = {
+    tree: t.string()
+  };
+
+  // src/module_bindings/respond_friend_request_reducer.ts
+  var respond_friend_request_reducer_default = {
+    requestId: t.string(),
+    accept: t.bool()
+  };
+
+  // src/module_bindings/respond_invite_reducer.ts
+  var respond_invite_reducer_default = {
+    inviteId: t.string(),
+    accept: t.bool()
+  };
+
+  // src/module_bindings/restart_tutorial_reducer.ts
+  var restart_tutorial_reducer_default = {};
+
+  // src/module_bindings/reveal_run_loot_reducer.ts
+  var reveal_run_loot_reducer_default = {
+    runId: t.string(),
+    kind: t.string(),
+    index: t.u32()
+  };
+
+  // src/module_bindings/salvage_gear_instance_reducer.ts
+  var salvage_gear_instance_reducer_default = {
+    instanceId: t.string()
+  };
+
+  // src/module_bindings/salvage_item_reducer.ts
+  var salvage_item_reducer_default = {
+    itemId: t.string(),
+    quantity: t.u32()
+  };
+
+  // src/module_bindings/save_account_settings_reducer.ts
+  var save_account_settings_reducer_default = {
+    payload: t.string()
+  };
+
+  // src/module_bindings/save_loadout_reducer.ts
+  var save_loadout_reducer_default = {
+    loadoutId: t.string(),
+    name: t.string(),
+    slotsJson: t.string(),
+    combatBuildId: t.string(),
+    skillsBuildId: t.string()
+  };
+
+  // src/module_bindings/sell_gear_instance_reducer.ts
+  var sell_gear_instance_reducer_default = {
+    instanceId: t.string()
+  };
+
+  // src/module_bindings/sell_item_reducer.ts
+  var sell_item_reducer_default = {
+    itemId: t.string(),
+    quantity: t.u32()
+  };
+
+  // src/module_bindings/send_chat_message_reducer.ts
+  var send_chat_message_reducer_default = {
+    kind: t.string(),
+    text: t.string()
+  };
+
+  // src/module_bindings/send_dark_duel_blow_reducer.ts
+  var send_dark_duel_blow_reducer_default = {
+    duelId: t.string(),
+    lines: t.u32(),
+    spinType: t.string(),
+    combo: t.u32(),
+    backToBack: t.bool(),
+    perfectClear: t.bool(),
+    sequence: t.u32()
+  };
+
+  // src/module_bindings/send_farm_pvp_attack_reducer.ts
+  var send_farm_pvp_attack_reducer_default = {
+    lines: t.u32(),
+    spinType: t.string(),
+    combo: t.u32(),
+    backToBack: t.bool(),
+    perfectClear: t.bool(),
+    cancelled: t.u32(),
+    sequence: t.u32()
+  };
+
+  // src/module_bindings/send_friend_request_reducer.ts
+  var send_friend_request_reducer_default = {
+    name: t.string()
+  };
+
+  // src/module_bindings/send_friend_request_recent_reducer.ts
+  var send_friend_request_recent_reducer_default = {
+    recentId: t.string()
+  };
+
+  // src/module_bindings/send_party_blow_reducer.ts
+  var send_party_blow_reducer_default = {
+    partyId: t.string(),
+    encounterIndex: t.u32(),
+    damage: t.u32(),
+    lines: t.u32(),
+    spinType: t.string(),
+    combo: t.u32(),
+    backToBack: t.bool(),
+    perfectClear: t.bool(),
+    necklace: t.bool()
+  };
+
+  // src/module_bindings/send_party_blow_v_2_reducer.ts
+  var send_party_blow_v_2_reducer_default = {
+    partyId: t.string(),
+    encounterIndex: t.u32(),
+    damage: t.u32(),
+    lines: t.u32(),
+    spinType: t.string(),
+    combo: t.u32(),
+    backToBack: t.bool(),
+    perfectClear: t.bool(),
+    necklace: t.bool(),
+    procs: t.u32()
+  };
+
+  // src/module_bindings/send_party_heal_reducer.ts
+  var send_party_heal_reducer_default = {
+    partyId: t.string(),
+    lines: t.u32(),
+    spinType: t.string(),
+    pieceKind: t.u32(),
+    halfTurn: t.bool(),
+    perfectClear: t.bool()
+  };
+
+  // src/module_bindings/send_party_thorns_reducer.ts
+  var send_party_thorns_reducer_default = {
+    partyId: t.string(),
+    encounterIndex: t.u32(),
+    amount: t.u32()
+  };
+
+  // src/module_bindings/set_bounty_block_reducer.ts
+  var set_bounty_block_reducer_default = {
+    targetId: t.string(),
+    blocked: t.bool()
+  };
+
+  // src/module_bindings/set_bounty_option_reducer.ts
+  var set_bounty_option_reducer_default = {
+    option: t.string(),
+    on: t.bool()
+  };
+
+  // src/module_bindings/set_display_name_reducer.ts
+  var set_display_name_reducer_default = {
+    displayName: t.string()
+  };
+
+  // src/module_bindings/set_duel_ready_reducer.ts
+  var set_duel_ready_reducer_default = {
+    ready: t.bool()
+  };
+
+  // src/module_bindings/set_friend_settings_reducer.ts
+  var set_friend_settings_reducer_default = {
+    requests: t.string(),
+    appearOffline: t.bool(),
+    showActivity: t.bool(),
+    acceptInvites: t.bool(),
+    onlineToasts: t.bool()
+  };
+
+  // src/module_bindings/set_hair_reducer.ts
+  var set_hair_reducer_default = {
+    hairStyle: t.u32(),
+    hairColor: t.u32()
+  };
+
+  // src/module_bindings/set_party_omens_reducer.ts
+  var set_party_omens_reducer_default = {
+    on: t.bool()
+  };
+
+  // src/module_bindings/set_party_ready_reducer.ts
+  var set_party_ready_reducer_default = {
+    ready: t.bool()
+  };
+
+  // src/module_bindings/set_shown_badge_reducer.ts
+  var set_shown_badge_reducer_default = {
+    badgeId: t.string()
+  };
+
+  // src/module_bindings/set_skin_tone_reducer.ts
+  var set_skin_tone_reducer_default = {
+    skinTone: t.u32()
+  };
+
+  // src/module_bindings/star_replay_reducer.ts
+  var star_replay_reducer_default = {
+    replayId: t.string(),
+    starred: t.bool()
+  };
+
+  // src/module_bindings/start_builds_reducer.ts
+  var start_builds_reducer_default = {
+    tree: t.string()
+  };
+
+  // src/module_bindings/start_dark_run_insured_reducer.ts
+  var start_dark_run_insured_reducer_default = {
+    dungeonId: t.string(),
+    slot: t.string()
+  };
+
+  // src/module_bindings/start_farm_run_reducer.ts
+  var start_farm_run_reducer_default = {
+    headStart: t.bool()
+  };
+
+  // src/module_bindings/start_farm_run_v_2_reducer.ts
+  var start_farm_run_v_2_reducer_default = {
+    headStart: t.bool(),
+    fertilise: t.bool()
+  };
+
+  // src/module_bindings/start_omen_run_reducer.ts
+  var start_omen_run_reducer_default = {
+    dungeonId: t.string(),
+    insuredSlot: t.string()
+  };
+
+  // src/module_bindings/start_run_reducer.ts
+  var start_run_reducer_default = {
+    dungeonId: t.string(),
+    seed: t.u32()
+  };
+
+  // src/module_bindings/submit_dungeon_run_result_v_1_reducer.ts
+  var submit_dungeon_run_result_v_1_reducer_default = {
+    runId: t.string(),
+    trace: t.string()
+  };
+
+  // src/module_bindings/submit_farm_run_result_v_3_reducer.ts
+  var submit_farm_run_result_v_3_reducer_default = {
+    runId: t.string(),
+    trace: t.string()
+  };
+
+  // src/module_bindings/submit_farm_waiting_run_result_reducer.ts
+  var submit_farm_waiting_run_result_reducer_default = {
+    runId: t.string(),
+    trace: t.string()
+  };
+
+  // src/module_bindings/submit_feedback_reducer.ts
+  var submit_feedback_reducer_default = {
+    category: t.string(),
+    text: t.string(),
+    build: t.string(),
+    diagnostics: t.string()
+  };
+
+  // src/module_bindings/switch_build_reducer.ts
+  var switch_build_reducer_default = {
+    buildId: t.string()
+  };
+
+  // src/module_bindings/take_bounty_reducer.ts
+  var take_bounty_reducer_default = {
+    slot: t.u32()
+  };
+
+  // src/module_bindings/unblock_chat_player_reducer.ts
+  var unblock_chat_player_reducer_default = {
+    blockId: t.string()
+  };
+
+  // src/module_bindings/unequip_boost_reducer.ts
+  var unequip_boost_reducer_default = {
+    slot: t.string()
+  };
+
+  // src/module_bindings/unequip_food_reducer.ts
+  var unequip_food_reducer_default = {};
+
+  // src/module_bindings/unequip_inventory_item_reducer.ts
+  var unequip_inventory_item_reducer_default = {
+    slot: t.string()
+  };
+
+  // src/module_bindings/verify_dark_duel_win_reducer.ts
+  var verify_dark_duel_win_reducer_default = {
+    duelId: t.string(),
+    trace: t.string()
+  };
+
+  // src/module_bindings/watch_replay_reducer.ts
+  var watch_replay_reducer_default = {
+    replayId: t.string()
+  };
+
+  // src/module_bindings/yield_dark_duel_reducer.ts
+  var yield_dark_duel_reducer_default = {
+    duelId: t.string(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/bounty_shop_table.ts
+  var bounty_shop_table_default = t.row({
+    kind: t.string(),
+    id: t.string(),
+    name: t.string(),
+    description: t.string(),
+    cost: t.u32(),
+    rank: t.u32(),
+    maxLevel: t.u32().name("max_level"),
+    requires: t.string(),
+    itemId: t.string().name("item_id")
+  });
+
+  // src/module_bindings/dark_player_count_table.ts
+  var dark_player_count_table_default = t.row({
+    mode: t.string(),
+    players: t.u32()
+  });
+
+  // src/module_bindings/duel_listings_table.ts
+  var duel_listings_table_default = t.row({
+    listingId: t.string().primaryKey().name("listing_id"),
+    displayName: t.string().name("display_name"),
+    level: t.u32(),
+    stake: t.string(),
+    look: t.string(),
+    wins: t.u32(),
+    losses: t.u32(),
+    state: t.string(),
+    postedAt: t.timestamp().name("posted_at"),
+    isMine: t.bool().name("is_mine")
+  });
+
+  // src/module_bindings/farm_board_event_table.ts
+  var farm_board_event_table_default = t.row({
+    room: t.u32(),
+    slot: t.u8(),
+    board: t.byteArray(),
+    activeKind: t.i8().name("active_kind"),
+    activeX: t.i8().name("active_x"),
+    activeY: t.u8().name("active_y"),
+    activeRotation: t.u8().name("active_rotation"),
+    score: t.u32(),
+    lines: t.u16(),
+    toppedOut: t.bool().name("topped_out")
+  });
+
+  // src/module_bindings/farm_lock_event_table.ts
+  var farm_lock_event_table_default = t.row({
+    room: t.u32(),
+    slot: t.u8(),
+    lockKind: t.u8().name("lock_kind"),
+    lockX: t.i8().name("lock_x"),
+    lockY: t.u8().name("lock_y"),
+    lockRotation: t.u8().name("lock_rotation"),
+    checksum: t.u16(),
+    activeKind: t.i8().name("active_kind"),
+    activeX: t.i8().name("active_x"),
+    activeY: t.u8().name("active_y"),
+    activeRotation: t.u8().name("active_rotation"),
+    score: t.u32(),
+    lines: t.u16()
+  });
+
+  // src/module_bindings/farm_pose_event_table.ts
+  var farm_pose_event_table_default = t.row({
+    room: t.u32(),
+    slot: t.u8(),
+    kind: t.i8(),
+    x: t.i8(),
+    y: t.u8(),
+    rotation: t.u8()
+  });
+
+  // src/module_bindings/farm_player_counts_table.ts
+  var farm_player_counts_table_default = t.row({
+    mode: t.string(),
+    players: t.u32()
+  });
+
+  // src/module_bindings/market_listings_table.ts
+  var market_listings_table_default = t.row({
+    listingId: t.string().primaryKey().name("listing_id"),
+    sellerName: t.string().name("seller_name"),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32(),
+    pricePer: t.u32().name("price_per"),
+    createdAt: t.timestamp().name("created_at"),
+    isMine: t.bool().name("is_mine"),
+    instanceId: t.string().name("instance_id"),
+    modifierId: t.string().name("modifier_id"),
+    modifierValue: t.u32().name("modifier_value"),
+    rolls: t.u32()
+  });
+
+  // src/module_bindings/market_price_guide_table.ts
+  var market_price_guide_table_default = t.row({
+    itemId: t.string().name("item_id"),
+    averagePrice: t.u32().name("average_price"),
+    sampleCount: t.u32().name("sample_count"),
+    enhancedListings: t.u32().name("enhanced_listings")
+  });
+
+  // src/module_bindings/my_account_settings_table.ts
+  var my_account_settings_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    payload: t.string(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_active_run_table.ts
+  var my_active_run_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    runId: t.string().name("run_id"),
+    dungeonId: t.string().name("dungeon_id"),
+    seed: t.u32(),
+    currentFloor: t.u32().name("current_floor"),
+    score: t.u32(),
+    linesCleared: t.u32().name("lines_cleared"),
+    startedAt: t.timestamp().name("started_at"),
+    rivalPressure: t.bool().name("rival_pressure"),
+    pvpBagSeed: t.u32().name("pvp_bag_seed"),
+    darkMatchId: t.string().name("dark_match_id"),
+    darkRound: t.u32().name("dark_round"),
+    combatStatsJson: t.string().name("combat_stats_json"),
+    combatWeaponType: t.string().name("combat_weapon_type"),
+    combatSkillsJson: t.string().name("combat_skills_json"),
+    dungeonStoryVersion: t.u32().name("dungeon_story_version"),
+    combatWeaponId: t.string().name("combat_weapon_id"),
+    foodItemId: t.string().name("food_item_id"),
+    foodQuantity: t.u32().name("food_quantity"),
+    necklaceItemId: t.string().name("necklace_item_id"),
+    partyId: t.string().name("party_id")
+  });
+
+  // src/module_bindings/my_badge_lookup_table.ts
+  var my_badge_lookup_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    source: t.string(),
+    sourceId: t.string().name("source_id"),
+    badgeIds: t.string().name("badge_ids"),
+    shown: t.string(),
+    at: t.timestamp()
+  });
+
+  // src/module_bindings/my_badges_table.ts
+  var my_badges_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    badgeId: t.string().name("badge_id"),
+    earnedAt: t.timestamp().name("earned_at"),
+    shown: t.bool()
+  });
+
+  // src/module_bindings/my_bounty_table.ts
+  var my_bounty_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    targetId: t.string().name("target_id"),
+    count: t.u32(),
+    progress: t.u32(),
+    twist: t.string(),
+    detailJson: t.string().name("detail_json"),
+    bankedXp: t.u64().name("banked_xp"),
+    takenAt: t.timestamp().name("taken_at")
+  });
+
+  // src/module_bindings/my_bounty_state_table.ts
+  var my_bounty_state_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    marks: t.u64(),
+    finished: t.u32(),
+    streak: t.u32(),
+    paidDrops: t.u32().name("paid_drops"),
+    boardCounter: t.u32().name("board_counter"),
+    offersJson: t.string().name("offers_json"),
+    rerollDay: t.u32().name("reroll_day"),
+    rerollsUsed: t.u32().name("rerolls_used"),
+    unlocksJson: t.string().name("unlocks_json"),
+    blocksJson: t.string().name("blocks_json"),
+    twistsOn: t.bool().name("twists_on"),
+    lastRunJson: t.string().name("last_run_json"),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_broken_gear_table.ts
+  var my_broken_gear_table_default = t.row({
+    instanceId: t.u64().primaryKey().name("instance_id"),
+    brokenAt: t.timestamp().name("broken_at")
+  });
+
+  // src/module_bindings/my_chat_blocks_table.ts
+  var my_chat_blocks_table_default = t.row({
+    blockId: t.u64().name("block_id"),
+    name: t.string(),
+    at: t.timestamp()
+  });
+
+  // src/module_bindings/my_chat_global_table.ts
+  var my_chat_global_table_default = t.row({
+    id: t.u64().primaryKey(),
+    channel: t.string(),
+    authorName: t.string().name("author_name"),
+    authorLevel: t.u32().name("author_level"),
+    text: t.string(),
+    sentAt: t.timestamp().name("sent_at"),
+    authorColor: t.u32().name("author_color"),
+    authorBadge: t.string().name("author_badge"),
+    authorRestricted: t.bool().name("author_restricted")
+  });
+
+  // src/module_bindings/my_chat_room_table.ts
+  var my_chat_room_table_default = t.row({
+    id: t.u64().primaryKey(),
+    channel: t.string(),
+    authorName: t.string().name("author_name"),
+    authorLevel: t.u32().name("author_level"),
+    text: t.string(),
+    sentAt: t.timestamp().name("sent_at"),
+    authorColor: t.u32().name("author_color"),
+    authorBadge: t.string().name("author_badge"),
+    authorRestricted: t.bool().name("author_restricted")
+  });
+
+  // src/module_bindings/my_chat_status_table.ts
+  var my_chat_status_table_default = t.row({
+    open: t.bool(),
+    mutedUntilMicros: t.u64().name("muted_until_micros"),
+    muteReason: t.string().name("mute_reason"),
+    room: t.string(),
+    channel: t.string(),
+    presetsOnly: t.bool().name("presets_only"),
+    globalMinLevel: t.u32().name("global_min_level")
+  });
+
+  // src/module_bindings/my_collection_kills_table.ts
+  var my_collection_kills_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    sourceId: t.string().name("source_id"),
+    kills: t.u64()
+  });
+
+  // src/module_bindings/my_collection_log_table.ts
+  var my_collection_log_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    itemId: t.string().name("item_id"),
+    firstSourceId: t.string().name("first_source_id"),
+    firstAt: t.timestamp().name("first_at"),
+    firstKillCount: t.u64().name("first_kill_count"),
+    obtained: t.u64()
+  });
+
+  // src/module_bindings/my_dark_chest_claims_table.ts
+  var my_dark_chest_claims_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    runId: t.string().name("run_id"),
+    chestIndex: t.u32().name("chest_index"),
+    source: t.string(),
+    rowsJson: t.string().name("rows_json"),
+    claimedAt: t.timestamp().name("claimed_at")
+  });
+
+  // src/module_bindings/my_dark_death_loss_table.ts
+  var my_dark_death_loss_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    runId: t.string().name("run_id"),
+    lostItemId: t.string().name("lost_item_id"),
+    lostInstanceId: t.u64().name("lost_instance_id"),
+    lostFate: t.string().name("lost_fate"),
+    brokenJson: t.string().name("broken_json"),
+    settledAt: t.timestamp().name("settled_at")
+  });
+
+  // src/module_bindings/my_dark_duel_table.ts
+  var my_dark_duel_table_default = t.row({
+    duelId: t.string().primaryKey().name("duel_id"),
+    playerOne: t.identity().name("player_one"),
+    playerTwo: t.identity().name("player_two"),
+    oneName: t.string().name("one_name"),
+    twoName: t.string().name("two_name"),
+    oneLevel: t.u32().name("one_level"),
+    twoLevel: t.u32().name("two_level"),
+    oneAtEncounter: t.u32().name("one_at_encounter"),
+    twoAtEncounter: t.u32().name("two_at_encounter"),
+    oneHealth: t.u32().name("one_health"),
+    twoHealth: t.u32().name("two_health"),
+    oneEntered: t.bool().name("one_entered"),
+    twoEntered: t.bool().name("two_entered"),
+    oneDamageSent: t.u32().name("one_damage_sent"),
+    twoDamageSent: t.u32().name("two_damage_sent"),
+    state: t.string(),
+    winner: t.identity(),
+    winnerName: t.string().name("winner_name"),
+    outcome: t.string(),
+    matchedAt: t.timestamp().name("matched_at"),
+    startedAt: t.timestamp().name("started_at"),
+    decidedAt: t.timestamp().name("decided_at"),
+    oneRunSeed: t.u32().name("one_run_seed"),
+    twoRunSeed: t.u32().name("two_run_seed"),
+    oneLook: t.string().name("one_look"),
+    twoLook: t.string().name("two_look"),
+    friendly: t.bool(),
+    ground: t.string(),
+    oneRunId: t.string().name("one_run_id"),
+    twoRunId: t.string().name("two_run_id"),
+    oneBlows: t.u32().name("one_blows"),
+    twoBlows: t.u32().name("two_blows"),
+    oneBoardBreaks: t.u32().name("one_board_breaks"),
+    twoBoardBreaks: t.u32().name("two_board_breaks"),
+    oneEntryHealth: t.u32().name("one_entry_health"),
+    twoEntryHealth: t.u32().name("two_entry_health"),
+    onePotions: t.u32().name("one_potions"),
+    twoPotions: t.u32().name("two_potions"),
+    oneEntryPotions: t.u32().name("one_entry_potions"),
+    twoEntryPotions: t.u32().name("two_entry_potions"),
+    oneNecklace: t.u32().name("one_necklace"),
+    twoNecklace: t.u32().name("two_necklace"),
+    oneEntryNecklace: t.u32().name("one_entry_necklace"),
+    twoEntryNecklace: t.u32().name("two_entry_necklace"),
+    oneShielded: t.bool().name("one_shielded"),
+    twoShielded: t.bool().name("two_shielded"),
+    oneBoardBreakCells: t.u32().name("one_board_break_cells"),
+    twoBoardBreakCells: t.u32().name("two_board_break_cells")
+  });
+
+  // src/module_bindings/my_dark_duel_blows_table.ts
+  var my_dark_duel_blows_table_default = t.row({
+    blowId: t.string().primaryKey().name("blow_id"),
+    duelId: t.string().name("duel_id"),
+    sender: t.identity(),
+    recipient: t.identity(),
+    damage: t.u32(),
+    remainingHealth: t.u32().name("remaining_health"),
+    lines: t.u32(),
+    spinType: t.string().name("spin_type"),
+    combo: t.u32(),
+    backToBack: t.bool().name("back_to_back"),
+    perfectClear: t.bool().name("perfect_clear"),
+    ordinal: t.u32(),
+    createdAt: t.timestamp().name("created_at"),
+    effectBehavior: t.string().name("effect_behavior"),
+    effectCells: t.u32().name("effect_cells"),
+    effectSeed: t.u32().name("effect_seed"),
+    effects: t.string()
+  });
+
+  // src/module_bindings/my_dark_duel_core_table.ts
+  var my_dark_duel_core_table_default = t.row({
+    duelId: t.string().primaryKey().name("duel_id"),
+    playerOne: t.identity().name("player_one"),
+    playerTwo: t.identity().name("player_two"),
+    oneName: t.string().name("one_name"),
+    twoName: t.string().name("two_name"),
+    oneLevel: t.u32().name("one_level"),
+    twoLevel: t.u32().name("two_level"),
+    oneAtEncounter: t.u32().name("one_at_encounter"),
+    twoAtEncounter: t.u32().name("two_at_encounter"),
+    oneHealth: t.u32().name("one_health"),
+    twoHealth: t.u32().name("two_health"),
+    oneEntered: t.bool().name("one_entered"),
+    twoEntered: t.bool().name("two_entered"),
+    oneDamageSent: t.u32().name("one_damage_sent"),
+    twoDamageSent: t.u32().name("two_damage_sent"),
+    state: t.string(),
+    winner: t.identity(),
+    winnerName: t.string().name("winner_name"),
+    outcome: t.string(),
+    matchedAt: t.timestamp().name("matched_at"),
+    startedAt: t.timestamp().name("started_at"),
+    decidedAt: t.timestamp().name("decided_at"),
+    oneRunSeed: t.u32().name("one_run_seed"),
+    twoRunSeed: t.u32().name("two_run_seed"),
+    oneLook: t.string().name("one_look"),
+    twoLook: t.string().name("two_look"),
+    friendly: t.bool(),
+    ground: t.string(),
+    oneRunId: t.string().name("one_run_id"),
+    twoRunId: t.string().name("two_run_id"),
+    oneBlows: t.u32().name("one_blows"),
+    twoBlows: t.u32().name("two_blows"),
+    oneBoardBreaks: t.u32().name("one_board_breaks"),
+    twoBoardBreaks: t.u32().name("two_board_breaks"),
+    oneEntryHealth: t.u32().name("one_entry_health"),
+    twoEntryHealth: t.u32().name("two_entry_health"),
+    onePotions: t.u32().name("one_potions"),
+    twoPotions: t.u32().name("two_potions"),
+    oneEntryPotions: t.u32().name("one_entry_potions"),
+    twoEntryPotions: t.u32().name("two_entry_potions"),
+    oneNecklace: t.u32().name("one_necklace"),
+    twoNecklace: t.u32().name("two_necklace"),
+    oneEntryNecklace: t.u32().name("one_entry_necklace"),
+    twoEntryNecklace: t.u32().name("two_entry_necklace"),
+    oneShielded: t.bool().name("one_shielded"),
+    twoShielded: t.bool().name("two_shielded"),
+    oneBoardBreakCells: t.u32().name("one_board_break_cells"),
+    twoBoardBreakCells: t.u32().name("two_board_break_cells")
+  });
+
+  // src/module_bindings/my_dark_duel_haul_table.ts
+  var my_dark_duel_haul_table_default = t.row({
+    haulId: t.string().primaryKey().name("haul_id"),
+    winner: t.identity(),
+    duelId: t.string().name("duel_id"),
+    fromName: t.string().name("from_name"),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32(),
+    worn: t.bool(),
+    createdAt: t.timestamp().name("created_at"),
+    instanceId: t.u64().name("instance_id")
+  });
+
+  // src/module_bindings/my_dark_duel_score_table.ts
+  var my_dark_duel_score_table_default = t.row({
+    duelId: t.string().name("duel_id"),
+    oneHealth: t.u32().name("one_health"),
+    twoHealth: t.u32().name("two_health"),
+    oneDamageSent: t.u32().name("one_damage_sent"),
+    twoDamageSent: t.u32().name("two_damage_sent"),
+    oneBlows: t.u32().name("one_blows"),
+    twoBlows: t.u32().name("two_blows"),
+    oneBoardBreaks: t.u32().name("one_board_breaks"),
+    twoBoardBreaks: t.u32().name("two_board_breaks"),
+    onePotions: t.u32().name("one_potions"),
+    twoPotions: t.u32().name("two_potions"),
+    oneNecklace: t.u32().name("one_necklace"),
+    twoNecklace: t.u32().name("two_necklace"),
+    oneShielded: t.bool().name("one_shielded"),
+    twoShielded: t.bool().name("two_shielded"),
+    oneBoardBreakCells: t.u32().name("one_board_break_cells"),
+    twoBoardBreakCells: t.u32().name("two_board_break_cells")
+  });
+
+  // src/module_bindings/my_dark_presence_table.ts
+  var my_dark_presence_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    runId: t.string().name("run_id"),
+    displayName: t.string().name("display_name"),
+    level: t.u32(),
+    health: t.u32(),
+    encountersCleared: t.u32().name("encounters_cleared"),
+    queuedAt: t.timestamp().name("queued_at"),
+    ground: t.string()
+  });
+
+  // src/module_bindings/my_diary_claims_table.ts
+  var my_diary_claims_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    regionId: t.string().name("region_id"),
+    tier: t.string(),
+    claimedAt: t.timestamp().name("claimed_at"),
+    rowsJson: t.string().name("rows_json")
+  });
+
+  // src/module_bindings/my_diary_daily_charts_table.ts
+  var my_diary_daily_charts_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    regionId: t.string().name("region_id"),
+    day: t.u64()
+  });
+
+  // src/module_bindings/my_diary_tasks_table.ts
+  var my_diary_tasks_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    taskId: t.string().name("task_id"),
+    value: t.u64(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_duel_lobby_table.ts
+  var my_duel_lobby_table_default = t.row({
+    listingId: t.string().primaryKey().name("listing_id"),
+    owner: t.identity(),
+    displayName: t.string().name("display_name"),
+    level: t.u32(),
+    stake: t.string(),
+    look: t.string(),
+    wins: t.u32(),
+    losses: t.u32(),
+    challenger: t.identity(),
+    challengerName: t.string().name("challenger_name"),
+    challengerLevel: t.u32().name("challenger_level"),
+    challengerLook: t.string().name("challenger_look"),
+    challengerWins: t.u32().name("challenger_wins"),
+    challengerLosses: t.u32().name("challenger_losses"),
+    ownerReady: t.bool().name("owner_ready"),
+    challengerReady: t.bool().name("challenger_ready"),
+    state: t.string(),
+    postedAt: t.timestamp().name("posted_at"),
+    matchedAt: t.timestamp().name("matched_at")
+  });
+
+  // src/module_bindings/my_duel_notices_table.ts
+  var my_duel_notices_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    duelId: t.string().name("duel_id"),
+    side: t.string(),
+    opponentName: t.string().name("opponent_name"),
+    at: t.timestamp()
+  });
+
+  // src/module_bindings/my_duel_opponent_board_table.ts
+  var my_duel_opponent_board_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    duelId: t.string().name("duel_id"),
+    cells: t.string(),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    sequence: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_duel_opponent_piece_table.ts
+  var my_duel_opponent_piece_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    duelId: t.string().name("duel_id"),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    sequence: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_duel_record_table.ts
+  var my_duel_record_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    wins: t.u32(),
+    losses: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_dungeon_progress_table.ts
+  var my_dungeon_progress_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    dungeonId: t.string().name("dungeon_id"),
+    storyCompleted: t.bool().name("story_completed"),
+    completedAt: t.timestamp().name("completed_at")
+  });
+
+  // src/module_bindings/my_endless_records_table.ts
+  var my_endless_records_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    dungeonId: t.string().name("dungeon_id"),
+    bestEncounter: t.u32().name("best_encounter"),
+    bestRound: t.u32().name("best_round"),
+    reachedAt: t.timestamp().name("reached_at")
+  });
+
+  // src/module_bindings/my_endless_regions_table.ts
+  var my_endless_regions_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    regionId: t.string().name("region_id"),
+    firstSeenAt: t.timestamp().name("first_seen_at"),
+    timesEntered: t.u32().name("times_entered"),
+    chestsOpened: t.u32().name("chests_opened"),
+    deepestEncounter: t.u32().name("deepest_encounter")
+  });
+
+  // src/module_bindings/my_equipment_table.ts
+  var my_equipment_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    slot: t.string(),
+    itemId: t.string().name("item_id"),
+    instanceId: t.u64().name("instance_id")
+  });
+
+  // src/module_bindings/my_equipped_boosts_table.ts
+  var my_equipped_boosts_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    slot: t.string(),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32()
+  });
+
+  // src/module_bindings/my_equipped_food_table.ts
+  var my_equipped_food_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32()
+  });
+
+  // src/module_bindings/my_farm_dark_haul_table.ts
+  var my_farm_dark_haul_table_default = t.row({
+    haulId: t.string().primaryKey().name("haul_id"),
+    winner: t.identity(),
+    round: t.u32(),
+    fromName: t.string().name("from_name"),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32(),
+    createdAt: t.timestamp().name("created_at")
+  });
+
+  // src/module_bindings/my_farm_pvp_attacks_table.ts
+  var my_farm_pvp_attacks_table_default = t.row({
+    attackId: t.string().primaryKey().name("attack_id"),
+    recipient: t.identity(),
+    sender: t.identity(),
+    lines: t.u32(),
+    hole: t.u32(),
+    createdAt: t.timestamp().name("created_at"),
+    ordinal: t.u32()
+  });
+
+  // src/module_bindings/my_farm_pvp_member_v_2_table.ts
+  var my_farm_pvp_member_v_2_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    matchId: t.string().name("match_id"),
+    slot: t.u32(),
+    alive: t.bool(),
+    placement: t.u32(),
+    joinedAt: t.timestamp().name("joined_at")
+  });
+
+  // src/module_bindings/my_farm_pvp_session_table.ts
+  var my_farm_pvp_session_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    mode: t.string(),
+    privateCode: t.string().name("private_code"),
+    matchId: t.string().name("match_id"),
+    wins: t.u32(),
+    losses: t.u32(),
+    round: t.u32(),
+    roundState: t.string().name("round_state"),
+    winnerName: t.string().name("winner_name"),
+    attackSequence: t.u32().name("attack_sequence"),
+    joinedAt: t.timestamp().name("joined_at"),
+    relayCount: t.u32().name("relay_count"),
+    claimedAttackTotal: t.u32().name("claimed_attack_total")
+  });
+
+  // src/module_bindings/my_farm_records_table.ts
+  var my_farm_records_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    mode: t.string(),
+    bestLines: t.u32().name("best_lines"),
+    bestLevel: t.u32().name("best_level"),
+    reachedAt: t.timestamp().name("reached_at")
+  });
+
+  // src/module_bindings/my_feat_claims_table.ts
+  var my_feat_claims_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    featId: t.string().name("feat_id"),
+    claimedAt: t.timestamp().name("claimed_at")
+  });
+
+  // src/module_bindings/my_friend_requests_table.ts
+  var my_friend_requests_table_default = t.row({
+    requestId: t.u64().name("request_id"),
+    direction: t.string(),
+    name: t.string(),
+    level: t.u32(),
+    sentAt: t.timestamp().name("sent_at"),
+    look: t.string()
+  });
+
+  // src/module_bindings/my_friend_settings_table.ts
+  var my_friend_settings_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    requests: t.string(),
+    appearOffline: t.bool().name("appear_offline"),
+    showActivity: t.bool().name("show_activity"),
+    acceptInvites: t.bool().name("accept_invites"),
+    onlineToasts: t.bool().name("online_toasts")
+  });
+
+  // src/module_bindings/my_friends_table.ts
+  var my_friends_table_default = t.row({
+    friendId: t.u64().name("friend_id"),
+    name: t.string(),
+    level: t.u32(),
+    online: t.bool(),
+    activity: t.string(),
+    lastSeenMicros: t.u64().name("last_seen_micros"),
+    since: t.timestamp(),
+    look: t.string()
+  });
+
+  // src/module_bindings/my_game_invites_table.ts
+  var my_game_invites_table_default = t.row({
+    inviteId: t.u64().name("invite_id"),
+    direction: t.string(),
+    name: t.string(),
+    level: t.u32(),
+    kind: t.string(),
+    dungeonId: t.string().name("dungeon_id"),
+    code: t.string(),
+    filled: t.u32(),
+    capacity: t.u32(),
+    stakes: t.bool(),
+    expiresMicros: t.u64().name("expires_micros"),
+    state: t.string(),
+    look: t.string()
+  });
+
+  // src/module_bindings/my_gear_instances_table.ts
+  var my_gear_instances_table_default = t.row({
+    instanceId: t.u64().primaryKey().name("instance_id"),
+    owner: t.identity(),
+    itemId: t.string().name("item_id"),
+    place: t.string(),
+    modifierId: t.string().name("modifier_id"),
+    value: t.u32(),
+    rolls: t.u32(),
+    scrapSpent: t.u32().name("scrap_spent"),
+    createdAt: t.timestamp().name("created_at"),
+    rolledAt: t.timestamp().name("rolled_at")
+  });
+
+  // src/module_bindings/my_gear_insurance_table.ts
+  var my_gear_insurance_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    scope: t.string(),
+    ref: t.string(),
+    slot: t.string(),
+    itemId: t.string().name("item_id"),
+    scrapPaid: t.u32().name("scrap_paid"),
+    boughtAt: t.timestamp().name("bought_at"),
+    sealItemId: t.string().name("seal_item_id"),
+    instanceId: t.u64().name("instance_id")
+  });
+
+  // src/module_bindings/my_inventory_table.ts
+  var my_inventory_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32()
+  });
+
+  // src/module_bindings/my_inventory_order_table.ts
+  var my_inventory_order_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    itemId: t.string().name("item_id"),
+    position: t.u32()
+  });
+
+  // src/module_bindings/my_loadouts_table.ts
+  var my_loadouts_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    position: t.u32(),
+    label: t.string(),
+    slotsJson: t.string().name("slots_json"),
+    combatBuildId: t.u64().name("combat_build_id"),
+    skillsBuildId: t.u64().name("skills_build_id"),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_market_sale_notice_table.ts
+  var my_market_sale_notice_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    announcedThroughId: t.u64().name("announced_through_id")
+  });
+
+  // src/module_bindings/my_market_transactions_table.ts
+  var my_market_transactions_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    kind: t.string(),
+    counterpartyName: t.string().name("counterparty_name"),
+    itemId: t.string().name("item_id"),
+    quantity: t.u32(),
+    pricePer: t.u32().name("price_per"),
+    gold: t.u32(),
+    at: t.timestamp(),
+    modifierId: t.string().name("modifier_id")
+  });
+
+  // src/module_bindings/my_onboarding_table.ts
+  var my_onboarding_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    tutorialStage: t.u32().name("tutorial_stage"),
+    createdAt: t.timestamp().name("created_at"),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_party_table.ts
+  var my_party_table_default = t.row({
+    partyId: t.string().primaryKey().name("party_id"),
+    mode: t.string(),
+    dungeonId: t.string().name("dungeon_id"),
+    code: t.string(),
+    state: t.string(),
+    seed: t.u32(),
+    encounterIndex: t.u32().name("encounter_index"),
+    enemyHealth: t.u32().name("enemy_health"),
+    enemyMaxHealth: t.u32().name("enemy_max_health"),
+    phase: t.string(),
+    chestIndex: t.u32().name("chest_index"),
+    soloFromEncounter: t.u32().name("solo_from_encounter"),
+    stepCount: t.u32().name("step_count"),
+    createdAt: t.timestamp().name("created_at"),
+    startedAt: t.timestamp().name("started_at"),
+    updatedAt: t.timestamp().name("updated_at"),
+    attackDueMicros: t.u64().name("attack_due_micros"),
+    attackSetMicros: t.u64().name("attack_set_micros"),
+    attackNumber: t.u32().name("attack_number"),
+    enemyShielded: t.bool().name("enemy_shielded")
+  });
+
+  // src/module_bindings/my_party_core_table.ts
+  var my_party_core_table_default = t.row({
+    partyId: t.string().primaryKey().name("party_id"),
+    mode: t.string(),
+    dungeonId: t.string().name("dungeon_id"),
+    code: t.string(),
+    state: t.string(),
+    seed: t.u32(),
+    encounterIndex: t.u32().name("encounter_index"),
+    enemyHealth: t.u32().name("enemy_health"),
+    enemyMaxHealth: t.u32().name("enemy_max_health"),
+    phase: t.string(),
+    chestIndex: t.u32().name("chest_index"),
+    soloFromEncounter: t.u32().name("solo_from_encounter"),
+    stepCount: t.u32().name("step_count"),
+    createdAt: t.timestamp().name("created_at"),
+    startedAt: t.timestamp().name("started_at"),
+    updatedAt: t.timestamp().name("updated_at"),
+    attackDueMicros: t.u64().name("attack_due_micros"),
+    attackSetMicros: t.u64().name("attack_set_micros"),
+    attackNumber: t.u32().name("attack_number"),
+    enemyShielded: t.bool().name("enemy_shielded")
+  });
+
+  // src/module_bindings/my_party_member_core_table.ts
+  var my_party_member_core_table_default = t.row({
+    memberId: t.string().primaryKey().name("member_id"),
+    partyId: t.string().name("party_id"),
+    owner: t.identity(),
+    slot: t.u32(),
+    state: t.string(),
+    ready: t.bool(),
+    runId: t.string().name("run_id"),
+    name: t.string(),
+    level: t.u32(),
+    armor: t.u32(),
+    look: t.string(),
+    health: t.u32(),
+    blows: t.u32(),
+    lastBlowDamage: t.u32().name("last_blow_damage"),
+    damageSent: t.u64().name("damage_sent"),
+    necklaceUsed: t.bool().name("necklace_used"),
+    disconnectedMicros: t.u64().name("disconnected_micros"),
+    joinedAt: t.timestamp().name("joined_at"),
+    snapArmed: t.bool().name("snap_armed"),
+    revives: t.u32(),
+    healsSent: t.u32().name("heals_sent"),
+    reviveProgress: t.u32().name("revive_progress"),
+    bandaged: t.bool()
+  });
+
+  // src/module_bindings/my_party_member_score_table.ts
+  var my_party_member_score_table_default = t.row({
+    memberId: t.string().name("member_id"),
+    health: t.u32(),
+    blows: t.u32(),
+    lastBlowDamage: t.u32().name("last_blow_damage"),
+    damageSent: t.u64().name("damage_sent"),
+    snapArmed: t.bool().name("snap_armed"),
+    necklaceUsed: t.bool().name("necklace_used"),
+    revives: t.u32(),
+    healsSent: t.u32().name("heals_sent"),
+    reviveProgress: t.u32().name("revive_progress"),
+    bandaged: t.bool()
+  });
+
+  // src/module_bindings/my_party_members_table.ts
+  var my_party_members_table_default = t.row({
+    memberId: t.string().primaryKey().name("member_id"),
+    partyId: t.string().name("party_id"),
+    owner: t.identity(),
+    slot: t.u32(),
+    state: t.string(),
+    ready: t.bool(),
+    runId: t.string().name("run_id"),
+    name: t.string(),
+    level: t.u32(),
+    armor: t.u32(),
+    look: t.string(),
+    health: t.u32(),
+    blows: t.u32(),
+    lastBlowDamage: t.u32().name("last_blow_damage"),
+    damageSent: t.u64().name("damage_sent"),
+    necklaceUsed: t.bool().name("necklace_used"),
+    disconnectedMicros: t.u64().name("disconnected_micros"),
+    joinedAt: t.timestamp().name("joined_at"),
+    snapArmed: t.bool().name("snap_armed"),
+    revives: t.u32(),
+    healsSent: t.u32().name("heals_sent"),
+    reviveProgress: t.u32().name("revive_progress"),
+    bandaged: t.bool()
+  });
+
+  // src/module_bindings/my_party_omens_table.ts
+  var my_party_omens_table_default = t.row({
+    memberId: t.string().name("member_id"),
+    slot: t.u32(),
+    wish: t.string(),
+    seeker: t.bool(),
+    holdout: t.bool(),
+    partyOn: t.bool().name("party_on"),
+    reason: t.string()
+  });
+
+  // src/module_bindings/my_party_partner_boards_table.ts
+  var my_party_partner_boards_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    partyId: t.string().name("party_id"),
+    cells: t.string(),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    sequence: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_party_partner_pieces_table.ts
+  var my_party_partner_pieces_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    partyId: t.string().name("party_id"),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    sequence: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_party_queue_table.ts
+  var my_party_queue_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    dungeonId: t.string().name("dungeon_id"),
+    level: t.u32(),
+    armor: t.u32(),
+    queuedAt: t.timestamp().name("queued_at")
+  });
+
+  // src/module_bindings/my_party_score_table.ts
+  var my_party_score_table_default = t.row({
+    partyId: t.string().name("party_id"),
+    enemyHealth: t.u32().name("enemy_health"),
+    enemyShielded: t.bool().name("enemy_shielded"),
+    attackDueMicros: t.u64().name("attack_due_micros"),
+    attackSetMicros: t.u64().name("attack_set_micros"),
+    attackNumber: t.u32().name("attack_number"),
+    stepCount: t.u32().name("step_count"),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_party_steps_table.ts
+  var my_party_steps_table_default = t.row({
+    stepId: t.string().primaryKey().name("step_id"),
+    partyId: t.string().name("party_id"),
+    index: t.u32(),
+    kind: t.string(),
+    encounterIndex: t.u32().name("encounter_index"),
+    chestIndex: t.u32().name("chest_index"),
+    killerSlot: t.u32().name("killer_slot"),
+    killCombo: t.u32().name("kill_combo"),
+    scaled: t.bool(),
+    damageJson: t.string().name("damage_json"),
+    at: t.timestamp(),
+    attackNumber: t.u32().name("attack_number"),
+    snapShotMask: t.u32().name("snap_shot_mask"),
+    subjectSlot: t.u32().name("subject_slot"),
+    amount: t.u32(),
+    challenge: t.string()
+  });
+
+  // src/module_bindings/my_profile_table.ts
+  var my_profile_table_default = t.row({
+    identity: t.identity().primaryKey(),
+    displayName: t.string().name("display_name"),
+    level: t.u32(),
+    experience: t.u32(),
+    totalExperience: t.u32().name("total_experience"),
+    unspentSkillPoints: t.u32().name("unspent_skill_points"),
+    gold: t.u32(),
+    bestScore: t.u32().name("best_score"),
+    createdAt: t.timestamp().name("created_at"),
+    lastPlayedAt: t.timestamp().name("last_played_at")
+  });
+
+  // src/module_bindings/my_profile_preferences_table.ts
+  var my_profile_preferences_table_default = t.row({
+    identity: t.identity().primaryKey(),
+    nameChosen: t.bool().name("name_chosen"),
+    createdAt: t.timestamp().name("created_at"),
+    lastSeenAt: t.timestamp().name("last_seen_at"),
+    skinTone: t.u32().name("skin_tone"),
+    hairStyle: t.u32().name("hair_style"),
+    hairColor: t.u32().name("hair_color")
+  });
+
+  // src/module_bindings/my_quest_claims_table.ts
+  var my_quest_claims_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    questId: t.string().name("quest_id"),
+    claimedAt: t.timestamp().name("claimed_at")
+  });
+
+  // src/module_bindings/my_quest_stats_table.ts
+  var my_quest_stats_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    key: t.string(),
+    value: t.u32(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
+  // src/module_bindings/my_quests_table.ts
+  var my_quests_table_default = t.row({
+    questId: t.string().name("quest_id"),
+    progress: t.u32(),
+    target: t.u32(),
+    state: t.string()
+  });
+
+  // src/module_bindings/my_recent_players_table.ts
+  var my_recent_players_table_default = t.row({
+    recentId: t.u64().name("recent_id"),
+    name: t.string(),
+    level: t.u32(),
+    context: t.string(),
+    at: t.timestamp(),
+    isFriend: t.bool().name("is_friend"),
+    requested: t.bool(),
+    look: t.string()
+  });
+
+  // src/module_bindings/my_replays_table.ts
+  var my_replays_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    runId: t.string().name("run_id"),
+    activity: t.string(),
+    kind: t.string(),
+    storyVersion: t.u32().name("story_version"),
+    finishedAt: t.timestamp().name("finished_at"),
+    summaryJson: t.string().name("summary_json"),
+    best: t.string(),
+    starred: t.bool()
+  });
+
+  // src/module_bindings/my_restricted_account_table.ts
+  var my_restricted_account_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    chosenAt: t.timestamp().name("chosen_at")
+  });
+
+  // src/module_bindings/my_run_loot_reveals_table.ts
+  var my_run_loot_reveals_table_default = t.row({
+    revealId: t.string().primaryKey().name("reveal_id"),
+    owner: t.identity(),
+    runId: t.string().name("run_id"),
+    kind: t.string(),
+    index: t.u32(),
+    seed: t.u32(),
+    createdAt: t.timestamp().name("created_at")
+  });
+
+  // src/module_bindings/my_satchel_keep_table.ts
+  var my_satchel_keep_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    runId: t.string().name("run_id"),
+    itemId: t.string().name("item_id"),
+    keptAt: t.timestamp().name("kept_at"),
+    instanceId: t.u64().name("instance_id")
+  });
+
+  // src/module_bindings/my_saved_builds_table.ts
+  var my_saved_builds_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    tree: t.string(),
+    position: t.u32(),
+    label: t.string(),
+    ranksJson: t.string().name("ranks_json"),
+    active: t.bool(),
+    savedAt: t.timestamp().name("saved_at")
+  });
+
+  // src/module_bindings/my_sent_farm_pvp_attacks_table.ts
+  var my_sent_farm_pvp_attacks_table_default = t.row({
+    attackId: t.string().primaryKey().name("attack_id"),
+    recipient: t.identity(),
+    sender: t.identity(),
+    lines: t.u32(),
+    hole: t.u32(),
+    createdAt: t.timestamp().name("created_at"),
+    ordinal: t.u32()
+  });
+
+  // src/module_bindings/my_skills_table.ts
+  var my_skills_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    skillId: t.string().name("skill_id"),
+    level: t.u32(),
+    equippedSlot: t.option(t.u32()).name("equipped_slot")
+  });
+
+  // src/module_bindings/my_skin_unlocks_table.ts
+  var my_skin_unlocks_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    skinId: t.string().name("skin_id"),
+    unlockedAt: t.timestamp().name("unlocked_at")
+  });
+
+  // src/module_bindings/my_slime_bag_keep_table.ts
+  var my_slime_bag_keep_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    runId: t.string().name("run_id"),
+    keptJson: t.string().name("kept_json"),
+    keptAt: t.timestamp().name("kept_at")
+  });
+
+  // src/module_bindings/my_task_chests_table.ts
+  var my_task_chests_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    cadence: t.string(),
+    taskId: t.string().name("task_id"),
+    tier: t.u32(),
+    rowsJson: t.string().name("rows_json"),
+    openedAt: t.timestamp().name("opened_at")
+  });
+
+  // src/module_bindings/my_task_state_table.ts
+  var my_task_state_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    dailySeen: t.u32().name("daily_seen"),
+    weeklySeen: t.u32().name("weekly_seen"),
+    dailyReroll: t.u32().name("daily_reroll"),
+    weeklyReroll: t.u32().name("weekly_reroll"),
+    updatedAt: t.timestamp().name("updated_at"),
+    dailyRerollsUsed: t.u32().name("daily_rerolls_used")
+  });
+
+  // src/module_bindings/my_tasks_table.ts
+  var my_tasks_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    cadence: t.string(),
+    period: t.u32(),
+    slot: t.u32(),
+    taskId: t.string().name("task_id"),
+    progress: t.u32(),
+    target: t.u32(),
+    claimed: t.bool(),
+    assignedAt: t.timestamp().name("assigned_at")
+  });
+
+  // src/module_bindings/my_upgrade_progress_table.ts
+  var my_upgrade_progress_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    level: t.u32(),
+    combatEarned: t.u32().name("combat_earned"),
+    combatSpent: t.u32().name("combat_spent"),
+    combatAvailable: t.u32().name("combat_available"),
+    skillsEarned: t.u32().name("skills_earned"),
+    skillsSpent: t.u32().name("skills_spent"),
+    skillsAvailable: t.u32().name("skills_available"),
+    buildEarned: t.u32().name("build_earned"),
+    buildSpent: t.u32().name("build_spent"),
+    buildAvailable: t.u32().name("build_available")
+  });
+
+  // src/module_bindings/my_upgrade_unlocks_table.ts
+  var my_upgrade_unlocks_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    tree: t.string(),
+    upgradeId: t.string().name("upgrade_id"),
+    rank: t.u32(),
+    pointCost: t.u32().name("point_cost")
+  });
+
+  // src/module_bindings/my_watched_replay_table.ts
+  var my_watched_replay_table_default = t.row({
+    replayId: t.u64().primaryKey().name("replay_id"),
+    owner: t.identity(),
+    requestJson: t.string().name("request_json"),
+    trace: t.string()
+  });
+
+  // src/module_bindings/my_welcome_chest_table.ts
+  var my_welcome_chest_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    claimedAt: t.timestamp().name("claimed_at"),
+    rowsJson: t.string().name("rows_json"),
+    revealed: t.bool()
+  });
+
+  // src/module_bindings/opponent_farm_boards_compact_v_4_table.ts
+  var opponent_farm_boards_compact_v_4_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    slot: t.u32(),
+    alive: t.bool(),
+    placement: t.u32(),
+    ready: t.bool(),
+    displayName: t.string().name("display_name"),
+    cells: t.string(),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    score: t.u32(),
+    linesCleared: t.u32().name("lines_cleared"),
+    toppedOut: t.bool().name("topped_out")
+  });
+
+  // src/module_bindings/opponent_farm_keyframes_v_1_table.ts
+  var opponent_farm_keyframes_v_1_table_default = t.row({
+    slot: t.u32().primaryKey(),
+    board: t.byteArray(),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation"),
+    score: t.u32(),
+    linesCleared: t.u32().name("lines_cleared"),
+    toppedOut: t.bool().name("topped_out")
+  });
+
+  // src/module_bindings/opponent_farm_pieces_compact_v_3_table.ts
+  var opponent_farm_pieces_compact_v_3_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    activeKind: t.i32().name("active_kind"),
+    activeX: t.i32().name("active_x"),
+    activeY: t.i32().name("active_y"),
+    activeRotation: t.u32().name("active_rotation")
+  });
+
+  // src/module_bindings/opponent_farm_roster_v_1_table.ts
+  var opponent_farm_roster_v_1_table_default = t.row({
+    slot: t.u32().primaryKey(),
+    owner: t.identity(),
+    alive: t.bool(),
+    placement: t.u32(),
+    ready: t.bool(),
+    displayName: t.string().name("display_name")
+  });
+
+  // src/module_bindings/opponent_farm_roster_v_2_table.ts
+  var opponent_farm_roster_v_2_table_default = t.row({
+    slot: t.u32().primaryKey(),
+    owner: t.identity(),
+    alive: t.bool(),
+    placement: t.u32(),
+    ready: t.bool(),
+    displayName: t.string().name("display_name"),
+    level: t.u32()
+  });
+
+  // src/module_bindings/party_board_event_table.ts
+  var party_board_event_table_default = t.row({
+    room: t.u32(),
+    slot: t.u8(),
+    board: t.byteArray(),
+    activeKind: t.i8().name("active_kind"),
+    activeX: t.i8().name("active_x"),
+    activeY: t.u8().name("active_y"),
+    activeRotation: t.u8().name("active_rotation"),
+    score: t.u32(),
+    lines: t.u16(),
+    toppedOut: t.bool().name("topped_out")
+  });
+
+  // src/module_bindings/party_lock_event_table.ts
+  var party_lock_event_table_default = t.row({
+    room: t.u32(),
+    slot: t.u8(),
+    lockKind: t.u8().name("lock_kind"),
+    lockX: t.i8().name("lock_x"),
+    lockY: t.u8().name("lock_y"),
+    lockRotation: t.u8().name("lock_rotation"),
+    checksum: t.u16(),
+    activeKind: t.i8().name("active_kind"),
+    activeX: t.i8().name("active_x"),
+    activeY: t.u8().name("active_y"),
+    activeRotation: t.u8().name("active_rotation"),
+    score: t.u32(),
+    lines: t.u16()
+  });
+
+  // src/module_bindings/quest_catalog_table.ts
+  var quest_catalog_table_default = t.row({
+    kind: t.string(),
+    id: t.string(),
+    parent: t.string(),
+    category: t.string(),
+    sortOrder: t.u32().name("sort_order"),
+    title: t.string(),
+    description: t.string(),
+    line: t.string(),
+    level: t.u32(),
+    target: t.u32(),
+    rewardsJson: t.string().name("rewards_json")
+  });
+
+  // src/module_bindings/quest_details_table.ts
+  var quest_details_table_default = t.row({
+    kind: t.string(),
+    id: t.string(),
+    detailJson: t.string().name("detail_json")
+  });
+
+  // src/module_bindings/server_notices_table.ts
+  var server_notices_table_default = t.row({
+    id: t.u64().primaryKey(),
+    text: t.string(),
+    severity: t.string(),
+    postedAt: t.timestamp().name("posted_at"),
+    until: t.timestamp()
+  });
+
+  // src/module_bindings/slime_best_waves_table.ts
+  var slime_best_waves_table_default = t.row({
+    board: t.string(),
+    rank: t.u32(),
+    displayName: t.string().name("display_name"),
+    wave: t.u32()
+  });
+
+  // src/module_bindings/index.ts
+  var tablesSchema = schema({
+    farmBoardEvent: table({
+      name: "farm_board_event",
+      indexes: [
+        { accessor: "room", name: "farm_board_event_room_idx_btree", algorithm: "btree", columns: [
+          "room"
+        ] }
+      ],
+      constraints: [],
+      event: true
+    }, farm_board_event_table_default),
+    farmLockEvent: table({
+      name: "farm_lock_event",
+      indexes: [
+        { accessor: "room", name: "farm_lock_event_room_idx_btree", algorithm: "btree", columns: [
+          "room"
+        ] }
+      ],
+      constraints: [],
+      event: true
+    }, farm_lock_event_table_default),
+    farmPoseEvent: table({
+      name: "farm_pose_event",
+      indexes: [
+        { accessor: "room", name: "farm_pose_event_room_idx_btree", algorithm: "btree", columns: [
+          "room"
+        ] }
+      ],
+      constraints: [],
+      event: true
+    }, farm_pose_event_table_default),
+    partyBoardEvent: table({
+      name: "party_board_event",
+      indexes: [
+        { accessor: "room", name: "party_board_event_room_idx_btree", algorithm: "btree", columns: [
+          "room"
+        ] }
+      ],
+      constraints: [],
+      event: true
+    }, party_board_event_table_default),
+    partyLockEvent: table({
+      name: "party_lock_event",
+      indexes: [
+        { accessor: "room", name: "party_lock_event_room_idx_btree", algorithm: "btree", columns: [
+          "room"
+        ] }
+      ],
+      constraints: [],
+      event: true
+    }, party_lock_event_table_default),
+    bountyShop: table({
+      name: "bounty_shop",
+      indexes: [],
+      constraints: []
+    }, bounty_shop_table_default),
+    darkPlayerCount: table({
+      name: "dark_player_count",
+      indexes: [],
+      constraints: []
+    }, dark_player_count_table_default),
+    duelListings: table({
+      name: "duel_listings",
+      indexes: [],
+      constraints: []
+    }, duel_listings_table_default),
+    farmPlayerCounts: table({
+      name: "farm_player_counts",
+      indexes: [],
+      constraints: []
+    }, farm_player_counts_table_default),
+    marketListings: table({
+      name: "market_listings",
+      indexes: [],
+      constraints: []
+    }, market_listings_table_default),
+    marketPriceGuide: table({
+      name: "market_price_guide",
+      indexes: [],
+      constraints: []
+    }, market_price_guide_table_default),
+    myAccountSettings: table({
+      name: "my_account_settings",
+      indexes: [],
+      constraints: []
+    }, my_account_settings_table_default),
+    myActiveRun: table({
+      name: "my_active_run",
+      indexes: [],
+      constraints: []
+    }, my_active_run_table_default),
+    myBadgeLookup: table({
+      name: "my_badge_lookup",
+      indexes: [],
+      constraints: []
+    }, my_badge_lookup_table_default),
+    myBadges: table({
+      name: "my_badges",
+      indexes: [],
+      constraints: []
+    }, my_badges_table_default),
+    myBounty: table({
+      name: "my_bounty",
+      indexes: [],
+      constraints: []
+    }, my_bounty_table_default),
+    myBountyState: table({
+      name: "my_bounty_state",
+      indexes: [],
+      constraints: []
+    }, my_bounty_state_table_default),
+    myBrokenGear: table({
+      name: "my_broken_gear",
+      indexes: [],
+      constraints: []
+    }, my_broken_gear_table_default),
+    myChatBlocks: table({
+      name: "my_chat_blocks",
+      indexes: [],
+      constraints: []
+    }, my_chat_blocks_table_default),
+    myChatGlobal: table({
+      name: "my_chat_global",
+      indexes: [],
+      constraints: []
+    }, my_chat_global_table_default),
+    myChatRoom: table({
+      name: "my_chat_room",
+      indexes: [],
+      constraints: []
+    }, my_chat_room_table_default),
+    myChatStatus: table({
+      name: "my_chat_status",
+      indexes: [],
+      constraints: []
+    }, my_chat_status_table_default),
+    myCollectionKills: table({
+      name: "my_collection_kills",
+      indexes: [],
+      constraints: []
+    }, my_collection_kills_table_default),
+    myCollectionLog: table({
+      name: "my_collection_log",
+      indexes: [],
+      constraints: []
+    }, my_collection_log_table_default),
+    myDarkChestClaims: table({
+      name: "my_dark_chest_claims",
+      indexes: [],
+      constraints: []
+    }, my_dark_chest_claims_table_default),
+    myDarkDeathLoss: table({
+      name: "my_dark_death_loss",
+      indexes: [],
+      constraints: []
+    }, my_dark_death_loss_table_default),
+    myDarkDuel: table({
+      name: "my_dark_duel",
+      indexes: [],
+      constraints: []
+    }, my_dark_duel_table_default),
+    myDarkDuelBlows: table({
+      name: "my_dark_duel_blows",
+      indexes: [],
+      constraints: []
+    }, my_dark_duel_blows_table_default),
+    myDarkDuelCore: table({
+      name: "my_dark_duel_core",
+      indexes: [],
+      constraints: []
+    }, my_dark_duel_core_table_default),
+    myDarkDuelHaul: table({
+      name: "my_dark_duel_haul",
+      indexes: [],
+      constraints: []
+    }, my_dark_duel_haul_table_default),
+    myDarkDuelScore: table({
+      name: "my_dark_duel_score",
+      indexes: [],
+      constraints: []
+    }, my_dark_duel_score_table_default),
+    myDarkPresence: table({
+      name: "my_dark_presence",
+      indexes: [],
+      constraints: []
+    }, my_dark_presence_table_default),
+    myDiaryClaims: table({
+      name: "my_diary_claims",
+      indexes: [],
+      constraints: []
+    }, my_diary_claims_table_default),
+    myDiaryDailyCharts: table({
+      name: "my_diary_daily_charts",
+      indexes: [],
+      constraints: []
+    }, my_diary_daily_charts_table_default),
+    myDiaryTasks: table({
+      name: "my_diary_tasks",
+      indexes: [],
+      constraints: []
+    }, my_diary_tasks_table_default),
+    myDuelLobby: table({
+      name: "my_duel_lobby",
+      indexes: [],
+      constraints: []
+    }, my_duel_lobby_table_default),
+    myDuelNotices: table({
+      name: "my_duel_notices",
+      indexes: [],
+      constraints: []
+    }, my_duel_notices_table_default),
+    myDuelOpponentBoard: table({
+      name: "my_duel_opponent_board",
+      indexes: [],
+      constraints: []
+    }, my_duel_opponent_board_table_default),
+    myDuelOpponentPiece: table({
+      name: "my_duel_opponent_piece",
+      indexes: [],
+      constraints: []
+    }, my_duel_opponent_piece_table_default),
+    myDuelRecord: table({
+      name: "my_duel_record",
+      indexes: [],
+      constraints: []
+    }, my_duel_record_table_default),
+    myDungeonProgress: table({
+      name: "my_dungeon_progress",
+      indexes: [],
+      constraints: []
+    }, my_dungeon_progress_table_default),
+    myEndlessRecords: table({
+      name: "my_endless_records",
+      indexes: [],
+      constraints: []
+    }, my_endless_records_table_default),
+    myEndlessRegions: table({
+      name: "my_endless_regions",
+      indexes: [],
+      constraints: []
+    }, my_endless_regions_table_default),
+    myEquipment: table({
+      name: "my_equipment",
+      indexes: [],
+      constraints: []
+    }, my_equipment_table_default),
+    myEquippedBoosts: table({
+      name: "my_equipped_boosts",
+      indexes: [],
+      constraints: []
+    }, my_equipped_boosts_table_default),
+    myEquippedFood: table({
+      name: "my_equipped_food",
+      indexes: [],
+      constraints: []
+    }, my_equipped_food_table_default),
+    myFarmDarkHaul: table({
+      name: "my_farm_dark_haul",
+      indexes: [],
+      constraints: []
+    }, my_farm_dark_haul_table_default),
+    myFarmPvpAttacks: table({
+      name: "my_farm_pvp_attacks",
+      indexes: [],
+      constraints: []
+    }, my_farm_pvp_attacks_table_default),
+    myFarmPvpMemberV2: table({
+      name: "my_farm_pvp_member_v2",
+      indexes: [],
+      constraints: []
+    }, my_farm_pvp_member_v_2_table_default),
+    myFarmPvpSession: table({
+      name: "my_farm_pvp_session",
+      indexes: [],
+      constraints: []
+    }, my_farm_pvp_session_table_default),
+    myFarmRecords: table({
+      name: "my_farm_records",
+      indexes: [],
+      constraints: []
+    }, my_farm_records_table_default),
+    myFeatClaims: table({
+      name: "my_feat_claims",
+      indexes: [],
+      constraints: []
+    }, my_feat_claims_table_default),
+    myFriendRequests: table({
+      name: "my_friend_requests",
+      indexes: [],
+      constraints: []
+    }, my_friend_requests_table_default),
+    myFriendSettings: table({
+      name: "my_friend_settings",
+      indexes: [],
+      constraints: []
+    }, my_friend_settings_table_default),
+    myFriends: table({
+      name: "my_friends",
+      indexes: [],
+      constraints: []
+    }, my_friends_table_default),
+    myGameInvites: table({
+      name: "my_game_invites",
+      indexes: [],
+      constraints: []
+    }, my_game_invites_table_default),
+    myGearInstances: table({
+      name: "my_gear_instances",
+      indexes: [],
+      constraints: []
+    }, my_gear_instances_table_default),
+    myGearInsurance: table({
+      name: "my_gear_insurance",
+      indexes: [],
+      constraints: []
+    }, my_gear_insurance_table_default),
+    myInventory: table({
+      name: "my_inventory",
+      indexes: [],
+      constraints: []
+    }, my_inventory_table_default),
+    myInventoryOrder: table({
+      name: "my_inventory_order",
+      indexes: [],
+      constraints: []
+    }, my_inventory_order_table_default),
+    myLoadouts: table({
+      name: "my_loadouts",
+      indexes: [],
+      constraints: []
+    }, my_loadouts_table_default),
+    myMarketSaleNotice: table({
+      name: "my_market_sale_notice",
+      indexes: [],
+      constraints: []
+    }, my_market_sale_notice_table_default),
+    myMarketTransactions: table({
+      name: "my_market_transactions",
+      indexes: [],
+      constraints: []
+    }, my_market_transactions_table_default),
+    myOnboarding: table({
+      name: "my_onboarding",
+      indexes: [],
+      constraints: []
+    }, my_onboarding_table_default),
+    myParty: table({
+      name: "my_party",
+      indexes: [],
+      constraints: []
+    }, my_party_table_default),
+    myPartyCore: table({
+      name: "my_party_core",
+      indexes: [],
+      constraints: []
+    }, my_party_core_table_default),
+    myPartyMemberCore: table({
+      name: "my_party_member_core",
+      indexes: [],
+      constraints: []
+    }, my_party_member_core_table_default),
+    myPartyMemberScore: table({
+      name: "my_party_member_score",
+      indexes: [],
+      constraints: []
+    }, my_party_member_score_table_default),
+    myPartyMembers: table({
+      name: "my_party_members",
+      indexes: [],
+      constraints: []
+    }, my_party_members_table_default),
+    myPartyOmens: table({
+      name: "my_party_omens",
+      indexes: [],
+      constraints: []
+    }, my_party_omens_table_default),
+    myPartyPartnerBoards: table({
+      name: "my_party_partner_boards",
+      indexes: [],
+      constraints: []
+    }, my_party_partner_boards_table_default),
+    myPartyPartnerPieces: table({
+      name: "my_party_partner_pieces",
+      indexes: [],
+      constraints: []
+    }, my_party_partner_pieces_table_default),
+    myPartyQueue: table({
+      name: "my_party_queue",
+      indexes: [],
+      constraints: []
+    }, my_party_queue_table_default),
+    myPartyScore: table({
+      name: "my_party_score",
+      indexes: [],
+      constraints: []
+    }, my_party_score_table_default),
+    myPartySteps: table({
+      name: "my_party_steps",
+      indexes: [],
+      constraints: []
+    }, my_party_steps_table_default),
+    myProfile: table({
+      name: "my_profile",
+      indexes: [],
+      constraints: []
+    }, my_profile_table_default),
+    myProfilePreferences: table({
+      name: "my_profile_preferences",
+      indexes: [],
+      constraints: []
+    }, my_profile_preferences_table_default),
+    myQuestClaims: table({
+      name: "my_quest_claims",
+      indexes: [],
+      constraints: []
+    }, my_quest_claims_table_default),
+    myQuestStats: table({
+      name: "my_quest_stats",
+      indexes: [],
+      constraints: []
+    }, my_quest_stats_table_default),
+    myQuests: table({
+      name: "my_quests",
+      indexes: [],
+      constraints: []
+    }, my_quests_table_default),
+    myRecentPlayers: table({
+      name: "my_recent_players",
+      indexes: [],
+      constraints: []
+    }, my_recent_players_table_default),
+    myReplays: table({
+      name: "my_replays",
+      indexes: [],
+      constraints: []
+    }, my_replays_table_default),
+    myRestrictedAccount: table({
+      name: "my_restricted_account",
+      indexes: [],
+      constraints: []
+    }, my_restricted_account_table_default),
+    myRunLootReveals: table({
+      name: "my_run_loot_reveals",
+      indexes: [],
+      constraints: []
+    }, my_run_loot_reveals_table_default),
+    mySatchelKeep: table({
+      name: "my_satchel_keep",
+      indexes: [],
+      constraints: []
+    }, my_satchel_keep_table_default),
+    mySavedBuilds: table({
+      name: "my_saved_builds",
+      indexes: [],
+      constraints: []
+    }, my_saved_builds_table_default),
+    mySentFarmPvpAttacks: table({
+      name: "my_sent_farm_pvp_attacks",
+      indexes: [],
+      constraints: []
+    }, my_sent_farm_pvp_attacks_table_default),
+    mySkills: table({
+      name: "my_skills",
+      indexes: [],
+      constraints: []
+    }, my_skills_table_default),
+    mySkinUnlocks: table({
+      name: "my_skin_unlocks",
+      indexes: [],
+      constraints: []
+    }, my_skin_unlocks_table_default),
+    mySlimeBagKeep: table({
+      name: "my_slime_bag_keep",
+      indexes: [],
+      constraints: []
+    }, my_slime_bag_keep_table_default),
+    myTaskChests: table({
+      name: "my_task_chests",
+      indexes: [],
+      constraints: []
+    }, my_task_chests_table_default),
+    myTaskState: table({
+      name: "my_task_state",
+      indexes: [],
+      constraints: []
+    }, my_task_state_table_default),
+    myTasks: table({
+      name: "my_tasks",
+      indexes: [],
+      constraints: []
+    }, my_tasks_table_default),
+    myUpgradeProgress: table({
+      name: "my_upgrade_progress",
+      indexes: [],
+      constraints: []
+    }, my_upgrade_progress_table_default),
+    myUpgradeUnlocks: table({
+      name: "my_upgrade_unlocks",
+      indexes: [],
+      constraints: []
+    }, my_upgrade_unlocks_table_default),
+    myWatchedReplay: table({
+      name: "my_watched_replay",
+      indexes: [],
+      constraints: []
+    }, my_watched_replay_table_default),
+    myWelcomeChest: table({
+      name: "my_welcome_chest",
+      indexes: [],
+      constraints: []
+    }, my_welcome_chest_table_default),
+    opponentFarmBoardsCompactV4: table({
+      name: "opponent_farm_boards_compact_v4",
+      indexes: [],
+      constraints: []
+    }, opponent_farm_boards_compact_v_4_table_default),
+    opponentFarmKeyframesV1: table({
+      name: "opponent_farm_keyframes_v1",
+      indexes: [],
+      constraints: []
+    }, opponent_farm_keyframes_v_1_table_default),
+    opponentFarmPiecesCompactV3: table({
+      name: "opponent_farm_pieces_compact_v3",
+      indexes: [],
+      constraints: []
+    }, opponent_farm_pieces_compact_v_3_table_default),
+    opponentFarmRosterV1: table({
+      name: "opponent_farm_roster_v1",
+      indexes: [],
+      constraints: []
+    }, opponent_farm_roster_v_1_table_default),
+    opponentFarmRosterV2: table({
+      name: "opponent_farm_roster_v2",
+      indexes: [],
+      constraints: []
+    }, opponent_farm_roster_v_2_table_default),
+    questCatalog: table({
+      name: "quest_catalog",
+      indexes: [],
+      constraints: []
+    }, quest_catalog_table_default),
+    questDetails: table({
+      name: "quest_details",
+      indexes: [],
+      constraints: []
+    }, quest_details_table_default),
+    serverNotices: table({
+      name: "server_notices",
+      indexes: [],
+      constraints: []
+    }, server_notices_table_default),
+    slimeBestWaves: table({
+      name: "slime_best_waves",
+      indexes: [],
+      constraints: []
+    }, slime_best_waves_table_default)
+  });
+  var reducersSchema = reducers(
+    reducerSchema("abandon_run", abandon_run_reducer_default),
+    reducerSchema("acknowledge_duel_notice", acknowledge_duel_notice_reducer_default),
+    reducerSchema("acknowledge_market_sales", acknowledge_market_sales_reducer_default),
+    reducerSchema("acknowledge_task_chest", acknowledge_task_chest_reducer_default),
+    reducerSchema("acknowledge_welcome_chest", acknowledge_welcome_chest_reducer_default),
+    reducerSchema("advance_tutorial", advance_tutorial_reducer_default),
+    reducerSchema("block_chat_author", block_chat_author_reducer_default),
+    reducerSchema("block_player", block_player_reducer_default),
+    reducerSchema("buy_bounty_reward", buy_bounty_reward_reducer_default),
+    reducerSchema("buy_market_listing", buy_market_listing_reducer_default),
+    reducerSchema("buy_shop_item", buy_shop_item_reducer_default),
+    reducerSchema("cancel_friend_request", cancel_friend_request_reducer_default),
+    reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
+    reducerSchema("challenge_duel_listing", challenge_duel_listing_reducer_default),
+    reducerSchema("choose_restricted_account", choose_restricted_account_reducer_default),
+    reducerSchema("claim_bounty", claim_bounty_reducer_default),
+    reducerSchema("claim_diary_chart", claim_diary_chart_reducer_default),
+    reducerSchema("claim_diary_tier", claim_diary_tier_reducer_default),
+    reducerSchema("claim_duel_tranquil", claim_duel_tranquil_reducer_default),
+    reducerSchema("claim_duel_ward", claim_duel_ward_reducer_default),
+    reducerSchema("claim_feat", claim_feat_reducer_default),
+    reducerSchema("claim_play_session", claim_play_session_reducer_default),
+    reducerSchema("claim_quest", claim_quest_reducer_default),
+    reducerSchema("claim_task", claim_task_reducer_default),
+    reducerSchema("claim_welcome_chest", claim_welcome_chest_reducer_default),
+    reducerSchema("complete_party_revive", complete_party_revive_reducer_default),
+    reducerSchema("consume_item", consume_item_reducer_default),
+    reducerSchema("continue_dark_run", continue_dark_run_reducer_default),
+    reducerSchema("craft_item", craft_item_reducer_default),
+    reducerSchema("create_farm_dark_private", create_farm_dark_private_reducer_default),
+    reducerSchema("create_farm_private", create_farm_private_reducer_default),
+    reducerSchema("create_instance_listing", create_instance_listing_reducer_default),
+    reducerSchema("create_market_listing", create_market_listing_reducer_default),
+    reducerSchema("create_party_room", create_party_room_reducer_default),
+    reducerSchema("delete_build", delete_build_reducer_default),
+    reducerSchema("delete_loadout", delete_loadout_reducer_default),
+    reducerSchema("delete_my_data", delete_my_data_reducer_default),
+    reducerSchema("drop_bounty", drop_bounty_reducer_default),
+    reducerSchema("enhance_gear", enhance_gear_reducer_default),
+    reducerSchema("enter_dark_duel", enter_dark_duel_reducer_default),
+    reducerSchema("enter_dark_duel_v_2", enter_dark_duel_v_2_reducer_default),
+    reducerSchema("enter_dark_duel_v_3", enter_dark_duel_v_3_reducer_default),
+    reducerSchema("enter_dark_duel_v_4", enter_dark_duel_v_4_reducer_default),
+    reducerSchema("equip_boost", equip_boost_reducer_default),
+    reducerSchema("equip_food", equip_food_reducer_default),
+    reducerSchema("equip_gear_instance", equip_gear_instance_reducer_default),
+    reducerSchema("equip_inventory_item", equip_inventory_item_reducer_default),
+    reducerSchema("equip_inventory_item_to_slot", equip_inventory_item_to_slot_reducer_default),
+    reducerSchema("equip_loadout", equip_loadout_reducer_default),
+    reducerSchema("insure_duel_lobby", insure_duel_lobby_reducer_default),
+    reducerSchema("invite_friend", invite_friend_reducer_default),
+    reducerSchema("join_farm_dark_private", join_farm_dark_private_reducer_default),
+    reducerSchema("join_farm_dark_public", join_farm_dark_public_reducer_default),
+    reducerSchema("join_farm_private", join_farm_private_reducer_default),
+    reducerSchema("join_farm_public", join_farm_public_reducer_default),
+    reducerSchema("join_party_queue", join_party_queue_reducer_default),
+    reducerSchema("join_party_room", join_party_room_reducer_default),
+    reducerSchema("learn_skill", learn_skill_reducer_default),
+    reducerSchema("leave_dark_run", leave_dark_run_reducer_default),
+    reducerSchema("leave_duel_listing", leave_duel_listing_reducer_default),
+    reducerSchema("leave_farm_match", leave_farm_match_reducer_default),
+    reducerSchema("leave_party", leave_party_reducer_default),
+    reducerSchema("leave_party_queue", leave_party_queue_reducer_default),
+    reducerSchema("leave_restricted_account", leave_restricted_account_reducer_default),
+    reducerSchema("look_up_badges", look_up_badges_reducer_default),
+    reducerSchema("mark_tasks_seen", mark_tasks_seen_reducer_default),
+    reducerSchema("new_build", new_build_reducer_default),
+    reducerSchema("open_bounty_board", open_bounty_board_reducer_default),
+    reducerSchema("open_dark_chest", open_dark_chest_reducer_default),
+    reducerSchema("open_party_chest", open_party_chest_reducer_default),
+    reducerSchema("operator_chat_clear", operator_chat_clear_reducer_default),
+    reducerSchema("operator_chat_delete", operator_chat_delete_reducer_default),
+    reducerSchema("operator_chat_mute", operator_chat_mute_reducer_default),
+    reducerSchema("operator_chat_set_mode", operator_chat_set_mode_reducer_default),
+    reducerSchema("operator_chat_tester", operator_chat_tester_reducer_default),
+    reducerSchema("operator_chat_unmute", operator_chat_unmute_reducer_default),
+    reducerSchema("operator_clear_notices", operator_clear_notices_reducer_default),
+    reducerSchema("operator_lift_suspension", operator_lift_suspension_reducer_default),
+    reducerSchema("operator_post_notice", operator_post_notice_reducer_default),
+    reducerSchema("operator_regrade_enhancements", operator_regrade_enhancements_reducer_default),
+    reducerSchema("operator_rename_player", operator_rename_player_reducer_default),
+    reducerSchema("operator_set_loot_key", operator_set_loot_key_reducer_default),
+    reducerSchema("operator_suspend_account", operator_suspend_account_reducer_default),
+    reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
+    reducerSchema("publish_duel_board", publish_duel_board_reducer_default),
+    reducerSchema("publish_duel_piece", publish_duel_piece_reducer_default),
+    reducerSchema("publish_farm_board", publish_farm_board_reducer_default),
+    reducerSchema("publish_farm_board_v_2", publish_farm_board_v_2_reducer_default),
+    reducerSchema("publish_farm_piece", publish_farm_piece_reducer_default),
+    reducerSchema("publish_party_board", publish_party_board_reducer_default),
+    reducerSchema("publish_party_board_v_2", publish_party_board_v_2_reducer_default),
+    reducerSchema("publish_party_piece", publish_party_piece_reducer_default),
+    reducerSchema("purchase_build_upgrade", purchase_build_upgrade_reducer_default),
+    reducerSchema("reach_dark_checkpoint", reach_dark_checkpoint_reducer_default),
+    reducerSchema("ready_farm_pvp_round", ready_farm_pvp_round_reducer_default),
+    reducerSchema("reclaim_pet", reclaim_pet_reducer_default),
+    reducerSchema("refresh_dark_presence", refresh_dark_presence_reducer_default),
+    reducerSchema("refresh_my_tasks", refresh_my_tasks_reducer_default),
+    reducerSchema("release_pet", release_pet_reducer_default),
+    reducerSchema("remove_friend", remove_friend_reducer_default),
+    reducerSchema("rename_build", rename_build_reducer_default),
+    reducerSchema("renew_play_session", renew_play_session_reducer_default),
+    reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
+    reducerSchema("repair_gear", repair_gear_reducer_default),
+    reducerSchema("report_chat_message", report_chat_message_reducer_default),
+    reducerSchema("report_client_problem", report_client_problem_reducer_default),
+    reducerSchema("report_duel_board_break", report_duel_board_break_reducer_default),
+    reducerSchema("report_farm_pvp_top_out", report_farm_pvp_top_out_reducer_default),
+    reducerSchema("report_party_down", report_party_down_reducer_default),
+    reducerSchema("report_party_enemy_heal", report_party_enemy_heal_reducer_default),
+    reducerSchema("report_party_health", report_party_health_reducer_default),
+    reducerSchema("report_party_revive_progress", report_party_revive_progress_reducer_default),
+    reducerSchema("report_player", report_player_reducer_default),
+    reducerSchema("report_run_submission_problem", report_run_submission_problem_reducer_default),
+    reducerSchema("request_duel_rematch", request_duel_rematch_reducer_default),
+    reducerSchema("reroll_bounties", reroll_bounties_reducer_default),
+    reducerSchema("reroll_task", reroll_task_reducer_default),
+    reducerSchema("respec_tree", respec_tree_reducer_default),
+    reducerSchema("respond_friend_request", respond_friend_request_reducer_default),
+    reducerSchema("respond_invite", respond_invite_reducer_default),
+    reducerSchema("restart_tutorial", restart_tutorial_reducer_default),
+    reducerSchema("reveal_run_loot", reveal_run_loot_reducer_default),
+    reducerSchema("salvage_gear_instance", salvage_gear_instance_reducer_default),
+    reducerSchema("salvage_item", salvage_item_reducer_default),
+    reducerSchema("save_account_settings", save_account_settings_reducer_default),
+    reducerSchema("save_loadout", save_loadout_reducer_default),
+    reducerSchema("sell_gear_instance", sell_gear_instance_reducer_default),
+    reducerSchema("sell_item", sell_item_reducer_default),
+    reducerSchema("send_chat_message", send_chat_message_reducer_default),
+    reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
+    reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
+    reducerSchema("send_friend_request", send_friend_request_reducer_default),
+    reducerSchema("send_friend_request_recent", send_friend_request_recent_reducer_default),
+    reducerSchema("send_party_blow", send_party_blow_reducer_default),
+    reducerSchema("send_party_blow_v_2", send_party_blow_v_2_reducer_default),
+    reducerSchema("send_party_heal", send_party_heal_reducer_default),
+    reducerSchema("send_party_thorns", send_party_thorns_reducer_default),
+    reducerSchema("set_bounty_block", set_bounty_block_reducer_default),
+    reducerSchema("set_bounty_option", set_bounty_option_reducer_default),
+    reducerSchema("set_display_name", set_display_name_reducer_default),
+    reducerSchema("set_duel_ready", set_duel_ready_reducer_default),
+    reducerSchema("set_friend_settings", set_friend_settings_reducer_default),
+    reducerSchema("set_hair", set_hair_reducer_default),
+    reducerSchema("set_party_omens", set_party_omens_reducer_default),
+    reducerSchema("set_party_ready", set_party_ready_reducer_default),
+    reducerSchema("set_shown_badge", set_shown_badge_reducer_default),
+    reducerSchema("set_skin_tone", set_skin_tone_reducer_default),
+    reducerSchema("star_replay", star_replay_reducer_default),
+    reducerSchema("start_builds", start_builds_reducer_default),
+    reducerSchema("start_dark_run_insured", start_dark_run_insured_reducer_default),
+    reducerSchema("start_farm_run", start_farm_run_reducer_default),
+    reducerSchema("start_farm_run_v_2", start_farm_run_v_2_reducer_default),
+    reducerSchema("start_omen_run", start_omen_run_reducer_default),
+    reducerSchema("start_run", start_run_reducer_default),
+    reducerSchema("submit_dungeon_run_result_v_1", submit_dungeon_run_result_v_1_reducer_default),
+    reducerSchema("submit_farm_run_result_v_3", submit_farm_run_result_v_3_reducer_default),
+    reducerSchema("submit_farm_waiting_run_result", submit_farm_waiting_run_result_reducer_default),
+    reducerSchema("submit_feedback", submit_feedback_reducer_default),
+    reducerSchema("switch_build", switch_build_reducer_default),
+    reducerSchema("take_bounty", take_bounty_reducer_default),
+    reducerSchema("unblock_chat_player", unblock_chat_player_reducer_default),
+    reducerSchema("unequip_boost", unequip_boost_reducer_default),
+    reducerSchema("unequip_food", unequip_food_reducer_default),
+    reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default),
+    reducerSchema("verify_dark_duel_win", verify_dark_duel_win_reducer_default),
+    reducerSchema("watch_replay", watch_replay_reducer_default),
+    reducerSchema("yield_dark_duel", yield_dark_duel_reducer_default)
+  );
+  var proceduresSchema = procedures();
+  var REMOTE_MODULE = {
+    versionInfo: {
+      cliVersion: "2.8.2"
+    },
+    tables: tablesSchema.schemaType.tables,
+    reducers: reducersSchema.reducersType.reducers,
+    ...proceduresSchema
+  };
+  var tableAccessorAliases = {
+    "bounty_shop": "bountyShop",
+    "dark_player_count": "darkPlayerCount",
+    "duel_listings": "duelListings",
+    "farm_player_counts": "farmPlayerCounts",
+    "market_listings": "marketListings",
+    "market_price_guide": "marketPriceGuide",
+    "my_account_settings": "myAccountSettings",
+    "my_active_run": "myActiveRun",
+    "my_badge_lookup": "myBadgeLookup",
+    "my_badges": "myBadges",
+    "my_bounty": "myBounty",
+    "my_bounty_state": "myBountyState",
+    "my_broken_gear": "myBrokenGear",
+    "my_chat_blocks": "myChatBlocks",
+    "my_chat_global": "myChatGlobal",
+    "my_chat_room": "myChatRoom",
+    "my_chat_status": "myChatStatus",
+    "my_collection_kills": "myCollectionKills",
+    "my_collection_log": "myCollectionLog",
+    "my_dark_chest_claims": "myDarkChestClaims",
+    "my_dark_death_loss": "myDarkDeathLoss",
+    "my_dark_duel": "myDarkDuel",
+    "my_dark_duel_blows": "myDarkDuelBlows",
+    "my_dark_duel_core": "myDarkDuelCore",
+    "my_dark_duel_haul": "myDarkDuelHaul",
+    "my_dark_duel_score": "myDarkDuelScore",
+    "my_dark_presence": "myDarkPresence",
+    "my_diary_claims": "myDiaryClaims",
+    "my_diary_daily_charts": "myDiaryDailyCharts",
+    "my_diary_tasks": "myDiaryTasks",
+    "my_duel_lobby": "myDuelLobby",
+    "my_duel_notices": "myDuelNotices",
+    "my_duel_opponent_board": "myDuelOpponentBoard",
+    "my_duel_opponent_piece": "myDuelOpponentPiece",
+    "my_duel_record": "myDuelRecord",
+    "my_dungeon_progress": "myDungeonProgress",
+    "my_endless_records": "myEndlessRecords",
+    "my_endless_regions": "myEndlessRegions",
+    "my_equipment": "myEquipment",
+    "my_equipped_boosts": "myEquippedBoosts",
+    "my_equipped_food": "myEquippedFood",
+    "my_farm_dark_haul": "myFarmDarkHaul",
+    "my_farm_pvp_attacks": "myFarmPvpAttacks",
+    "my_farm_pvp_member_v2": "myFarmPvpMemberV2",
+    "my_farm_pvp_session": "myFarmPvpSession",
+    "my_farm_records": "myFarmRecords",
+    "my_feat_claims": "myFeatClaims",
+    "my_friend_requests": "myFriendRequests",
+    "my_friend_settings": "myFriendSettings",
+    "my_friends": "myFriends",
+    "my_game_invites": "myGameInvites",
+    "my_gear_instances": "myGearInstances",
+    "my_gear_insurance": "myGearInsurance",
+    "my_inventory": "myInventory",
+    "my_inventory_order": "myInventoryOrder",
+    "my_loadouts": "myLoadouts",
+    "my_market_sale_notice": "myMarketSaleNotice",
+    "my_market_transactions": "myMarketTransactions",
+    "my_onboarding": "myOnboarding",
+    "my_party": "myParty",
+    "my_party_core": "myPartyCore",
+    "my_party_member_core": "myPartyMemberCore",
+    "my_party_member_score": "myPartyMemberScore",
+    "my_party_members": "myPartyMembers",
+    "my_party_omens": "myPartyOmens",
+    "my_party_partner_boards": "myPartyPartnerBoards",
+    "my_party_partner_pieces": "myPartyPartnerPieces",
+    "my_party_queue": "myPartyQueue",
+    "my_party_score": "myPartyScore",
+    "my_party_steps": "myPartySteps",
+    "my_profile": "myProfile",
+    "my_profile_preferences": "myProfilePreferences",
+    "my_quest_claims": "myQuestClaims",
+    "my_quest_stats": "myQuestStats",
+    "my_quests": "myQuests",
+    "my_recent_players": "myRecentPlayers",
+    "my_replays": "myReplays",
+    "my_restricted_account": "myRestrictedAccount",
+    "my_run_loot_reveals": "myRunLootReveals",
+    "my_satchel_keep": "mySatchelKeep",
+    "my_saved_builds": "mySavedBuilds",
+    "my_sent_farm_pvp_attacks": "mySentFarmPvpAttacks",
+    "my_skills": "mySkills",
+    "my_skin_unlocks": "mySkinUnlocks",
+    "my_slime_bag_keep": "mySlimeBagKeep",
+    "my_task_chests": "myTaskChests",
+    "my_task_state": "myTaskState",
+    "my_tasks": "myTasks",
+    "my_upgrade_progress": "myUpgradeProgress",
+    "my_upgrade_unlocks": "myUpgradeUnlocks",
+    "my_watched_replay": "myWatchedReplay",
+    "my_welcome_chest": "myWelcomeChest",
+    "opponent_farm_boards_compact_v4": "opponentFarmBoardsCompactV4",
+    "opponent_farm_keyframes_v1": "opponentFarmKeyframesV1",
+    "opponent_farm_pieces_compact_v3": "opponentFarmPiecesCompactV3",
+    "opponent_farm_roster_v1": "opponentFarmRosterV1",
+    "opponent_farm_roster_v2": "opponentFarmRosterV2",
+    "quest_catalog": "questCatalog",
+    "quest_details": "questDetails",
+    "server_notices": "serverNotices",
+    "slime_best_waves": "slimeBestWaves"
+  };
+  function __withTableAccessorAliases(target, freeze = false) {
+    const out = Object.create(Object.getPrototypeOf(target));
+    Object.defineProperties(out, Object.getOwnPropertyDescriptors(target));
+    for (const [deprecatedAccessor, targetAccessor] of Object.entries(tableAccessorAliases)) {
+      if (deprecatedAccessor in out) {
+        continue;
+      }
+      Object.defineProperty(out, deprecatedAccessor, {
+        enumerable: true,
+        configurable: false,
+        get: () => out[targetAccessor]
+      });
+    }
+    return freeze ? Object.freeze(out) : out;
+  }
+  var tablesBase = makeQueryBuilder(tablesSchema.schemaType);
+  var tables = __withTableAccessorAliases(tablesBase, true);
+  var reducers2 = convertToAccessorMap(reducersSchema.reducersType.reducers);
+  var procedures2 = convertToAccessorMap(proceduresSchema.procedures);
+  var SubscriptionBuilder = class extends SubscriptionBuilderImpl {
+  };
+  var DbConnectionBuilder2 = class extends DbConnectionBuilder {
+  };
+  var DbConnection = class _DbConnection extends DbConnectionImpl {
+    constructor(config) {
+      super(config);
+      this.db = __withTableAccessorAliases(this.db);
+    }
+    /** Creates a new {@link DbConnectionBuilder} to configure and connect to the remote SpacetimeDB instance. */
+    static builder = () => {
+      return new DbConnectionBuilder2(REMOTE_MODULE, (config) => new _DbConnection(config));
+    };
+    /** Creates a new {@link SubscriptionBuilder} to configure a subscription to the remote SpacetimeDB instance. */
+    subscriptionBuilder = () => {
+      return new SubscriptionBuilder(this);
+    };
+  };
+
+  // src/reducer_queue.ts
+  var pendingReducerCalls = [];
+  var pendingCallTimer = null;
+  function flushPendingReducerCalls() {
+    if (!live.connection || !live.coreSubscriptionReady) return;
+    clearPendingCallTimer();
+    const queued = collapsePendingCalls(pendingReducerCalls.splice(0, pendingReducerCalls.length));
+    for (const item of queued) void callReducer(item.name, item.argumentsJson);
+  }
+  function clearPendingCallTimer() {
+    if (pendingCallTimer !== null) window.clearTimeout(pendingCallTimer);
+    pendingCallTimer = null;
+  }
+  function expireHeldCalls() {
+    pendingCallTimer = null;
+    const { kept, expired } = partitionExpiredCalls(pendingReducerCalls, Date.now());
+    pendingReducerCalls.length = 0;
+    pendingReducerCalls.push(...kept);
+    for (const call of expired) {
+      emit({
+        type: "error",
+        command: call.name,
+        message: "The server didn't answer. Check your connection or reload the page, then try again."
+      });
+    }
+    armPendingCallTimer();
+  }
+  function armPendingCallTimer() {
+    if (pendingCallTimer !== null || pendingReducerCalls.length === 0) return;
+    const oldest = pendingReducerCalls.reduce(
+      (at, call) => Math.min(at, call.queuedAt),
+      Number.POSITIVE_INFINITY
+    );
+    const remaining = Math.max(0, HELD_CALL_TIMEOUT_MS - (Date.now() - oldest));
+    pendingCallTimer = window.setTimeout(expireHeldCalls, remaining);
+  }
+  async function callReducer(name, argumentsJson) {
+    try {
+      const background = isBackgroundCall(name);
+      if (!background) noteUserActivity();
+      if (!live.connection || !live.coreSubscriptionReady) {
+        if (!background && currentAuthMode() === "account" && live.lastBackendRequest && (live.resumeNeeded || live.connectionOpening)) {
+          pendingReducerCalls.push({ name, argumentsJson, queuedAt: Date.now() });
+          const collapsed = collapsePendingCalls(pendingReducerCalls);
+          pendingReducerCalls.length = 0;
+          pendingReducerCalls.push(...collapsed);
+          armPendingCallTimer();
+          resumeBackend();
+          return;
+        }
+        throw new Error("You're not connected.");
+      }
+      const reducer = live.connection.reducers[name];
+      if (typeof reducer !== "function") throw new Error(`Unknown reducer '${name}'.`);
+      await reducer.call(live.connection.reducers, JSON.parse(argumentsJson));
+      if (reportsSuccess(name)) emit({ type: "command_succeeded", command: name });
+    } catch (error) {
+      emit({ type: "error", command: name, message: String(error) });
+    }
+  }
+
+  // src/runtime_config.ts
+  function resolveBackendConfig(overrides, fallback) {
+    return {
+      uri: overrides?.uri?.trim() || fallback.uri,
+      database: overrides?.database?.trim() || fallback.database
+    };
+  }
+
+  // ../../spacetimedb/src/sim/board.ts
+  var WIDTH = 10;
+  var VISIBLE_HEIGHT = 20;
+  var HIDDEN_ROWS = 20;
+  var TOTAL_HEIGHT = VISIBLE_HEIGHT + HIDDEN_ROWS;
+  var EMPTY = -1;
+  var GARBAGE_CLEAN = 7;
+  var GARBAGE_CRYSTAL = 10;
+  function isGarbageValue(value) {
+    return value >= GARBAGE_CLEAN && value <= GARBAGE_CRYSTAL;
+  }
+  var Board = class {
+    cells;
+    // The columns in play, inclusive. Cells outside them are frozen: no rule reads
+    // or writes them, and they come back exactly as they were when the corridor
+    // opens again. Mirrors BoardState.play_left / play_right.
+    playLeft = 0;
+    playRight = WIDTH - 1;
+    constructor() {
+      this.cells = new Int8Array(WIDTH * TOTAL_HEIGHT).fill(EMPTY);
+    }
+    // A reset board is a fresh board: the whole width again.
+    reset() {
+      this.cells.fill(EMPTY);
+      this.openCorridor();
+    }
+    /** Narrows play to columns left..right. Mirrors BoardState.narrow_corridor. */
+    narrowCorridor(left, right) {
+      this.playLeft = Math.max(0, Math.min(WIDTH - 1, Math.trunc(left)));
+      this.playRight = Math.max(this.playLeft, Math.min(WIDTH - 1, Math.trunc(right)));
+    }
+    openCorridor() {
+      this.playLeft = 0;
+      this.playRight = WIDTH - 1;
+    }
+    hasCorridor() {
+      return this.playLeft !== 0 || this.playRight !== WIDTH - 1;
+    }
+    /**
+     * THE column rule. Every rule that asks whether a column is part of the game
+     * -- placing, kicking, spin corners, full rows, clears, garbage, top-out, an
+     * All Clear -- asks here. Mirrors BoardState.column_in_play.
+     */
+    columnInPlay(x) {
+      return x >= this.playLeft && x <= this.playRight;
+    }
+    // Inside the board AND in play: what a wall is to a piece.
+    inPlay(x, y) {
+      return this.columnInPlay(x) && y >= 0 && y < TOTAL_HEIGHT;
+    }
+    isInside(x, y) {
+      return x >= 0 && x < WIDTH && y >= 0 && y < TOTAL_HEIGHT;
+    }
+    getCell(x, y) {
+      if (!this.isInside(x, y)) return EMPTY;
+      return this.cells[y * WIDTH + x];
+    }
+    setCell(x, y, kind) {
+      this.cells[y * WIDTH + x] = kind;
+    }
+    canPlace(pieceCells, originX, originY) {
+      for (let index = 0; index < pieceCells.length; index += 1) {
+        const x = originX + pieceCells[index].x;
+        const y = originY + pieceCells[index].y;
+        if (!this.inPlay(x, y)) return false;
+        if (this.cells[y * WIDTH + x] !== EMPTY) return false;
+      }
+      return true;
+    }
+    lockPiece(pieceCells, originX, originY, kind) {
+      for (let index = 0; index < pieceCells.length; index += 1) {
+        this.setCell(originX + pieceCells[index].x, originY + pieceCells[index].y, kind);
+      }
+    }
+    isRowFull(y) {
+      const row = y * WIDTH;
+      for (let x = 0; x < WIDTH; x += 1) {
+        if (this.columnInPlay(x) && this.cells[row + x] === EMPTY) return false;
+      }
+      return true;
+    }
+    // Compacts survivors downward exactly as the GDScript does: read from the
+    // bottom, write to the bottom, then blank whatever is left at the top.
+    clearFullLines() {
+      let anyFull = false;
+      for (let y = TOTAL_HEIGHT - 1; y >= 0; y -= 1) {
+        if (this.isRowFull(y)) {
+          anyFull = true;
+          break;
+        }
+      }
+      if (!anyFull) return 0;
+      let cleared = 0;
+      let writeY = TOTAL_HEIGHT - 1;
+      for (let readY = TOTAL_HEIGHT - 1; readY >= 0; readY -= 1) {
+        if (this.isRowFull(readY)) {
+          cleared += 1;
+          continue;
+        }
+        this.copyRow(readY, writeY);
+        writeY -= 1;
+      }
+      while (writeY >= 0) {
+        this.clearRow(writeY);
+        writeY -= 1;
+      }
+      return cleared;
+    }
+    /** Garbage cells sitting in rows that are about to clear. Call before clearing. */
+    garbageBlocksInFullLines() {
+      let count = 0;
+      for (let y = 0; y < TOTAL_HEIGHT; y += 1) {
+        if (!this.isRowFull(y)) continue;
+        for (let x = 0; x < WIDTH; x += 1) {
+          if (this.columnInPlay(x) && isGarbageValue(this.getCell(x, y))) count += 1;
+        }
+      }
+      return count;
+    }
+    addGarbageRows(holeColumns, value = GARBAGE_CLEAN) {
+      let overflowedCells = 0;
+      for (const holeColumn of holeColumns) {
+        for (let x = 0; x < WIDTH; x += 1) {
+          if (this.columnInPlay(x) && this.getCell(x, 0) !== EMPTY) overflowedCells += 1;
+        }
+        for (let y = 0; y < TOTAL_HEIGHT - 1; y += 1) this.copyRow(y + 1, y);
+        for (let x = 0; x < WIDTH; x += 1) {
+          if (this.columnInPlay(x)) this.setCell(x, TOTAL_HEIGHT - 1, x === holeColumn ? EMPTY : value);
+        }
+      }
+      return overflowedCells;
+    }
+    /**
+     * How many rows the stack stands in play, from the floor to its highest block
+     * in a column in play (hidden rows included, so it can pass VISIBLE_HEIGHT).
+     * What crowded-board relief reads (endless_regions.ts). Mirrors
+     * BoardState.stack_height_in_play.
+     */
+    stackHeightInPlay() {
+      for (let y = 0; y < TOTAL_HEIGHT; y += 1) {
+        for (let x = this.playLeft; x <= this.playRight; x += 1) {
+          if (this.cells[y * WIDTH + x] !== EMPTY) return TOTAL_HEIGHT - y;
+        }
+      }
+      return 0;
+    }
+    hasCellsInHiddenRows() {
+      for (let y = 0; y < HIDDEN_ROWS; y += 1) {
+        for (let x = 0; x < WIDTH; x += 1) {
+          if (this.columnInPlay(x) && this.getCell(x, y) !== EMPTY) return true;
+        }
+      }
+      return false;
+    }
+    // Empty cells with a block somewhere above them in their column: the holes a
+    // stack has, as the Farm's Tidy Stack rank reads them. A well is not a hole,
+    // because nothing is over it. Mirrors BoardState.covered_holes.
+    coveredHoles() {
+      let holes = 0;
+      for (let x = 0; x < WIDTH; x += 1) {
+        let covered = false;
+        for (let y = 0; y < TOTAL_HEIGHT; y += 1) {
+          if (this.getCell(x, y) !== EMPTY) covered = true;
+          else if (covered) holes += 1;
+        }
+      }
+      return holes;
+    }
+    // Empty in play: an All Clear in a corridor ignores the frozen sides.
+    isEmpty() {
+      for (let index = this.cells.length - 1; index >= 0; index -= 1) {
+        if (this.cells[index] !== EMPTY && this.columnInPlay(index % WIDTH)) return false;
+      }
+      return true;
+    }
+    // Row moves touch only the columns in play: a frozen side neither falls nor
+    // is lifted.
+    copyRow(fromY, toY) {
+      if (fromY === toY) return;
+      this.cells.copyWithin(toY * WIDTH + this.playLeft, fromY * WIDTH + this.playLeft, fromY * WIDTH + this.playRight + 1);
+    }
+    clearRow(y) {
+      this.cells.fill(EMPTY, y * WIDTH + this.playLeft, y * WIDTH + this.playRight + 1);
+    }
+  };
+
+  // ../../spacetimedb/src/sim/tetromino.ts
+  var Kind = {
+    I: 0,
+    J: 1,
+    L: 2,
+    O: 3,
+    S: 4,
+    T: 5,
+    Z: 6
+  };
+  var KIND_COUNT = 7;
+  var BASE = {
+    [Kind.I]: [[-1, 0], [0, 0], [1, 0], [2, 0]],
+    [Kind.J]: [[-1, -1], [-1, 0], [0, 0], [1, 0]],
+    [Kind.L]: [[1, -1], [-1, 0], [0, 0], [1, 0]],
+    [Kind.O]: [[0, -1], [1, -1], [0, 0], [1, 0]],
+    [Kind.S]: [[0, -1], [1, -1], [-1, 0], [0, 0]],
+    [Kind.T]: [[0, -1], [-1, 0], [0, 0], [1, 0]],
+    [Kind.Z]: [[-1, -1], [0, -1], [0, 0], [1, 0]]
+  };
+  var I_CELLS = [
+    [[-1, 0], [0, 0], [1, 0], [2, 0]],
+    [[1, -1], [1, 0], [1, 1], [1, 2]],
+    [[-1, 1], [0, 1], [1, 1], [2, 1]],
+    [[0, -1], [0, 0], [0, 1], [0, 2]]
+  ];
+  function posmod(value, modulus) {
+    return (value % modulus + modulus) % modulus;
+  }
+  var CELLS = (() => {
+    const table2 = [];
+    for (let kind = 0; kind < KIND_COUNT; kind += 1) {
+      table2[kind] = [];
+      for (let rotation = 0; rotation < 4; rotation += 1) {
+        if (kind === Kind.I) {
+          table2[kind][rotation] = I_CELLS[rotation].map(([x, y]) => ({ x, y }));
+          continue;
+        }
+        let current = BASE[kind].map(([x, y]) => ({ x, y }));
+        if (kind !== Kind.O) {
+          for (let step = 0; step < rotation; step += 1) {
+            current = current.map((cell) => ({ x: 0 - cell.y, y: cell.x }));
+          }
+        }
+        table2[kind][rotation] = current;
+      }
+    }
+    return table2;
+  })();
+  function cells(kind, rotation = 0) {
+    return CELLS[kind][posmod(rotation, 4)];
+  }
+
+  // ../../spacetimedb/src/farm_board_transport.ts
+  var VISIBLE_CELL_COUNT = WIDTH * VISIBLE_HEIGHT;
+  var MAX_CELL_VALUE = 10;
+  function decodeCell(code) {
+    if (code === 46) return EMPTY;
+    if (code === 65) return 10;
+    if (code >= 48 && code <= 57) return code - 48;
+    return -2;
+  }
+  function encodeCell(value) {
+    if (value === EMPTY) return ".";
+    if (value >= 0 && value <= 9) return String(value);
+    if (value === 10) return "A";
+    return ".";
+  }
+  function isVisibleCells(cells2) {
+    if (cells2.length !== VISIBLE_CELL_COUNT) return false;
+    for (let index = 0; index < VISIBLE_CELL_COUNT; index += 1) {
+      if (decodeCell(cells2.charCodeAt(index)) < EMPTY) return false;
+    }
+    return true;
+  }
+  function packVisibleCells(cells2) {
+    let skipped = 0;
+    while (skipped < VISIBLE_HEIGHT) {
+      const start = skipped * WIDTH;
+      let empty = true;
+      for (let x = 0; x < WIDTH; x += 1) {
+        if (cells2.charCodeAt(start + x) !== 46) {
+          empty = false;
+          break;
+        }
+      }
+      if (!empty) break;
+      skipped += 1;
+    }
+    const remaining = (VISIBLE_HEIGHT - skipped) * WIDTH;
+    const bytes = new Uint8Array(1 + remaining / 2);
+    bytes[0] = skipped;
+    for (let index = 0; index < remaining; index += 1) {
+      const value = decodeCell(cells2.charCodeAt(skipped * WIDTH + index));
+      const nibble = value < 0 ? 0 : Math.min(value, MAX_CELL_VALUE) + 1;
+      if (index % 2 === 0) bytes[1 + index / 2] = nibble << 4;
+      else bytes[1 + (index - 1) / 2] |= nibble;
+    }
+    return bytes;
+  }
+  function unpackVisibleCells(bytes) {
+    if (bytes.length < 1) return null;
+    const skipped = bytes[0];
+    if (!Number.isInteger(skipped) || skipped < 0 || skipped > VISIBLE_HEIGHT) return null;
+    const remaining = (VISIBLE_HEIGHT - skipped) * WIDTH;
+    if (bytes.length !== 1 + remaining / 2) return null;
+    let text = ".".repeat(skipped * WIDTH);
+    for (let index = 0; index < remaining; index += 1) {
+      const byte = bytes[1 + (index >> 1)];
+      const nibble = index % 2 === 0 ? byte >> 4 : byte & 15;
+      if (nibble > MAX_CELL_VALUE + 1) return null;
+      text += nibble === 0 ? "." : encodeCell(nibble - 1);
+    }
+    return text;
+  }
+  function boardChecksum(cells2) {
+    let hash = 2166136261;
+    for (let index = 0; index < cells2.length; index += 1) {
+      hash ^= cells2.charCodeAt(index);
+      hash = Math.imul(hash, 16777619) >>> 0;
+    }
+    return (hash >>> 16 ^ hash & 65535) & 65535;
+  }
+  function farmRoomKey(matchId) {
+    let hash = 2166136261;
+    for (let index = 0; index < matchId.length; index += 1) {
+      hash ^= matchId.charCodeAt(index);
+      hash = Math.imul(hash, 16777619) >>> 0;
+    }
+    return hash >>> 0;
+  }
+  function isLockPose(pose) {
+    return Number.isInteger(pose.kind) && pose.kind >= 0 && pose.kind <= 6 && Number.isInteger(pose.rotation) && pose.rotation >= 0 && pose.rotation <= 3 && Number.isInteger(pose.x) && pose.x >= -3 && pose.x <= WIDTH + 2 && Number.isInteger(pose.y) && pose.y >= 0 && pose.y < HIDDEN_ROWS + VISIBLE_HEIGHT;
+  }
+  function applyLockToVisibleCells(cells2, pose) {
+    if (!isVisibleCells(cells2) || !isLockPose(pose)) return null;
+    const board = new Board();
+    for (let index = 0; index < VISIBLE_CELL_COUNT; index += 1) {
+      board.cells[HIDDEN_ROWS * WIDTH + index] = decodeCell(cells2.charCodeAt(index));
+    }
+    const shape = cells(pose.kind, pose.rotation);
+    if (!board.canPlace(shape, pose.x, pose.y)) return null;
+    board.lockPiece(shape, pose.x, pose.y, pose.kind);
+    board.clearFullLines();
+    let text = "";
+    for (let index = 0; index < VISIBLE_CELL_COUNT; index += 1) {
+      text += encodeCell(board.cells[HIDDEN_ROWS * WIDTH + index]);
+    }
+    return text;
+  }
+
+  // src/farm_rival_boards.ts
+  var EMPTY_CELLS = ".".repeat(VISIBLE_CELL_COUNT);
+  var NO_PIECE = { activeKind: -1, activeX: 4, activeY: 19, activeRotation: 0 };
+  var FarmRivalBoards = class {
+    room = -1;
+    boards = /* @__PURE__ */ new Map();
+    // For a look from the console (window.__ldbgFarmTransport): how the lanes
+    // are doing, and above all whether a rebuilt board ever disagreed.
+    stats = { lockEvents: 0, boardEvents: 0, mismatches: 0, keyframes: 0 };
+    // A different room forgets every board. The same room keeps them: a
+    // reconnect listens again without blanking the cards in front of the player.
+    follow(room) {
+      if (room === this.room) return false;
+      this.room = room;
+      this.boards.clear();
+      return true;
+    }
+    clear() {
+      this.room = -1;
+      this.boards.clear();
+    }
+    applyLock(row) {
+      if (row.room !== this.room) return "ignored";
+      this.stats.lockEvents += 1;
+      const board = this.boards.get(row.slot);
+      if (!board || board.stale) return "ignored";
+      const after = applyLockToVisibleCells(board.cells, {
+        kind: row.lockKind,
+        x: row.lockX,
+        y: row.lockY,
+        rotation: row.lockRotation
+      });
+      if (after === null || boardChecksum(after) !== row.checksum) {
+        this.stats.mismatches += 1;
+        board.stale = true;
+        return "mismatch";
+      }
+      this.boards.set(row.slot, {
+        cells: after,
+        activeKind: row.activeKind,
+        activeX: row.activeX,
+        activeY: row.activeY,
+        activeRotation: row.activeRotation,
+        score: row.score,
+        linesCleared: row.lines,
+        toppedOut: false,
+        stale: false
+      });
+      return "applied";
+    }
+    applyBoard(row) {
+      if (row.room !== this.room) return false;
+      this.stats.boardEvents += 1;
+      const cells2 = unpackVisibleCells(row.board);
+      if (cells2 === null) return false;
+      this.boards.set(row.slot, {
+        cells: cells2,
+        activeKind: row.activeKind,
+        activeX: row.activeX,
+        activeY: row.activeY,
+        activeRotation: row.activeRotation,
+        score: row.score,
+        linesCleared: row.lines,
+        toppedOut: row.toppedOut,
+        stale: false
+      });
+      return true;
+    }
+    // The truth as of the snapshot. Events that arrived before it were applied
+    // to whatever was held and are simply overwritten.
+    applyKeyframe(rows2) {
+      this.stats.keyframes += 1;
+      for (const row of rows2) {
+        const cells2 = unpackVisibleCells(row.board);
+        if (cells2 === null) continue;
+        this.boards.set(Number(row.slot), {
+          cells: cells2,
+          activeKind: row.activeKind,
+          activeX: row.activeX,
+          activeY: row.activeY,
+          activeRotation: row.activeRotation,
+          score: row.score,
+          linesCleared: row.linesCleared,
+          toppedOut: row.toppedOut,
+          stale: false
+        });
+      }
+    }
+    hasStaleBoard() {
+      for (const board of this.boards.values()) if (board.stale) return true;
+      return false;
+    }
+    // One row per seat on the roster, in the old views' shapes. A seat with no
+    // board yet shows an empty one, as a freshly dealt board is.
+    opponentRows(roster) {
+      const boards = [];
+      const pieces = [];
+      for (const seat of roster) {
+        const board = this.boards.get(Number(seat.slot));
+        const pose = NO_PIECE;
+        boards.push({
+          owner: seat.owner,
+          slot: seat.slot,
+          alive: seat.alive,
+          placement: seat.placement,
+          ready: seat.ready,
+          displayName: seat.displayName,
+          level: seat.level ?? 0,
+          cells: board?.cells ?? EMPTY_CELLS,
+          ...pose,
+          score: board?.score ?? 0,
+          linesCleared: board?.linesCleared ?? 0,
+          toppedOut: board?.toppedOut ?? false
+        });
+        pieces.push({ owner: seat.owner, ...pose });
+      }
+      return { boards, pieces };
+    }
+  };
+
+  // src/farm_room.ts
+  var farmEventSubscription = null;
+  var farmEventRoom = -1;
+  var farmKeyframeSubscription = null;
+  var farmKeyframeAskedAt = 0;
+  var farmRivals = new FarmRivalBoards();
+  window.__ldbgFarmTransport = farmRivals.stats;
+  function releaseFarmRoomHandles() {
+    farmEventSubscription = null;
+    farmEventRoom = -1;
+    farmKeyframeSubscription = null;
+  }
+  function farmScopeWanted() {
+    return live.clientScreen === CLIENT_SCREENS.farm || live.clientScreen === CLIENT_SCREENS.farmRoundEnd;
+  }
+  function stopFarmEvents() {
+    for (const handle of [farmEventSubscription, farmKeyframeSubscription]) {
+      if (handle && typeof handle.unsubscribe === "function") {
+        try {
+          handle.unsubscribe();
+        } catch {
+        }
+      }
+    }
+    farmEventSubscription = null;
+    farmKeyframeSubscription = null;
+    farmEventRoom = -1;
+  }
+  var farmEventHandlersOn = /* @__PURE__ */ new WeakSet();
+  function watchFarmEvents(activeConnection) {
+    if (farmEventHandlersOn.has(activeConnection)) return;
+    farmEventHandlersOn.add(activeConnection);
+    const db = activeConnection.db;
+    db.farmLockEvent.onInsert((_ctx, row) => {
+      const outcome = farmRivals.applyLock(row);
+      if (outcome === "applied") scheduleDomain(activeConnection, "farmBoard");
+      else if (outcome === "mismatch") requestFarmKeyframe(activeConnection);
+    });
+    db.farmBoardEvent.onInsert((_ctx, row) => {
+      if (farmRivals.applyBoard(row)) scheduleDomain(activeConnection, "farmBoard");
+    });
+    const follow = () => followFarmRoom(activeConnection);
+    db.myFarmPvpMemberV2.onInsert(follow);
+    db.myFarmPvpMemberV2.onDelete(follow);
+    if (typeof db.myFarmPvpMemberV2.onUpdate === "function") db.myFarmPvpMemberV2.onUpdate(follow);
+  }
+  function followFarmRoom(activeConnection) {
+    if (live.connection !== activeConnection || !groupSubscribed("farm") || !farmScopeWanted()) return;
+    const member = rows(activeConnection.db.myFarmPvpMemberV2)[0];
+    const room = member && member.matchId ? farmRoomKey(String(member.matchId)) : -1;
+    if (room === farmEventRoom && (farmEventSubscription || room < 0)) return;
+    if (farmRivals.follow(room)) scheduleDomain(activeConnection, "farmBoard");
+    stopFarmEvents();
+    farmEventRoom = room;
+    if (room < 0) return;
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (farmEventSubscription !== handle) return;
+      requestFarmKeyframe(activeConnection, true);
+    }).onError((_ctx, error) => {
+      if (live.connection === activeConnection) emit({ type: "error", command: "subscribeFarmEvents", message: String(error) });
+    }).subscribe([
+      `SELECT * FROM farm_lock_event WHERE room = ${room}`,
+      `SELECT * FROM farm_board_event WHERE room = ${room}`
+      // Not farm_pose_event: the room shares a board when a piece is placed,
+      // never a piece in flight (docs/BACKEND_COST_AUDIT_3.md). A page from
+      // before that still sends poses; the server takes them and sends nothing.
+    ]);
+    farmEventSubscription = handle;
+  }
+  function requestFarmKeyframe(activeConnection, force = false) {
+    if (live.connection !== activeConnection || !farmEventSubscription || farmKeyframeSubscription) return;
+    const now = Date.now();
+    if (!force && now - farmKeyframeAskedAt < 2e3) return;
+    farmKeyframeAskedAt = now;
+    const room = farmEventRoom;
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (farmKeyframeSubscription !== handle) return;
+      if (room === farmEventRoom) {
+        farmRivals.applyKeyframe(Array.from(activeConnection.db.opponentFarmKeyframesV1.iter()));
+        scheduleDomain(activeConnection, "farmBoard");
+      }
+      farmKeyframeSubscription = null;
+      try {
+        handle.unsubscribe();
+      } catch {
+      }
+    }).onError(() => {
+      if (farmKeyframeSubscription === handle) farmKeyframeSubscription = null;
+    }).subscribe([tables.opponentFarmKeyframesV1]);
+    farmKeyframeSubscription = handle;
+  }
+
+  // src/farm_transport_patch.ts
+  function farmBoardDomainPatch(opponentBoard) {
+    return {
+      opponentFarmBoard: opponentBoard ?? null,
+      opponentFarmPiece: null
+    };
+  }
+
+  // src/party_partner_boards.ts
+  function identityHex(value) {
+    const hex = value?.toHexString;
+    return typeof hex === "function" ? String(hex.call(value)) : String(value ?? "");
+  }
+  function ownSlot(members, selfHex2) {
+    const own = members.find((member) => identityHex(member.owner) === selfHex2);
+    return own ? Number(own.slot) : -1;
+  }
+  function partnerBoardRows(boards, members, selfHex2) {
+    const result = [];
+    for (const member of members) {
+      if (identityHex(member.owner) === selfHex2) continue;
+      const board = boards.boards.get(Number(member.slot));
+      if (!board || board.stale) continue;
+      result.push({
+        owner: identityHex(member.owner),
+        partyId: String(member.partyId),
+        cells: board.cells,
+        activeKind: -1,
+        activeX: 4,
+        activeY: 19,
+        activeRotation: 0
+      });
+    }
+    return result;
+  }
+  function partnerKeyframes(viewRows, members) {
+    const slots = new Map(members.map((member) => [identityHex(member.owner), Number(member.slot)]));
+    const result = [];
+    for (const row of viewRows) {
+      const slot = slots.get(identityHex(row.owner));
+      if (slot === void 0) continue;
+      result.push({
+        slot,
+        board: packVisibleCells(String(row.cells)),
+        activeKind: -1,
+        activeX: 4,
+        activeY: 19,
+        activeRotation: 0,
+        score: 0,
+        linesCleared: 0,
+        toppedOut: false
+      });
+    }
+    return result;
+  }
+
+  // src/party_room.ts
+  var partyEventSubscription = null;
+  var partyEventRoom = -1;
+  var partySnapshotSubscription = null;
+  var partySnapshotAskedAt = 0;
+  var partyRivals = new FarmRivalBoards();
+  function releasePartyRoomHandles() {
+    partyEventSubscription = null;
+    partyEventRoom = -1;
+    partySnapshotSubscription = null;
+  }
+  function stopPartyEvents() {
+    for (const handle of [partyEventSubscription, partySnapshotSubscription]) {
+      if (handle && typeof handle.unsubscribe === "function") {
+        try {
+          handle.unsubscribe();
+        } catch {
+        }
+      }
+    }
+    partyEventSubscription = null;
+    partySnapshotSubscription = null;
+    partyEventRoom = -1;
+  }
+  function partyMembers(activeConnection) {
+    return rows(activeConnection.db.myPartyMemberCore);
+  }
+  function selfHex(activeConnection) {
+    return identityHex(activeConnection.identity);
+  }
+  var partyEventHandlersOn = /* @__PURE__ */ new WeakSet();
+  function watchPartyEvents(activeConnection) {
+    if (partyEventHandlersOn.has(activeConnection)) return;
+    partyEventHandlersOn.add(activeConnection);
+    const db = activeConnection.db;
+    const mine = (slot) => slot === ownSlot(partyMembers(activeConnection), selfHex(activeConnection));
+    db.partyLockEvent.onInsert((_ctx, row) => {
+      if (mine(Number(row.slot))) return;
+      const outcome = partyRivals.applyLock(row);
+      if (outcome === "applied") scheduleDomain(activeConnection, "partyBoard");
+      else if (outcome === "mismatch") requestPartySnapshot(activeConnection);
+    });
+    db.partyBoardEvent.onInsert((_ctx, row) => {
+      if (mine(Number(row.slot))) return;
+      if (partyRivals.applyBoard(row)) scheduleDomain(activeConnection, "partyBoard");
+    });
+    const follow = () => followPartyRoom(activeConnection);
+    for (const handle of [db.myPartyCore, db.myPartyMemberCore]) {
+      handle.onInsert(follow);
+      handle.onDelete(follow);
+      if (typeof handle.onUpdate === "function") handle.onUpdate(follow);
+    }
+  }
+  function followPartyRoom(activeConnection) {
+    if (live.connection !== activeConnection || !groupSubscribed("party")) return;
+    scheduleDomain(activeConnection, "partyBoard");
+    const party = rows(activeConnection.db.myPartyCore)[0];
+    const room = party && party.partyId ? farmRoomKey(String(party.partyId)) : -1;
+    if (room === partyEventRoom && (partyEventSubscription || room < 0)) return;
+    partyRivals.follow(room);
+    stopPartyEvents();
+    partyEventRoom = room;
+    if (room < 0) return;
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (partyEventSubscription !== handle) return;
+      requestPartySnapshot(activeConnection, true);
+    }).onError((_ctx, error) => {
+      if (live.connection === activeConnection) emit({ type: "error", command: "subscribePartyEvents", message: String(error) });
+    }).subscribe([
+      `SELECT * FROM party_lock_event WHERE room = ${room}`,
+      `SELECT * FROM party_board_event WHERE room = ${room}`
+    ]);
+    partyEventSubscription = handle;
+  }
+  function requestPartySnapshot(activeConnection, force = false) {
+    if (live.connection !== activeConnection || !partyEventSubscription || partySnapshotSubscription) return;
+    const now = Date.now();
+    if (!force && now - partySnapshotAskedAt < 2e3) return;
+    partySnapshotAskedAt = now;
+    const room = partyEventRoom;
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (partySnapshotSubscription !== handle) return;
+      if (room === partyEventRoom) {
+        const viewRows = Array.from(activeConnection.db.myPartyPartnerBoards.iter());
+        partyRivals.applyKeyframe(partnerKeyframes(viewRows, partyMembers(activeConnection)));
+        scheduleDomain(activeConnection, "partyBoard");
+      }
+      partySnapshotSubscription = null;
+      try {
+        handle.unsubscribe();
+      } catch {
+      }
+    }).onError(() => {
+      if (partySnapshotSubscription === handle) partySnapshotSubscription = null;
+    }).subscribe([tables.myPartyPartnerBoards]);
+    partySnapshotSubscription = handle;
+  }
+
+  // src/fight_rows.ts
+  function joinFightRows(core, score, key, missing = () => {
+  }) {
+    const byKey = /* @__PURE__ */ new Map();
+    for (const row of score) byKey.set(String(row?.[key]), row);
+    return core.map((row) => {
+      const scored = byKey.get(String(row?.[key]));
+      if (scored === void 0) {
+        missing(String(row?.[key]));
+        return row;
+      }
+      return { ...row, ...scored };
+    });
+  }
+
+  // src/row_json.ts
+  function jsonSafe(value) {
+    return convertBigInts(value);
+  }
+  function convertBigInts(value) {
+    if (typeof value === "bigint") return value.toString();
+    if (value === null || typeof value !== "object") return value;
+    const hex = value.toHexString;
+    if (typeof hex === "function") return hex.call(value);
+    const custom = value.toJSON;
+    if (typeof custom === "function") {
+      return convertBigInts(custom.call(value));
+    }
+    if (Array.isArray(value)) return value.map(convertBigInts);
+    const result = {};
+    for (const key of Object.keys(value)) {
+      result[key] = convertBigInts(value[key]);
+    }
+    return result;
+  }
+
+  // src/subscriptions.ts
+  var scopedHandles = /* @__PURE__ */ new Map();
+  var scopedSubscriptionConnection = null;
+  var dirtySnapshotDomains = /* @__PURE__ */ new Set();
+  var snapshotFlushScheduled = false;
+  var observedHandles = /* @__PURE__ */ new WeakSet();
+  function rows(handle) {
+    return Array.from(handle.iter()).map(jsonSafe);
+  }
+  function releaseScopedSubscriptions() {
+    scopedSubscriptionConnection = null;
+    scopedHandles.clear();
+    releaseFarmRoomHandles();
+    releasePartyRoomHandles();
+  }
+  function adoptScopedSubscriptions(activeConnection) {
+    if (scopedSubscriptionConnection === activeConnection) return;
+    releaseScopedSubscriptions();
+    scopedSubscriptionConnection = activeConnection;
+  }
+  var EMPTY_CONNECTION = {
+    db: new Proxy({}, { get: () => ({ iter: () => [] }) })
+  };
+  function missingScore(what) {
+    return (key) => emit({ type: "error", command: "snapshot:fightScore", message: `The ${what} ${key} arrived without its score.` });
+  }
+  var SNAPSHOT_DOMAINS = Object.keys(DOMAINS);
+  var BUILDERS = {
+    // The roster says who sits where; the boards are what the room's events
+    // rebuilt. Godot gets the rows the old views gave it.
+    farmBoard: (activeConnection) => {
+      const { boards, pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV2));
+      return { farmOpponents: boards, farmOpponentPieces: pieces, ...farmBoardDomainPatch(boards[0]) };
+    },
+    // The fight rows: each core row with its score laid over it, the row the old
+    // view sent (spacetimedb/src/domain/fight_split.ts).
+    darkDuel: (activeConnection) => ({
+      darkDuel: joinFightRows(
+        rows(activeConnection.db.myDarkDuelCore),
+        rows(activeConnection.db.myDarkDuelScore),
+        "duelId",
+        missingScore("duel")
+      ),
+      darkDuelBlows: rows(activeConnection.db.myDarkDuelBlows),
+      darkDuelHaul: rows(activeConnection.db.myDarkDuelHaul)
+    }),
+    party: (activeConnection) => ({
+      party: joinFightRows(
+        rows(activeConnection.db.myPartyCore),
+        rows(activeConnection.db.myPartyScore),
+        "partyId",
+        missingScore("party")
+      )[0] ?? null,
+      partyMembers: joinFightRows(
+        rows(activeConnection.db.myPartyMemberCore),
+        rows(activeConnection.db.myPartyMemberScore),
+        "memberId",
+        missingScore("party member")
+      ),
+      partyQueue: rows(activeConnection.db.myPartyQueue)[0] ?? null
+    }),
+    // What the party's events rebuilt (party_room.ts): the partner's board, never
+    // a piece in flight, so no piece rows.
+    partyBoard: (activeConnection) => ({
+      partyBoards: partnerBoardRows(partyRivals, partyMembers(activeConnection), selfHex(activeConnection)),
+      partyPieces: []
+    }),
+    // Refreshed by nothing since the room stopped sharing pieces in flight
+    // (docs/BACKEND_COST_AUDIT_3.md); kept so the wire contract and Godot's
+    // handling of it are unchanged. The roster it reads is observed for farmBoard.
+    farmPiece: (activeConnection) => {
+      const { pieces } = farmRivals.opponentRows(rows(activeConnection.db.opponentFarmRosterV2));
+      return { farmOpponentPieces: pieces, opponentFarmPiece: pieces[0] ?? null };
+    }
+  };
+  function groupDomains(group) {
+    return SNAPSHOT_DOMAINS.filter((domain) => DOMAINS[domain].group === group);
+  }
+  function domainViews(domain) {
+    const spec = DOMAINS[domain];
+    return "keys" in spec ? Object.values(spec.keys).map((wire) => wire.view) : [...spec.observes];
+  }
+  function groupViews(group) {
+    return [...new Set(groupDomains(group).flatMap(domainViews))];
+  }
+  function observeGroup(activeConnection, group) {
+    for (const domain of groupDomains(group)) {
+      for (const view of domainViews(domain)) observe(activeConnection, activeConnection.db[view], domain);
+    }
+  }
+  function emptyAccountSnapshot() {
+    return snapshotPatch(EMPTY_CONNECTION, new Set(SNAPSHOT_DOMAINS));
+  }
+  function buildDomain(domain, build) {
+    buildPatchPart(domain, build, (failed, message) => emit({
+      type: "error",
+      command: `snapshot:${failed}`,
+      message: `The ${failed} patch could not be built: ${message}`
+    }));
+  }
+  function snapshotPatch(activeConnection, domains) {
+    const data = {};
+    for (const domain of SNAPSHOT_DOMAINS) {
+      if (!domains.has(domain)) continue;
+      const spec = DOMAINS[domain];
+      buildDomain(domain, () => {
+        if (!("keys" in spec)) {
+          Object.assign(data, BUILDERS[domain](activeConnection));
+          return;
+        }
+        for (const [key, wire] of Object.entries(spec.keys)) {
+          const found = rows(activeConnection.db[wire.view]);
+          data[key] = wire.one ? found[0] ?? null : found;
+        }
+      });
+    }
+    return { type: "snapshot", data };
+  }
+  function publishDomains(activeConnection, domains) {
+    if (!activeConnection || live.connection !== activeConnection) return;
+    const requested = new Set(domains);
+    if (requested.size > 0) emit(snapshotPatch(activeConnection, requested));
+  }
+  function scheduleDomain(activeConnection, domain) {
+    if (!activeConnection || live.connection !== activeConnection) return;
+    dirtySnapshotDomains.add(domain);
+    if (snapshotFlushScheduled) return;
+    snapshotFlushScheduled = true;
+    queueMicrotask(() => {
+      snapshotFlushScheduled = false;
+      if (!activeConnection || live.connection !== activeConnection) {
+        dirtySnapshotDomains.clear();
+        return;
+      }
+      const domains = new Set(dirtySnapshotDomains);
+      dirtySnapshotDomains.clear();
+      publishDomains(activeConnection, domains);
+    });
+  }
+  function observe(activeConnection, handle, domain) {
+    if (!handle || typeof handle === "object" && observedHandles.has(handle)) return;
+    if (typeof handle === "object") observedHandles.add(handle);
+    handle.onInsert(() => scheduleDomain(activeConnection, domain));
+    handle.onDelete(() => scheduleDomain(activeConnection, domain));
+    if (typeof handle.onUpdate === "function") handle.onUpdate(() => scheduleDomain(activeConnection, domain));
+  }
+  var GROUPS = {
+    // The Farm's matchmaking, roster and attacks, held only on the Farm screen
+    // and its round-end context. The rival boards are the room's events, which
+    // farm room following subscribes once the roster says which room.
+    farm: {
+      wanted: farmScopeWanted,
+      errorCommand: "subscribeFarm",
+      afterObserve: watchFarmEvents,
+      afterApplied: followFarmRoom,
+      afterStop: () => {
+        stopFarmEvents();
+        farmRivals.clear();
+      },
+      clearAlso: { myFarmBoard: null, myFarmPiece: null }
+    },
+    // The global listing feed is the one potentially large account projection, so
+    // keep it out of the always-on core subscription and hold it only while Store
+    // is open. The server view omits seller identities. Only the storefront is
+    // dropped on leaving the Store. The player's own history stays: it is what
+    // announces a sale wherever they are.
+    market: { wanted: () => live.clientScreen === CLIENT_SCREENS.store, errorCommand: "subscribeMarket" },
+    // One aggregate per listed item, derived by the server from the ten cheapest
+    // live listings. Unlike the full storefront this stays subscribed everywhere:
+    // it is small, identity-free, and useful anywhere the game needs to explain
+    // what an item or loadout is worth. The view is pushed on market changes, so no
+    // browser timer polls the whole listing table.
+    marketPrices: { errorCommand: "subscribeMarketPrices" },
+    // The player's own completed trades, for the whole connection. This is what
+    // lets a sale be announced on any screen: it used to ride on the Store-only
+    // subscription above, so a sale was only noticed on walking into the Store.
+    // Pushed, not polled -- nothing crosses the wire until a trade happens -- and
+    // small: sender-scoped, and pruned to fifty rows a player on the server. Kept
+    // out of the core subscription so a failure costs the notices and nothing else.
+    // my_market_sale_notice rides along: how far the player has been told, so a sale
+    // made while the game was closed is announced once on the next load.
+    marketHistory: { errorCommand: "subscribeMarketHistory" },
+    // Dark Greenshore's duels. Subscribed for the whole connection rather than
+    // while a Dark run is open, because being matched is something that HAPPENS to
+    // a player: the row arrives from somebody else's reducer call, and a client
+    // that only listened while it thought a fight was on would never hear the one
+    // that starts it. Every view is small and sender-scoped. The Arena's lobby
+    // rides along for the same reason: being challenged happens to a player too.
+    darkDuel: { errorCommand: "subscribeDarkDuel" },
+    // Co-op parties. Subscribed for the whole connection, like the duels and for the
+    // same reason: a partner being found, readying up, or killing the monster are
+    // all things that happen to a player from somebody else's reducer call. Every
+    // view is sender-scoped and small.
+    party: { errorCommand: "subscribeParty", afterObserve: watchPartyEvents, afterApplied: followPartyRoom },
+    // Everybody's open listings: a whole-table projection recomputed for every
+    // subscriber on the Duels screen every time anybody posts, so it is held only
+    // while that screen is open. The server view omits identities. Only the board
+    // is dropped on leaving the Duels screen. The lobby stays (darkDuel): it is
+    // what tells a player somebody has taken their listing up, and a listing does
+    // not expire because they went to look at their inventory.
+    duelBoard: { wanted: () => live.clientScreen === CLIENT_SCREENS.duels, errorCommand: "subscribeDuelBoard" },
+    // Kept runs, only while the Replays page is open: the list is small, but a
+    // watched trace is the biggest row a player has, and nothing else needs either.
+    replays: { wanted: () => live.clientScreen === CLIENT_SCREENS.replays, errorCommand: "subscribeReplays" },
+    // The counters beside the Farm menu's versus modes. Tiny and shared by every
+    // player, so it is subscribed for the whole connection rather than scoped to a
+    // screen. Kept out of the core subscription so a server that predates the view
+    // costs the counters and nothing else; its failure is logged, not surfaced.
+    playerCounts: { quietError: "LDBG: player counts are unavailable:" },
+    // Tasks and quests, for the whole connection: a task finishes during a run, and
+    // the hub's button says so wherever the player is. All the views are small and
+    // sender-scoped (the catalog is shared and never changes). Kept out of the core
+    // subscription so a server without them costs the quest screen and nothing else.
+    quests: { errorCommand: "subscribeQuests" },
+    // Chat, for the whole connection: a line arrives because somebody ELSE spoke,
+    // and walking into a room happens to a player. Small and sender-scoped; every
+    // view is empty while chat is closed to the player. Kept out of the core
+    // subscription so a server without chat costs the chat and nothing else.
+    chat: { errorCommand: "subscribeChat" },
+    // Friends, for the whole connection: a request, an invite or a friend coming
+    // online all happen to a player because of somebody else. Every view is
+    // sender-scoped and small.
+    friends: { errorCommand: "subscribeFriends" }
+  };
+  var SCOPED_GROUPS = Object.keys(GROUPS);
+  function ensureSubscription(activeConnection, group) {
+    if (!live.coreSubscriptionReady || live.connection !== activeConnection) return;
+    adoptScopedSubscriptions(activeConnection);
+    const spec = GROUPS[group];
+    if (spec.wanted && !spec.wanted() || scopedHandles.get(group)) return;
+    observeGroup(activeConnection, group);
+    spec.afterObserve?.(activeConnection);
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (live.connection !== activeConnection) return;
+      if (spec.wanted && (!scopedHandles.get(group) || !spec.wanted())) return;
+      publishDomains(activeConnection, groupDomains(group));
+      spec.afterApplied?.(activeConnection);
+    }).onError((_ctx, error) => {
+      if (spec.quietError) console.warn(spec.quietError, error);
+      else if (live.connection === activeConnection) emit({ type: "error", command: spec.errorCommand, message: String(error) });
+    }).subscribe(groupViews(group).map((view) => tables[view]));
+    scopedHandles.set(group, handle);
+  }
+  function stopSubscription(group) {
+    const previous = scopedHandles.get(group);
+    scopedHandles.delete(group);
+    if (previous && typeof previous.unsubscribe === "function") previous.unsubscribe();
+    const spec = GROUPS[group];
+    spec.afterStop?.();
+    const cleared = snapshotPatch(EMPTY_CONNECTION, new Set(groupDomains(group)));
+    emit({ ...cleared, data: { ...cleared.data, ...spec.clearAlso } });
+  }
+  function groupSubscribed(group) {
+    return Boolean(scopedHandles.get(group));
+  }
+  function ensureScopedSubscriptions(activeConnection) {
+    for (const group of SCOPED_GROUPS) ensureSubscription(activeConnection, group);
+  }
+  function followClientScreen(activeConnection) {
+    for (const group of SCOPED_GROUPS) {
+      const wanted = GROUPS[group].wanted;
+      if (!wanted) continue;
+      if (wanted()) ensureSubscription(activeConnection, group);
+      else if (scopedHandles.get(group)) stopSubscription(group);
+    }
+  }
+  function forgetDirtyDomains() {
+    dirtySnapshotDomains.clear();
+    snapshotFlushScheduled = false;
+  }
+  function dirtyDomainNames() {
+    return Array.from(dirtySnapshotDomains);
+  }
+
+  // src/connection.ts
+  var coreSubscription = null;
+  var lastUserActivityAt = Date.now();
+  var reconnectTimer = null;
+  var reconnectAttempt = 0;
+  var backendConfigOverrides = window.LDBGBackendConfig;
+  function disconnectBackend() {
+    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+    const previousConnection = live.connection;
+    live.connection = null;
+    coreSubscription = null;
+    releaseScopedSubscriptions();
+    live.coreSubscriptionReady = false;
+    live.connectionOpening = false;
+    forgetDirtyDomains();
+    live.connectionEpoch += 1;
+    if (previousConnection && typeof previousConnection.disconnect === "function") previousConnection.disconnect();
+  }
+  async function openBackendConnection(request) {
+    const config = resolveBackendConfig(backendConfigOverrides, request);
+    const token = currentAccountToken();
+    disconnectBackend();
+    const epoch = live.connectionEpoch;
+    if (!token) {
+      live.resumeNeeded = false;
+      pendingReducerCalls.length = 0;
+      emit({ type: "guest_demo" });
+      return;
+    }
+    const connectionAuthMode = "account";
+    live.connectionOpening = true;
+    live.resumeNeeded = false;
+    emit({
+      type: "connecting",
+      authMode: connectionAuthMode,
+      uri: config.uri,
+      database: config.database
+    });
+    let builder = DbConnection.builder().withUri(config.uri).withDatabaseName(config.database).onConnect((conn, identity, _issuedToken) => {
+      if (epoch !== live.connectionEpoch) {
+        if (typeof conn.disconnect === "function") conn.disconnect();
+        return;
+      }
+      live.connection = conn;
+      emit({ type: "connected", identity: identity.toHexString(), authMode: connectionAuthMode });
+      observeGroup(conn, "core");
+      coreSubscription = conn.subscriptionBuilder().onApplied(() => {
+        if (epoch !== live.connectionEpoch || live.connection !== conn) return;
+        live.coreSubscriptionReady = true;
+        live.connectionOpening = false;
+        reconnectAttempt = 0;
+        publishDomains(conn, groupDomains("core"));
+        emit({ type: "subscribed" });
+        ensureScopedSubscriptions(conn);
+        flushPendingReducerCalls();
+      }).onError((_ctx, error) => {
+        if (epoch === live.connectionEpoch) emit({ type: "error", command: "subscribe", message: String(error) });
+      }).subscribe(groupViews("core").map((view) => tables[view]));
+    }).onDisconnect((_ctx, error) => {
+      if (epoch !== live.connectionEpoch) return;
+      live.connection = null;
+      live.coreSubscriptionReady = false;
+      live.connectionOpening = false;
+      releaseScopedSubscriptions();
+      live.resumeNeeded = currentAuthMode() === "account";
+      emit({ type: "disconnected", message: error ? String(error) : "" });
+      scheduleBackendResume();
+    }).onConnectError((_ctx, error) => {
+      if (epoch === live.connectionEpoch) {
+        live.connectionOpening = false;
+        releaseScopedSubscriptions();
+        live.resumeNeeded = currentAuthMode() === "account";
+        emit({ type: "error", command: "connect", message: String(error) });
+        scheduleBackendResume();
+      }
+    });
+    builder = builder.withToken(token);
+    builder.build();
+  }
+  async function reconnectBackendForCurrentAuth() {
+    if (live.lastBackendRequest) await openBackendConnection(live.lastBackendRequest);
+  }
+  function renewThenResume() {
+    if (!hasRefreshToken()) {
+      reportExpiredSession();
+      return;
+    }
+    void refreshAccountToken().then((renewed) => {
+      if (!renewed) {
+        if (accountSessionExpired()) reportExpiredSession();
+        return;
+      }
+      live.resumeNeeded = true;
+      resumeBackend();
+    });
+  }
+  function reportExpiredSession() {
+    live.resumeNeeded = false;
+    pendingReducerCalls.length = 0;
+    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+    reportAuthExpired();
+  }
+  function resumeBackend() {
+    if (accountSessionExpired()) {
+      renewThenResume();
+      return;
+    }
+    if (live.connection || live.connectionOpening || currentAuthMode() !== "account" || !currentAccountToken() || !live.lastBackendRequest) return;
+    if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+    live.resumeNeeded = false;
+    void openBackendConnection(live.lastBackendRequest);
+  }
+  function reconnectBackend() {
+    if (currentAuthMode() !== "account" || !live.lastBackendRequest) return;
+    disconnectBackend();
+    live.resumeNeeded = true;
+    resumeBackend();
+  }
+  function scheduleBackendResume() {
+    if (accountSessionExpired()) {
+      renewThenResume();
+      return;
+    }
+    if (!live.resumeNeeded || live.connection || live.connectionOpening || reconnectTimer !== null) return;
+    if (!shouldAutoResumeConnection({
+      accountAuthenticated: currentAuthMode() === "account",
+      authBusy: isAuthBusy(),
+      clientScreen: live.clientScreen,
+      documentHidden: document.hidden
+    })) return;
+    const delay = Math.min(500 * 2 ** reconnectAttempt, 5e3);
+    reconnectAttempt += 1;
+    reconnectTimer = window.setTimeout(() => {
+      reconnectTimer = null;
+      resumeBackend();
+    }, delay);
+  }
+  function noteUserActivity() {
+    lastUserActivityAt = Date.now();
+    if (live.resumeNeeded) resumeBackend();
+  }
+  function enterAfkIdle() {
+    if (!live.connection || currentAuthMode() !== "account" || isAuthBusy()) return;
+    if (live.clientScreen === CLIENT_SCREENS.farm) return;
+    const requiresRefresh = live.clientScreen === CLIENT_SCREENS.farmRoundEnd;
+    disconnectBackend();
+    live.resumeNeeded = false;
+    emit({ type: "idle_disconnected", requiresRefresh });
+  }
+  function checkAfkIdle() {
+    if (shouldEnterAfkIdle({
+      connected: Boolean(live.connection),
+      accountAuthenticated: currentAuthMode() === "account",
+      authBusy: isAuthBusy(),
+      clientScreen: live.clientScreen,
+      documentHidden: document.hidden,
+      inactiveForMs: Date.now() - lastUserActivityAt
+    })) enterAfkIdle();
+  }
+  function setClientContext(contextJson) {
+    try {
+      const context2 = JSON.parse(contextJson);
+      const nextScreen = typeof context2.screen === "string" ? context2.screen : CLIENT_SCREENS.title;
+      if (nextScreen === live.clientScreen) {
+        noteUserActivity();
+        return;
+      }
+      live.clientScreen = nextScreen;
+      noteUserActivity();
+      if (!live.connection || !live.coreSubscriptionReady) return;
+      followClientScreen(live.connection);
+    } catch (error) {
+      emit({ type: "error", command: "setClientContext", message: String(error) });
+    }
+  }
+  async function connectBackend(configJson) {
+    try {
+      await authInitialization;
+      const request = JSON.parse(configJson);
+      live.lastBackendRequest = request;
+      noteUserActivity();
+      await openBackendConnection(request);
+    } catch (error) {
+      emit({ type: "error", command: "connect", message: String(error) });
+    }
+  }
+  var DIAGNOSTIC_TABLES = [
+    "myProfile",
+    "myActiveRun",
+    "myInventory",
+    "myEquipment",
+    "myEquippedFood",
+    "myDungeonProgress",
+    "myEndlessRecords",
+    "myFarmRecords",
+    "myDarkDuel",
+    "myDuelLobby",
+    "myDuelRecord",
+    "myDarkChestClaims",
+    "myParty",
+    "myPartyMembers",
+    "myPartySteps"
+  ];
+  function snapshotDiagnostics() {
+    const counts = {};
+    for (const name of DIAGNOSTIC_TABLES) {
+      try {
+        const handle = live.connection?.db?.[name];
+        counts[name] = handle ? Array.from(handle.iter()).length : -1;
+      } catch {
+        counts[name] = -2;
+      }
+    }
+    return JSON.stringify({
+      connected: !!live.connection,
+      coreReady: live.coreSubscriptionReady,
+      opening: live.connectionOpening,
+      resumeNeeded: live.resumeNeeded,
+      screen: live.clientScreen,
+      held: pendingReducerCalls.map((call) => call.name),
+      dirty: dirtyDomainNames(),
+      counts
+    });
+  }
+
+  // src/auth_session.ts
+  var AUTH_PENDING_KEY = "ldbg.auth.pending.v1";
+  var AUTH_PENDING_MAX_AGE_MS = 10 * 60 * 1e3;
+  var LOGIN_POPUP_NAME = "ldbg_spacetime_auth";
+  var LOGOUT_POPUP_NAME = "ldbg_spacetime_logout";
+  var SESSION_RESET_POPUP_NAME = "ldbg_spacetime_session_reset";
+  var POPUP_FEATURES = "popup=yes,width=560,height=760,resizable=yes,scrollbars=yes";
+  var accountToken = "";
+  var accountClaims = null;
+  var accountRefreshToken = "";
+  var tokenRefreshTimer = null;
+  var tokenRefreshInFlight = null;
+  var authMode = "guest";
+  var authBusy = true;
+  var authError = "";
+  var loginPopup = null;
+  var loginPopupMonitor = null;
+  var loginPopupCloseGrace = null;
+  var sessionResetPopup = null;
+  var sessionResetPopupMonitor = null;
+  var authCallbackHandling = false;
+  var authConfig = resolveAuthConfig(window.LDBGAuthConfig);
+  function authAvailable() {
+    return authConfig.clientId.trim().length > 0;
+  }
+  function authStatus() {
+    return {
+      type: "auth_changed",
+      mode: authMode,
+      available: authAvailable(),
+      busy: authBusy,
+      label: authMode === "account" ? accountLabel(accountClaims) : "Guest session",
+      error: authError
+    };
+  }
+  function publishAuthStatus() {
+    emit(authStatus());
+  }
+  function randomBase64Url(byteLength = 32) {
+    const bytes = new Uint8Array(byteLength);
+    crypto.getRandomValues(bytes);
+    return base64Url(bytes);
+  }
+  function base64Url(bytes) {
+    let binary = "";
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+  }
+  async function sha256Base64Url(value) {
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+    return base64Url(new Uint8Array(digest));
+  }
+  function redirectUri() {
+    return authConfig.redirectUri?.trim() || browserPageUrl(window.location.href);
+  }
+  function readPendingLogin() {
+    try {
+      const encoded = sessionStorage.getItem(AUTH_PENDING_KEY);
+      if (!encoded) return null;
+      const parsed = JSON.parse(encoded);
+      if (!parsed.state || !parsed.nonce || !parsed.verifier || !parsed.redirectUri || !Number.isFinite(parsed.createdAt)) return null;
+      return parsed;
+    } catch {
+      return null;
+    }
+  }
+  function writePendingLogin(pending) {
+    try {
+      sessionStorage.setItem(AUTH_PENDING_KEY, JSON.stringify(pending));
+    } catch {
+      throw new Error("Your browser is blocking the storage that logging in needs. Allow site data for this page and try again.");
+    }
+  }
+  function clearPendingLogin() {
+    try {
+      sessionStorage.removeItem(AUTH_PENDING_KEY);
+    } catch {
+    }
+  }
+  function clearCallbackParameters() {
+    const url = new URL(window.location.href);
+    for (const key of ["code", "state", "error", "error_description", "error_uri", "iss", "session_state"]) {
+      url.searchParams.delete(key);
+    }
+    window.history.replaceState({}, document.title, url.toString());
+  }
+  function stopLoginPopupMonitoring(clearReference = true) {
+    if (loginPopupMonitor !== null) window.clearInterval(loginPopupMonitor);
+    if (loginPopupCloseGrace !== null) window.clearTimeout(loginPopupCloseGrace);
+    loginPopupMonitor = null;
+    loginPopupCloseGrace = null;
+    if (clearReference) loginPopup = null;
+  }
+  function cancelClosedLoginPopup(expectedPopup) {
+    if (loginPopup !== expectedPopup || authCallbackHandling) return;
+    stopLoginPopupMonitoring();
+    clearPendingLogin();
+    authBusy = false;
+    authError = "Login was cancelled. Open Account to try again.";
+    publishAuthStatus();
+    emit({ type: "auth_error", message: authError });
+  }
+  function monitorLoginPopup(popup) {
+    stopLoginPopupMonitoring(false);
+    loginPopupMonitor = window.setInterval(() => {
+      if (!popup.closed) return;
+      if (loginPopupMonitor !== null) window.clearInterval(loginPopupMonitor);
+      loginPopupMonitor = null;
+      loginPopupCloseGrace = window.setTimeout(() => cancelClosedLoginPopup(popup), 400);
+    }, 250);
+  }
+  function relayPopupNavigation() {
+    if (!window.opener) return false;
+    if (window.name === LOGOUT_POPUP_NAME || window.name === SESSION_RESET_POPUP_NAME) {
+      window.close();
+      return true;
+    }
+    const parameters = new URLSearchParams(window.location.search);
+    if (window.name !== LOGIN_POPUP_NAME || !parameters.has("code") && !parameters.has("error")) return false;
+    window.opener.postMessage(createAuthCallbackMessage(window.location.href), window.location.origin);
+    window.setTimeout(() => window.close(), 50);
+    return true;
+  }
+  async function exchangeAuthorizationCode(code, pending) {
+    const body = new URLSearchParams({
+      grant_type: "authorization_code",
+      client_id: authConfig.clientId,
+      code,
+      redirect_uri: pending.redirectUri,
+      code_verifier: pending.verifier
+    });
+    const response = await fetch(authConfig.tokenEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body
+    });
+    const responseText = await response.text();
+    let tokenResponse = {};
+    try {
+      tokenResponse = JSON.parse(responseText);
+    } catch {
+    }
+    if (!response.ok) {
+      const detail = tokenResponse.error_description ?? tokenResponse.error ?? `HTTP ${response.status}`;
+      throw new Error(`SpacetimeAuth rejected the sign-in callback: ${String(detail)}`);
+    }
+    if (typeof tokenResponse.id_token !== "string" || !tokenResponse.id_token) {
+      throw new Error("The login server did not send your account details. Try logging in again.");
+    }
+    const claims = decodeJwtClaims(tokenResponse.id_token);
+    const claimsError = validateIdTokenClaims(claims, authConfig, pending.nonce);
+    if (claimsError) throw new Error(claimsError);
+    accountToken = tokenResponse.id_token;
+    accountClaims = claims;
+    accountRefreshToken = typeof tokenResponse.refresh_token === "string" ? tokenResponse.refresh_token : "";
+    authMode = "account";
+    if (!accountRefreshToken) console.info("LDBG: sign-in returned no refresh token; it cannot be renewed.");
+    scheduleTokenRefresh();
+  }
+  function clearTokenRefresh() {
+    if (tokenRefreshTimer !== null) window.clearTimeout(tokenRefreshTimer);
+    tokenRefreshTimer = null;
+    accountRefreshToken = "";
+  }
+  function scheduleTokenRefresh(delayMs = tokenRefreshDelayMs(accountClaims?.exp)) {
+    if (tokenRefreshTimer !== null) window.clearTimeout(tokenRefreshTimer);
+    tokenRefreshTimer = null;
+    if (authMode !== "account" || !accountRefreshToken || delayMs === null) return;
+    tokenRefreshTimer = window.setTimeout(() => {
+      tokenRefreshTimer = null;
+      void refreshAccountToken().then((renewed) => {
+        if (!renewed && accountRefreshToken) scheduleTokenRefresh(60 * 1e3);
+      });
+    }, delayMs);
+  }
+  function refreshAccountToken() {
+    if (tokenRefreshInFlight) return tokenRefreshInFlight;
+    tokenRefreshInFlight = (async () => {
+      const refreshToken = accountRefreshToken;
+      if (authMode !== "account" || !refreshToken) return false;
+      try {
+        const response = await fetch(authConfig.tokenEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            grant_type: "refresh_token",
+            client_id: authConfig.clientId,
+            refresh_token: refreshToken
+          })
+        });
+        const tokenResponse = await response.json().catch(() => ({}));
+        if (authMode !== "account" || accountRefreshToken !== refreshToken) return false;
+        if (!response.ok || typeof tokenResponse.id_token !== "string" || !tokenResponse.id_token) {
+          if (response.status === 400 || response.status === 401) accountRefreshToken = "";
+          console.warn("LDBG: renewing the sign-in failed:", tokenResponse.error ?? response.status);
+          return false;
+        }
+        const claims = decodeJwtClaims(tokenResponse.id_token);
+        const claimsError = validateRefreshedIdTokenClaims(claims, accountClaims, authConfig);
+        if (claimsError) {
+          console.warn("LDBG: renewed sign-in rejected:", claimsError);
+          return false;
+        }
+        accountToken = tokenResponse.id_token;
+        accountClaims = claims;
+        if (typeof tokenResponse.refresh_token === "string" && tokenResponse.refresh_token) {
+          accountRefreshToken = tokenResponse.refresh_token;
+        }
+        scheduleTokenRefresh();
+        return true;
+      } catch (error) {
+        console.warn("LDBG: renewing the sign-in failed:", error);
+        return false;
+      }
+    })().finally(() => {
+      tokenRefreshInFlight = null;
+    });
+    return tokenRefreshInFlight;
+  }
+  async function processAuthorizationCallback(callbackUrl, cleanCurrentPage) {
+    authCallbackHandling = true;
+    stopLoginPopupMonitoring();
+    authBusy = true;
+    authError = "";
+    publishAuthStatus();
+    let authenticated = false;
+    try {
+      if (!authAvailable()) throw new Error("Logging in is not available in this version of the game.");
+      const pending = readPendingLogin();
+      if (!pending) throw new Error("The login request was lost. Try logging in again.");
+      if (!authCallbackTargetsRedirect(callbackUrl, pending.redirectUri)) {
+        throw new Error("The login came back to the wrong page. Try logging in again.");
+      }
+      if (Date.now() - pending.createdAt > AUTH_PENDING_MAX_AGE_MS) {
+        throw new Error("The login took too long and expired. Try again.");
+      }
+      const parameters = new URL(callbackUrl).searchParams;
+      const callbackError = parameters.get("error");
+      if (callbackError) throw new Error(parameters.get("error_description") || callbackError);
+      if (parameters.get("state") !== pending.state) {
+        throw new Error("That login was started somewhere else. Try logging in again from this tab.");
+      }
+      const code = parameters.get("code");
+      if (!code) throw new Error("The login server did not finish logging you in. Try again.");
+      await exchangeAuthorizationCode(code, pending);
+      authenticated = true;
+    } catch (error) {
+      authError = error instanceof Error ? error.message : String(error);
+      emit({ type: "auth_error", message: authError });
+    } finally {
+      clearPendingLogin();
+      if (cleanCurrentPage) clearCallbackParameters();
+      authBusy = false;
+      publishAuthStatus();
+      authCallbackHandling = false;
+    }
+    if (authenticated) await reconnectBackendForCurrentAuth();
+  }
+  async function initializeAuthentication() {
+    if (relayPopupNavigation()) return;
+    const parameters = new URLSearchParams(window.location.search);
+    if (parameters.has("code") || parameters.has("error")) {
+      await processAuthorizationCallback(window.location.href, true);
+      return;
+    }
+    authBusy = false;
+    publishAuthStatus();
+  }
+  async function beginLogin() {
+    let popup = null;
+    try {
+      if (loginPopup && !loginPopup.closed) {
+        loginPopup.focus();
+        return;
+      }
+      popup = window.open("about:blank", LOGIN_POPUP_NAME, POPUP_FEATURES);
+      if (!popup) throw new Error("Your browser blocked the login window. Allow pop-ups for this site and try again.");
+      loginPopup = popup;
+      monitorLoginPopup(popup);
+      await authInitialization;
+      if (!authAvailable()) throw new Error("Add this game's SpacetimeAuth client ID before signing in.");
+      const verifier = randomBase64Url(48);
+      const state = randomBase64Url(32);
+      const nonce = randomBase64Url(32);
+      const currentRedirectUri = redirectUri();
+      const pending = { state, nonce, verifier, redirectUri: currentRedirectUri, createdAt: Date.now() };
+      writePendingLogin(pending);
+      authBusy = true;
+      authError = "";
+      publishAuthStatus();
+      const challenge = await sha256Base64Url(verifier);
+      popup.location.replace(buildAuthorizationUrl(authConfig, currentRedirectUri, state, nonce, challenge));
+    } catch (error) {
+      if (popup && !popup.closed) popup.close();
+      stopLoginPopupMonitoring();
+      clearPendingLogin();
+      authBusy = false;
+      authError = error instanceof Error ? error.message : String(error);
+      publishAuthStatus();
+      emit({ type: "auth_error", message: authError });
+    }
+  }
+  async function beginLogout() {
+    const idTokenHint = accountToken;
+    let logoutPopup = null;
+    if (authAvailable() && idTokenHint && authConfig.endSessionEndpoint) {
+      logoutPopup = window.open("about:blank", LOGOUT_POPUP_NAME, POPUP_FEATURES);
+    }
+    await authInitialization;
+    disconnectBackend();
+    live.resumeNeeded = false;
+    pendingReducerCalls.length = 0;
+    accountToken = "";
+    accountClaims = null;
+    clearTokenRefresh();
+    authMode = "guest";
+    authBusy = false;
+    authError = "";
+    clearPendingLogin();
+    emit(emptyAccountSnapshot());
+    publishAuthStatus();
+    emit({ type: "guest_demo" });
+    if (logoutPopup) {
+      const returnUri = authConfig.postLogoutRedirectUri?.trim() || browserPageUrl(window.location.href);
+      logoutPopup.location.replace(buildLogoutUrl(authConfig, idTokenHint, returnUri));
+    }
+  }
+  function stopSessionResetMonitoring(clearReference = true) {
+    if (sessionResetPopupMonitor !== null) window.clearInterval(sessionResetPopupMonitor);
+    sessionResetPopupMonitor = null;
+    if (clearReference) sessionResetPopup = null;
+  }
+  function monitorSessionResetPopup(popup) {
+    stopSessionResetMonitoring(false);
+    sessionResetPopupMonitor = window.setInterval(() => {
+      if (!popup.closed) return;
+      stopSessionResetMonitoring();
+      authBusy = false;
+      authError = "";
+      publishAuthStatus();
+      emit({ type: "command_succeeded", command: "resetAuthSession" });
+    }, 250);
+  }
+  async function resetAuthSession() {
+    let popup = null;
+    try {
+      if (sessionResetPopup && !sessionResetPopup.closed) {
+        sessionResetPopup.focus();
+        return;
+      }
+      popup = window.open("about:blank", SESSION_RESET_POPUP_NAME, POPUP_FEATURES);
+      if (!popup) throw new Error("Your browser blocked the window that clears your saved login. Allow pop-ups for this site and try again.");
+      sessionResetPopup = popup;
+      monitorSessionResetPopup(popup);
+      await authInitialization;
+      if (!authAvailable() || !authConfig.endSessionEndpoint) {
+        throw new Error("Clearing the saved login is not available in this version of the game.");
+      }
+      if (authMode === "account") throw new Error("Log out first, then try again.");
+      clearPendingLogin();
+      authBusy = true;
+      authError = "";
+      publishAuthStatus();
+      const returnUri = authConfig.postLogoutRedirectUri?.trim() || browserPageUrl(window.location.href);
+      popup.location.replace(buildLogoutUrl(authConfig, "", returnUri));
+    } catch (error) {
+      if (popup && !popup.closed) popup.close();
+      stopSessionResetMonitoring();
+      authBusy = false;
+      authError = error instanceof Error ? error.message : String(error);
+      publishAuthStatus();
+      emit({ type: "auth_error", message: authError });
+    }
+  }
+  function accountSessionExpired() {
+    return authMode === "account" && isAccountTokenExpired(accountClaims?.exp);
+  }
+  function getAuthStatus() {
+    return JSON.stringify(authStatus());
+  }
+  function currentAuthMode() {
+    return authMode;
+  }
+  function currentAccountToken() {
+    return accountToken;
+  }
+  function hasRefreshToken() {
+    return accountRefreshToken.length > 0;
+  }
+  function isAuthBusy() {
+    return authBusy;
+  }
+  function reportAuthExpired() {
+    authBusy = false;
+    if (authError === EXPIRED_SESSION_MESSAGE) return;
+    authError = EXPIRED_SESSION_MESSAGE;
+    publishAuthStatus();
+    emit({ type: "auth_error", message: authError });
+  }
+  window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin || !loginPopup || event.source !== loginPopup) return;
+    const callbackUrl = authCallbackUrlFromMessage(event.data);
+    if (!callbackUrl || new URL(callbackUrl).origin !== window.location.origin) return;
+    void processAuthorizationCallback(callbackUrl, false);
+  });
+  var authInitialization = initializeAuthentication();
+
+  // src/problem_watch.ts
+  var LOG_LINE_LIMIT = 300;
+  var LOG_KEEP = 200;
+  var SCRUBBERS = [
+    [/eyJ[A-Za-z0-9_-]{6,}\.[A-Za-z0-9_-]{6,}\.[A-Za-z0-9_-]{6,}/g, "[jwt]"],
+    [/\b(Bearer|Basic)\s+[A-Za-z0-9._~+/=-]{8,}/gi, "$1 [token]"],
+    [/\b((?:access|id|refresh)_token|code|state|nonce|code_verifier|client_secret)=([^&\s"']+)/gi, "$1=[redacted]"],
+    [/"((?:access|id|refresh)Token|(?:access|id|refresh)_token|token|password)"\s*:\s*"[^"]*"/gi, '"$1":"[redacted]"'],
+    [/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[email]"]
+  ];
+  function scrub(text) {
+    let out = String(text ?? "");
+    for (const [pattern, replacement] of SCRUBBERS) out = out.replace(pattern, replacement);
+    return out;
+  }
+  function logLine(level, parts) {
+    const text = parts.map((part) => {
+      if (typeof part === "string") return part;
+      if (part instanceof Error) return `${part.name}: ${part.message}`;
+      try {
+        return JSON.stringify(part);
+      } catch {
+        return String(part);
+      }
+    }).join(" ");
+    const line = scrub(`${level}: ${text}`);
+    return line.length <= LOG_LINE_LIMIT ? line : `${line.slice(0, LOG_LINE_LIMIT)}\u2026`;
+  }
+  var LogRing = class {
+    constructor(keep = LOG_KEEP) {
+      this.keep = keep;
+    }
+    lines = [];
+    push(line) {
+      this.lines.push(line);
+      if (this.lines.length > this.keep) this.lines.splice(0, this.lines.length - this.keep);
+    }
+    tail() {
+      return this.lines.slice();
+    }
+  };
+  function buildTagFrom(sources) {
+    for (const source of sources) {
+      const versioned = /index\.js\?v=([0-9a-f]{6,})/.exec(source);
+      if (versioned) return `index-${versioned[1]}`;
+      const named = /(index-[0-9a-f]{6,})\.js/.exec(source);
+      if (named) return named[1];
+    }
+    return "local";
+  }
+  function watchdogMain(scope) {
+    const FREEZE = 5e3;
+    const CHECK = 1e3;
+    const REWRITE = 5e3;
+    const KEEP_LINES = 200;
+    const KEEP_RECORDS = 10;
+    const clock = () => typeof scope.now === "function" ? scope.now() : Date.now();
+    let lastBeat = 0;
+    let visible = true;
+    let armed = false;
+    let context2 = null;
+    let stall = null;
+    const lines = [];
+    const openDb = () => {
+      if (!scope.indexedDB) return null;
+      return new Promise((resolve) => {
+        try {
+          const request = scope.indexedDB.open("ldbg-diagnostics", 1);
+          request.onupgradeneeded = () => request.result.createObjectStore("reports", { keyPath: "id" });
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => resolve(null);
+        } catch {
+          resolve(null);
+        }
+      });
+    };
+    const db = openDb();
+    const withStore = (mode, work) => {
+      if (!db) return;
+      db.then((handle) => {
+        if (!handle) return;
+        try {
+          work(handle.transaction("reports", mode).objectStore("reports"));
+        } catch {
+        }
+      });
+    };
+    const signature = (ctx) => {
+      const boot = String(ctx?.bootPhase ?? "");
+      if (boot && boot !== "ready") return `boot/${boot}`;
+      const screen = String(ctx?.screen ?? "");
+      const activity = String(ctx?.activity ?? "");
+      return activity ? `${screen}/${activity}` : screen;
+    };
+    const snapshot = (at, recovered) => ({
+      id: stall.id,
+      kind: "freeze",
+      signature: signature(context2),
+      startedAt: new Date(stall.startedAt).toISOString(),
+      stallMs: at - stall.startedAt,
+      recovered,
+      context: context2,
+      log: lines.slice()
+    });
+    const write = (record) => withStore("readwrite", (store) => store.put(record));
+    const check = (at = clock()) => {
+      if (!armed || !visible) return;
+      if (!stall) {
+        if (at - lastBeat <= FREEZE) return;
+        stall = { id: `freeze-${lastBeat}-${Math.floor(Math.random() * 1e6)}`, startedAt: lastBeat, writtenAt: at };
+        write(snapshot(at, false));
+        return;
+      }
+      if (at - stall.writtenAt >= REWRITE) {
+        stall.writtenAt = at;
+        write(snapshot(at, false));
+      }
+    };
+    const receive = (message, at = clock()) => {
+      if (!message || typeof message !== "object") return;
+      if (message.type === "beat") {
+        if (stall) {
+          const record = snapshot(at, true);
+          stall = null;
+          write(record);
+          scope.postMessage({ type: "freeze", record });
+        }
+        lastBeat = at;
+        armed = true;
+        if (message.context) context2 = message.context;
+      } else if (message.type === "visibility") {
+        visible = !!message.visible;
+        lastBeat = at;
+      } else if (message.type === "log") {
+        for (const line of message.lines ?? []) {
+          lines.push(String(line));
+        }
+        if (lines.length > KEEP_LINES) lines.splice(0, lines.length - KEEP_LINES);
+      } else if (message.type === "delete") {
+        const ids = message.ids ?? [];
+        withStore("readwrite", (store) => ids.forEach((id) => store.delete(id)));
+      } else if (message.type === "stop") {
+        armed = false;
+      }
+    };
+    scope.onmessage = (event) => receive(event?.data);
+    if (typeof scope.setInterval === "function") scope.setInterval(() => check(), CHECK);
+    withStore("readonly", (store) => {
+      const request = store.getAll();
+      request.onsuccess = () => {
+        const records = (request.result ?? []).slice(-KEEP_RECORDS);
+        if (records.length > 0) scope.postMessage({ type: "pending", records });
+      };
+    });
+    return { check, receive, state: () => ({ armed, visible, stalled: !!stall, lines: lines.length }) };
+  }
+  function watchdogSource() {
+    return `(${watchdogMain.toString()})(self);`;
+  }
+
+  // src/diagnostics.ts
+  var ring = new LogRing();
+  var ready = /* @__PURE__ */ new Map();
+  var worker = null;
+  var lastContext = null;
+  var shellBootPhase = "";
+  var lastShellContextAt = 0;
+  var pageErrors = 0;
+  var pageErrorSignatures = /* @__PURE__ */ new Set();
+  var MAX_PAGE_ERRORS = 3;
+  var SHELL_CONTEXT_MS = 2e3;
+  var unsent = [];
+  function shell() {
+    const client = window.ldbgClient;
+    return client && typeof client === "object" ? client : null;
+  }
+  function buildTag() {
+    try {
+      return buildTagFrom(Array.from(document.scripts).map((script) => script.src));
+    } catch {
+      return "local";
+    }
+  }
+  function flushLines() {
+    if (!worker || unsent.length === 0) return;
+    worker.postMessage({ type: "log", lines: unsent });
+    unsent = [];
+  }
+  function capture(level, parts) {
+    const line = logLine(level, parts);
+    ring.push(line);
+    unsent.push(line);
+    if (unsent.length > 200) unsent.splice(0, unsent.length - 200);
+    if (level === "error" || level === "warn") flushLines();
+  }
+  function wrapConsole() {
+    const target = console;
+    for (const level of ["log", "info", "warn", "error", "debug"]) {
+      const original = target[level];
+      if (typeof original !== "function" || original.__ldbgWrapped) continue;
+      const wrapped = (...parts) => {
+        try {
+          capture(level, parts);
+        } catch {
+        }
+        return original.apply(console, parts);
+      };
+      wrapped.__ldbgWrapped = true;
+      target[level] = wrapped;
+    }
+  }
+  function context() {
+    const game = lastContext ?? { screen: "boot" };
+    return {
+      ...game,
+      // The game's own phase once it has spoken (BootProgress), the loading
+      // screen's before that.
+      bootPhase: game.bootPhase ?? shellBootPhase,
+      build: buildTag(),
+      visible: document.visibilityState === "visible",
+      connection: {
+        connected: !!live.connection,
+        coreReady: live.coreSubscriptionReady,
+        opening: live.connectionOpening,
+        resumeNeeded: live.resumeNeeded,
+        held: pendingReducerCalls.length
+      },
+      shell: !!shell()
+    };
+  }
+  function pageError(message, where) {
+    const text = scrub(message).slice(0, 300);
+    capture("error", [`${where}: ${text}`]);
+    const signature = text.slice(0, 120);
+    if (pageErrors >= MAX_PAGE_ERRORS || pageErrorSignatures.has(signature)) return;
+    pageErrors += 1;
+    pageErrorSignatures.add(signature);
+    const id = `page-${Date.now()}-${pageErrors}`;
+    ready.set(id, {
+      id,
+      kind: "page_error",
+      signature,
+      startedAt: (/* @__PURE__ */ new Date()).toISOString(),
+      message: text,
+      where,
+      context: context(),
+      log: ring.tail()
+    });
+  }
+  function startWorker() {
+    if (typeof Worker === "undefined" || typeof Blob === "undefined" || typeof URL === "undefined") return;
+    try {
+      const url = URL.createObjectURL(new Blob([watchdogSource()], { type: "text/javascript" }));
+      worker = new Worker(url);
+      worker.onmessage = (event) => {
+        const data = event.data;
+        if (data?.type === "freeze" && data.record?.id) ready.set(data.record.id, data.record);
+        if (data?.type === "pending") {
+          for (const record of data.records ?? []) if (record?.id) ready.set(record.id, record);
+        }
+      };
+      worker.postMessage({ type: "visibility", visible: document.visibilityState === "visible" });
+    } catch {
+      worker = null;
+    }
+  }
+  function adoptShellReports() {
+    const client = shell();
+    if (!client || typeof client.problemReports !== "function") return;
+    try {
+      const records = JSON.parse(String(client.problemReports() || "[]"));
+      for (const record of Array.isArray(records) ? records : []) {
+        if (record?.id) ready.set(String(record.id), { ...record, fromShell: true });
+      }
+    } catch {
+    }
+  }
+  function diagnosticsBeat(contextJson) {
+    try {
+      lastContext = JSON.parse(contextJson);
+    } catch {
+      return;
+    }
+    flushLines();
+    const merged = context();
+    worker?.postMessage({ type: "beat", context: merged });
+    const client = shell();
+    const now = Date.now();
+    if (client && typeof client.diagnosticsContext === "function" && now - lastShellContextAt >= SHELL_CONTEXT_MS) {
+      lastShellContextAt = now;
+      try {
+        client.diagnosticsContext(JSON.stringify(merged));
+      } catch {
+      }
+    }
+  }
+  function diagnosticsBootBeat(phase) {
+    shellBootPhase = String(phase ?? "").slice(0, 24);
+    flushLines();
+    worker?.postMessage({ type: "beat", context: context() });
+  }
+  function takeProblemReports() {
+    adoptShellReports();
+    if (ready.size === 0) return "";
+    const records = Array.from(ready.values());
+    ready.clear();
+    const stored = records.filter((record) => !record.fromShell && String(record.id).startsWith("freeze-")).map((record) => record.id);
+    if (stored.length > 0) worker?.postMessage({ type: "delete", ids: stored });
+    const fromShell = records.filter((record) => record.fromShell).map((record) => record.id);
+    const client = shell();
+    if (fromShell.length > 0 && client && typeof client.ackProblemReports === "function") {
+      try {
+        client.ackProblemReports(JSON.stringify(fromShell));
+      } catch {
+      }
+    }
+    return JSON.stringify(records);
+  }
+  function diagnosticsLogTail() {
+    return JSON.stringify(ring.tail());
+  }
+  function installDiagnostics() {
+    wrapConsole();
+    window.addEventListener("error", (event) => {
+      pageError(String(event.message || "error"), "uncaught");
+    });
+    window.addEventListener("unhandledrejection", (event) => {
+      const reason = event.reason;
+      pageError(reason instanceof Error ? `${reason.name}: ${reason.message}` : String(reason), "rejection");
+    });
+    document.addEventListener("visibilitychange", () => {
+      worker?.postMessage({ type: "visibility", visible: document.visibilityState === "visible" });
+    });
+    window.addEventListener("pagehide", () => worker?.postMessage({ type: "stop" }));
+    startWorker();
+  }
+
+  // src/music_schedule.ts
+  var SWITCH_SAFETY_SECONDS = 0.2;
+  var START_DELAY_SECONDS = 0.1;
+  var EPSILON = 1e-6;
+  var SILENCE = "silence";
+  var SAFE_FILE = /^[A-Za-z0-9][A-Za-z0-9_.-]*$/;
+  var SAFE_ID = /^[A-Za-z0-9_][A-Za-z0-9_-]*$/;
+  function fail(message) {
+    throw new Error(`music manifest: ${message}`);
+  }
+  function integer(value, name, min, max) {
+    if (typeof value !== "number" || !Number.isInteger(value) || value < min || value > max) {
+      fail(`${name} must be a whole number from ${min} to ${max}`);
+    }
+    return value;
+  }
+  function fallbackFile(value, where) {
+    if (value == null) return null;
+    if (typeof value !== "string" || !SAFE_FILE.test(value)) fail(`${where} fallback needs a plain file name`);
+    return value;
+  }
+  function sectionId(value, sections, where) {
+    if (typeof value !== "string" || !sections.has(value)) fail(`${where} names no section: ${String(value)}`);
+    return value;
+  }
+  function parseMusicManifest(raw) {
+    if (raw === null || typeof raw !== "object") fail("not an object");
+    const root = raw;
+    const version = integer(root.version, "version", 1, 1);
+    const bpm = typeof root.bpm === "number" ? root.bpm : NaN;
+    if (!(bpm >= 30 && bpm <= 300)) fail("bpm must be from 30 to 300");
+    const beatsPerBar = integer(root.beatsPerBar ?? 4, "beatsPerBar", 1, 16);
+    const switchEvery = integer(root.switchEveryBars ?? 4, "switchEveryBars", 0, 512);
+    const gainDb = root.gainDb ?? 0;
+    if (typeof gainDb !== "number" || !(gainDb >= -40 && gainDb <= 6)) fail("gainDb must be from -40 to 6");
+    const sections = /* @__PURE__ */ new Map();
+    const rawSections = root.sections;
+    if (rawSections === null || typeof rawSections !== "object") fail("sections must be an object");
+    for (const [id, value] of Object.entries(rawSections)) {
+      if (!SAFE_ID.test(id)) fail(`section id ${id} has characters a file name cannot`);
+      const entry = value ?? {};
+      if (typeof entry.file !== "string" || !SAFE_FILE.test(entry.file)) fail(`section ${id} needs a plain file name`);
+      const sectionBpm = typeof entry.bpm === "number" ? entry.bpm : bpm;
+      if (!(sectionBpm >= 30 && sectionBpm <= 300)) fail(`section ${id} bpm must be from 30 to 300`);
+      sections.set(id, {
+        id,
+        file: entry.file,
+        fallback: fallbackFile(entry.fallback, `section ${id}`),
+        bars: integer(entry.bars, `section ${id} bars`, 1, 512),
+        bpm: sectionBpm,
+        beatsPerBar: integer(entry.beatsPerBar ?? beatsPerBar, `section ${id} beatsPerBar`, 1, 16),
+        switchEveryBars: integer(entry.switchEveryBars ?? switchEvery, `section ${id} switchEveryBars`, 0, 512),
+        pickupBeats: integer(entry.pickupBeats ?? 0, `section ${id} pickupBeats`, 0, 16)
+      });
+    }
+    if (sections.size === 0) fail("no sections");
+    const states = /* @__PURE__ */ new Map();
+    const rawStates = root.states;
+    if (rawStates === null || typeof rawStates !== "object") fail("states must be an object");
+    for (const [name, value] of Object.entries(rawStates)) {
+      if (name === SILENCE) fail(`"${SILENCE}" is built in and cannot be mapped`);
+      const entry = value ?? {};
+      const play = entry.play ?? [];
+      if (!Array.isArray(play)) fail(`state ${name} play must be a list`);
+      const syncFrom = entry.syncFrom ?? null;
+      if (syncFrom !== null && (!Array.isArray(syncFrom) || syncFrom.length === 0)) fail(`state ${name} syncFrom must be a list of sections`);
+      states.set(name, {
+        name,
+        intro: entry.intro == null ? null : sectionId(entry.intro, sections, `state ${name} intro`),
+        introOnce: entry.introOnce === true,
+        play: play.map((id, index) => sectionId(id, sections, `state ${name} play[${index}]`)),
+        then: entry.then == null ? null : String(entry.then),
+        thenOverlapBars: integer(entry.thenOverlapBars ?? 0, `state ${name} thenOverlapBars`, 0, 64),
+        thenFadeInBars: integer(entry.thenFadeInBars ?? 0, `state ${name} thenFadeInBars`, 0, 64),
+        syncPosition: entry.syncPosition === true || syncFrom !== null,
+        syncFrom: syncFrom === null ? null : syncFrom.map((id) => sectionId(id, sections, `state ${name} syncFrom`))
+      });
+    }
+    for (const state of states.values()) {
+      if (state.then !== null && !states.has(state.then)) fail(`state ${state.name} then names no state: ${state.then}`);
+      if (state.intro === null && state.play.length === 0 && state.then === null) {
+        fail(`state ${state.name} plays nothing; leave it out, or map it to "${SILENCE}" through fallbacks`);
+      }
+      if (state.thenOverlapBars > 0 && (state.then === null || state.intro === null || state.play.length > 0)) {
+        fail(`state ${state.name} thenOverlapBars needs an intro, an empty play list and a then`);
+      }
+      if (state.intro !== null && state.thenOverlapBars > sections.get(state.intro).bars) {
+        fail(`state ${state.name} thenOverlapBars is longer than its intro`);
+      }
+    }
+    const leadIns = /* @__PURE__ */ new Map();
+    const rawLeadIns = root.leadIns ?? {};
+    if (rawLeadIns === null || typeof rawLeadIns !== "object") fail("leadIns must be an object");
+    for (const [id, value] of Object.entries(rawLeadIns)) {
+      if (!SAFE_ID.test(id) || sections.has(id)) fail(`lead-in id ${id} is not a plain id of its own`);
+      const entry = value ?? {};
+      if (typeof entry.file !== "string" || !SAFE_FILE.test(entry.file)) fail(`lead-in ${id} needs a plain file name`);
+      const beats = entry.beats;
+      if (typeof beats !== "number" || !(beats > 0 && beats <= 64)) fail(`lead-in ${id} beats must be above 0 and at most 64`);
+      const leadInBpm = typeof entry.bpm === "number" ? entry.bpm : bpm;
+      if (!(leadInBpm >= 30 && leadInBpm <= 300)) fail(`lead-in ${id} bpm must be from 30 to 300`);
+      leadIns.set(id, { id, file: entry.file, fallback: fallbackFile(entry.fallback, `lead-in ${id}`), beats, bpm: leadInBpm });
+    }
+    const transitions = [];
+    const rawTransitions = root.transitions ?? [];
+    if (!Array.isArray(rawTransitions)) fail("transitions must be a list");
+    rawTransitions.forEach((value, index) => {
+      const entry = value ?? {};
+      const where = `transitions[${index}]`;
+      let from = null;
+      if (entry.from !== "*") {
+        if (!Array.isArray(entry.from) || entry.from.length === 0) fail(`${where} from must be a list of sections or "*"`);
+        from = entry.from.map((id) => sectionId(id, sections, `${where} from`));
+      }
+      let to = null;
+      if (entry.to !== "*") {
+        if (!Array.isArray(entry.to) || entry.to.length === 0) fail(`${where} to must be a list of states or "*"`);
+        to = entry.to.map((name) => {
+          if (typeof name !== "string" || !states.has(name)) fail(`${where} to names no state: ${String(name)}`);
+          return name;
+        });
+      }
+      const sound = (key) => {
+        const id = entry[key];
+        if (id == null) return null;
+        if (typeof id !== "string" || !leadIns.has(id)) fail(`${where} ${key} names no lead-in: ${String(id)}`);
+        return id;
+      };
+      const leadIn = sound("leadIn");
+      const hit = sound("hit");
+      const every = entry.switchEveryBars == null ? null : integer(entry.switchEveryBars, `${where} switchEveryBars`, 1, 512);
+      const immediate = entry.immediate === true;
+      if (leadIn === null && hit === null && !(immediate && entry.releaseSeconds != null)) {
+        fail(`${where} plays nothing: give it a leadIn or a hit, or make it an immediate crossfade with releaseSeconds`);
+      }
+      if (immediate && leadIn !== null) fail(`${where} is immediate, so it has no time for a leadIn; give it a hit`);
+      const release = entry.releaseSeconds;
+      if (release != null && (typeof release !== "number" || !(release >= 0 && release <= 10))) {
+        fail(`${where} releaseSeconds must be from 0 to 10`);
+      }
+      if (entry.preload != null && typeof entry.preload !== "boolean") fail(`${where} preload must be true or false`);
+      const fadeIn = entry.fadeInSeconds ?? 0;
+      if (typeof fadeIn !== "number" || !(fadeIn >= 0 && fadeIn <= 10)) fail(`${where} fadeInSeconds must be from 0 to 10`);
+      if (fadeIn > 0 && !immediate) fail(`${where} fadeInSeconds is for an immediate transition`);
+      transitions.push({
+        from,
+        to,
+        leadIn,
+        hit,
+        switchEveryBars: every,
+        immediate,
+        releaseSeconds: release == null ? null : release,
+        preload: entry.preload !== false,
+        fadeInSeconds: fadeIn
+      });
+    });
+    const fallbacks = /* @__PURE__ */ new Map();
+    const rawFallbacks = root.fallbacks ?? {};
+    if (rawFallbacks === null || typeof rawFallbacks !== "object") fail("fallbacks must be an object");
+    for (const [from, to] of Object.entries(rawFallbacks)) {
+      if (typeof to !== "string" || to !== SILENCE && !states.has(to) && !(to in rawFallbacks)) {
+        fail(`fallback ${from} names no state: ${String(to)}`);
+      }
+      fallbacks.set(from, to);
+    }
+    const priming = integer(root.fallbackPrimingSamples ?? 0, "fallbackPrimingSamples", 0, 8192);
+    return { version, gainDb, fallbackPrimingSamples: priming, sections, leadIns, transitions, states, fallbacks };
+  }
+  function barSeconds(section) {
+    return 60 / section.bpm * section.beatsPerBar;
+  }
+  function pickupSeconds(section) {
+    return 60 / section.bpm * section.pickupBeats;
+  }
+  function resolveState(manifest, requested) {
+    let name = requested;
+    for (let hop = 0; hop < 8; hop++) {
+      if (name === SILENCE || manifest.states.has(name)) return name;
+      const next = manifest.fallbacks.get(name);
+      if (next === void 0) return null;
+      name = next;
+    }
+    return null;
+  }
+  function findTransition(manifest, fromSection, target) {
+    for (const transition of manifest.transitions) {
+      const fromMatches = transition.from === null || fromSection !== null && transition.from.includes(fromSection);
+      if (fromMatches && (transition.to === null || transition.to.includes(target))) return transition;
+    }
+    return null;
+  }
+  function leadInSeconds(manifest, transition) {
+    if (transition === null || transition.leadIn === null) return 0;
+    return soundSeconds(manifest.leadIns.get(transition.leadIn));
+  }
+  function soundSeconds(leadIn) {
+    return leadIn.beats * 60 / leadIn.bpm;
+  }
+  function nextSwitchTime(manifest, segment, earliest, everyBars = null) {
+    const section = manifest.sections.get(segment.section);
+    if (earliest >= segment.end - EPSILON) return Math.max(segment.end, earliest);
+    const every = everyBars ?? section.switchEveryBars;
+    if (every <= 0) return segment.end;
+    const bar = barSeconds(section);
+    const step = every * bar;
+    const sectionStart = segment.start + segment.pickup - segment.offsetBars * bar;
+    const k = Math.max(1, Math.ceil((earliest - sectionStart) / step - EPSILON));
+    const at = sectionStart + k * step;
+    return at < segment.end - EPSILON ? at : segment.end;
+  }
+  function place(manifest, section, state, playIndex, offsetBars, start) {
+    const info = manifest.sections.get(section);
+    const pickup = offsetBars === 0 ? pickupSeconds(info) : 0;
+    return { section, state, playIndex, offsetBars, pickup, start, end: start + pickup + (info.bars - offsetBars) * barSeconds(info), fadeIn: 0 };
+  }
+  function enterState(manifest, stateName, at, from, introsPlayed = /* @__PURE__ */ new Set()) {
+    if (stateName === SILENCE) return null;
+    const state = manifest.states.get(stateName);
+    if (state === void 0) return null;
+    if (state.intro !== null && !(state.introOnce && introsPlayed.has(stateName))) {
+      return place(manifest, state.intro, stateName, -1, 0, at);
+    }
+    if (state.play.length === 0) return state.then === null ? null : enterState(manifest, state.then, at, from);
+    const synced = from !== null && state.syncPosition && (state.syncFrom === null ? at < from.end - EPSILON : state.syncFrom.includes(from.section) && at <= from.end + EPSILON);
+    if (!synced) return place(manifest, state.play[0], stateName, 0, 0, at);
+    const total = state.play.reduce((sum, id) => sum + manifest.sections.get(id).bars, 0);
+    let bar = playListBar(manifest, from, at) % total;
+    for (let index = 0; index < state.play.length; index++) {
+      const bars = manifest.sections.get(state.play[index]).bars;
+      if (bar < bars) return place(manifest, state.play[index], stateName, index, bar, at);
+      bar -= bars;
+    }
+    return place(manifest, state.play[0], stateName, 0, 0, at);
+  }
+  function playListBar(manifest, segment, at) {
+    const section = manifest.sections.get(segment.section);
+    const own = Math.round(segment.offsetBars + (at - segment.start - segment.pickup) / barSeconds(section));
+    const state = manifest.states.get(segment.state);
+    if (state === void 0 || segment.playIndex < 0 || state.play[segment.playIndex] !== segment.section) return own;
+    let before = 0;
+    for (let index = 0; index < segment.playIndex; index++) before += manifest.sections.get(state.play[index]).bars;
+    return before + own;
+  }
+  function followingSegment(manifest, segment) {
+    const state = manifest.states.get(segment.state);
+    if (state === void 0) return null;
+    if (state.play.length === 0) {
+      if (state.then === null) return null;
+      const bar = barSeconds(manifest.sections.get(segment.section));
+      const at = Math.max(segment.start, segment.end - state.thenOverlapBars * bar);
+      const next = enterState(manifest, state.then, at, null);
+      if (next !== null && state.thenFadeInBars > 0) {
+        next.fadeIn = state.thenFadeInBars * barSeconds(manifest.sections.get(next.section));
+      }
+      return next;
+    }
+    const index = segment.playIndex < 0 ? 0 : (segment.playIndex + 1) % state.play.length;
+    return place(manifest, state.play[index], segment.state, index, 0, segment.end);
+  }
+  function prefetchPlan(manifest) {
+    const always = alwaysDecoded(manifest);
+    const rest = [...manifest.sections.keys()].filter((id) => !always.includes(id));
+    return [...always.map((id) => ({ id, decode: true })), ...rest.map((id) => ({ id, decode: false }))];
+  }
+  function entryOf(state) {
+    return state.intro ?? state.play[0] ?? null;
+  }
+  function alwaysDecoded(manifest) {
+    const ids = [];
+    const add = (id) => {
+      if (id !== null && !ids.includes(id)) ids.push(id);
+    };
+    for (const transition of manifest.transitions) {
+      add(transition.leadIn);
+      add(transition.hit);
+      if (!transition.immediate || transition.from !== null) continue;
+      const targets = transition.to ?? [...manifest.states.keys()];
+      for (const name of targets) {
+        const state = manifest.states.get(name);
+        if (state !== void 0) add(entryOf(state));
+      }
+    }
+    return ids;
+  }
+  function reachableEntries(manifest, fromSection) {
+    const ids = [];
+    for (const [name, state] of manifest.states) {
+      const transition = findTransition(manifest, fromSection, name);
+      if (transition === null || !transition.preload || transition.from === null) continue;
+      const id = entryOf(state);
+      if (id !== null && !ids.includes(id)) ids.push(id);
+    }
+    return ids;
+  }
+  function syncedSections(manifest, segment, at) {
+    const ids = [];
+    for (const [name, state] of manifest.states) {
+      if (state.syncFrom === null || !state.syncFrom.includes(segment.section)) continue;
+      for (const when of [Math.min(at, segment.end), segment.end]) {
+        const landed = enterState(manifest, name, when, segment);
+        if (landed !== null && !ids.includes(landed.section)) ids.push(landed.section);
+      }
+    }
+    return ids;
+  }
+  function continuesInto(manifest, segment, stateName) {
+    if (segment.playIndex < 0) return -1;
+    const state = manifest.states.get(stateName);
+    if (state === void 0) return -1;
+    return state.play.indexOf(segment.section);
+  }
+
+  // src/music_engine.ts
+  var RELEASE_SECONDS = 0.03;
+  var FADE_IN_SECONDS = 0.01;
+  var CURVE_POINTS = 64;
+  function fadeCurve(from, to) {
+    const curve = new Float32Array(CURVE_POINTS);
+    for (let i = 0; i < CURVE_POINTS; i++) {
+      const t2 = i / (CURVE_POINTS - 1);
+      const shape = to < from ? Math.cos(t2 * Math.PI / 2) : Math.sin(t2 * Math.PI / 2);
+      curve[i] = to < from ? to + (from - to) * shape : from + (to - from) * shape;
+    }
+    return curve;
+  }
+  var LATE_JOIN_SECONDS = 0.05;
+  var PLAN_AHEAD_SECONDS = 1.5;
+  var TICK_MS = 250;
+  var DECODE_AHEAD_SECONDS = 12;
+  var IDLE_FETCH_DELAY_MS = 2e3;
+  var IDLE_FETCH_GAP_MS = 750;
+  var PRIMARY_TYPE = 'audio/ogg; codecs="opus"';
+  var FALLBACK_TYPE = 'audio/mp4; codecs="mp4a.40.2"';
+  function startsBy(playing) {
+    return playing.leadAt ?? playing.segment.start;
+  }
+  var MusicEngine = class {
+    deps;
+    baseUrl;
+    manifest = null;
+    manifestLoad = null;
+    disabledReason = "";
+    context = null;
+    master = null;
+    volume = 0;
+    requested = "";
+    active = "";
+    // Started or planned, in start order. Never more than one past the playing one,
+    // except a cut section's last moments.
+    queue = [];
+    // A section that played out with nothing yet planned after it (its follower
+    // was still decoding). What follows is planned from it, late but on the beat.
+    orphan = null;
+    // The last section that played, kept through a silence: a transition out of
+    // the Outro applies after the Outro has finished.
+    lastSection = null;
+    // Every transition sound placed and not yet finished. Only one sounds at a
+    // time: a player bouncing between the menu and an activity hears one cymbal.
+    stingers = [];
+    // Sections and transition sounds that started after the moment they were
+    // placed for (joined part-way): none, in a session whose decodes kept up.
+    lateStarts = 0;
+    // Whether the AAC copies are in use (this browser cannot decode the Oggs).
+    useFallback = false;
+    // Seconds of encoder priming at the start of a decoded fallback that the
+    // browser left in, by id: skipped on every start, so a section is on the beat.
+    priming = /* @__PURE__ */ new Map();
+    bytes = /* @__PURE__ */ new Map();
+    decoded = /* @__PURE__ */ new Map();
+    decoding = /* @__PURE__ */ new Map();
+    failed = /* @__PURE__ */ new Set();
+    introsPlayed = /* @__PURE__ */ new Set();
+    idleFetchStarted = false;
+    timer = null;
+    constructor(deps) {
+      this.deps = deps;
+      this.baseUrl = deps.baseUrl ?? "music/";
+    }
+    // What the player is doing, in the game's words (src/core/music_mood.gd). The
+    // music follows at its next switch point; a name the map does not know
+    // leaves it as it is.
+    setState(name) {
+      this.requested = String(name);
+      if (this.manifest === null) {
+        void this.loadManifest().then(() => this.apply());
+        return;
+      }
+      this.apply();
+    }
+    // Master x Music, 0 when muted, linear (src/core/volume_settings.gd).
+    setVolume(linear) {
+      const value = Number(linear);
+      this.volume = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
+      if (this.master !== null && this.context !== null) {
+        const now = this.context.currentTime;
+        this.master.gain.cancelScheduledValues(now);
+        this.master.gain.setValueAtTime(this.master.gain.value, now);
+        this.master.gain.linearRampToValueAtTime(this.level(), now + 0.05);
+      }
+    }
+    // The slider's volume, with the song's own level under it.
+    level() {
+      return this.volume * Math.pow(10, (this.manifest?.gainDb ?? 0) / 20);
+    }
+    // A browser keeps an audio context suspended until the page is used; the page
+    // calls this on the first click or key.
+    resume() {
+      if (this.context !== null && this.context.state !== "running") {
+        this.context.resume().catch(() => {
+        });
+      }
+    }
+    status() {
+      let decodedBytes = 0;
+      for (const buffer of this.decoded.values()) decodedBytes += buffer.length * buffer.numberOfChannels * 4;
+      return {
+        enabled: this.manifest !== null,
+        disabledReason: this.disabledReason,
+        requested: this.requested,
+        active: this.active,
+        contextState: this.context?.state ?? "none",
+        now: this.context?.currentTime ?? 0,
+        volume: this.volume,
+        decodedBytes,
+        lateStarts: this.lateStarts,
+        decoded: [...this.decoded.keys()],
+        fetched: [...this.bytes.keys()],
+        queue: this.queue.map((playing) => ({
+          section: playing.segment.section,
+          state: playing.segment.state,
+          start: playing.segment.start,
+          end: playing.segment.end,
+          offsetBars: playing.segment.offsetBars,
+          pickup: playing.segment.pickup,
+          cutAt: playing.cutAt,
+          leadAt: playing.leadAt,
+          hitAt: playing.hitAt,
+          fadeIn: playing.segment.fadeIn
+        }))
+      };
+    }
+    // The next bar line at the earliest time given, or after, of the section sounding then:
+    // where the tempo test changes step. Null with nothing sounding.
+    nextBarAfter(earliest) {
+      const manifest = this.manifest;
+      if (manifest === null) return null;
+      for (const playing of this.queue) {
+        const end = playing.cutAt ?? playing.segment.end;
+        if (playing.segment.start <= earliest && earliest < end) return nextSwitchTime(manifest, playing.segment, earliest, 1);
+      }
+      return null;
+    }
+    // Every section decoded now, by id: what the tempo test's steps need copies of
+    // when they are switched on mid-song.
+    decodedSections() {
+      return [...this.decoded.entries()].filter(([id]) => this.manifest?.sections.has(id) ?? false);
+    }
+    // Moves the queue on: lets finished sections go, and plans the next one.
+    tick() {
+      if (this.context === null || this.manifest === null) return;
+      const now = this.context.currentTime;
+      const last = this.queue[this.queue.length - 1];
+      this.queue = this.queue.filter((playing) => {
+        const over = (playing.cutAt ?? playing.segment.end) + RELEASE_SECONDS;
+        if (over < now) {
+          this.release(playing);
+          return false;
+        }
+        return true;
+      });
+      if (this.queue.length === 0 && last !== void 0 && last.cutAt === null) this.orphan = last.segment;
+      this.stingers = this.stingers.filter((stinger) => {
+        if (stinger.end + RELEASE_SECONDS >= now) return true;
+        stinger.source.disconnect();
+        stinger.gain.disconnect();
+        return false;
+      });
+      this.planFollowing();
+      this.keepDecoded();
+    }
+    loadManifest() {
+      if (this.manifestLoad !== null) return this.manifestLoad;
+      this.manifestLoad = this.deps.fetchBytes(`${this.baseUrl}manifest.json`).then((bytes) => {
+        const raw = JSON.parse(new TextDecoder().decode(bytes));
+        if (raw !== null && typeof raw === "object" && raw.none === true) {
+          this.disabledReason = "this build has no music";
+          return;
+        }
+        this.manifest = parseMusicManifest(raw);
+        const hasFallbacks = [...this.manifest.sections.values(), ...this.manifest.leadIns.values()].some((entry) => entry.fallback !== null);
+        this.useFallback = hasFallbacks && this.deps.canPlay !== void 0 && !this.deps.canPlay(PRIMARY_TYPE) && this.deps.canPlay(FALLBACK_TYPE);
+        this.context = this.deps.createContext();
+        if (this.context === null) {
+          this.manifest = null;
+          this.disabledReason = "this browser has no Web Audio";
+          return;
+        }
+        this.master = this.context.createGain();
+        this.master.gain.value = this.level();
+        this.master.connect(this.context.destination);
+        if (this.deps.timers !== false) this.timer = setInterval(() => this.tick(), TICK_MS);
+      }).catch((error) => {
+        this.manifest = null;
+        this.disabledReason = String(error instanceof Error ? error.message : error);
+        this.deps.log(`music: off (${this.disabledReason})`);
+      });
+      return this.manifestLoad;
+    }
+    // The latest section that has started, or is too close to starting to change.
+    // One whose lead-in has begun counts as started: a change of mind never
+    // chops the swell into it.
+    committed(now) {
+      let found = null;
+      for (const playing of this.queue) {
+        if (startsBy(playing) <= now + SWITCH_SAFETY_SECONDS) found = playing;
+      }
+      return found;
+    }
+    apply() {
+      const manifest = this.manifest;
+      const context2 = this.context;
+      if (manifest === null || context2 === null) return;
+      const target = resolveState(manifest, this.requested);
+      if (target === null) return;
+      const now = context2.currentTime;
+      const earliest = now + SWITCH_SAFETY_SECONDS;
+      this.orphan = null;
+      let committed = this.committed(now);
+      if (committed !== null && committed.cutAt === null) {
+        const settled = committed.segment.state === target || this.queue.some((playing) => playing !== committed && playing.cutAt === null && playing.segment.state === target && playing.segment.start >= committed.segment.start);
+        if (settled) {
+          this.planFollowing();
+          return;
+        }
+      }
+      for (const playing of this.queue) {
+        if (playing !== committed && startsBy(playing) > earliest) this.cancel(playing);
+      }
+      this.queue = this.queue.filter((playing) => playing === committed || startsBy(playing) <= earliest);
+      if (committed !== null && committed.cutAt !== null) {
+        if (committed.cutAt > earliest) {
+          this.uncut(committed);
+        } else {
+          committed = null;
+        }
+      }
+      if (committed !== null && committed.segment.end <= earliest) committed = null;
+      const fromSection = committed?.segment.section ?? this.lastSection;
+      const probe = committed !== null && committed.segment.state === target ? null : enterState(manifest, target, 0, null, this.introsPlayed);
+      const transition = probe === null ? null : findTransition(manifest, fromSection, target);
+      const lead = probe === null ? 0 : leadInSeconds(manifest, transition);
+      if (transition !== null && transition.immediate && probe !== null) {
+        this.applyImmediately(manifest, target, transition);
+        return;
+      }
+      if (lead > 0 && committed !== null && committed.cutAt === null && earliest + lead >= committed.segment.end - 1e-6) {
+        const follower = followingSegment(manifest, committed.segment);
+        const buffer = follower === null ? void 0 : this.decoded.get(follower.section);
+        if (follower !== null && buffer !== void 0) committed = this.schedule(follower, buffer);
+      }
+      let at;
+      let from = null;
+      if (committed === null) {
+        at = now + START_DELAY_SECONDS + lead;
+      } else if (committed.segment.state === target) {
+        this.active = target;
+        this.planFollowing();
+        return;
+      } else {
+        const index = continuesInto(manifest, committed.segment, target);
+        if (index >= 0) {
+          committed.segment.state = target;
+          committed.segment.playIndex = index;
+          this.active = target;
+          this.planFollowing();
+          return;
+        }
+        at = nextSwitchTime(manifest, committed.segment, earliest + lead, transition?.switchEveryBars ?? null);
+        from = committed.segment;
+      }
+      const next = enterState(manifest, target, at, from, this.introsPlayed);
+      if (next !== null) {
+        const buffer = this.decoded.get(next.section);
+        const leadBuffer = transition?.leadIn == null ? null : this.decoded.get(transition.leadIn);
+        const hitBuffer = transition?.hit == null ? null : this.decoded.get(transition.hit);
+        if (buffer === void 0 || leadBuffer === void 0 || hitBuffer === void 0) {
+          const sounds = transition === null ? [] : [transition.leadIn, transition.hit].filter((id) => id !== null);
+          const waits = [this.decode(next.section), ...sounds.map((id) => this.decode(id))];
+          void Promise.all(waits).then((ready2) => {
+            if (ready2.every((item) => item !== null) && resolveState(manifest, this.requested) === target) this.apply();
+          });
+          this.planFollowing();
+          return;
+        }
+        if (committed !== null && at < committed.segment.end - 1e-6) this.cut(committed, at);
+        const playing = this.schedule(next, buffer);
+        if (leadBuffer !== null && this.playStinger(playing, leadBuffer, at - lead, false, this.skipOf(transition.leadIn))) playing.leadAt = at - lead;
+        if (hitBuffer !== null && this.playStinger(playing, hitBuffer, at, false, this.skipOf(transition.hit))) playing.hitAt = at;
+      } else if (committed !== null && at < committed.segment.end - 1e-6) {
+        this.cut(committed, at);
+      } else if (committed !== null) {
+        committed.cutAt = committed.segment.end;
+      }
+      this.active = target;
+      this.prefetchState(target);
+      this.planFollowing();
+      this.startIdleFetch();
+    }
+    // Plans the section after the last one queued, once that one is close to
+    // starting. A section ending in a cut has nothing after it.
+    planFollowing() {
+      const manifest = this.manifest;
+      const context2 = this.context;
+      if (manifest === null || context2 === null) return;
+      const last = this.queue[this.queue.length - 1];
+      if (last !== void 0 && last.cutAt !== null) return;
+      const lastSegment = last?.segment ?? this.orphan;
+      if (lastSegment === null) return;
+      if (lastSegment.start > context2.currentTime + PLAN_AHEAD_SECONDS) return;
+      const following = followingSegment(manifest, lastSegment);
+      if (following === null) {
+        if (last !== void 0) last.cutAt = last.segment.end;
+        this.orphan = null;
+        return;
+      }
+      const buffer = this.decoded.get(following.section);
+      if (buffer === void 0) {
+        void this.decode(following.section).then((ready2) => {
+          if (ready2 !== null) this.tick();
+        });
+        return;
+      }
+      this.schedule(following, buffer);
+      if (following.state !== this.active) this.active = following.state;
+    }
+    // What must be decoded now: what always must be (alwaysDecoded), every
+    // section queued, the next in line once it is within DECODE_AHEAD_SECONDS of
+    // its bar, and the first section of every state the playing section's
+    // transitions can reach. Each tick decodes what is missing from it and lets
+    // everything else go: the song decoded whole was about 70 MB of samples.
+    needed() {
+      const manifest = this.manifest;
+      const now = this.context.currentTime;
+      const ids = new Set(alwaysDecoded(manifest));
+      for (const playing of this.queue) ids.add(playing.segment.section);
+      const last = this.queue[this.queue.length - 1];
+      if (last !== void 0 && last.cutAt === null && last.segment.end - now <= DECODE_AHEAD_SECONDS) {
+        const following = followingSegment(manifest, last.segment);
+        if (following !== null) ids.add(following.section);
+      }
+      const committed = this.committed(now);
+      const sounding = committed?.segment.section ?? this.lastSection;
+      if (sounding !== null) for (const id of reachableEntries(manifest, sounding)) ids.add(id);
+      if (committed != null) for (const id of syncedSections(manifest, committed.segment, now)) ids.add(id);
+      return ids;
+    }
+    keepDecoded() {
+      if (this.manifest === null || this.context === null) return;
+      const needed = this.needed();
+      for (const id of needed) {
+        if (!this.decoded.has(id) && !this.failed.has(id)) void this.decode(id);
+      }
+      for (const id of [...this.decoded.keys()]) {
+        if (!needed.has(id)) this.decoded.delete(id);
+      }
+    }
+    schedule(segment, buffer) {
+      const context2 = this.context;
+      const section = this.manifest.sections.get(segment.section);
+      const source = context2.createBufferSource();
+      const gain = context2.createGain();
+      source.buffer = buffer;
+      source.connect(gain);
+      gain.connect(this.master);
+      let offset = segment.offsetBars > 0 ? pickupSeconds(section) + segment.offsetBars * barSeconds(section) : 0;
+      let start = segment.start;
+      const earliest = context2.currentTime + LATE_JOIN_SECONDS;
+      if (start < earliest) {
+        offset += earliest - start;
+        start = earliest;
+        this.lateStarts++;
+      }
+      let fade = null;
+      if (segment.fadeIn > 0) {
+        fade = { start: segment.start, duration: segment.fadeIn };
+        const from = Math.min(1, Math.max(0, (start - segment.start) / segment.fadeIn));
+        const left = segment.start + segment.fadeIn - start;
+        if (left > 0) {
+          gain.gain.setValueAtTime(Math.sin(from * Math.PI / 2), start);
+          gain.gain.setValueCurveAtTime(fadeCurve(Math.sin(from * Math.PI / 2), 1), start, left);
+        }
+      } else if (offset > 0) {
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(1, start + FADE_IN_SECONDS);
+      }
+      const playing = { segment, source, gain, cutAt: null, fade, stingers: [], leadAt: null, hitAt: null };
+      this.orphan = null;
+      this.lastSection = segment.section;
+      if (segment.playIndex < 0) this.introsPlayed.add(segment.state);
+      source.onended = () => this.tick();
+      source.start(start, offset + this.skipOf(segment.section), segment.end - start);
+      this.queue.push(playing);
+      return playing;
+    }
+    // An immediate change (a death): every section still sounding falls away
+    // over the transition's release from now, anything planned is called off,
+    // and the new state's music starts at once under the hit. Nothing here waits
+    // for a decode: a section not yet decoded joins as soon as it is, and a hit
+    // not yet decoded is let go (the background load decodes both early).
+    applyImmediately(manifest, target, transition) {
+      const context2 = this.context;
+      const at = context2.currentTime + LATE_JOIN_SECONDS;
+      const release = transition.releaseSeconds ?? RELEASE_SECONDS;
+      for (const playing2 of this.queue) {
+        if (startsBy(playing2) > at) this.cancel(playing2);
+        else if ((playing2.cutAt ?? playing2.segment.end) > at) this.cut(playing2, at, release);
+      }
+      this.queue = this.queue.filter((playing2) => startsBy(playing2) <= at);
+      this.orphan = null;
+      this.active = target;
+      const next = enterState(manifest, target, at, null, this.introsPlayed);
+      if (next !== null && transition.fadeInSeconds > 0) next.fadeIn = transition.fadeInSeconds;
+      let playing = null;
+      const wanted = () => resolveState(manifest, this.requested) === target;
+      const startSection = (section2) => {
+        if (!wanted() || next === null || section2 === null) return;
+        if (this.queue.some((queued) => queued.segment === next)) return;
+        playing = this.schedule(next, section2);
+        this.planFollowing();
+      };
+      const startHit = (hit2) => {
+        if (!wanted() || hit2 === null) return;
+        if (this.playStinger(playing, hit2, at, true, this.skipOf(transition.hit)) && playing !== null) playing.hitAt = at;
+      };
+      const section = next === null ? null : this.decoded.get(next.section);
+      if (section !== void 0) startSection(section);
+      else if (next !== null) void this.decode(next.section).then(startSection);
+      const hit = transition.hit === null ? null : this.decoded.get(transition.hit);
+      if (hit !== void 0) startHit(hit);
+      else if (transition.hit !== null) void this.decode(transition.hit).then(startHit);
+      this.prefetchState(target);
+      this.planFollowing();
+    }
+    // A transition's sound for `playing`, played whole from `at`: a lead-in is
+    // placed to end on the section's downbeat, a hit to start on it. Skipped,
+    // returning false, when another is still to sound over any of that time:
+    // one cymbal at a time, however fast the player bounces between screens.
+    // A `forced` one (a death's impact) is never skipped: it fades out whatever
+    // it would sound over instead.
+    playStinger(playing, buffer, at, forced = false, skip = 0) {
+      const context2 = this.context;
+      const now = context2.currentTime;
+      this.stingers = this.stingers.filter((stinger2) => stinger2.end > now);
+      const end = at + buffer.duration - skip;
+      const overlapping = this.stingers.filter((stinger2) => stinger2.start < end && at < stinger2.end && (forced || !stinger2.forced));
+      if (overlapping.length > 0 && !forced) return false;
+      for (const stinger2 of overlapping) {
+        if (stinger2.start > now) {
+          stinger2.source.stop(0);
+        } else {
+          stinger2.gain.gain.cancelScheduledValues(now);
+          stinger2.gain.gain.setValueAtTime(1, Math.max(now, at));
+          stinger2.gain.gain.linearRampToValueAtTime(0, at + RELEASE_SECONDS);
+          stinger2.source.stop(at + RELEASE_SECONDS);
+        }
+        this.stingers = this.stingers.filter((other) => other !== stinger2);
+      }
+      const source = context2.createBufferSource();
+      const gain = context2.createGain();
+      source.buffer = buffer;
+      source.connect(gain);
+      gain.connect(this.master);
+      const start = Math.max(at, now + LATE_JOIN_SECONDS);
+      if (start > at) this.lateStarts++;
+      source.start(start, skip + start - at, buffer.duration - skip - (start - at));
+      const stinger = { source, gain, start: at, end, forced };
+      this.stingers.push(stinger);
+      if (playing !== null) playing.stingers.push(stinger);
+      return true;
+    }
+    // Its level at `time`: 1, or where its fade in had got to.
+    levelAt(playing, time) {
+      if (playing.fade === null) return 1;
+      const t2 = (time - playing.fade.start) / playing.fade.duration;
+      return t2 >= 1 ? 1 : Math.sin(Math.max(0, t2) * Math.PI / 2);
+    }
+    // Cancelling automation drops a fade in mid-way, which would jump the level
+    // back to where that fade began: so the level now is held first, from the
+    // fade's own curve.
+    holdLevel(playing, now) {
+      const level = this.levelAt(playing, now);
+      playing.gain.gain.cancelScheduledValues(now);
+      playing.gain.gain.setValueAtTime(level, now);
+      return level;
+    }
+    // A cut at `at`: over RELEASE_SECONDS a quick linear fade, and over a longer
+    // release (an immediate cut's fall-away) an equal-power one.
+    cut(playing, at, release = RELEASE_SECONDS) {
+      const now = this.context.currentTime;
+      playing.cutAt = at;
+      const level = this.holdLevel(playing, now);
+      const from = Math.max(now, at);
+      if (release > RELEASE_SECONDS) {
+        if (from > now) playing.gain.gain.setValueAtTime(level, from);
+        playing.gain.gain.setValueCurveAtTime(fadeCurve(level, 0), from, release);
+      } else {
+        playing.gain.gain.setValueAtTime(level, from);
+        playing.gain.gain.linearRampToValueAtTime(0, at + release);
+      }
+      playing.fade = null;
+      playing.source.stop(at + release);
+    }
+    // A change called off before its switch point: the section plays out again.
+    uncut(playing) {
+      const now = this.context.currentTime;
+      playing.cutAt = null;
+      const level = this.holdLevel(playing, now);
+      const segment = playing.segment;
+      const fadeEnd = segment.fadeIn > 0 ? segment.start + segment.fadeIn : now;
+      playing.gain.gain.linearRampToValueAtTime(1, Math.max(now + FADE_IN_SECONDS, fadeEnd));
+      if (level < 1 && segment.fadeIn > 0) playing.fade = { start: segment.start, duration: segment.fadeIn };
+      playing.source.stop(playing.segment.end + RELEASE_SECONDS);
+    }
+    // A planned section that never started, and its transition sounds that
+    // have not begun either. One already sounding plays out.
+    cancel(playing) {
+      playing.source.onended = null;
+      playing.source.stop(0);
+      const now = this.context.currentTime;
+      for (const stinger of playing.stingers) {
+        if (stinger.start <= now) continue;
+        stinger.source.stop(0);
+        stinger.source.disconnect();
+        stinger.gain.disconnect();
+        this.stingers = this.stingers.filter((other) => other !== stinger);
+      }
+      this.release(playing);
+    }
+    // Its transition sounds are not released with it: a hit outlives a section
+    // cut short under it, and is let go once it has finished (tick).
+    release(playing) {
+      playing.source.onended = null;
+      playing.source.disconnect();
+      playing.gain.disconnect();
+    }
+    fetchSection(id) {
+      let pending = this.bytes.get(id);
+      if (pending === void 0) {
+        const entry = this.manifest.sections.get(id) ?? this.manifest.leadIns.get(id);
+        const file = this.useFallback && entry.fallback !== null ? entry.fallback : entry.file;
+        pending = this.deps.fetchBytes(`${this.baseUrl}${file}`);
+        this.bytes.set(id, pending);
+        pending.catch(() => this.bytes.delete(id));
+      }
+      return pending;
+    }
+    decode(id) {
+      const ready2 = this.decoded.get(id);
+      if (ready2 !== void 0) return Promise.resolve(ready2);
+      if (this.failed.has(id)) return Promise.resolve(null);
+      let pending = this.decoding.get(id);
+      if (pending === void 0) {
+        pending = this.decodeNow(id).finally(() => this.decoding.delete(id));
+        this.decoding.set(id, pending);
+      }
+      return pending;
+    }
+    async decodeNow(id) {
+      const usingFallback = this.useFallback;
+      try {
+        const bytes = await this.fetchSection(id);
+        const buffer = await this.context.decodeAudioData(bytes.slice(0));
+        this.decoded.set(id, buffer);
+        if (usingFallback) this.notePriming(id, buffer);
+        this.deps.onDecoded?.(id, buffer, usingFallback);
+        return buffer;
+      } catch (error) {
+        const entry = this.manifest.sections.get(id) ?? this.manifest.leadIns.get(id);
+        if (!usingFallback && entry?.fallback) {
+          this.deps.log(`music: ${id} would not decode (${String(error)}); using the AAC copies`);
+          this.useFallback = true;
+          this.bytes.clear();
+          return this.decodeNow(id);
+        }
+        this.failed.add(id);
+        this.deps.log(`music: section ${id} could not be loaded (${String(error)})`);
+        return null;
+      }
+    }
+    // An AAC file starts with the encoder's priming. A browser that reads the
+    // file's edit list trims it; one that does not leaves it in, and the decoded
+    // buffer is that much longer than the bars it holds. Then it is skipped.
+    notePriming(id, buffer) {
+      const manifest = this.manifest;
+      const priming = manifest.fallbackPrimingSamples / 48e3;
+      if (priming <= 0) return;
+      const section = manifest.sections.get(id);
+      const leadIn = manifest.leadIns.get(id);
+      const expected = section !== void 0 ? pickupSeconds(section) + section.bars * barSeconds(section) : soundSeconds(leadIn);
+      if (buffer.duration - expected >= priming * 0.5) this.priming.set(id, priming);
+      else this.priming.delete(id);
+    }
+    skipOf(id) {
+      return this.priming.get(id) ?? 0;
+    }
+    stateSections(name) {
+      const state = this.manifest?.states.get(name);
+      if (state === void 0) return [];
+      return [...state.intro === null ? [] : [state.intro], ...state.play];
+    }
+    // What a state needs first: its intro and the first of its play list. The
+    // rest of the list is decoded one section ahead as it plays (planFollowing).
+    prefetchState(name) {
+      const state = this.manifest?.states.get(name);
+      if (state === void 0) return;
+      if (state.intro !== null) void this.decode(state.intro);
+      if (state.play.length > 0) void this.decode(state.play[0]);
+    }
+    startIdleFetch() {
+      if (this.idleFetchStarted || this.deps.timers === false || this.manifest === null) return;
+      this.idleFetchStarted = true;
+      const plan = prefetchPlan(this.manifest);
+      const next = () => {
+        const step = plan.shift();
+        if (step === void 0) return;
+        const load = step.decode ? this.decode(step.id) : this.fetchSection(step.id);
+        load.then(
+          () => setTimeout(next, IDLE_FETCH_GAP_MS),
+          () => setTimeout(next, IDLE_FETCH_GAP_MS)
+        );
+      };
+      setTimeout(next, IDLE_FETCH_DELAY_MS);
+    }
+  };
+
+  // src/music_warp.ts
+  var SWAP_FADE_SECONDS = 0.01;
+  var RATE_EPSILON = 1e-4;
+  var WarpParam = class {
+    constructor(warp, real) {
+      this.warp = warp;
+      this.real = real;
+    }
+    // Every change asked for, in song time and the order asked, so a re-anchor
+    // can place the later ones again.
+    events = [];
+    get value() {
+      return this.real.value;
+    }
+    set value(value) {
+      this.real.value = value;
+    }
+    setValueAtTime(value, at) {
+      this.events.push({ kind: "set", value, at });
+      return this.real.setValueAtTime(value, this.warp.toReal(at));
+    }
+    linearRampToValueAtTime(value, at) {
+      this.events.push({ kind: "ramp", value, at });
+      return this.real.linearRampToValueAtTime(value, this.warp.toReal(at));
+    }
+    setValueCurveAtTime(values, at, duration) {
+      this.events.push({ kind: "curve", values, at, duration });
+      const start = this.warp.toReal(at);
+      return this.real.setValueCurveAtTime(values, start, this.warp.toReal(at + duration) - start);
+    }
+    cancelScheduledValues(at) {
+      this.events = this.events.filter((event) => event.at < at);
+      return this.real.cancelScheduledValues(this.warp.toReal(at));
+    }
+    // Whether a ramp or curve is under way across song time `at`.
+    spans(at) {
+      let before = Number.NEGATIVE_INFINITY;
+      for (const event of [...this.events].sort((a, b) => a.at - b.at)) {
+        if (event.kind === "curve" && event.at < at && at < event.at + event.duration) return true;
+        if (event.kind === "ramp" && event.at > at && before < at && before > Number.NEGATIVE_INFINITY) return true;
+        before = event.kind === "curve" ? event.at + event.duration : event.at;
+      }
+      return false;
+    }
+    // Places every change from song time `at` on again, on the clock as it now is.
+    retime(at, real) {
+      this.real.cancelScheduledValues(real);
+      for (const event of this.events) {
+        if (event.at < at) continue;
+        if (event.kind === "set") this.real.setValueAtTime(event.value, this.warp.toReal(event.at));
+        else if (event.kind === "ramp") this.real.linearRampToValueAtTime(event.value, this.warp.toReal(event.at));
+        else {
+          const start = this.warp.toReal(event.at);
+          this.real.setValueCurveAtTime(event.values, start, this.warp.toReal(event.at + event.duration) - start);
+        }
+      }
+    }
+    // Lets go of what is long past.
+    prune(before) {
+      if (this.events.length < 16) return;
+      const last = this.events.filter((event) => event.at < before).pop();
+      this.events = this.events.filter((event) => event.at >= before || event === last);
+    }
+  };
+  var WarpGain = class {
+    constructor(warp, real) {
+      this.warp = warp;
+      this.real = real;
+      this.gain = new WarpParam(warp, real.gain);
+      warp.params.add(this.gain);
+    }
+    gain;
+    connect(node) {
+      return this.real.connect(unwrap(node));
+    }
+    disconnect() {
+      this.real.disconnect();
+      this.warp.params.delete(this.gain);
+    }
+  };
+  function unwrap(node) {
+    return node instanceof WarpGain ? node.real : node;
+  }
+  var WarpSource = class {
+    constructor(warp) {
+      this.warp = warp;
+    }
+    buffer = null;
+    handler = null;
+    target = null;
+    // In song time: when it starts, how far into the original it starts, and
+    // when it stops (null: its buffer's end).
+    startAt = null;
+    offset = 0;
+    stopAt = null;
+    voice = null;
+    finished = false;
+    get onended() {
+      return this.handler;
+    }
+    set onended(handler) {
+      this.handler = handler;
+      if (this.voice !== null) this.voice.node.onended = handler === null ? null : () => this.ended();
+    }
+    connect(node) {
+      this.target = unwrap(node);
+      if (this.voice !== null) this.voice.gain.connect(this.target);
+      return node;
+    }
+    disconnect() {
+      this.target = null;
+      if (this.voice !== null) this.voice.gain.disconnect();
+      this.warp.sources.delete(this);
+    }
+    // Duration is in song seconds, as the engine means it: where it stops.
+    start(when, offset = 0, duration) {
+      this.startAt = when;
+      this.offset = offset;
+      this.stopAt = duration === void 0 ? null : when + duration;
+      this.warp.sources.add(this);
+      this.voice = this.makeVoice(this.warp.rateAt(when), this.warp.toReal(when), offset, false);
+      this.placeStop();
+    }
+    stop(when = 0) {
+      if (this.voice === null) return;
+      const now = this.warp.currentTime;
+      if (when <= now) {
+        this.stopAt = now;
+        this.voice.node.stop(0);
+        return;
+      }
+      this.stopAt = when;
+      this.placeStop();
+    }
+    // Song time `at` on: the clock has been re-anchored there.
+    retime(at, real) {
+      if (this.voice === null || this.startAt === null || this.finished) return;
+      if (this.stopAt !== null && this.stopAt <= at) return;
+      const rate = this.warp.rateAt(at);
+      if (this.startAt >= at) {
+        this.dropVoice(this.voice, null);
+        this.voice = this.makeVoice(rate, this.warp.toReal(this.startAt), this.offset, false);
+        this.placeStop();
+        return;
+      }
+      const content = this.offset + (at - this.startAt);
+      const variant = this.warp.variantOf(this.buffer, rate);
+      if (variant === null && !this.voice.variant) {
+        this.voice.node.playbackRate.cancelScheduledValues(real);
+        this.voice.node.playbackRate.setValueAtTime(rate, real);
+        this.voice.rate = rate;
+        this.placeStop();
+        return;
+      }
+      const old = this.voice;
+      this.voice = this.makeVoice(rate, real, content, true);
+      this.dropVoice(old, real);
+      this.placeStop();
+    }
+    makeVoice(rate, real, content, fadeIn) {
+      const context2 = this.warp.real;
+      const node = context2.createBufferSource();
+      const gain = context2.createGain();
+      const variant = this.warp.variantOf(this.buffer, rate);
+      node.buffer = variant ?? this.buffer;
+      node.playbackRate.value = variant === null ? rate : 1;
+      node.connect(gain);
+      if (this.target !== null) gain.connect(this.target);
+      if (fadeIn) {
+        gain.gain.setValueAtTime(0, real);
+        gain.gain.linearRampToValueAtTime(1, real + SWAP_FADE_SECONDS);
+      }
+      if (this.handler !== null) node.onended = () => this.ended();
+      const into = variant === null ? content : content / rate;
+      const now = context2.currentTime;
+      if (real < now) {
+        node.start(now, into + (now - real) * (variant === null ? rate : 1));
+      } else {
+        node.start(real, into);
+      }
+      return { node, gain, rate, variant: variant !== null };
+    }
+    dropVoice(voice, at) {
+      voice.node.onended = null;
+      if (at === null) {
+        voice.node.stop(0);
+        voice.gain.disconnect();
+        return;
+      }
+      voice.gain.gain.setValueAtTime(1, at);
+      voice.gain.gain.linearRampToValueAtTime(0, at + SWAP_FADE_SECONDS);
+      voice.node.stop(at + SWAP_FADE_SECONDS);
+      voice.node.onended = () => voice.gain.disconnect();
+    }
+    placeStop() {
+      if (this.voice === null || this.stopAt === null) return;
+      this.voice.node.stop(Math.max(this.warp.real.currentTime, this.warp.toReal(this.stopAt)));
+    }
+    ended() {
+      this.finished = true;
+      this.warp.sources.delete(this);
+      this.handler?.();
+    }
+    // The original buffer it plays, while it is sounding after song time `at`.
+    liveAfter(at) {
+      if (this.finished || this.startAt === null) return null;
+      if (this.stopAt !== null && this.stopAt <= at) return null;
+      return this.buffer;
+    }
+  };
+  var MusicWarp = class {
+    constructor(real) {
+      this.real = real;
+      this.anchors = [{ song: real.currentTime, real: real.currentTime, rate: 1 }];
+    }
+    params = /* @__PURE__ */ new Set();
+    sources = /* @__PURE__ */ new Set();
+    anchors;
+    // Original buffer -> its faster copies, by rate (the tempo test's steps).
+    variants = /* @__PURE__ */ new WeakMap();
+    get currentTime() {
+      const now = this.real.currentTime;
+      let anchor = this.anchors[0];
+      for (const candidate of this.anchors) if (candidate.real <= now) anchor = candidate;
+      return anchor.song + (now - anchor.real) * anchor.rate;
+    }
+    get state() {
+      return this.real.state;
+    }
+    get destination() {
+      return this.real.destination;
+    }
+    // The rate the clock runs at now.
+    get rate() {
+      return this.rateAt(this.currentTime);
+    }
+    resume() {
+      return this.real.resume();
+    }
+    decodeAudioData(bytes) {
+      return this.real.decodeAudioData(bytes);
+    }
+    createGain() {
+      return new WarpGain(this, this.real.createGain());
+    }
+    createBufferSource() {
+      return new WarpSource(this);
+    }
+    anchorAt(song) {
+      let anchor = this.anchors[0];
+      for (const candidate of this.anchors) if (candidate.song <= song) anchor = candidate;
+      return anchor;
+    }
+    rateAt(song) {
+      return this.anchorAt(song).rate;
+    }
+    // The real time song time `song` plays at.
+    toReal(song) {
+      const anchor = this.anchorAt(song);
+      return anchor.real + (song - anchor.song) / anchor.rate;
+    }
+    // Registers `original`'s faster copies, by the rate each is made for.
+    setVariants(original, copies) {
+      this.variants.set(original, copies);
+    }
+    variantOf(original, rate) {
+      if (original === null || Math.abs(rate - 1) < RATE_EPSILON) return null;
+      const copies = this.variants.get(original);
+      if (copies === void 0) return null;
+      for (const [made, copy] of copies) if (Math.abs(made - rate) < RATE_EPSILON) return copy;
+      return null;
+    }
+    // The originals sounding after song time `at`: what a step there needs copies of.
+    buffersAfter(at) {
+      const found = [];
+      for (const source of this.sources) {
+        const buffer = source.liveAfter(at);
+        if (buffer !== null && !found.includes(buffer)) found.push(buffer);
+      }
+      return found;
+    }
+    // From song time `at` (now or later) the song runs at `rate`. False, and
+    // nothing changed, when a gain ramp or curve is under way across `at`.
+    setRate(rate, at = this.currentTime + 0.05) {
+      const now = this.currentTime;
+      if (at < now) at = now;
+      if (Math.abs(this.rateAt(at) - rate) < RATE_EPSILON && this.anchors.every((anchor) => anchor.song <= at)) return true;
+      for (const param of this.params) if (param.spans(at)) return false;
+      const real = this.toReal(at);
+      this.anchors = this.anchors.filter((anchor) => anchor.song < at);
+      const realNow = this.real.currentTime;
+      while (this.anchors.length > 1 && this.anchors[1].real <= realNow) this.anchors.shift();
+      this.anchors.push({ song: at, real, rate });
+      for (const param of this.params) {
+        param.retime(at, real);
+        param.prune(now);
+      }
+      for (const source of [...this.sources]) source.retime(at, real);
+      return true;
+    }
+  };
+
+  // src/music_tempo.ts
+  var SMOOTH_MAX_RATE = 1.2;
+  var SMOOTH_GRAIN = 0.02;
+  var STEP_RATES = [1, 1.1, 1.2];
+  var STEP_UP = [0.45, 0.75];
+  var STEP_DOWN = [0.35, 0.65];
+  var STEP_LEAD_SECONDS = 0.15;
+  var RETRY_MS = 120;
+  function parseTempoManifest(raw) {
+    if (raw === null || typeof raw !== "object" || !Array.isArray(raw.steps)) throw new Error("tempo.json has no steps");
+    const steps = raw.steps.map(Number).filter((rate) => Number.isFinite(rate) && rate > 1);
+    const sections = /* @__PURE__ */ new Map();
+    for (const [id, copies] of Object.entries(raw.sections ?? {})) {
+      const byRate = /* @__PURE__ */ new Map();
+      for (const [rate, file] of Object.entries(copies)) {
+        if (!/^[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(file)) throw new Error(`tempo.json: ${id} names an unsafe file`);
+        byRate.set(Number(rate), file);
+      }
+      sections.set(id, byRate);
+    }
+    return { steps, sections };
+  }
+  function stepFor(danger, current) {
+    let step = current;
+    while (step < STEP_UP.length && danger >= STEP_UP[step]) step++;
+    while (step > 0 && danger < STEP_DOWN[step - 1]) step--;
+    return step;
+  }
+  function smoothRateFor(danger) {
+    const rate = 1 + (SMOOTH_MAX_RATE - 1) * Math.min(1, Math.max(0, danger));
+    return Math.round(rate / SMOOTH_GRAIN) * SMOOTH_GRAIN;
+  }
+  var TempoTest = class {
+    constructor(deps) {
+      this.deps = deps;
+    }
+    mode = "off";
+    danger = 0;
+    step = 0;
+    manifest = null;
+    manifestLoad = null;
+    copyBytes = /* @__PURE__ */ new Map();
+    retry = null;
+    // The step waiting for its bar line, and when.
+    pendingStep = null;
+    setMode(mode) {
+      const next = mode === "smooth" || mode === "steps" ? mode : "off";
+      if (next === this.mode) return;
+      this.mode = next;
+      this.step = 0;
+      this.pendingStep = null;
+      if (next === "steps") {
+        void this.loadManifest().then(() => {
+          for (const [id, buffer] of this.deps.decodedSections()) this.attachCopies(id, buffer, false);
+        });
+      }
+      this.apply();
+    }
+    setDanger(value) {
+      const danger = Number(value);
+      this.danger = Number.isFinite(danger) ? Math.min(1, Math.max(0, danger)) : 0;
+      this.apply();
+    }
+    // The engine decoded a section: in steps mode, its faster copies are made ready.
+    onDecoded(id, buffer, fallback) {
+      if (this.mode === "steps") this.attachCopies(id, buffer, fallback);
+    }
+    status() {
+      const warp = this.deps.warp();
+      return {
+        mode: this.mode,
+        danger: this.danger,
+        step: this.step,
+        rate: warp?.rate ?? 1,
+        copies: this.manifest === null ? 0 : this.manifest.sections.size
+      };
+    }
+    apply() {
+      const warp = this.deps.warp();
+      if (warp === null) return;
+      if (this.mode === "smooth") {
+        const rate = smoothRateFor(this.danger);
+        if (Math.abs(rate - warp.rate) < 1e-6) return;
+        if (!warp.setRate(rate)) this.later();
+        return;
+      }
+      const step = this.mode === "steps" ? stepFor(this.danger, this.step) : 0;
+      if (this.mode === "off") {
+        this.step = 0;
+        if (Math.abs(warp.rate - 1) > 1e-6 && !warp.setRate(1)) this.later();
+        return;
+      }
+      if (step === this.step && this.pendingStep === null) return;
+      if (this.pendingStep !== null && this.pendingStep.step === step) return;
+      this.placeStep(step);
+    }
+    // A step lands on the next bar line, once every section sounding past it
+    // has its faster copy ready; otherwise it waits for the bar after.
+    placeStep(step) {
+      const warp = this.deps.warp();
+      const rate = STEP_RATES[step];
+      const bar = this.deps.nextBarAfter(warp.currentTime + STEP_LEAD_SECONDS);
+      const at = bar ?? warp.currentTime + STEP_LEAD_SECONDS;
+      const ready2 = rate === 1 || warp.buffersAfter(at).every((buffer) => warp.variantOf(buffer, rate) !== null);
+      if (ready2 && warp.setRate(rate, at)) {
+        this.step = step;
+        this.pendingStep = null;
+        return;
+      }
+      this.pendingStep = { step, at };
+      this.later(Math.max(RETRY_MS, (at - warp.currentTime) * 1e3));
+    }
+    later(ms = RETRY_MS) {
+      if (this.deps.timers === false || this.retry !== null) return;
+      this.retry = setTimeout(() => {
+        this.retry = null;
+        if (this.pendingStep !== null) {
+          const step = this.mode === "steps" ? stepFor(this.danger, this.step) : 0;
+          this.pendingStep = null;
+          if (this.mode === "steps" && step !== this.step) this.placeStep(step);
+          return;
+        }
+        this.apply();
+      }, ms);
+    }
+    loadManifest() {
+      if (this.manifestLoad !== null) return this.manifestLoad;
+      this.manifestLoad = this.deps.fetchBytes(`${this.deps.baseUrl}tempo.json`).then((bytes) => {
+        this.manifest = parseTempoManifest(JSON.parse(new TextDecoder().decode(bytes)));
+      }).catch((error) => {
+        this.deps.log(`music: tempo steps off (${String(error instanceof Error ? error.message : error)})`);
+        this.manifestLoad = null;
+      });
+      return this.manifestLoad;
+    }
+    // Fetches and decodes `id`'s faster copies, and hands them to the clock. A
+    // section with none (a menu section, a cymbal) plays faster instead.
+    attachCopies(id, buffer, fallback) {
+      const warp = this.deps.warp();
+      if (warp === null || fallback) return;
+      void this.loadManifest().then(async () => {
+        const copies = this.manifest?.sections.get(id);
+        if (copies === void 0) return;
+        const decoded = /* @__PURE__ */ new Map();
+        for (const [rate, file] of copies) {
+          try {
+            let bytes = this.copyBytes.get(file);
+            if (bytes === void 0) {
+              bytes = this.deps.fetchBytes(`${this.deps.baseUrl}${file}`);
+              this.copyBytes.set(file, bytes);
+              bytes.catch(() => this.copyBytes.delete(file));
+            }
+            decoded.set(rate, await warp.decodeAudioData((await bytes).slice(0)));
+          } catch (error) {
+            this.deps.log(`music: ${id}'s ${rate}x copy could not be loaded (${String(error)})`);
+          }
+        }
+        warp.setVariants(buffer, decoded);
+      });
+    }
+  };
+
+  // src/music.ts
+  function installMusic() {
+    let warp = null;
+    let tempo = null;
+    const engine = new MusicEngine({
+      createContext: () => {
+        const Context = window.AudioContext || window.webkitAudioContext;
+        if (!Context) return null;
+        try {
+          warp = new MusicWarp(new Context({ latencyHint: "playback" }));
+          return warp;
+        } catch {
+          return null;
+        }
+      },
+      onDecoded: (id, buffer, fallback) => tempo?.onDecoded(id, buffer, fallback),
+      // no-cache revalidates rather than refetches: the manifest is tiny and must
+      // be current, and the section files it names carry their content hash.
+      fetchBytes: (url) => fetch(url, { cache: url.endsWith("manifest.json") ? "no-cache" : "default" }).then(
+        (response) => response.ok ? response.arrayBuffer() : Promise.reject(new Error(`${response.status} ${url}`))
+      ),
+      log: (message) => console.info(message),
+      // Safari before it learned Ogg says '' here and gets the AAC copies.
+      canPlay: (type) => {
+        try {
+          return document.createElement("audio").canPlayType(type) !== "";
+        } catch {
+          return true;
+        }
+      }
+    });
+    tempo = new TempoTest({
+      warp: () => warp,
+      nextBarAfter: (time) => engine.nextBarAfter(time),
+      decodedSections: () => engine.decodedSections(),
+      fetchBytes: (url) => fetch(url).then(
+        (response) => response.ok ? response.arrayBuffer() : Promise.reject(new Error(`${response.status} ${url}`))
+      ),
+      baseUrl: "music/",
+      log: (message) => console.info(message)
+    });
+    const unlock = () => engine.resume();
+    for (const eventName of ["pointerdown", "keydown", "touchend"]) {
+      window.addEventListener(eventName, unlock, { passive: true });
+    }
+    window.LDBGMusic = {
+      setState: (name) => engine.setState(name),
+      setVolume: (linear) => engine.setVolume(linear),
+      status: () => JSON.stringify({ ...engine.status(), tempo: tempo.status() }),
+      setTempoTest: (mode) => tempo.setMode(mode),
+      setDanger: (danger) => tempo.setDanger(danger)
+    };
+  }
+
+  // src/index.ts
+  installDiagnostics();
+  for (const eventName of ["pointerdown", "keydown", "touchstart", "focus"]) {
+    window.addEventListener(eventName, noteUserActivity, { passive: true });
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) noteUserActivity();
+  });
+  window.setInterval(checkAfkIdle, AFK_CHECK_INTERVAL_MS);
+  installMusic();
+  window.LDBGSpacetime = {
+    beginLogin,
+    beginLogout,
+    resetAuthSession,
+    connectBackend,
+    setClientContext,
+    noteUserActivity,
+    callReducer,
+    getAuthStatus,
+    snapshotDiagnostics,
+    reconnectBackend,
+    drainEvents,
+    diagnosticsBeat,
+    diagnosticsBootBeat,
+    takeProblemReports,
+    diagnosticsLogTail
+  };
+})();

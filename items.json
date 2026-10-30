@@ -1,0 +1,1138 @@
+[
+ {
+  "id": "cultist_amulet",
+  "icon": "cultist_amulet.webp",
+  "name": "Cultist's Amulet",
+  "rarity": "legendary",
+  "type": "accessory",
+  "level": 40
+ },
+ {
+  "id": "bandit_crown",
+  "icon": "bandit_crown.webp",
+  "name": "Bandit Crown",
+  "rarity": "legendary",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "clutched_ring",
+  "icon": "clutched_ring.webp",
+  "name": "Clutched Ring",
+  "rarity": "epic",
+  "type": "accessory",
+  "level": 30
+ },
+ {
+  "id": "hourglass_amulet",
+  "icon": "hourglass_amulet.webp",
+  "name": "Hourglass Amulet",
+  "rarity": "epic",
+  "type": "accessory",
+  "level": 35
+ },
+ {
+  "id": "kings_amulet",
+  "icon": "kings_amulet.webp",
+  "name": "King's Amulet",
+  "rarity": "epic",
+  "type": "accessory",
+  "level": 30
+ },
+ {
+  "id": "ring_of_goop",
+  "icon": "ring_of_goop.webp",
+  "name": "Oozing Ring",
+  "rarity": "epic",
+  "type": "accessory",
+  "level": 40
+ },
+ {
+  "id": "recycler_ring",
+  "icon": "recycler_ring.webp",
+  "name": "Recycler's Ring",
+  "rarity": "epic",
+  "type": "accessory",
+  "level": 35
+ },
+ {
+  "id": "ring_of_garbage",
+  "icon": "ring_of_garbage.webp",
+  "name": "Ring of Garbage",
+  "rarity": "epic",
+  "type": "accessory",
+  "level": 45
+ },
+ {
+  "id": "ring_of_thorns",
+  "icon": "ring_of_thorns.webp",
+  "name": "Ring of Thorns",
+  "rarity": "epic",
+  "type": "accessory",
+  "level": 40
+ },
+ {
+  "id": "lotus_hat",
+  "icon": "lotus_hat.webp",
+  "name": "Lotus Hat",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "lotus_robe",
+  "icon": "lotus_robe.webp",
+  "name": "Lotus Robe",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "lotus_tome",
+  "icon": "lotus_tome.webp",
+  "name": "Lotus Tome",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "lotus_cap",
+  "icon": "lotus_cap.webp",
+  "name": "Lotus-Lined Cap",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "lotus_tunic",
+  "icon": "lotus_tunic.webp",
+  "name": "Lotus-Lined Tunic",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "orichalcum_armor",
+  "icon": "orichalcum_armor.webp",
+  "name": "Orichalcum Armor",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "orichalcum_buckler",
+  "icon": "orichalcum_buckler.webp",
+  "name": "Orichalcum Buckler",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "orichalcum_helmet",
+  "icon": "orichalcum_helmet.webp",
+  "name": "Orichalcum Helmet",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "spiked_buckler",
+  "icon": "spiked_buckler.webp",
+  "name": "Spiked Buckler",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 35
+ },
+ {
+  "id": "royal_slime_broth",
+  "icon": "royal_slime_broth.webp",
+  "name": "Royal Slime Broth",
+  "rarity": "epic",
+  "type": "consumable",
+  "level": 1
+ },
+ {
+  "id": "cult_idol",
+  "icon": "cult_idol.webp",
+  "name": "Cult Idol",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "darkwood_log",
+  "icon": "darkwood_log.webp",
+  "name": "Darkwood Log",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "darkwood_plank",
+  "icon": "darkwood_plank.webp",
+  "name": "Darkwood Plank",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "duskhide",
+  "icon": "duskhide.webp",
+  "name": "Duskhide",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "lotus_cloth",
+  "icon": "lotus_cloth.webp",
+  "name": "Lotus Cloth",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "lotus_leaves",
+  "icon": "lotus_leaves.webp",
+  "name": "Lotus Leaves",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "orichalcum_ingot",
+  "icon": "orichalcum_ingot.webp",
+  "name": "Orichalcum Ingot",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "orichalcum_ore",
+  "icon": "orichalcum_ore.webp",
+  "name": "Orichalcum Ore",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "thick_slime",
+  "icon": "thick_slime.webp",
+  "name": "Thick Slime",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "bandit_blade_a",
+  "icon": "bandit_blade_a.webp",
+  "name": "Bandit Blade (A)",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 35
+ },
+ {
+  "id": "darkwood_bow",
+  "icon": "darkwood_bow.webp",
+  "name": "Darkwood Bow",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 50
+ },
+ {
+  "id": "darkwood_staff",
+  "icon": "darkwood_staff.webp",
+  "name": "Darkwood Staff",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 50
+ },
+ {
+  "id": "horned_staff",
+  "icon": "horned_staff.webp",
+  "name": "Horned Staff",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 35
+ },
+ {
+  "id": "orichalcum_sword",
+  "icon": "orichalcum_sword.webp",
+  "name": "Orichalcum Sword",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 50
+ },
+ {
+  "id": "spiky_bow",
+  "icon": "spiky_bow.webp",
+  "name": "Spiky Bow",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 35
+ },
+ {
+  "id": "kamikaze_necklace",
+  "icon": "kamikaze_necklace.webp",
+  "name": "Kamikaze Necklace",
+  "rarity": "rare",
+  "type": "accessory",
+  "level": 30
+ },
+ {
+  "id": "adamantite_armor",
+  "icon": "adamantite_armor.webp",
+  "name": "Adamantite Armor",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 30
+ },
+ {
+  "id": "adamantite_buckler",
+  "icon": "adamantite_buckler.webp",
+  "name": "Adamantite Buckler",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 30
+ },
+ {
+  "id": "adamantite_helmet",
+  "icon": "adamantite_helmet.webp",
+  "name": "Adamantite Helmet",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 30
+ },
+ {
+  "id": "bernie_hat",
+  "icon": "bernie_hat.webp",
+  "name": "Bernie's Hat",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 10
+ },
+ {
+  "id": "cultist_book",
+  "icon": "cultist_book.webp",
+  "name": "Cultist Book",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 30
+ },
+ {
+  "id": "cultist_robe",
+  "icon": "cultist_robe.webp",
+  "name": "Cultist Robe",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 30
+ },
+ {
+  "id": "nettle_hat",
+  "icon": "nettle_hat.webp",
+  "name": "Nettle Hat",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 30
+ },
+ {
+  "id": "nettle_robe",
+  "icon": "nettle_robe.webp",
+  "name": "Nettle Robe",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 30
+ },
+ {
+  "id": "punchy_hat",
+  "icon": "punchy_hat.webp",
+  "name": "Punchy's Hat",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 10
+ },
+ {
+  "id": "rugged_cap",
+  "icon": "rugged_cap.webp",
+  "name": "Rugged Hide Cap",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 30
+ },
+ {
+  "id": "rugged_chest",
+  "icon": "rugged_chest.webp",
+  "name": "Rugged Hide Cuirass",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 30
+ },
+ {
+  "id": "shooty_hat",
+  "icon": "shooty_hat.webp",
+  "name": "Shooty's Hat",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 10
+ },
+ {
+  "id": "slime_broth",
+  "icon": "slime_broth.webp",
+  "name": "Slime Broth",
+  "rarity": "rare",
+  "type": "consumable",
+  "level": 1
+ },
+ {
+  "id": "trout_pie",
+  "icon": "trout_pie.webp",
+  "name": "Trout Pie",
+  "rarity": "rare",
+  "type": "consumable",
+  "level": 1
+ },
+ {
+  "id": "adamantite_ingot",
+  "icon": "adamantite_ingot.webp",
+  "name": "Adamantite Ingot",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "adamantite_ore",
+  "icon": "adamantite_ore.webp",
+  "name": "Adamantite Ore",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "horn",
+  "icon": "horn.webp",
+  "name": "Broken Horn",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "clutch_idol",
+  "icon": "clutch_idol.webp",
+  "name": "Clutch Idol",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "garbage_idol",
+  "icon": "garbage_idol.webp",
+  "name": "Garbage Idol",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "horn_chunk",
+  "icon": "horn_chunk.webp",
+  "name": "Horn Chunks",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "ipe_log",
+  "icon": "ipe_log.webp",
+  "name": "Ipe Log",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "ipe_plank",
+  "icon": "ipe_plank.webp",
+  "name": "Ipe Plank",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "kamikaze_idol",
+  "icon": "kamikaze_idol.webp",
+  "name": "Kamikaze Idol",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "kings_idol",
+  "icon": "kings_idol.webp",
+  "name": "King's Idol",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "nettle",
+  "icon": "nettle.webp",
+  "name": "Nettle",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "nettle_fabric",
+  "icon": "nettle_fabric.webp",
+  "name": "Nettle Fabric",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "goop_idol",
+  "icon": "goop_idol.webp",
+  "name": "Ooze Idol",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "royal_jelly",
+  "icon": "royal_jelly.webp",
+  "name": "Royal Jelly",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "rugged_hide",
+  "icon": "rugged_hide.webp",
+  "name": "Rugged Hide",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "sand_idol",
+  "icon": "sand_idol.webp",
+  "name": "Sand Idol",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "scrap_idol",
+  "icon": "scrap_idol.webp",
+  "name": "Scrap Idol",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "thorny_idol",
+  "icon": "thorny_idol.webp",
+  "name": "Thorny Idol",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "adamantite_sword",
+  "icon": "adamantite_sword.webp",
+  "name": "Adamantite Sword",
+  "rarity": "rare",
+  "type": "weapon",
+  "level": 30
+ },
+ {
+  "id": "burning_staff",
+  "icon": "burning_staff.webp",
+  "name": "Burning Staff",
+  "rarity": "rare",
+  "type": "weapon",
+  "level": 10
+ },
+ {
+  "id": "ipe_bow",
+  "icon": "ipe_bow.webp",
+  "name": "Ipe Bow",
+  "rarity": "rare",
+  "type": "weapon",
+  "level": 30
+ },
+ {
+  "id": "kris",
+  "icon": "kris.webp",
+  "name": "Kris",
+  "rarity": "rare",
+  "type": "weapon",
+  "level": 35
+ },
+ {
+  "id": "magic_ring",
+  "icon": "magic_ring.webp",
+  "name": "Magic Ring",
+  "rarity": "uncommon",
+  "type": "accessory",
+  "level": 10
+ },
+ {
+  "id": "cotton_hat",
+  "icon": "cotton_hat.webp",
+  "name": "Cotton Hat",
+  "rarity": "uncommon",
+  "type": "armor",
+  "level": 10
+ },
+ {
+  "id": "cotton_robe",
+  "icon": "cotton_robe.webp",
+  "name": "Cotton Robe",
+  "rarity": "uncommon",
+  "type": "armor",
+  "level": 10
+ },
+ {
+  "id": "iron_armor",
+  "icon": "iron_armor.webp",
+  "name": "Iron Armor",
+  "rarity": "uncommon",
+  "type": "armor",
+  "level": 1
+ },
+ {
+  "id": "mithril_armor",
+  "icon": "mithril_armor.webp",
+  "name": "Mithril Armor",
+  "rarity": "uncommon",
+  "type": "armor",
+  "level": 10
+ },
+ {
+  "id": "mithril_buckler",
+  "icon": "mithril_buckler.webp",
+  "name": "Mithril Buckler",
+  "rarity": "uncommon",
+  "type": "armor",
+  "level": 10
+ },
+ {
+  "id": "mithril_helmet",
+  "icon": "mithril_helmet.webp",
+  "name": "Mithril Helmet",
+  "rarity": "uncommon",
+  "type": "armor",
+  "level": 10
+ },
+ {
+  "id": "rough_leather_cap",
+  "icon": "rough_leather_cap.webp",
+  "name": "Rough Leather Cap",
+  "rarity": "uncommon",
+  "type": "armor",
+  "level": 10
+ },
+ {
+  "id": "rough_leather_tunic",
+  "icon": "rough_leather_tunic.webp",
+  "name": "Rough Leather Tunic",
+  "rarity": "uncommon",
+  "type": "armor",
+  "level": 10
+ },
+ {
+  "id": "carrot_stew",
+  "icon": "carrot_stew.webp",
+  "name": "Carrot Stew",
+  "rarity": "uncommon",
+  "type": "consumable",
+  "level": 1
+ },
+ {
+  "id": "sardine_stew",
+  "icon": "sardine_stew.webp",
+  "name": "Guppy Stew",
+  "rarity": "uncommon",
+  "type": "consumable",
+  "level": 1
+ },
+ {
+  "id": "minor_healing_potion",
+  "icon": "minor_healing_potion.webp",
+  "name": "Minor Healing Potion",
+  "rarity": "uncommon",
+  "type": "consumable",
+  "level": 1
+ },
+ {
+  "id": "bernie_skin",
+  "icon": "bernie_skin.webp",
+  "name": "Bernie's Skin",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "cotton",
+  "icon": "cotton.webp",
+  "name": "Cotton",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "cotton_fabric",
+  "icon": "cotton_fabric.webp",
+  "name": "Cotton Fabric",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "eye_ball",
+  "icon": "eye_ball.webp",
+  "name": "Eye Ball",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "magic_chain",
+  "icon": "magic_chain.webp",
+  "name": "Magic Chain",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "maple_log",
+  "icon": "maple_log.webp",
+  "name": "Maple Log",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "maple_plank",
+  "icon": "maple_plank.webp",
+  "name": "Maple Plank",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "mithril_ingot",
+  "icon": "mithril_ingot.webp",
+  "name": "Mithril Ingot",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "mithril_ore",
+  "icon": "mithril_ore.webp",
+  "name": "Mithril Ore",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "punchy_skin",
+  "icon": "punchy_skin.webp",
+  "name": "Punchy's Skin",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "rough_fabric",
+  "icon": "rough_fabric.webp",
+  "name": "Rough Leather",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "shooty_skin",
+  "icon": "shooty_skin.webp",
+  "name": "Shooty's Skin",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "slime_gel",
+  "icon": "slime_gel.webp",
+  "name": "Slime Ball",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "raw_trout",
+  "icon": "raw_trout.webp",
+  "name": "Trout",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "bandit_blades",
+  "icon": "bandit_blades.webp",
+  "name": "Bandit Blade",
+  "rarity": "uncommon",
+  "type": "weapon",
+  "level": 20
+ },
+ {
+  "id": "fire_staff",
+  "icon": "fire_staff.webp",
+  "name": "Fire Staff",
+  "rarity": "uncommon",
+  "type": "weapon",
+  "level": 1
+ },
+ {
+  "id": "maple_bow",
+  "icon": "maple_bow.webp",
+  "name": "Maple Bow",
+  "rarity": "uncommon",
+  "type": "weapon",
+  "level": 10
+ },
+ {
+  "id": "mithril_sword",
+  "icon": "mithril_sword.webp",
+  "name": "Mithril Sword",
+  "rarity": "uncommon",
+  "type": "weapon",
+  "level": 10
+ },
+ {
+  "id": "iron_helmet",
+  "icon": "iron_helmet.webp",
+  "name": "Iron Helmet",
+  "rarity": "common",
+  "type": "armor",
+  "level": 1
+ },
+ {
+  "id": "leather_cap",
+  "icon": "leather_cap.webp",
+  "name": "Leather Cap",
+  "rarity": "common",
+  "type": "armor",
+  "level": 1
+ },
+ {
+  "id": "leather_tunic",
+  "icon": "leather_tunic.webp",
+  "name": "Leather Tunic",
+  "rarity": "common",
+  "type": "armor",
+  "level": 1
+ },
+ {
+  "id": "wizard_hat",
+  "icon": "wizard_hat.webp",
+  "name": "Wizard Hat",
+  "rarity": "common",
+  "type": "armor",
+  "level": 1
+ },
+ {
+  "id": "wizard_robe",
+  "icon": "wizard_robe.webp",
+  "name": "Wizard Robe",
+  "rarity": "common",
+  "type": "armor",
+  "level": 1
+ },
+ {
+  "id": "wooden_buckler",
+  "icon": "wooden_buckler.webp",
+  "name": "Wooden Buckler",
+  "rarity": "common",
+  "type": "armor",
+  "level": 1
+ },
+ {
+  "id": "anglers_compost",
+  "icon": "anglers_compost.webp",
+  "name": "Angler's Compost",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "bandage_roll",
+  "icon": "bandage_roll.webp",
+  "name": "Bandage Roll",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "blank_chart",
+  "icon": "blank_chart.webp",
+  "name": "Blank Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "bandit_camp_chart",
+  "icon": "bandit_camp_chart.webp",
+  "name": "Camp Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "carrot",
+  "icon": "carrot.webp",
+  "name": "Carrot",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "coal",
+  "icon": "coal.webp",
+  "name": "Coal",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "cultist_tower_chart",
+  "icon": "cultist_tower_chart.webp",
+  "name": "Cultist Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "cyclops_arena_chart",
+  "icon": "cyclops_arena_chart.webp",
+  "name": "Cyclops Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "the_dump_chart",
+  "icon": "the_dump_chart.webp",
+  "name": "Dump Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "farmers_compost",
+  "icon": "farmers_compost.webp",
+  "name": "Farmer's Compost",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "fertiliser",
+  "icon": "fertiliser.webp",
+  "name": "Fertiliser",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "greenshore_fields_chart",
+  "icon": "greenshore_fields_chart.webp",
+  "name": "Fields Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "flax",
+  "icon": "flax.webp",
+  "name": "Flax",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "flax_fabric",
+  "icon": "flax_fabric.webp",
+  "name": "Flax Fabric",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "gold_coin",
+  "icon": "gold_coin.webp",
+  "name": "Gold Coin",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "slime_grotto_chart",
+  "icon": "slime_grotto_chart.webp",
+  "name": "Grotto Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "raw_guppy",
+  "icon": "raw_guppy.webp",
+  "name": "Guppy",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "iron_ingot",
+  "icon": "iron_ingot.webp",
+  "name": "Iron Ingot",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "iron_ore",
+  "icon": "iron_ore.webp",
+  "name": "Iron Ore",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "leather",
+  "icon": "leather.webp",
+  "name": "Leather",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "miners_compost",
+  "icon": "miners_compost.webp",
+  "name": "Miner's Compost",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "oak_log",
+  "icon": "oak_log.webp",
+  "name": "Oak Log",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "oak_plank",
+  "icon": "oak_plank.webp",
+  "name": "Oak Plank",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "provisions_pouch",
+  "icon": "provisions_pouch.webp",
+  "name": "Provisions Pouch",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "rich_compost",
+  "icon": "rich_compost.webp",
+  "name": "Rich Compost",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "rugged_satchel",
+  "icon": "rugged_satchel.webp",
+  "name": "Rugged Satchel",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "scrap",
+  "icon": "scrap.webp",
+  "name": "Scrap",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "slime_bag",
+  "icon": "slime_bag.webp",
+  "name": "Slime Bag",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "super_compost",
+  "icon": "super_compost.webp",
+  "name": "Super Compost",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "bandit_town_chart",
+  "icon": "bandit_town_chart.webp",
+  "name": "Town Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "treasure_seal",
+  "icon": "treasure_seal.webp",
+  "name": "Treasure Seal",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "wardens_seal",
+  "icon": "wardens_seal.webp",
+  "name": "Warden's Seal",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "woodcutters_compost",
+  "icon": "woodcutters_compost.webp",
+  "name": "Woodcutter's Compost",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "iron_sword",
+  "icon": "iron_sword.webp",
+  "name": "Iron Sword",
+  "rarity": "common",
+  "type": "weapon",
+  "level": 1
+ },
+ {
+  "id": "oak_bow",
+  "icon": "oak_bow.webp",
+  "name": "Oak Bow",
+  "rarity": "common",
+  "type": "weapon",
+  "level": 1
+ }
+]

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="352" height="32" viewBox="0 0 352 32">
+  <title>LDBG one-row block skin template: I J L O S T Z, clean armored cursed crystal garbage</title>
+  <g id="slot-I" aria-label="I tetromino">
+    <rect x="0" y="0" width="32" height="32" fill="#37b2c3"/>
+    <rect x="3.429" y="3.429" width="25.143" height="25.143" fill="#45dff4"/>
+    <rect x="3.429" y="2.286" width="25.143" height="2.286" fill="#79e8f7"/>
+    <rect x="2.286" y="3.429" width="2.286" height="25.143" fill="#66e5f6"/>
+  </g>
+  <g id="slot-J" aria-label="J tetromino">
+    <rect x="32" y="0" width="32" height="32" fill="#445fbe"/>
+    <rect x="35.429" y="3.429" width="25.143" height="25.143" fill="#5577ee"/>
+    <rect x="35.429" y="2.286" width="25.143" height="2.286" fill="#859df3"/>
+    <rect x="34.286" y="3.429" width="2.286" height="25.143" fill="#748ff1"/>
+  </g>
+  <g id="slot-L" aria-label="L tetromino">
+    <rect x="64" y="0" width="32" height="32" fill="#cc7f36"/>
+    <rect x="67.429" y="3.429" width="25.143" height="25.143" fill="#ff9f43"/>
+    <rect x="67.429" y="2.286" width="25.143" height="2.286" fill="#ffba78"/>
+    <rect x="66.286" y="3.429" width="2.286" height="25.143" fill="#ffb065"/>
+  </g>
+  <g id="slot-O" aria-label="O tetromino">
+    <rect x="96" y="0" width="32" height="32" fill="#c6b042"/>
+    <rect x="99.429" y="3.429" width="25.143" height="25.143" fill="#f7dc52"/>
+    <rect x="99.429" y="2.286" width="25.143" height="2.286" fill="#f9e682"/>
+    <rect x="98.286" y="3.429" width="2.286" height="25.143" fill="#f8e271"/>
+  </g>
+  <g id="slot-S" aria-label="S tetromino">
+    <rect x="128" y="0" width="32" height="32" fill="#4aab64"/>
+    <rect x="131.429" y="3.429" width="25.143" height="25.143" fill="#5dd67d"/>
+    <rect x="131.429" y="2.286" width="25.143" height="2.286" fill="#8ae1a1"/>
+    <rect x="130.286" y="3.429" width="2.286" height="25.143" fill="#7add94"/>
+  </g>
+  <g id="slot-T" aria-label="T tetromino">
+    <rect x="160" y="0" width="32" height="32" fill="#9255c2"/>
+    <rect x="163.429" y="3.429" width="25.143" height="25.143" fill="#b66af2"/>
+    <rect x="163.429" y="2.286" width="25.143" height="2.286" fill="#ca94f6"/>
+    <rect x="162.286" y="3.429" width="2.286" height="25.143" fill="#c385f4"/>
+  </g>
+  <g id="slot-Z" aria-label="Z tetromino">
+    <rect x="192" y="0" width="32" height="32" fill="#c04954"/>
+    <rect x="195.429" y="3.429" width="25.143" height="25.143" fill="#f05b69"/>
+    <rect x="195.429" y="2.286" width="25.143" height="2.286" fill="#f48993"/>
+    <rect x="194.286" y="3.429" width="2.286" height="25.143" fill="#f37984"/>
+  </g>
+  <g id="slot-garbage-clean" aria-label="Clean garbage">
+    <rect x="224" y="0" width="32" height="32" fill="#606a7f"/>
+    <rect x="227.429" y="3.429" width="25.143" height="25.143" fill="#78859f"/>
+    <rect x="227.429" y="2.286" width="25.143" height="2.286" fill="#9ea7ba"/>
+    <rect x="226.286" y="3.429" width="2.286" height="25.143" fill="#909bb0"/>
+  </g>
+  <g id="slot-garbage-armored" aria-label="Armored garbage">
+    <rect x="256" y="0" width="32" height="32" fill="#596376"/><rect x="259.429" y="3.429" width="25.142" height="25.142" fill="#6f7c93"/><path d="M266.4 7.2 L279.2 7.2 L282.72 10.72 L282.72 23.52 L279.2 27.04 L266.4 27.04 L262.88 23.52 L262.88 10.72 Z" fill="#383e4a"/><path d="M265.6 6.08 L278.4 6.08 L281.92 9.6 L281.92 22.4 L278.4 25.92 L265.6 25.92 L262.08 22.4 L262.08 9.6 Z" fill="#9aa3b3"/><path d="M267.52 9.28 L276.48 9.28 L278.72 11.52 L278.72 20.48 L276.48 22.72 L267.52 22.72 L265.28 20.48 L265.28 11.52 Z" fill="#626d81"/><path d="M272 10.56 L277.44 16 L272 21.44 L266.56 16 Z" fill="#323842"/><path d="M272 12 L276 16 L272 20 L268 16 Z" fill="#c8cdd6"/><rect x="259.429" y="2.286" width="25.142" height="2.286" fill="#97a1b1"/><rect x="258.286" y="3.429" width="2.286" height="25.142" fill="#8994a6"/>
+  </g>
+  <g id="slot-garbage-cursed" aria-label="Cursed garbage">
+    <rect x="288" y="0" width="32" height="32" fill="#6e327d"/><rect x="291.429" y="3.429" width="25.142" height="25.142" fill="#8a3f9c"/><path d="M292.8 16 Q304 3.2 315.2 16 Q304 28.8 292.8 16 Z" fill="#b382bf"/><path d="M294.08 16 Q304 5.44 313.92 16 Q304 26.56 294.08 16 Z" fill="#361641"/><circle cx="304" cy="16" r="4.96" fill="#e87fdf"/><path d="M304 11.52 Q305.92 16 304 20.48 Q302.08 16 304 11.52 Z" fill="#16051e"/><rect x="291.429" y="2.286" width="25.142" height="2.286" fill="#ab75b8"/><rect x="290.286" y="3.429" width="2.286" height="25.142" fill="#9f62ae"/>
+  </g>
+  <g id="slot-garbage-crystal" aria-label="Crystal garbage">
+    <rect x="320" y="0" width="32" height="32" fill="#1c7e7d"/><rect x="323.429" y="3.429" width="25.142" height="25.142" fill="#239e9c"/><path d="M329.34 5.44 L342.66 5.44 L346.56 9.34 L346.56 22.66 L342.66 26.56 L329.34 26.56 L325.44 22.66 L325.44 9.34 Z" fill="#125658"/><path d="M329.92 6.4 L342.08 6.4 L345.6 9.92 L345.6 22.08 L342.08 25.6 L329.92 25.6 L326.4 22.08 L326.4 9.92 Z" fill="#4fb1b0"/><path d="M329.92 6.4 L342.08 6.4 L340.16 11.84 L331.84 11.84 Z" fill="#9cd3d2"/><path d="M342.08 25.6 L329.92 25.6 L331.84 20.16 L340.16 20.16 Z" fill="#1a7675"/><path d="M331.84 11.84 L340.16 11.84 L340.16 20.16 L331.84 20.16 Z" fill="#d7eeed"/><rect x="323.429" y="2.286" width="25.142" height="2.286" fill="#61b9b8"/><rect x="322.286" y="3.429" width="2.286" height="25.142" fill="#4bafae"/>
+  </g>
+</svg>
