@@ -885,6 +885,8 @@ ${originalIndentation}`;
         // Which of those pieces are broken, and what the last Dark death a
         // monster caused did to the gear (repair.ts): the Repair Station's.
         brokenGear: many("myBrokenGear"),
+        // And which wear an ornament (docs/ORNAMENT_KITS.md): looks only.
+        gearOrnaments: many("myGearOrnaments"),
         darkDeathLoss: one("myDarkDeathLoss")
       }
     },
@@ -9004,6 +9006,14 @@ ${ty.variants.map(
     stage: t.u32()
   };
 
+  // src/module_bindings/apply_ornament_reducer.ts
+  var apply_ornament_reducer_default = {
+    kitItemId: t.string(),
+    itemId: t.string(),
+    instanceId: t.string(),
+    slot: t.string()
+  };
+
   // src/module_bindings/block_chat_author_reducer.ts
   var block_chat_author_reducer_default = {
     lineId: t.string()
@@ -9537,6 +9547,11 @@ ${ty.variants.map(
   // src/module_bindings/remove_friend_reducer.ts
   var remove_friend_reducer_default = {
     friendId: t.string()
+  };
+
+  // src/module_bindings/remove_ornament_reducer.ts
+  var remove_ornament_reducer_default = {
+    instanceId: t.string()
   };
 
   // src/module_bindings/rename_build_reducer.ts
@@ -10685,6 +10700,13 @@ ${ty.variants.map(
     instanceId: t.u64().name("instance_id")
   });
 
+  // src/module_bindings/my_gear_ornaments_table.ts
+  var my_gear_ornaments_table_default = t.row({
+    instanceId: t.u64().primaryKey().name("instance_id"),
+    kitItemId: t.string().name("kit_item_id"),
+    appliedAt: t.timestamp().name("applied_at")
+  });
+
   // src/module_bindings/my_inventory_table.ts
   var my_inventory_table_default = t.row({
     id: t.u64().primaryKey(),
@@ -11610,6 +11632,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_gear_insurance_table_default),
+    myGearOrnaments: table({
+      name: "my_gear_ornaments",
+      indexes: [],
+      constraints: []
+    }, my_gear_ornaments_table_default),
     myInventory: table({
       name: "my_inventory",
       indexes: [],
@@ -11858,6 +11885,7 @@ ${ty.variants.map(
     reducerSchema("acknowledge_task_chest", acknowledge_task_chest_reducer_default),
     reducerSchema("acknowledge_welcome_chest", acknowledge_welcome_chest_reducer_default),
     reducerSchema("advance_tutorial", advance_tutorial_reducer_default),
+    reducerSchema("apply_ornament", apply_ornament_reducer_default),
     reducerSchema("block_chat_author", block_chat_author_reducer_default),
     reducerSchema("block_player", block_player_reducer_default),
     reducerSchema("buy_bounty_reward", buy_bounty_reward_reducer_default),
@@ -11952,6 +11980,7 @@ ${ty.variants.map(
     reducerSchema("refresh_my_tasks", refresh_my_tasks_reducer_default),
     reducerSchema("release_pet", release_pet_reducer_default),
     reducerSchema("remove_friend", remove_friend_reducer_default),
+    reducerSchema("remove_ornament", remove_ornament_reducer_default),
     reducerSchema("rename_build", rename_build_reducer_default),
     reducerSchema("renew_play_session", renew_play_session_reducer_default),
     reducerSchema("reorder_inventory_item", reorder_inventory_item_reducer_default),
@@ -12083,6 +12112,7 @@ ${ty.variants.map(
     "my_game_invites": "myGameInvites",
     "my_gear_instances": "myGearInstances",
     "my_gear_insurance": "myGearInsurance",
+    "my_gear_ornaments": "myGearOrnaments",
     "my_inventory": "myInventory",
     "my_inventory_order": "myInventoryOrder",
     "my_loadouts": "myLoadouts",
