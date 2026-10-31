@@ -14464,6 +14464,14 @@ ${ty.variants.map(
     const at = sectionStart + k * step;
     return at < segment.end - EPSILON ? at : segment.end;
   }
+  function nextBeatTime(manifest, segment, earliest, maxGrid) {
+    const section = manifest.sections.get(segment.section);
+    let grid = 60 / section.bpm;
+    while (maxGrid > 0 && grid > maxGrid + EPSILON) grid /= 2;
+    const barOne = segment.start + segment.pickup - segment.offsetBars * barSeconds(section);
+    const k = Math.ceil((earliest - barOne) / grid - EPSILON);
+    return barOne + k * grid;
+  }
   function place(manifest, section, state, playIndex, offsetBars, start) {
     const info = manifest.sections.get(section);
     const pickup = offsetBars === 0 ? pickupSeconds(info) : 0;
@@ -14585,6 +14593,7 @@ ${ty.variants.map(
   var DECODE_AHEAD_SECONDS = 12;
   var IDLE_FETCH_DELAY_MS = 2e3;
   var IDLE_FETCH_GAP_MS = 750;
+  var MIN_COUNT_SECONDS = 0.05;
   var PRIMARY_TYPE = 'audio/ogg; codecs="opus"';
   var FALLBACK_TYPE = 'audio/mp4; codecs="mp4a.40.2"';
   function startsBy(playing) {
@@ -14782,8 +14791,8 @@ ${ty.variants.map(
       const earliest = now + SWITCH_SAFETY_SECONDS;
       this.orphan = null;
       let committed = this.committed(now);
-      if (committed !== null && committed.cutAt === null) {
-        const settled = committed.segment.state === target || this.queue.some((playing) => playing !== committed && playing.cutAt === null && playing.segment.state === target && playing.segment.start >= committed.segment.start);
+      if (committed !== null) {
+        const settled = committed.segment.state === target && committed.cutAt === null || this.queue.some((playing) => playing !== committed && playing.cutAt === null && playing.segment.state === target && playing.segment.start >= committed.segment.start && (committed.cutAt === null || playing.segment.start <= committed.cutAt + 1e-6));
         if (settled) {
           this.planFollowing();
           return;
@@ -14861,6 +14870,104 @@ ${ty.variants.map(
       this.prefetchState(target);
       this.planFollowing();
       this.startIdleFetch();
+    }
+    // A solo run's count-in (docs/MUSIC.md, "The count-in"; the owner, 2026-10-30):
+    // the board is about to count `countSeconds` to GO and play into `state`.
+    // GO is put on a beat of the music that will be sounding then (its own beat,
+    // halved until no longer than `maxGrid`, the count's beat), and if the music
+    // is not yet in `state` by then, `state` drops ON GO: whatever sounds is cut
+    // there and the transition's lead-in (the cymbal) plays over the last beats
+    // of the count, in place of waiting for the next switch point.
+    //
+    // Returns how long the board waits before its first beat, in seconds, so
+    // that its GO -- played by Godot, heard `otherDelay` after it is played --
+    // is heard with the music's: -1 to count at once, with nothing synced. It
+    // never waits on a decode: anything not decoded, the music off or muted, not
+    // started, or on the tempo test's clock, is -1, and the state is asked for
+    // as setState would, at its next switch point.
+    countIn(state, countSeconds, maxGrid, otherDelay) {
+      this.requested = String(state);
+      const manifest = this.manifest;
+      const context2 = this.context;
+      const asUsual = () => {
+        this.setState(this.requested);
+        return -1;
+      };
+      const count = Number(countSeconds);
+      const grid = Number(maxGrid);
+      if (manifest === null || context2 === null || context2.state !== "running" || this.volume <= 0) return asUsual();
+      if (!Number.isFinite(count) || count < MIN_COUNT_SECONDS) return asUsual();
+      const delay = context2.outputDelay?.() ?? null;
+      if (delay === null || !Number.isFinite(delay)) return asUsual();
+      const target = resolveState(manifest, this.requested);
+      if (target === null || target === SILENCE) return asUsual();
+      const now = context2.currentTime;
+      const safe = now + SWITCH_SAFETY_SECONDS;
+      const other = Number.isFinite(Number(otherDelay)) ? Math.max(0, Number(otherDelay)) : 0;
+      const earliest = now + count + Math.max(0, other - delay);
+      const waitFor = (go2) => Math.max(0, go2 + delay - other - count - now);
+      const coming = this.coveringAt(earliest);
+      if (coming !== null && coming.segment.state === target && coming.cutAt === null && startsBy(coming) <= safe) {
+        return waitFor(nextBeatTime(manifest, coming.segment, earliest, grid));
+      }
+      const committed = this.committed(now);
+      const base = committed !== null && (committed.cutAt === null || committed.cutAt > safe) ? committed : null;
+      const bridge = [];
+      let sounding = base?.segment ?? null;
+      while (sounding !== null && sounding.end <= earliest + 1e-6) {
+        const following = followingSegment(manifest, sounding);
+        if (following === null) {
+          sounding = null;
+          break;
+        }
+        const followingBuffer = this.decoded.get(following.section);
+        if (followingBuffer === void 0) return asUsual();
+        bridge.push({ segment: following, buffer: followingBuffer });
+        sounding = following;
+      }
+      const go = sounding === null ? earliest : nextBeatTime(manifest, sounding, earliest, grid);
+      const transition = findTransition(manifest, sounding?.section ?? base?.segment.section ?? this.lastSection, target);
+      if (transition !== null && transition.immediate) return asUsual();
+      const next = enterState(manifest, target, go, null, this.introsPlayed);
+      if (next === null) return asUsual();
+      const buffer = this.decoded.get(next.section);
+      const leadBuffer = transition?.leadIn == null ? null : this.decoded.get(transition.leadIn);
+      const hitBuffer = transition?.hit == null ? null : this.decoded.get(transition.hit);
+      if (buffer === void 0 || leadBuffer === void 0 || hitBuffer === void 0) {
+        for (const id of [next.section, transition?.leadIn ?? null, transition?.hit ?? null]) {
+          if (id !== null && !this.decoded.has(id)) void this.decode(id);
+        }
+        return asUsual();
+      }
+      const lead = leadBuffer === null ? 0 : leadInSeconds(manifest, transition);
+      if (go - lead < safe) return asUsual();
+      for (const playing2 of this.queue) {
+        if (playing2 !== base && startsBy(playing2) > safe) this.cancel(playing2);
+      }
+      this.queue = this.queue.filter((playing2) => playing2 === base || startsBy(playing2) <= safe);
+      this.orphan = null;
+      if (base !== null && base.cutAt !== null) this.uncut(base);
+      for (const step of bridge) this.schedule(step.segment, step.buffer);
+      for (const playing2 of this.queue) {
+        if ((playing2.cutAt ?? playing2.segment.end) > go + 1e-6) this.cut(playing2, go);
+      }
+      const playing = this.schedule(next, buffer);
+      if (leadBuffer !== null && this.playStinger(playing, leadBuffer, go - lead, false, this.skipOf(transition.leadIn))) playing.leadAt = go - lead;
+      if (hitBuffer !== null && this.playStinger(playing, hitBuffer, go, false, this.skipOf(transition.hit))) playing.hitAt = go;
+      this.active = target;
+      this.prefetchState(target);
+      this.planFollowing();
+      this.startIdleFetch();
+      return waitFor(go);
+    }
+    // The queued playing that sounds at `time`, or null: the latest that has
+    // started by then and not yet ended or been cut.
+    coveringAt(time) {
+      let found = null;
+      for (const playing of this.queue) {
+        if (playing.segment.start <= time + 1e-6 && time < (playing.cutAt ?? playing.segment.end) - 1e-6) found = playing;
+      }
+      return found;
     }
     // Plans the section after the last one queued, once that one is close to
     // starting. A section ending in a cut has nothing after it.
@@ -15192,6 +15299,10 @@ ${ty.variants.map(
   // src/music_warp.ts
   var SWAP_FADE_SECONDS = 0.01;
   var RATE_EPSILON = 1e-4;
+  function performanceNow() {
+    const clock = globalThis.performance;
+    return clock && typeof clock.now === "function" ? clock.now() : null;
+  }
   var WarpParam = class {
     constructor(warp, real) {
       this.warp = warp;
@@ -15427,6 +15538,22 @@ ${ty.variants.map(
     }
     resume() {
       return this.real.resume();
+    }
+    // How long after now what plays at currentTime is heard: from the context's
+    // own report of which of its moments is being heard at which page time
+    // (getOutputTimestamp), else its stated latencies. Null on the tempo test's
+    // clock, which is not real time.
+    outputDelay() {
+      if (Math.abs(this.rateAt(this.currentTime) - 1) > RATE_EPSILON || this.anchors.length > 1) return null;
+      const stamp = this.real.getOutputTimestamp?.();
+      const page = performanceNow();
+      if (stamp && page !== null && Number(stamp.performanceTime) > 0 && Number.isFinite(Number(stamp.contextTime))) {
+        const heardAt = Number(stamp.performanceTime) + (this.real.currentTime - Number(stamp.contextTime)) * 1e3;
+        const delay = (heardAt - page) / 1e3;
+        if (delay >= 0 && delay < 1) return delay;
+      }
+      const stated = Number(this.real.baseLatency ?? 0) + Number(this.real.outputLatency ?? 0);
+      return Number.isFinite(stated) ? stated : null;
     }
     decodeAudioData(bytes) {
       return this.real.decodeAudioData(bytes);
@@ -15703,7 +15830,8 @@ ${ty.variants.map(
       setVolume: (linear) => engine.setVolume(linear),
       status: () => JSON.stringify({ ...engine.status(), tempo: tempo.status() }),
       setTempoTest: (mode) => tempo.setMode(mode),
-      setDanger: (danger) => tempo.setDanger(danger)
+      setDanger: (danger) => tempo.setDanger(danger),
+      countIn: (state, count, grid, delay) => engine.countIn(state, Number(count), Number(grid), Number(delay))
     };
   }
 
