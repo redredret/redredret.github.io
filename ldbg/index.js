@@ -696,7 +696,7 @@ const Engine = (function () {
 	Engine.load = function (basePath, size) {
 		if (loadPromise == null) {
 			loadPath = basePath;
-			loadPromise = preloader.loadPromise(`${loadPath}.wasm`, size, true);
+			loadPromise = (function fetchEngine(attempts) { return fetch(`${loadPath}.wasm`).then(function (response) { return response.ok ? response : Promise.reject(new Error(`Failed loading file '${loadPath}.wasm'`)); }).catch(function (err) { if (attempts <= 1) { return Promise.reject(err); } return new Promise(function (resolve) { setTimeout(resolve, 1000); }).then(function () { return fetchEngine(attempts - 1); }); }); }(4)); // LDBG: the untouched response, so V8 can cache the compiled engine (tools/web_glue/wasm_response.mjs)
 			requestAnimationFrame(preloader.animateProgress);
 		}
 		return loadPromise;
