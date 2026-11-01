@@ -565,7 +565,8 @@
       "to": [
         "menu"
       ],
-      "leadIn": "cymbal_lead_up"
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1
     },
     {
       "from": [
