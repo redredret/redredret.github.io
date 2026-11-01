@@ -441,11 +441,72 @@ window.addEventListener('keydown', function (event) {
 			<div id="status-notice"></div>
 		</div>
 
-		<script src="index.js?v=a8b032f7b623"></script>
+		<script src="index.js?v=6bb097973f5b"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index-3674a587a969","mainPack":"index-376719f43b30.pck","experimentalVK":false,"fileSizes":{"index-376719f43b30.pck":22626872,"index-3674a587a969.wasm":37695054},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index-362f93e0532d","mainPack":"index-64904c8abc34.pck","experimentalVK":false,"fileSizes":{"index-64904c8abc34.pck":22646220,"index-362f93e0532d.wasm":26346244},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
+// The base and the patch (docs/BROWSER_CLIENT.md, "The base and the patch"): a
+// deploy can name a patch pack to mount over the main pack, which is then an
+// older base, and the whole build as one pack to fall back to. A page that has
+// fallen back once loads with #full-pack and starts on the whole build.
+const fullPack = GODOT_CONFIG['ldbgFull'] || '';
+const fullPackAsked = window.location.hash === '#full-pack';
+if (fullPackAsked) {
+	history.replaceState(null, '', window.location.pathname + window.location.search);
+}
+let patchName = fullPackAsked || !fullPack ? '' : (GODOT_CONFIG['ldbgPatch'] || '');
+const patchBase = GODOT_CONFIG['ldbgBase'] || '';
+let patchMounted = false;
+
+// <patch-check> The base a patch pack names (its web_pack/patch_of.txt), read
+// from its bytes; null when it names none or is not a whole, plain pack. The
+// same reading as PatchMount.patch_made_for; tools/web_publish/patch_pack.test.mjs
+// runs this copy.
+function patchMadeFor(buffer) {
+	const bytes = new Uint8Array(buffer);
+	const view = new DataView(buffer);
+	if (bytes.length < 40 || view.getUint32(0, true) !== 0x43504447 || view.getUint32(4, true) !== 3) {
+		return null;
+	}
+	const flags = view.getUint32(20, true);
+	if ((flags & 1) || !(flags & 2)) {
+		return null;
+	}
+	const fileBase = Number(view.getBigUint64(24, true));
+	let at = Number(view.getBigUint64(32, true));
+	if (at + 4 > bytes.length) {
+		return null;
+	}
+	const count = view.getUint32(at, true);
+	at += 4;
+	const decoder = new TextDecoder();
+	let madeFor = null;
+	for (let i = 0; i < count; i++) {
+		if (at + 4 > bytes.length) {
+			return null;
+		}
+		const length = view.getUint32(at, true);
+		at += 4;
+		if (at + length + 36 > bytes.length) {
+			return null;
+		}
+		const name = decoder.decode(bytes.subarray(at, at + length)).replace(/\0+$/, '').replace(/^res:\/\//, '');
+		at += length;
+		const offset = Number(view.getBigUint64(at, true));
+		const size = Number(view.getBigUint64(at + 8, true));
+		const entryFlags = view.getUint32(at + 32, true);
+		at += 36;
+		if (fileBase + offset + size > bytes.length) {
+			return null;
+		}
+		if (name === 'web_pack/patch_of.txt' && entryFlags === 0) {
+			madeFor = decoder.decode(bytes.subarray(fileBase + offset, fileBase + offset + size)).trim();
+		}
+	}
+	return madeFor;
+}
+// </patch-check>
 
 (function () {
 	const statusOverlay = document.getElementById('status');
@@ -546,12 +607,38 @@ const engine = new Engine(GODOT_CONFIG);
 		},
 		// The game's own progress (BootProgress): its phase, and how far into it.
 		progress: function (phase, percent) {
+			if (patchName && !patchMounted && initializing) {
+				// The game got this far without mounting the patch it was handed: a
+				// base too old to have PatchMount, running an older build.
+				window.LDBGLoading.useFullPack('the base did not mount the patch');
+				return;
+			}
 			lastWordAt = Date.now();
 			bootPhase = String(phase || 'engine');
 			bootFraction = Number(percent || 0) / 100;
 			if (initializing && statusMode === 'progress') {
 				showProgress(bootPhase, bootFraction);
 			}
+		},
+		// PatchMount mounted the patch named above.
+		patchMounted: function () {
+			patchMounted = true;
+		},
+		// PatchMount would not mount the patch (or the base never tried): start
+		// again on the whole build. Once only: the whole build has no patch.
+		useFullPack: function (reason) {
+			if (!initializing) {
+				return;
+			}
+			console.warn('[patch] ' + String(reason || 'refused') + '; starting the full build');
+			if (!patchName) {
+				displayFailureNotice('This version of the game did not load properly. Reload the page to try again.');
+				return;
+			}
+			initializing = false;
+			engine.requestQuit();
+			window.location.replace('#full-pack');
+			window.location.reload();
 		},
 	};
 
@@ -626,8 +713,77 @@ const engine = new Engine(GODOT_CONFIG);
 		}
 	} else {
 		setStatusMode('progress');
+		// The patch, when the deploy names one: fetched beside the base, checked
+		// here, and in the engine's file system before main() runs, where
+		// PatchMount, the first autoload, checks it again and mounts it. One that
+		// will not download or names another base is never handed over: the whole
+		// build is loaded over the base's file instead (copyToFS writes the
+		// preloaded files in order, so the later one wins). startGame starts the
+		// engine through engine.start, so holding that holds only the start.
+		let patchBytes = { loaded: 0, total: 0 };
+		if (patchName) {
+			patchBytes.total = (GODOT_CONFIG['fileSizes'] || {})[patchName] || 0;
+			const fetchPatch = function (attempt) {
+				patchBytes.loaded = 0;
+				return fetch(patchName).then(function (response) {
+					if (!response.ok) {
+						throw new Error('the patch did not download (' + response.status + ')');
+					}
+					const reader = response.body.getReader();
+					const parts = [];
+					const pump = function () {
+						return reader.read().then(function (chunk) {
+							if (chunk.done) {
+								return new Blob(parts).arrayBuffer();
+							}
+							parts.push(chunk.value);
+							patchBytes.loaded += chunk.value.length;
+							return pump();
+						});
+					};
+					return pump();
+				}).catch(function (err) {
+					if (attempt >= 4) {
+						throw err;
+					}
+					return new Promise(function (resolve) {
+						setTimeout(resolve, 1000);
+					}).then(function () {
+						return fetchPatch(attempt + 1);
+					});
+				});
+			};
+			const patchChecked = fetchPatch(1).then(function (buffer) {
+				const madeFor = patchMadeFor(buffer);
+				if (madeFor !== patchBase) {
+					throw new Error(madeFor === null ? 'the patch is not a whole pack' : 'the patch is for base "' + madeFor + '"');
+				}
+				return buffer;
+			}).catch(function (err) {
+				console.warn('[patch] ' + err.message + '; loading the full build');
+				return null;
+			});
+			const start = engine.start;
+			engine.start = function (override) {
+				return patchChecked.then(function (buffer) {
+					if (buffer) {
+						return engine.preloadFile(buffer, 'ldbg_patch.pck');
+					}
+					patchName = '';
+					statusProgress.classList.add('indeterminate');
+					return engine.preloadFile(fullPack, GODOT_CONFIG['mainPack']);
+				}).then(function () {
+					return start.call(engine, override);
+				});
+			};
+		}
 		engine.startGame({
+			'mainPack': fullPackAsked ? fullPack : GODOT_CONFIG['mainPack'],
 			'onProgress': function (current, total) {
+				if (patchName && current > 0 && total > 0) {
+					current += patchBytes.loaded;
+					total += patchBytes.total;
+				}
 				if (current > 0 && total > 0) {
 					showProgress('download', current / total);
 					if (current >= total && bootPhase === 'download') {
