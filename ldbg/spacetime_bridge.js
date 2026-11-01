@@ -14577,6 +14577,7 @@ ${ty.variants.map(
   // src/music_engine.ts
   var RELEASE_SECONDS = 0.03;
   var FADE_IN_SECONDS = 0.01;
+  var JOIN_FADE_SECONDS = 5e-3;
   var CURVE_POINTS = 64;
   function fadeCurve(from, to) {
     const curve = new Float32Array(CURVE_POINTS);
@@ -15045,16 +15046,17 @@ ${ty.variants.map(
       }
       let fade = null;
       if (segment.fadeIn > 0) {
-        fade = { start: segment.start, duration: segment.fadeIn };
-        const from = Math.min(1, Math.max(0, (start - segment.start) / segment.fadeIn));
-        const left = segment.start + segment.fadeIn - start;
-        if (left > 0) {
-          gain.gain.setValueAtTime(Math.sin(from * Math.PI / 2), start);
-          gain.gain.setValueCurveAtTime(fadeCurve(Math.sin(from * Math.PI / 2), 1), start, left);
-        }
+        const left = Math.max(segment.start + segment.fadeIn - start, FADE_IN_SECONDS);
+        fade = { start, duration: left };
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.setValueCurveAtTime(fadeCurve(0, 1), start, left);
       } else if (offset > 0) {
         gain.gain.setValueAtTime(0, start);
         gain.gain.linearRampToValueAtTime(1, start + FADE_IN_SECONDS);
+      } else if (!this.abutted(segment)) {
+        fade = { start, duration: JOIN_FADE_SECONDS };
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(1, start + JOIN_FADE_SECONDS);
       }
       const playing = { segment, source, gain, cutAt: null, fade, stingers: [], leadAt: null, hitAt: null };
       this.orphan = null;
@@ -15140,6 +15142,11 @@ ${ty.variants.map(
       this.stingers.push(stinger);
       if (playing !== null) playing.stingers.push(stinger);
       return true;
+    }
+    // Whether `segment` plays straight on out of a section still sounding (the
+    // song carrying on, the waveform unbroken), rather than after a cut.
+    abutted(segment) {
+      return this.queue.some((playing) => playing.cutAt === null && Math.abs(playing.segment.end - segment.start) < 1e-6);
     }
     // Its level at `time`: 1, or where its fade in had got to.
     levelAt(playing, time) {
