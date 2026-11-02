@@ -316,6 +316,90 @@
       "switchEveryBars": 1,
       "file": "funky_6-2f1cc7b443f1.ogg",
       "fallback": "funky_6-31c52578836d.m4a"
+    },
+    "desert_intro": {
+      "bpm": 130,
+      "bars": 16,
+      "switchEveryBars": 1,
+      "file": "desert_intro-88905a0c4bc4.ogg",
+      "fallback": "desert_intro-630740e2f806.m4a"
+    },
+    "desert_1": {
+      "bpm": 130,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "desert_1-91e176c5502d.ogg",
+      "fallback": "desert_1-1427f8fc9fb6.m4a"
+    },
+    "desert_2": {
+      "bpm": 130,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "desert_2-dbf90aa70192.ogg",
+      "fallback": "desert_2-272cc7ff410f.m4a"
+    },
+    "desert_3": {
+      "bpm": 130,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "desert_3-122acd565b50.ogg",
+      "fallback": "desert_3-f9a0360e6067.m4a"
+    },
+    "desert_4": {
+      "bpm": 130,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "desert_4-a7d0082ae4d3.ogg",
+      "fallback": "desert_4-51e02c5d1ba8.m4a"
+    },
+    "desert_5": {
+      "bpm": 130,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "desert_5-858ae76e80fb.ogg",
+      "fallback": "desert_5-bd1d0a5f2998.m4a"
+    },
+    "desert_6": {
+      "bpm": 130,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "desert_6-ecc36e8987ae.ogg",
+      "fallback": "desert_6-5f9f04612657.m4a"
+    },
+    "desert_7": {
+      "bpm": 130,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "desert_7-40a7d4fe43d8.ogg",
+      "fallback": "desert_7-a18720745d4e.m4a"
+    },
+    "desert_8": {
+      "bpm": 130,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "desert_8-df80b85bf287.ogg",
+      "fallback": "desert_8-d130b2f0ba47.m4a"
+    },
+    "desert_9": {
+      "bpm": 130,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "desert_9-2cbd57f85ec3.ogg",
+      "fallback": "desert_9-a84fb172bd94.m4a"
+    },
+    "desert_10": {
+      "bpm": 130,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "desert_10-07854b306339.ogg",
+      "fallback": "desert_10-f048cdaa600e.m4a"
+    },
+    "desert_11": {
+      "bpm": 130,
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "desert_11-4f7043446756.ogg",
+      "fallback": "desert_11-6a25731b53ce.m4a"
     }
   },
   "leadIns": {
@@ -556,6 +640,71 @@
     },
     {
       "from": [
+        "intro_loop",
+        "menu_1",
+        "menu_2",
+        "menu_3",
+        "menu_4",
+        "funky_build",
+        "funky_1",
+        "funky_2",
+        "funky_3",
+        "funky_4",
+        "funky_5",
+        "funky_6"
+      ],
+      "to": [
+        "desert"
+      ],
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1,
+      "preload": false
+    },
+    {
+      "from": [
+        "desert_intro",
+        "desert_1",
+        "desert_2",
+        "desert_3",
+        "desert_4",
+        "desert_5",
+        "desert_6",
+        "desert_7",
+        "desert_8",
+        "desert_9",
+        "desert_10",
+        "desert_11"
+      ],
+      "to": [
+        "menu"
+      ],
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1
+    },
+    {
+      "from": [
+        "desert_intro",
+        "desert_1",
+        "desert_2",
+        "desert_3",
+        "desert_4",
+        "desert_5",
+        "desert_6",
+        "desert_7",
+        "desert_8",
+        "desert_9",
+        "desert_10",
+        "desert_11"
+      ],
+      "to": [
+        "farm"
+      ],
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1,
+      "preload": false
+    },
+    {
+      "from": [
         "a",
         "b",
         "a_2",
@@ -714,6 +863,22 @@
         "funky_5",
         "funky_6",
         "funky_1"
+      ]
+    },
+    "desert": {
+      "intro": "desert_intro",
+      "play": [
+        "desert_1",
+        "desert_2",
+        "desert_3",
+        "desert_4",
+        "desert_5",
+        "desert_6",
+        "desert_7",
+        "desert_8",
+        "desert_9",
+        "desert_10",
+        "desert_11"
       ]
     }
   },
