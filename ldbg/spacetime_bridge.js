@@ -15155,12 +15155,23 @@ ${ty.variants.map(
       return t2 >= 1 ? 1 : Math.sin(Math.max(0, t2) * Math.PI / 2);
     }
     // Cancelling automation drops a fade in mid-way, which would jump the level
-    // back to where that fade began: so the level now is held first, from the
-    // fade's own curve.
-    holdLevel(playing, now) {
-      const level = this.levelAt(playing, now);
+    // back to where that fade began: so the level is held first, from the
+    // fade's own curve, and returned as it is at `until`. A change from `until`
+    // on, once any fade in is over by then, keeps everything before it: a
+    // section cut before it has even started (the Slime King's walls rising in
+    // the instant before his song's first bar) would otherwise be held at the
+    // silence it starts from, and play silent up to the cut (2026-11-03).
+    holdLevel(playing, now, until = now) {
+      const level = this.levelAt(playing, until);
+      const fade = playing.fade;
+      if (until > now && (fade === null || fade.start + fade.duration < until - 1e-3)) {
+        playing.gain.gain.cancelScheduledValues(until);
+        playing.gain.gain.setValueAtTime(level, until);
+        return level;
+      }
       playing.gain.gain.cancelScheduledValues(now);
-      playing.gain.gain.setValueAtTime(level, now);
+      playing.gain.gain.setValueAtTime(this.levelAt(playing, now), now);
+      if (until > now) playing.gain.gain.linearRampToValueAtTime(level, until);
       return level;
     }
     // A cut at `at`: over RELEASE_SECONDS a quick linear fade, and over a longer
@@ -15168,8 +15179,8 @@ ${ty.variants.map(
     cut(playing, at, release = RELEASE_SECONDS) {
       const now = this.context.currentTime;
       playing.cutAt = at;
-      const level = this.holdLevel(playing, now);
       const from = Math.max(now, at);
+      const level = this.holdLevel(playing, now, from);
       if (release > RELEASE_SECONDS) {
         if (from > now) playing.gain.gain.setValueAtTime(level, from);
         playing.gain.gain.setValueCurveAtTime(fadeCurve(level, 0), from, release);
