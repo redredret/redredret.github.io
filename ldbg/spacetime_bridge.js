@@ -9132,6 +9132,13 @@ ${ty.variants.map(
     quantity: t.u32()
   };
 
+  // src/module_bindings/craft_item_with_pieces_reducer.ts
+  var craft_item_with_pieces_reducer_default = {
+    recipeId: t.string(),
+    quantity: t.u32(),
+    picksJson: t.string()
+  };
+
   // src/module_bindings/create_farm_dark_private_reducer.ts
   var create_farm_dark_private_reducer_default = {};
 
@@ -11909,6 +11916,7 @@ ${ty.variants.map(
     reducerSchema("consume_item", consume_item_reducer_default),
     reducerSchema("continue_dark_run", continue_dark_run_reducer_default),
     reducerSchema("craft_item", craft_item_reducer_default),
+    reducerSchema("craft_item_with_pieces", craft_item_with_pieces_reducer_default),
     reducerSchema("create_farm_dark_private", create_farm_dark_private_reducer_default),
     reducerSchema("create_farm_private", create_farm_private_reducer_default),
     reducerSchema("create_instance_listing", create_instance_listing_reducer_default),
