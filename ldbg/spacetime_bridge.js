@@ -9946,6 +9946,13 @@ ${ty.variants.map(
     slot: t.string()
   };
 
+  // src/module_bindings/upgrade_gear_reducer.ts
+  var upgrade_gear_reducer_default = {
+    itemId: t.string(),
+    instanceId: t.string(),
+    slot: t.string()
+  };
+
   // src/module_bindings/verify_dark_duel_win_reducer.ts
   var verify_dark_duel_win_reducer_default = {
     duelId: t.string(),
@@ -12045,6 +12052,7 @@ ${ty.variants.map(
     reducerSchema("unequip_boost", unequip_boost_reducer_default),
     reducerSchema("unequip_food", unequip_food_reducer_default),
     reducerSchema("unequip_inventory_item", unequip_inventory_item_reducer_default),
+    reducerSchema("upgrade_gear", upgrade_gear_reducer_default),
     reducerSchema("verify_dark_duel_win", verify_dark_duel_win_reducer_default),
     reducerSchema("watch_replay", watch_replay_reducer_default),
     reducerSchema("yield_dark_duel", yield_dark_duel_reducer_default)
