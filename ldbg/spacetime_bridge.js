@@ -9269,6 +9269,11 @@ ${ty.variants.map(
   // src/module_bindings/join_farm_dark_public_reducer.ts
   var join_farm_dark_public_reducer_default = {};
 
+  // src/module_bindings/join_farm_invite_reducer.ts
+  var join_farm_invite_reducer_default = {
+    inviteId: t.string()
+  };
+
   // src/module_bindings/join_farm_private_reducer.ts
   var join_farm_private_reducer_default = {
     code: t.string()
@@ -9276,6 +9281,11 @@ ${ty.variants.map(
 
   // src/module_bindings/join_farm_public_reducer.ts
   var join_farm_public_reducer_default = {};
+
+  // src/module_bindings/join_party_invite_reducer.ts
+  var join_party_invite_reducer_default = {
+    inviteId: t.string()
+  };
 
   // src/module_bindings/join_party_queue_reducer.ts
   var join_party_queue_reducer_default = {
@@ -11941,8 +11951,10 @@ ${ty.variants.map(
     reducerSchema("invite_friend", invite_friend_reducer_default),
     reducerSchema("join_farm_dark_private", join_farm_dark_private_reducer_default),
     reducerSchema("join_farm_dark_public", join_farm_dark_public_reducer_default),
+    reducerSchema("join_farm_invite", join_farm_invite_reducer_default),
     reducerSchema("join_farm_private", join_farm_private_reducer_default),
     reducerSchema("join_farm_public", join_farm_public_reducer_default),
+    reducerSchema("join_party_invite", join_party_invite_reducer_default),
     reducerSchema("join_party_queue", join_party_queue_reducer_default),
     reducerSchema("join_party_room", join_party_room_reducer_default),
     reducerSchema("learn_skill", learn_skill_reducer_default),
