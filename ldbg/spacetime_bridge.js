@@ -859,6 +859,9 @@ ${originalIndentation}`;
     // 'profile': the game reads it once per sign-in, and each save's echo would
     // otherwise re-apply the whole profile and redraw every screen that shows it.
     accountSettings: { group: "core", keys: { accountSettings: one("myAccountSettings") } },
+    // The course planned on the Endless Dungeon's world map (rules version 94):
+    // one tiny row, written when the player saves a course.
+    endlessCourse: { group: "core", keys: { endlessCourse: one("myEndlessCourse") } },
     // A new account's tutorial stage and its welcome vault (docs/ONBOARDING.md).
     // Core, so the welcome is decided on the first frame after sign-in.
     onboarding: {
@@ -973,6 +976,8 @@ ${originalIndentation}`;
     // party would get if it started now. A domain of its own, so a partner
     // flipping their toggle redraws the preview line and not the whole lobby.
     partyOmens: { group: "party", keys: { partyOmens: many("myPartyOmens") } },
+    // A lobby's course (rules version 94): what any member set, which READY agrees to.
+    partyCourse: { group: "party", keys: { partyCourse: one("myPartyCourse") } },
     // The teammate's board for the mini card, rebuilt from the party's event rows
     // the Farm's way (party_room.ts, docs/BACKEND_COST_AUDIT_3.md); Godot gets the
     // rows the old views gave it, with no piece. Refreshed by the events and by
@@ -9834,6 +9839,13 @@ ${ty.variants.map(
     ready: t.bool()
   };
 
+  // src/module_bindings/set_endless_course_reducer.ts
+  var set_endless_course_reducer_default = {
+    courseJson: t.string(),
+    ends: t.string(),
+    asks: t.bool()
+  };
+
   // src/module_bindings/set_friend_settings_reducer.ts
   var set_friend_settings_reducer_default = {
     requests: t.string(),
@@ -9847,6 +9859,12 @@ ${ty.variants.map(
   var set_hair_reducer_default = {
     hairStyle: t.u32(),
     hairColor: t.u32()
+  };
+
+  // src/module_bindings/set_party_course_reducer.ts
+  var set_party_course_reducer_default = {
+    courseJson: t.string(),
+    ends: t.string()
   };
 
   // src/module_bindings/set_party_omens_reducer.ts
@@ -10534,6 +10552,15 @@ ${ty.variants.map(
     completedAt: t.timestamp().name("completed_at")
   });
 
+  // src/module_bindings/my_endless_course_table.ts
+  var my_endless_course_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    courseJson: t.string().name("course_json"),
+    ends: t.string(),
+    asks: t.bool(),
+    updatedAt: t.timestamp().name("updated_at")
+  });
+
   // src/module_bindings/my_endless_records_table.ts
   var my_endless_records_table_default = t.row({
     id: t.u64().primaryKey(),
@@ -10832,6 +10859,14 @@ ${ty.variants.map(
     attackSetMicros: t.u64().name("attack_set_micros"),
     attackNumber: t.u32().name("attack_number"),
     enemyShielded: t.bool().name("enemy_shielded")
+  });
+
+  // src/module_bindings/my_party_course_table.ts
+  var my_party_course_table_default = t.row({
+    partyId: t.string().primaryKey().name("party_id"),
+    courseJson: t.string().name("course_json"),
+    ends: t.string(),
+    updatedAt: t.timestamp().name("updated_at")
   });
 
   // src/module_bindings/my_party_member_core_table.ts
@@ -11570,6 +11605,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_dungeon_progress_table_default),
+    myEndlessCourse: table({
+      name: "my_endless_course",
+      indexes: [],
+      constraints: []
+    }, my_endless_course_table_default),
     myEndlessRecords: table({
       name: "my_endless_records",
       indexes: [],
@@ -11700,6 +11740,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_party_core_table_default),
+    myPartyCourse: table({
+      name: "my_party_course",
+      indexes: [],
+      constraints: []
+    }, my_party_course_table_default),
     myPartyMemberCore: table({
       name: "my_party_member_core",
       indexes: [],
@@ -12048,8 +12093,10 @@ ${ty.variants.map(
     reducerSchema("set_bounty_option", set_bounty_option_reducer_default),
     reducerSchema("set_display_name", set_display_name_reducer_default),
     reducerSchema("set_duel_ready", set_duel_ready_reducer_default),
+    reducerSchema("set_endless_course", set_endless_course_reducer_default),
     reducerSchema("set_friend_settings", set_friend_settings_reducer_default),
     reducerSchema("set_hair", set_hair_reducer_default),
+    reducerSchema("set_party_course", set_party_course_reducer_default),
     reducerSchema("set_party_omens", set_party_omens_reducer_default),
     reducerSchema("set_party_ready", set_party_ready_reducer_default),
     reducerSchema("set_shown_badge", set_shown_badge_reducer_default),
@@ -12122,6 +12169,7 @@ ${ty.variants.map(
     "my_duel_opponent_piece": "myDuelOpponentPiece",
     "my_duel_record": "myDuelRecord",
     "my_dungeon_progress": "myDungeonProgress",
+    "my_endless_course": "myEndlessCourse",
     "my_endless_records": "myEndlessRecords",
     "my_endless_regions": "myEndlessRegions",
     "my_equipment": "myEquipment",
@@ -12148,6 +12196,7 @@ ${ty.variants.map(
     "my_onboarding": "myOnboarding",
     "my_party": "myParty",
     "my_party_core": "myPartyCore",
+    "my_party_course": "myPartyCourse",
     "my_party_member_core": "myPartyMemberCore",
     "my_party_member_score": "myPartyMemberScore",
     "my_party_members": "myPartyMembers",
