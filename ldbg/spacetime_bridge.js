@@ -9064,6 +9064,13 @@ ${ty.variants.map(
     listingId: t.string()
   };
 
+  // src/module_bindings/choose_party_road_reducer.ts
+  var choose_party_road_reducer_default = {
+    partyId: t.string(),
+    chestIndex: t.u32(),
+    stopsJson: t.string()
+  };
+
   // src/module_bindings/choose_restricted_account_reducer.ts
   var choose_restricted_account_reducer_default = {};
 
@@ -11962,6 +11969,7 @@ ${ty.variants.map(
     reducerSchema("cancel_friend_request", cancel_friend_request_reducer_default),
     reducerSchema("cancel_market_listing", cancel_market_listing_reducer_default),
     reducerSchema("challenge_duel_listing", challenge_duel_listing_reducer_default),
+    reducerSchema("choose_party_road", choose_party_road_reducer_default),
     reducerSchema("choose_restricted_account", choose_restricted_account_reducer_default),
     reducerSchema("claim_bounty", claim_bounty_reducer_default),
     reducerSchema("claim_diary_chart", claim_diary_chart_reducer_default),
