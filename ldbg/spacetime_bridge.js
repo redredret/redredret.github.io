@@ -924,6 +924,8 @@ ${originalIndentation}`;
         // The Endless Dungeon's regions this account has been to
         // (docs/ENDLESS_DUNGEON.md, "Discovery"): the Region Log's rows.
         endlessRegions: many("myEndlessRegions"),
+        // The map roads walked (rules version 96): the Wayfarer badge's progress.
+        roadsWalked: many("myRoadsWalked"),
         // The challenge skins earned (docs/BLOCK_SKINS_2.md): a record too,
         // written once by a settlement at most.
         skinUnlocks: many("mySkinUnlocks")
@@ -11104,6 +11106,15 @@ ${ty.variants.map(
     chosenAt: t.timestamp().name("chosen_at")
   });
 
+  // src/module_bindings/my_roads_walked_table.ts
+  var my_roads_walked_table_default = t.row({
+    id: t.u64().primaryKey(),
+    owner: t.identity(),
+    roadKey: t.string().name("road_key"),
+    times: t.u32(),
+    firstWalkedAt: t.timestamp().name("first_walked_at")
+  });
+
   // src/module_bindings/my_run_loot_reveals_table.ts
   var my_run_loot_reveals_table_default = t.row({
     revealId: t.string().primaryKey().name("reveal_id"),
@@ -11837,6 +11848,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_restricted_account_table_default),
+    myRoadsWalked: table({
+      name: "my_roads_walked",
+      indexes: [],
+      constraints: []
+    }, my_roads_walked_table_default),
     myRunLootReveals: table({
       name: "my_run_loot_reveals",
       indexes: [],
@@ -12222,6 +12238,7 @@ ${ty.variants.map(
     "my_recent_players": "myRecentPlayers",
     "my_replays": "myReplays",
     "my_restricted_account": "myRestrictedAccount",
+    "my_roads_walked": "myRoadsWalked",
     "my_run_loot_reveals": "myRunLootReveals",
     "my_satchel_keep": "mySatchelKeep",
     "my_saved_builds": "mySavedBuilds",
