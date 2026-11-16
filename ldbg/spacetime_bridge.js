@@ -1405,7 +1405,7 @@ ${originalIndentation}`;
     countersWanted: false
   };
 
-  // node_modules/.pnpm/spacetimedb@2.8.2/node_modules/spacetimedb/dist/index.browser.mjs
+  // node_modules/.pnpm/spacetimedb@2.15.0/node_modules/spacetimedb/dist/index.browser.mjs
   var import_base64_js = __toESM(require_base64_js(), 1);
 
   // node_modules/.pnpm/safe-stable-stringify@2.5.0/node_modules/safe-stable-stringify/esm/wrapper.js
@@ -1413,7 +1413,8 @@ ${originalIndentation}`;
   var configure = import__.default.configure;
   var stringify = import__.default;
 
-  // node_modules/.pnpm/spacetimedb@2.8.2/node_modules/spacetimedb/dist/index.browser.mjs
+  // node_modules/.pnpm/spacetimedb@2.15.0/node_modules/spacetimedb/dist/index.browser.mjs
+  var textDecoder = new TextDecoder("utf-8");
   var BinaryReader = class {
     /**
      * The DataView used to read values from the binary data.
@@ -1554,9 +1555,10 @@ ${originalIndentation}`;
       const length = this.readU32();
       this.#ensure(length);
       const bytes = this.readBytes(length);
-      return new TextDecoder("utf-8").decode(bytes);
+      return textDecoder.decode(bytes);
     }
   };
+  var textEncoder = new TextEncoder();
   var ArrayBufferPrototypeTransfer = ArrayBuffer.prototype.transfer ?? function(newByteLength) {
     if (newByteLength === void 0) {
       return this.slice();
@@ -1728,9 +1730,22 @@ ${originalIndentation}`;
       this.offset += 8;
     }
     writeString(value) {
-      const encoder = new TextEncoder();
-      const encodedString = encoder.encode(value);
-      this.writeUInt8Array(encodedString);
+      const len = value.length;
+      this.expandBuffer(4 + len);
+      const bytes = new Uint8Array(this.buffer.buffer);
+      let offset = this.offset + 4;
+      let i = 0;
+      for (; i < len; i++) {
+        const c = value.charCodeAt(i);
+        if (c >= 128) break;
+        bytes[offset++] = c;
+      }
+      if (i === len) {
+        this.view.setUint32(this.offset, len, true);
+        this.offset = offset;
+        return;
+      }
+      this.writeUInt8Array(textEncoder.encode(value));
     }
   };
   function deepEqual(obj1, obj2) {
@@ -1738,11 +1753,22 @@ ${originalIndentation}`;
     if (typeof obj1 !== "object" || obj1 === null || typeof obj2 !== "object" || obj2 === null) {
       return false;
     }
+    let firstKey = 0;
+    if (obj1 instanceof Uint8Array && obj2 instanceof Uint8Array) {
+      if (obj1.length !== obj2.length) return false;
+      for (let i = 0; i < obj1.length; i++) {
+        if (obj1[i] !== obj2[i]) return false;
+      }
+      firstKey = obj1.length;
+    }
     const keys1 = Object.keys(obj1);
     const keys2 = Object.keys(obj2);
     if (keys1.length !== keys2.length) return false;
-    for (const key of keys1) {
-      if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key])) {
+    const values1 = obj1;
+    const values2 = obj2;
+    for (let i = firstKey; i < keys1.length; i++) {
+      const key = keys1[i];
+      if (!Object.prototype.propertyIsEnumerable.call(obj2, key) || !deepEqual(values1[key], values2[key])) {
         return false;
       }
     }
@@ -2655,7 +2681,7 @@ return result;`
           typespace
         );
         const serializeErr = AlgebraicType.makeSerializer(
-          ty.variants[0].algebraicType,
+          ty.variants[1].algebraicType,
           typespace
         );
         return (writer, value) => {
@@ -2859,6 +2885,30 @@ ${ty.variants.map(
     }
     get name() {
       return "InternalError";
+    }
+  };
+  var DisconnectedError = class extends Error {
+    constructor(message = "Not connected to SpacetimeDB") {
+      super(message);
+    }
+    get name() {
+      return "DisconnectedError";
+    }
+  };
+  var UnknownCallResultError = class extends Error {
+    constructor(message = "Connection lost before the call was acknowledged; it may or may not have run") {
+      super(message);
+    }
+    get name() {
+      return "UnknownCallResultError";
+    }
+  };
+  var IdentityChangedError = class extends Error {
+    constructor(message = "Reconnected with a different identity; the token was revoked or replaced") {
+      super(message);
+    }
+    get name() {
+      return "IdentityChangedError";
     }
   };
   var ScheduleAt = {
@@ -3281,6 +3331,15 @@ ${ty.variants.map(
   function isLiteralExpr(expr) {
     return expr.type === "literal";
   }
+  function accessorSlot(root, accessorName) {
+    const path = accessorName.split(".");
+    const leaf = path.pop();
+    let target = root;
+    for (const segment of path) {
+      target = target[segment] ??= /* @__PURE__ */ Object.create(null);
+    }
+    return [target, leaf];
+  }
   function set(x, t2) {
     return { ...x, ...t2 };
   }
@@ -3305,6 +3364,10 @@ ${ty.variants.map(
     }
     optional() {
       return new OptionBuilder(this);
+    }
+    /** Match this column to a receiver parameter in an outbox table. */
+    param(opts) {
+      return new ColumnBuilder(this, { paramName: opts.name });
     }
     serialize(writer, value) {
       const serialize = this.serialize = AlgebraicType.makeSerializer(
@@ -4066,6 +4129,10 @@ ${ty.variants.map(
     constructor() {
       super(Identity.getAlgebraicType());
     }
+    /** Marks the destination database column of an IDC outbox. */
+    target() {
+      return new IdentityColumnBuilder(this, { isTarget: true });
+    }
     index(algorithm = "btree") {
       return new IdentityColumnBuilder(
         this,
@@ -4253,12 +4320,19 @@ ${ty.variants.map(
     }
   };
   var defaultMetadata = {};
-  var ColumnBuilder = class {
+  var ColumnBuilder = class _ColumnBuilder {
     typeBuilder;
     columnMetadata;
     constructor(typeBuilder, metadata) {
       this.typeBuilder = typeBuilder;
       this.columnMetadata = metadata;
+    }
+    /** Match this column to a receiver parameter in an outbox table. */
+    param(opts) {
+      return new _ColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { paramName: opts.name })
+      );
     }
     serialize(writer, value) {
       this.typeBuilder.serialize(writer, value);
@@ -4974,6 +5048,12 @@ ${ty.variants.map(
     }
   };
   var IdentityColumnBuilder = class _IdentityColumnBuilder extends ColumnBuilder {
+    target() {
+      return new _IdentityColumnBuilder(
+        this.typeBuilder,
+        set(this.columnMetadata, { isTarget: true })
+      );
+    }
     index(algorithm = "btree") {
       return new _IdentityColumnBuilder(
         this.typeBuilder,
@@ -5468,6 +5548,9 @@ ${ty.variants.map(
     },
     get CallProcedure() {
       return CallProcedure;
+    },
+    get SubscribeBatch() {
+      return SubscribeBatch;
     }
   });
   var EventTableRows = t.object("EventTableRows", {
@@ -5575,6 +5658,9 @@ ${ty.variants.map(
     },
     get ProcedureResult() {
       return ProcedureResult;
+    },
+    get SubscribeBatchApplied() {
+      return SubscribeBatchApplied;
     }
   });
   var SingleTableRows = t.object("SingleTableRows", {
@@ -5597,6 +5683,38 @@ ${ty.variants.map(
     },
     get rows() {
       return QueryRows;
+    }
+  });
+  var SubscribeBatch = t.object("SubscribeBatch", {
+    requestId: t.u32(),
+    get sets() {
+      return t.array(SubscribeSet);
+    }
+  });
+  var SubscribeBatchApplied = t.object("SubscribeBatchApplied", {
+    requestId: t.u32(),
+    get results() {
+      return t.array(SubscribeSetResult);
+    }
+  });
+  var SubscribeSet = t.object("SubscribeSet", {
+    get querySetId() {
+      return QuerySetId;
+    },
+    queryStrings: t.array(t.string())
+  });
+  var SubscribeSetOutcome = t.enum("SubscribeSetOutcome", {
+    get Applied() {
+      return QueryRows;
+    },
+    Error: t.string()
+  });
+  var SubscribeSetResult = t.object("SubscribeSetResult", {
+    get querySetId() {
+      return QuerySetId;
+    },
+    get outcome() {
+      return SubscribeSetOutcome;
     }
   });
   var SubscriptionError = t.object("SubscriptionError", {
@@ -5762,10 +5880,30 @@ ${ty.variants.map(
     if (x === y) return 0;
     return x < y ? -1 : 1;
   };
+  var isRange = (arg) => arg && typeof arg === "object" && "from" in arg && "to" in arg;
+  var inRange = (value, range) => {
+    const { from, to } = range;
+    if (from.tag !== "unbounded") {
+      const c = scalarCompare(value, from.value);
+      if (c < 0) return false;
+      if (c === 0 && from.tag === "excluded") return false;
+    }
+    if (to.tag !== "unbounded") {
+      const c = scalarCompare(value, to.value);
+      if (c > 0) return false;
+      if (c === 0 && to.tag === "excluded") return false;
+    }
+    return true;
+  };
+  var newIndexNode = () => ({
+    rows: /* @__PURE__ */ new Map(),
+    children: /* @__PURE__ */ new Map()
+  });
   var TableCacheImpl = class {
     hasPrimaryKey;
     rows;
     tableDef;
+    #indexes = [];
     emitter;
     /**
      * @param name the table name
@@ -5785,41 +5923,53 @@ ${ty.variants.map(
         this[idxDef.name] = index;
       }
     }
-    // TODO: this just scans the whole table; we should build proper index structures
     #makeReadonlyIndex(tableDef, idx) {
       if (idx.algorithm !== "btree") {
         throw new Error("Only btree indexes are supported in TableCacheImpl");
       }
       const columns = idx.columns;
-      const getKey = (row) => columns.map((c) => row[c]);
-      const matchRange = (row, rangeArg) => {
-        const key = getKey(row);
-        const arr = Array.isArray(rangeArg) ? rangeArg : [rangeArg];
-        const prefixLen = Math.max(0, arr.length - 1);
-        for (let i = 0; i < prefixLen; i++) {
-          if (!deepEqual(key[i], arr[i])) return false;
+      const keyFns = columns.map((c) => {
+        const ty = tableDef.columns[c].typeBuilder.algebraicType;
+        return (value) => AlgebraicType.intoMapKey(ty, value);
+      });
+      const getCol = (row, i) => row[columns[i]];
+      const root = newIndexNode();
+      const lookup = (prefix) => {
+        let node = root;
+        for (let i = 0; i < prefix.length && node; i++) {
+          node = node.children.get(keyFns[i](prefix[i]));
         }
-        const lastProvided = arr[arr.length - 1];
-        const kLast = key[prefixLen];
-        if (lastProvided && typeof lastProvided === "object" && "from" in lastProvided && "to" in lastProvided) {
-          const from = lastProvided.from;
-          const to = lastProvided.to;
-          if (from.tag !== "unbounded") {
-            const c = scalarCompare(kLast, from.value);
-            if (c < 0) return false;
-            if (c === 0 && from.tag === "excluded") return false;
-          }
-          if (to.tag !== "unbounded") {
-            const c = scalarCompare(kLast, to.value);
-            if (c > 0) return false;
-            if (c === 0 && to.tag === "excluded") return false;
-          }
-          return true;
-        } else {
-          if (!deepEqual(kLast, lastProvided)) return false;
-          return true;
-        }
+        return node;
       };
+      this.#indexes.push({
+        add: (rowId, row) => {
+          let node = root;
+          for (let i = 0; i < columns.length; i++) {
+            const key = keyFns[i](getCol(row, i));
+            let child = node.children.get(key);
+            if (!child) {
+              child = newIndexNode();
+              node.children.set(key, child);
+            }
+            child.rows.set(rowId, row);
+            node = child;
+          }
+        },
+        remove: (rowId, row) => {
+          let node = root;
+          for (let i = 0; i < columns.length; i++) {
+            const key = keyFns[i](getCol(row, i));
+            const child = node.children.get(key);
+            if (!child) return;
+            child.rows.delete(rowId);
+            if (child.rows.size === 0) {
+              node.children.delete(key);
+              return;
+            }
+            node = child;
+          }
+        }
+      });
       const isUnique = tableDef.constraints.some((constraint) => {
         if (constraint.constraint !== "unique") {
           return false;
@@ -5830,19 +5980,26 @@ ${ty.variants.map(
       if (isUnique) {
         const impl = {
           find: (colVal) => {
-            const expected = Array.isArray(colVal) ? colVal : [colVal];
-            for (const row of self.iter()) {
-              if (deepEqual(getKey(row), expected)) return row;
-            }
-            return null;
+            const node = lookup(Array.isArray(colVal) ? colVal : [colVal]);
+            return node?.rows.values().next().value ?? null;
           }
         };
         return impl;
       } else {
         const impl = {
+          // The server’s ranged scan fixes all prefix cols to equality and applies
+          // the bound only to the *last* provided term. We mirror that.
           *filter(range) {
-            for (const row of self.iter()) {
-              if (matchRange(row, range)) yield row;
+            const arr = Array.isArray(range) ? range : [range];
+            const last = arr[arr.length - 1];
+            if (!isRange(last)) {
+              const node = lookup(arr);
+              if (node) yield* node.rows.values();
+              return;
+            }
+            const candidates = arr.length === 1 ? self.iter() : lookup(arr.slice(0, -1))?.rows.values() ?? [];
+            for (const row of candidates) {
+              if (inRange(getCol(row, arr.length - 1), last)) yield row;
             }
           }
         };
@@ -5873,7 +6030,17 @@ ${ty.variants.map(
     [Symbol.iterator]() {
       return this.iter();
     }
-    applyOperations = (operations, ctx) => {
+    /** Delete every cached reference, including overlaps between subscriptions. */
+    snapshotDeleteOperations = () => {
+      const operations = [];
+      for (const [rowId, [row, refCount]] of this.rows) {
+        for (let i = 0; i < refCount; i++) {
+          operations.push({ type: "delete", rowId, row });
+        }
+      }
+      return operations;
+    };
+    applyOperations = (operations, ctx, options) => {
       const pendingCallbacks = [];
       if (this.tableDef.isEvent) {
         for (const op of operations) {
@@ -5889,7 +6056,7 @@ ${ty.variants.map(
         }
         return pendingCallbacks;
       }
-      if (this.hasPrimaryKey) {
+      if (this.hasPrimaryKey || options?.skipIdenticalUpdates) {
         const insertMap = /* @__PURE__ */ new Map();
         const deleteMap = /* @__PURE__ */ new Map();
         for (const op of operations) {
@@ -5910,7 +6077,8 @@ ${ty.variants.map(
               ctx,
               primaryKey,
               insertOp.row,
-              refCountDelta
+              refCountDelta,
+              options?.skipIdenticalUpdates
             );
             if (maybeCb) {
               pendingCallbacks.push(maybeCb);
@@ -5946,7 +6114,7 @@ ${ty.variants.map(
       }
       return pendingCallbacks;
     };
-    update = (ctx, rowId, newRow, refCountDelta = 0) => {
+    update = (ctx, rowId, newRow, refCountDelta = 0, skipIfIdentical = false) => {
       const existingEntry = this.rows.get(rowId);
       if (!existingEntry) {
         stdbLogger(
@@ -5964,7 +6132,10 @@ ${ty.variants.map(
         );
         return void 0;
       }
-      this.rows.set(rowId, [newRow, refCount]);
+      this.#setRow(rowId, newRow, refCount);
+      if (skipIfIdentical && deepEqual(oldRow, newRow)) {
+        return void 0;
+      }
       if (previousCount === 0) {
         stdbLogger(
           "error",
@@ -5987,12 +6158,12 @@ ${ty.variants.map(
       };
     };
     insert = (ctx, operation, count = 1) => {
-      const [_, previousCount] = this.rows.get(operation.rowId) || [
+      const [existingRow, previousCount] = this.rows.get(operation.rowId) || [
         operation.row,
         0
       ];
-      this.rows.set(operation.rowId, [operation.row, previousCount + count]);
       if (previousCount === 0) {
+        this.#setRow(operation.rowId, operation.row, count);
         return {
           type: "insert",
           table: this.tableDef.sourceName,
@@ -6001,10 +6172,11 @@ ${ty.variants.map(
           }
         };
       }
+      this.rows.set(operation.rowId, [existingRow, previousCount + count]);
       return void 0;
     };
     delete = (ctx, operation, count = 1) => {
-      const [_, previousCount] = this.rows.get(operation.rowId) || [
+      const [existingRow, previousCount] = this.rows.get(operation.rowId) || [
         operation.row,
         0
       ];
@@ -6013,7 +6185,7 @@ ${ty.variants.map(
         return void 0;
       }
       if (previousCount <= count) {
-        this.rows.delete(operation.rowId);
+        this.#deleteRow(operation.rowId);
         return {
           type: "delete",
           table: this.tableDef.sourceName,
@@ -6022,9 +6194,23 @@ ${ty.variants.map(
           }
         };
       }
-      this.rows.set(operation.rowId, [operation.row, previousCount - count]);
+      this.rows.set(operation.rowId, [existingRow, previousCount - count]);
       return void 0;
     };
+    #setRow(rowId, row, refCount) {
+      const existing = this.rows.get(rowId);
+      if (existing) {
+        for (const index of this.#indexes) index.remove(rowId, existing[0]);
+      }
+      this.rows.set(rowId, [row, refCount]);
+      for (const index of this.#indexes) index.add(rowId, row);
+    }
+    #deleteRow(rowId) {
+      const existing = this.rows.get(rowId);
+      if (!existing) return;
+      for (const index of this.#indexes) index.remove(rowId, existing[0]);
+      this.rows.delete(rowId);
+    }
     /**
      * Register a callback for when a row is newly inserted into the database.
      *
@@ -6323,6 +6509,13 @@ ${ty.variants.map(
       throw err;
     }
   }
+  var WebSocketTokenError = class extends Error {
+    constructor(status, statusText) {
+      super(`Failed to verify token: ${status} ${statusText}`);
+      this.status = status;
+      this.name = "WebSocketTokenError";
+    }
+  };
   async function openWebSocket({
     url,
     nameOrAddress,
@@ -6330,7 +6523,9 @@ ${ty.variants.map(
     authToken,
     compression,
     lightMode,
-    confirmedReads
+    confirmedReads,
+    connectionId,
+    sessionId
   }) {
     const headers = new Headers();
     const WS = await resolveWS();
@@ -6344,7 +6539,7 @@ ${ty.variants.map(
         const { token } = await response.json();
         temporaryAuthToken = token;
       } else {
-        throw new Error(`Failed to verify token: ${response.statusText}`);
+        throw new WebSocketTokenError(response.status, response.statusText);
       }
     }
     const databaseUrl = new URL(`v1/database/${nameOrAddress}/subscribe`, url);
@@ -6360,6 +6555,12 @@ ${ty.variants.map(
     }
     if (confirmedReads !== void 0) {
       databaseUrl.searchParams.set("confirmed", confirmedReads.toString());
+    }
+    if (connectionId) {
+      databaseUrl.searchParams.set("connection_id", connectionId);
+    }
+    if (sessionId) {
+      databaseUrl.searchParams.set("session_id", sessionId);
     }
     const ws = new WS(databaseUrl.toString(), wsProtocol);
     ws.binaryType = "arraybuffer";
@@ -6379,19 +6580,33 @@ ${ty.variants.map(
       this.#ws.onopen = handler;
     }
     set onmessage(handler) {
+      let tail = Promise.resolve();
       this.#ws.onmessage = async (msg) => {
-        let data;
+        const pending = this.#decompress(new Uint8Array(msg.data));
+        pending.catch(() => {
+        });
+        const previous = tail;
+        let release;
+        tail = new Promise((resolve) => {
+          release = resolve;
+        });
         try {
-          data = await this.#decompress(new Uint8Array(msg.data));
-        } catch (e) {
-          console.error(
-            "[SpacetimeDB] WebSocket decompress failed, closing socket:",
-            e
-          );
-          this.#ws.close();
-          return;
+          await previous;
+          let data;
+          try {
+            data = await pending;
+          } catch (e) {
+            console.error(
+              "[SpacetimeDB] WebSocket decompress failed, closing socket:",
+              e
+            );
+            this.#ws.close();
+            return;
+          }
+          handler({ data });
+        } finally {
+          release();
         }
-        handler({ data });
       };
     }
     set onerror(handler) {
@@ -6449,6 +6664,9 @@ ${ty.variants.map(
     #compression = "gzip";
     #lightMode = false;
     #confirmedReads;
+    #automaticReconnect = false;
+    #reconnectPolicy;
+    #tokenProvider;
     #createWSFn;
     /**
      * Set the URI of the SpacetimeDB server to connect to.
@@ -6543,7 +6761,32 @@ ${ty.variants.map(
       return this;
     }
     /**
-     * Register a callback to be invoked upon authentication with the database.
+     * Reconnect after an established connection drops, preserving handles and callbacks.
+     * Retries use exponential backoff from `minDelayMs` (default 1 s) up to
+     * `maxDelayMs` (default 30 s) until disconnect() or a terminal failure.
+     * Values below the 500 ms and 1 s floors are raised with a warning, so
+     * that retrying clients cannot overwhelm the database.
+     * Initial connection failures are not retried. Lifecycle callbacks report
+     * the next attempt and delay, or undefined when no retry is scheduled.
+     */
+    withAutomaticReconnect(options) {
+      this.#automaticReconnect = true;
+      if (options) {
+        this.#reconnectPolicy = resolveReconnectPolicy(options);
+      }
+      return this;
+    }
+    /**
+     * Refresh the retained token before reconnecting when it is near expiry or
+     * rejected. The provider must return a token for the same identity.
+     */
+    withTokenProvider(provider) {
+      this.#tokenProvider = provider;
+      return this;
+    }
+    /**
+     * Register a callback for the first successful connection to the database.
+     * Automatic reconnects invoke {@link DbConnectionBuilder.onAutomaticReconnect} instead.
      *
      * @param identity A unique identifier for a client connected to a database.
      * @param token The credentials to use to authenticate with SpacetimeDB.
@@ -6571,6 +6814,16 @@ ${ty.variants.map(
       return this;
     }
     /**
+     * Register a callback for each successful automatic reconnect after the
+     * initial connection. Receives the current identity and authentication token.
+     * Runs before subscription replay; use subscription `onApplied` callbacks
+     * to observe refreshed data.
+     */
+    onAutomaticReconnect(callback) {
+      this.#emitter.on("automaticReconnect", callback);
+      return this;
+    }
+    /**
      * Register a callback to be invoked upon an error.
      *
      * @example
@@ -6580,6 +6833,12 @@ ${ty.variants.map(
      *   console.log("Error connecting to SpacetimeDB:", error);
      * });
      * ```
+     *
+     * With {@link DbConnectionBuilder.withAutomaticReconnect} enabled, this
+     * callback also reports each failed reconnect attempt:
+     * `nextReconnectAttempt` is the number of the upcoming attempt and
+     * `nextReconnectDelayMs` the wait before it. Both are `undefined` when the
+     * SDK will not retry, as for a failed initial connection.
      */
     onConnectError(callback) {
       this.#emitter.on("connectError", callback);
@@ -6608,6 +6867,13 @@ ${ty.variants.map(
      * no mechanism is provided to unregister the provided callback.
      * This is a concession to ergonomics; there's no clean place to return a `CallbackId` from this method
      * or from `build`.
+     *
+     * With {@link DbConnectionBuilder.withAutomaticReconnect} enabled, this
+     * callback also reports connections lost mid-session, and the SDK keeps
+     * reconnecting afterwards: `nextReconnectAttempt` is the number of the
+     * upcoming attempt and `nextReconnectDelayMs` the wait before it. Both are
+     * `undefined` when the SDK will not retry, which is always the case without
+     * automatic reconnection.
      *
      * @param {function(error?: Error): void} callback - The callback to invoke upon disconnection.
      * @throws {Error} Throws an error if called multiple times on the same `DbConnectionBuilder`.
@@ -6656,7 +6922,10 @@ ${ty.variants.map(
         lightMode: this.#lightMode,
         confirmedReads: this.#confirmedReads,
         createWSFn: this.#createWSFn,
-        remoteModule: this.remoteModule
+        remoteModule: this.remoteModule,
+        automaticReconnect: this.#automaticReconnect,
+        reconnectPolicy: this.#reconnectPolicy,
+        tokenProvider: this.#tokenProvider
       });
     }
   };
@@ -6750,12 +7019,13 @@ ${ty.variants.map(
      * on a `DbConnection` that has previously used `subscribeToAllTables`,
      * or vice versa, may misbehave in any number of ways,
      * including dropping subscriptions, corrupting the client cache, or throwing errors.
+     *
+     * Views that take arguments are left out, as there are no arguments to pass them.
      */
     subscribeToAllTables() {
       const remoteModule = this.db[INTERNAL_REMOTE_MODULE]();
-      const queries = Object.values(remoteModule.tables).map(
-        (table2) => `SELECT * FROM ${table2.sourceName}`
-      );
+      const viewsWithArgs = new Set(remoteModule.viewsWithArgs);
+      const queries = Object.values(remoteModule.tables).filter((table2) => !viewsWithArgs.has(table2.sourceName)).map((table2) => `SELECT * FROM ${table2.sourceName}`);
       this.subscribe(queries);
     }
   };
@@ -6795,6 +7065,10 @@ ${ty.variants.map(
     #endedState = false;
     #activeState = false;
     #emitter = new EventEmitter();
+    /** @internal Rebind the retained handle to its replayed query set. */
+    rebindQuerySetId(querySetId) {
+      this.#querySetId = querySetId;
+    }
     /**
      * Consumes self and issues an `Unsubscribe` message,
      * removing this query from the client's set of subscribed queries.
@@ -6805,7 +7079,6 @@ ${ty.variants.map(
         throw new Error("Unsubscribe has already been called");
       }
       this.#unsubscribeCalled = true;
-      this.db.unregisterSubscription(this.#querySetId);
       this.#emitter.on(
         "end",
         (_ctx) => {
@@ -6813,6 +7086,7 @@ ${ty.variants.map(
           this.#activeState = false;
         }
       );
+      this.db.unregisterSubscription(this.#querySetId);
     }
     /**
      * Unsubscribes and also registers a callback to run upon success.
@@ -6832,7 +7106,6 @@ ${ty.variants.map(
         throw new Error("Unsubscribe has already been called");
       }
       this.#unsubscribeCalled = true;
-      this.db.unregisterSubscription(this.#querySetId);
       this.#emitter.on(
         "end",
         (ctx) => {
@@ -6841,6 +7114,7 @@ ${ty.variants.map(
           onEnd(ctx);
         }
       );
+      this.db.unregisterSubscription(this.#querySetId);
     }
     /**
      * True if this `SubscriptionHandle` has ended,
@@ -6935,6 +7209,114 @@ ${ty.variants.map(
     }
     return count;
   }
+  var RECONNECT_INITIAL_DELAY_MS = 1e3;
+  var RECONNECT_MAX_DELAY_MS = 3e4;
+  var RECONNECT_JITTER = 0.5;
+  var RECONNECT_MIN_DELAY_FLOOR_MS = 500;
+  var RECONNECT_MAX_DELAY_FLOOR_MS = 1e3;
+  var DEFAULT_RECONNECT_POLICY = {
+    minDelayMs: RECONNECT_INITIAL_DELAY_MS,
+    maxDelayMs: RECONNECT_MAX_DELAY_MS
+  };
+  function resolveReconnectPolicy(options = {}) {
+    let {
+      minDelayMs = RECONNECT_INITIAL_DELAY_MS,
+      maxDelayMs = RECONNECT_MAX_DELAY_MS
+    } = options;
+    if (!(minDelayMs >= RECONNECT_MIN_DELAY_FLOOR_MS)) {
+      stdbLogger(
+        "warn",
+        `Reconnect minDelayMs ${minDelayMs} is below the ${RECONNECT_MIN_DELAY_FLOOR_MS} ms floor; using ${RECONNECT_MIN_DELAY_FLOOR_MS} ms.`
+      );
+      minDelayMs = RECONNECT_MIN_DELAY_FLOOR_MS;
+    }
+    const maxFloor = Math.max(RECONNECT_MAX_DELAY_FLOOR_MS, minDelayMs);
+    if (!(maxDelayMs >= maxFloor)) {
+      stdbLogger(
+        "warn",
+        `Reconnect maxDelayMs ${maxDelayMs} is below the ${maxFloor} ms floor; using ${maxFloor} ms.`
+      );
+      maxDelayMs = maxFloor;
+    }
+    return { minDelayMs, maxDelayMs };
+  }
+  var TOKEN_REFRESH_MARGIN_FRACTION = 0.05;
+  var TOKEN_REFRESH_MIN_MARGIN_MS = 3e4;
+  function computeReconnectDelayMs(attempt, random = Math.random, { minDelayMs, maxDelayMs } = DEFAULT_RECONNECT_POLICY) {
+    const base = Math.min(
+      minDelayMs * Math.pow(2, Math.max(0, attempt - 1)),
+      maxDelayMs
+    );
+    const jittered = base * (1 + RECONNECT_JITTER * (2 * random() - 1));
+    return Math.max(minDelayMs, Math.min(jittered, maxDelayMs));
+  }
+  function tokenNeedsRefresh(token, nowMs = Date.now()) {
+    if (!token) {
+      return true;
+    }
+    const claims = decodeJwtClaims2(token);
+    if (claims === void 0 || claims.exp === void 0) {
+      return true;
+    }
+    const expiryMs = claims.exp * 1e3;
+    const lifetimeMs = claims.iat !== void 0 ? expiryMs - claims.iat * 1e3 : void 0;
+    const margin = Math.max(
+      TOKEN_REFRESH_MIN_MARGIN_MS,
+      lifetimeMs !== void 0 ? lifetimeMs * TOKEN_REFRESH_MARGIN_FRACTION : 0
+    );
+    return expiryMs - nowMs <= margin;
+  }
+  function errorFromEvent(value, fallbackMessage) {
+    if (value instanceof Error) {
+      return value;
+    }
+    if (typeof value === "object" && value !== null) {
+      const message = "message" in value ? value.message : void 0;
+      const error = "error" in value ? value.error : void 0;
+      if (error instanceof Error) {
+        return error;
+      }
+      if (typeof message === "string" && message.length > 0) {
+        return new Error(message, { cause: value });
+      }
+    }
+    return new Error(fallbackMessage, { cause: value });
+  }
+  function isTerminalConnectError(error) {
+    return error instanceof IdentityChangedError || error instanceof WebSocketProtocolError;
+  }
+  function isAuthError(error) {
+    return error instanceof WebSocketTokenError && (error.status === 401 || error.status === 403);
+  }
+  var WebSocketProtocolError = class extends Error {
+  };
+  var SESSION_BUSY_CLOSE_CODE = 4e3;
+  function decodeJwtClaims2(token) {
+    const parts = token.split(".");
+    if (parts.length < 2) {
+      return void 0;
+    }
+    try {
+      const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+      const padded = payload.padEnd(
+        payload.length + (4 - payload.length % 4) % 4,
+        "="
+      );
+      const json = typeof atob === "function" ? atob(padded) : Buffer.from(padded, "base64").toString("binary");
+      const claims = JSON.parse(json);
+      if (typeof claims !== "object" || claims === null) {
+        return void 0;
+      }
+      const exp = "exp" in claims ? claims.exp : void 0;
+      const iat = "iat" in claims ? claims.iat : void 0;
+      return {
+        exp: typeof exp === "number" && Number.isFinite(exp) ? exp : void 0,
+        iat: typeof iat === "number" && Number.isFinite(iat) ? iat : void 0
+      };
+    } catch {
+      return void 0;
+    }
+  }
   var TEXT_ENCODER = new TextEncoder();
   function createDeferred() {
     let resolve;
@@ -6962,7 +7344,7 @@ ${ty.variants.map(
   var MAX_V3_OUTBOUND_FRAME_BYTES = 256 * 1024;
   var WS_READY_STATE_CLOSING = 2;
   var WS_READY_STATE_CLOSED = 3;
-  var DbConnectionImpl = class {
+  var DbConnectionImpl2 = class {
     /**
      * Whether or not the connection is active.
      */
@@ -6975,11 +7357,18 @@ ${ty.variants.map(
      */
     isDisconnectRequested = false;
     /**
+     * The websocket error that ended an established connection, if any,
+     * normalized to `Error`. Passed to the `disconnect` emit so `onDisconnect`
+     * callbacks receive the documented `error?: Error` shape.
+     */
+    #connectionError = void 0;
+    /**
      * Whether the underlying websocket has entered `CLOSING` (2) or `CLOSED`
      * (3). This becomes true even when the browser never delivered an
      * `onclose` event, for example if the socket was torn down while the tab was
-     * frozen or the machine was asleep. The `ConnectionManager` uses this to detect
-     * such "zombie" connections when the page resumes and to force a reconnect.
+     * frozen or the machine was asleep. The liveness listeners (see
+     * {@link DbConnectionImpl.#installLivenessListeners}) use this to detect
+     * such "zombie" sockets when the page resumes and to force a reconnect.
      *
      * Returns false while the socket is still `CONNECTING`/`OPEN`, or before
      * the socket has been created.
@@ -7021,6 +7410,29 @@ ${ty.variants.map(
      */
     connectionId = ConnectionId.random();
     #connectionIdHex = this.connectionId.toHexString();
+    // Stable across sockets; each attempt still gets a fresh ConnectionId.
+    #sessionIdHex = ConnectionId.random().toHexString();
+    #automaticReconnect;
+    #reconnectPolicy;
+    #tokenProvider;
+    #wsBaseUrl;
+    #nameOrAddress;
+    #createWSFn;
+    #compression;
+    #lightMode;
+    #confirmedReads;
+    // Invalidates events and asynchronous work from discarded sockets.
+    #socketGeneration = 0;
+    #hasEverConnected = false;
+    #connectionEnded = false;
+    #reconnectAttempt = 0;
+    #reconnectTimer;
+    #forceTokenRefresh = false;
+    #usedFreshToken = false;
+    #livenessCleanup;
+    #pendingReplay;
+    #preparingReplay = false;
+    #socketEstablished = false;
     // These fields are meant to be strictly private.
     #queryId = 0;
     #requestId = 0;
@@ -7037,6 +7449,10 @@ ${ty.variants.map(
     #reducerCallbacks = /* @__PURE__ */ new Map();
     #reducerCallInfo = /* @__PURE__ */ new Map();
     #procedureCallbacks = /* @__PURE__ */ new Map();
+    /**
+     * Reject pending reducer and procedure calls when the socket drops.
+     */
+    #pendingCallRejecters = /* @__PURE__ */ new Map();
     #rowDeserializers;
     #rowIdMetadata;
     #reducerArgsSerializers;
@@ -7066,7 +7482,10 @@ ${ty.variants.map(
       createWSFn,
       compression,
       lightMode,
-      confirmedReads
+      confirmedReads,
+      automaticReconnect,
+      tokenProvider,
+      reconnectPolicy
     }) {
       stdbLogger("info", "Connecting to SpacetimeDB WS...");
       const url = new URL(uri.toString());
@@ -7119,37 +7538,279 @@ ${ty.variants.map(
           procedure.name
         );
       }
-      url.searchParams.set("connection_id", this.#connectionIdHex);
       this.clientCache = new ClientCache();
       this.db = this.#makeDbView();
       this.reducers = this.#makeReducers(remoteModule);
       this.procedures = this.#makeProcedures(remoteModule);
-      this.wsPromise = createWSFn({
-        url,
-        nameOrAddress,
-        wsProtocol: [...PREFERRED_WS_PROTOCOLS],
-        authToken: token,
-        compression,
-        lightMode,
-        confirmedReads
-      }).then((v) => {
-        this.ws = v;
-        this.ws.onclose = () => {
+      this.#automaticReconnect = automaticReconnect ?? false;
+      this.#preparingReplay = this.#automaticReconnect;
+      this.#reconnectPolicy = reconnectPolicy ?? DEFAULT_RECONNECT_POLICY;
+      this.#tokenProvider = tokenProvider;
+      this.#wsBaseUrl = url;
+      this.#nameOrAddress = nameOrAddress;
+      this.#createWSFn = createWSFn;
+      this.#compression = compression;
+      this.#lightMode = lightMode;
+      this.#confirmedReads = confirmedReads;
+      this.wsPromise = this.#openSocket();
+    }
+    async #openSocket() {
+      const generation = ++this.#socketGeneration;
+      if (this.#hasEverConnected) {
+        this.#setConnectionId(ConnectionId.random());
+      }
+      this.#usedFreshToken = false;
+      const url = new URL(this.#wsBaseUrl.toString());
+      url.searchParams.set("connection_id", this.#connectionIdHex);
+      try {
+        const authToken = await this.#tokenForAttempt();
+        if (generation !== this.#socketGeneration || this.#connectionEnded) {
+          return void 0;
+        }
+        this.token = authToken;
+        const ws = await this.#createWSFn({
+          url,
+          nameOrAddress: this.#nameOrAddress,
+          wsProtocol: [...PREFERRED_WS_PROTOCOLS],
+          authToken,
+          compression: this.#compression,
+          lightMode: this.#lightMode,
+          confirmedReads: this.#confirmedReads,
+          connectionId: this.#connectionIdHex,
+          sessionId: this.#automaticReconnect ? this.#sessionIdHex : void 0
+        });
+        if (generation !== this.#socketGeneration || this.#connectionEnded) {
+          ws.close();
+          return void 0;
+        }
+        this.ws = ws;
+        this.#socketEstablished = false;
+        const isCurrent = () => generation === this.#socketGeneration && !this.#connectionEnded;
+        const handleLoss = (error, isErrorEvent) => {
+          if (!isCurrent()) return;
           this.isActive = false;
-          this.#emitter.emit("disconnect", this);
+          if (!this.#automaticReconnect) {
+            this.#emitter.emit(
+              isErrorEvent ? "connectError" : "disconnect",
+              this,
+              isErrorEvent ? error : this.#connectionError
+            );
+          } else if (this.#socketEstablished) {
+            this.#handleConnectionLoss(error);
+          } else {
+            this.#handleAttemptFailure(error);
+          }
         };
-        this.ws.onerror = (e) => {
-          this.isActive = false;
-          this.#emitter.emit("connectError", this, e);
+        ws.onclose = (event) => {
+          if (!isCurrent()) return;
+          if (this.#automaticReconnect && this.#hasEverConnected && !this.#socketEstablished && event.code === SESSION_BUSY_CLOSE_CODE) {
+            this.#discardSocket();
+            const delayMs = this.#reconnectDelayMs(1);
+            this.#emitter.emit(
+              "connectError",
+              this,
+              new Error("Session busy"),
+              this.#reconnectAttempt,
+              delayMs
+            );
+            this.#scheduleReconnect(this.#reconnectAttempt, delayMs);
+            return;
+          }
+          const message = `WebSocket closed (code ${event.code}${event.reason ? `: ${event.reason}` : ""})`;
+          const error = [1002, 1003, 1007, 1008].includes(event.code) ? new WebSocketProtocolError(message) : new Error(message);
+          handleLoss(error, false);
         };
-        this.ws.onopen = this.#handleOnOpen.bind(this);
-        this.ws.onmessage = this.#handleOnMessage.bind(this);
-        return v;
-      }).catch((e) => {
+        ws.onerror = (event) => {
+          if (!isCurrent()) return;
+          const error = errorFromEvent(event, "WebSocket error");
+          if (!this.#automaticReconnect && this.#hasEverConnected) {
+            this.isActive = false;
+            this.#connectionError = error;
+            ws.close();
+            return;
+          }
+          handleLoss(error, true);
+        };
+        ws.onopen = () => {
+          if (isCurrent()) this.#handleOnOpen();
+        };
+        ws.onmessage = (message) => {
+          if (isCurrent()) this.#handleOnMessage(message);
+        };
+        return ws;
+      } catch (e) {
+        if (generation !== this.#socketGeneration || this.#connectionEnded) {
+          return void 0;
+        }
         stdbLogger("error", "Error connecting to SpacetimeDB WS");
-        this.#emitter.emit("connectError", this, e);
+        this.isActive = false;
+        this.#handleAttemptFailure(errorFromEvent(e, "Failed to connect"));
         return void 0;
-      });
+      }
+    }
+    async #tokenForAttempt() {
+      if (!this.#tokenProvider || !this.#hasEverConnected) {
+        return this.token;
+      }
+      if (!this.#forceTokenRefresh && !tokenNeedsRefresh(this.token)) {
+        return this.token;
+      }
+      const token = await this.#tokenProvider();
+      this.#forceTokenRefresh = false;
+      this.#usedFreshToken = true;
+      return token;
+    }
+    #handleConnectionLoss(error) {
+      if (this.#connectionEnded) {
+        return;
+      }
+      this.#discardSocket();
+      this.#failInFlightCalls(new UnknownCallResultError());
+      const willReconnect = this.#automaticReconnect && !this.isDisconnectRequested && !(error instanceof WebSocketProtocolError);
+      if (!willReconnect) {
+        this.#endConnection(error);
+        return;
+      }
+      const attempt = this.#reconnectAttempt + 1;
+      const delayMs = this.#reconnectDelayMs(attempt);
+      try {
+        this.#emitter.emit("disconnect", this, error, attempt, delayMs);
+      } finally {
+        this.#scheduleReconnect(attempt, delayMs);
+      }
+    }
+    #handleAttemptFailure(error) {
+      if (this.#connectionEnded) {
+        return;
+      }
+      this.#discardSocket();
+      this.#failInFlightCalls(new UnknownCallResultError());
+      const willReconnect = this.#automaticReconnect && this.#hasEverConnected && !this.isDisconnectRequested && !isTerminalConnectError(error) && !(isAuthError(error) && (!this.#tokenProvider || this.#usedFreshToken));
+      if (!willReconnect) {
+        this.#endConnection(void 0, { alreadyReported: true });
+        this.#emitter.emit("connectError", this, error);
+        return;
+      }
+      if (this.#tokenProvider && isAuthError(error)) {
+        this.#forceTokenRefresh = true;
+      }
+      const attempt = this.#reconnectAttempt + 1;
+      const delayMs = this.#reconnectDelayMs(attempt);
+      try {
+        this.#emitter.emit("connectError", this, error, attempt, delayMs);
+      } finally {
+        this.#scheduleReconnect(attempt, delayMs);
+      }
+    }
+    #reconnectDelayMs(attempt) {
+      return computeReconnectDelayMs(attempt, Math.random, this.#reconnectPolicy);
+    }
+    #scheduleReconnect(attempt, delayMs) {
+      if (this.#connectionEnded || this.isDisconnectRequested) return;
+      this.#reconnectAttempt = attempt;
+      this.#clearReconnectTimer();
+      this.#reconnectTimer = setTimeout(() => {
+        this.#reconnectTimer = void 0;
+        if (this.#connectionEnded || this.isDisconnectRequested) {
+          return;
+        }
+        this.wsPromise = this.#openSocket();
+      }, delayMs);
+    }
+    #clearReconnectTimer() {
+      if (this.#reconnectTimer !== void 0) {
+        clearTimeout(this.#reconnectTimer);
+        this.#reconnectTimer = void 0;
+      }
+    }
+    #endConnection(disconnectError, options) {
+      if (this.#connectionEnded) {
+        return;
+      }
+      this.#connectionEnded = true;
+      this.isActive = false;
+      this.#clearReconnectTimer();
+      this.#discardSocket();
+      this.#removeLivenessListeners();
+      this.#failInFlightCalls(new UnknownCallResultError());
+      if (!options?.alreadyReported) {
+        this.#emitter.emit("disconnect", this, disconnectError);
+      }
+    }
+    #failInFlightCalls(error) {
+      const rejecters = [...this.#pendingCallRejecters.values()];
+      this.#pendingCallRejecters.clear();
+      this.#reducerCallbacks.clear();
+      this.#reducerCallInfo.clear();
+      this.#procedureCallbacks.clear();
+      for (const reject of rejecters) {
+        reject(error);
+      }
+    }
+    /** True while the SDK is between a lost connection and a completed reconnect. */
+    get isReconnecting() {
+      return this.#automaticReconnect && this.#hasEverConnected && !this.isActive && !this.#connectionEnded;
+    }
+    #discardSocket() {
+      this.#socketGeneration += 1;
+      this.isActive = false;
+      this.#socketEstablished = false;
+      this.#pendingReplay = void 0;
+      this.#preparingReplay = this.#hasEverConnected;
+      this.#outboundQueue.length = 0;
+      this.#inboundQueue.length = 0;
+      const ws = this.ws;
+      this.ws = void 0;
+      ws?.close();
+      for (const [id, entry] of this.#subscriptionManager.subscriptions) {
+        if (entry.unsubscribeRequested) this.#endSubscription(id);
+      }
+    }
+    // Resume events recover sockets that closed silently while the page was frozen.
+    #installLivenessListeners() {
+      if (!this.#automaticReconnect || this.#livenessCleanup) {
+        return;
+      }
+      const doc = typeof document !== "undefined" ? document : void 0;
+      const win = typeof window !== "undefined" ? window : void 0;
+      if (!doc && !win) {
+        return;
+      }
+      const onResume = () => this.#handleLivenessResume();
+      const onVisibilityChange = () => {
+        if (doc?.visibilityState === "visible") {
+          onResume();
+        }
+      };
+      doc?.addEventListener("visibilitychange", onVisibilityChange);
+      win?.addEventListener("focus", onResume);
+      win?.addEventListener("online", onResume);
+      win?.addEventListener("pageshow", onResume);
+      this.#livenessCleanup = () => {
+        doc?.removeEventListener("visibilitychange", onVisibilityChange);
+        win?.removeEventListener("focus", onResume);
+        win?.removeEventListener("online", onResume);
+        win?.removeEventListener("pageshow", onResume);
+        this.#livenessCleanup = void 0;
+      };
+    }
+    #removeLivenessListeners() {
+      this.#livenessCleanup?.();
+    }
+    #handleLivenessResume() {
+      if (this.#connectionEnded || this.isDisconnectRequested) {
+        return;
+      }
+      if (this.isSocketClosed) {
+        const error = new Error("WebSocket closed while suspended");
+        if (this.#socketEstablished) this.#handleConnectionLoss(error);
+        else this.#handleAttemptFailure(error);
+        return;
+      }
+      if (this.#reconnectTimer !== void 0) {
+        this.#clearReconnectTimer();
+        this.wsPromise = this.#openSocket();
+      }
     }
     #getNextQueryId = () => {
       const queryId = this.#queryId;
@@ -7160,8 +7821,8 @@ ${ty.variants.map(
     #makeDbView() {
       const view = /* @__PURE__ */ Object.create(null);
       for (const tbl of Object.values(this.#sourceNameToTableDef)) {
-        const key = tbl.accessorName;
-        Object.defineProperty(view, key, {
+        const [target, key] = accessorSlot(view, tbl.accessorName);
+        Object.defineProperty(target, key, {
           enumerable: true,
           configurable: false,
           get: () => this.clientCache.getOrCreateTable(tbl)
@@ -7174,9 +7835,9 @@ ${ty.variants.map(
       for (const reducer of def.reducers) {
         const reducerName = reducer.name;
         const encodedReducerName = this.#reducerNameBytes[reducerName];
-        const key = reducer.accessorName;
+        const [target, key] = accessorSlot(out, reducer.accessorName);
         const { serialize: serializeArgs } = this.#reducerArgsSerializers[reducerName];
-        out[key] = (params) => {
+        target[key] = (params) => {
           const writer = this.#reducerArgsEncoder;
           writer.clear();
           serializeArgs(writer, params);
@@ -7197,9 +7858,9 @@ ${ty.variants.map(
       for (const procedure of def.procedures) {
         const procedureName = procedure.name;
         const encodedProcedureName = this.#procedureNameBytes[procedureName];
-        const key = procedure.accessorName;
+        const [target, key] = accessorSlot(out, procedure.accessorName);
         const { serializeArgs, deserializeReturn } = this.#procedureSerializers[procedureName];
-        out[key] = (params) => {
+        target[key] = (params) => {
           writer.clear();
           serializeArgs(writer, params);
           const argsBuffer = writer.getBuffer();
@@ -7243,8 +7904,14 @@ ${ty.variants.map(
       const querySetId = this.#getNextQueryId();
       this.#subscriptionManager.subscriptions.set(querySetId, {
         handle,
-        emitter: handleEmitter
+        emitter: handleEmitter,
+        // Retained so the subscription can be replayed after a reconnect.
+        querySql: [...querySql]
       });
+      if (!this.#preparingReplay) this.#sendSubscription(querySetId, querySql);
+      return querySetId;
+    }
+    #sendSubscription(querySetId, querySql) {
       const requestId = this.#getNextRequestId();
       this.#sendMessage(
         ClientMessage.Subscribe({
@@ -7253,9 +7920,124 @@ ${ty.variants.map(
           requestId
         })
       );
-      return querySetId;
+    }
+    #replaySubscriptions() {
+      const entries = [...this.#subscriptionManager.subscriptions.entries()];
+      const sets = [];
+      const replayed = /* @__PURE__ */ new Map();
+      for (const [, entry] of entries) {
+        const querySetId = this.#getNextQueryId();
+        entry.handle.rebindQuerySetId(querySetId);
+        replayed.set(querySetId, entry);
+        sets.push({
+          querySetId: { id: querySetId },
+          queryStrings: entry.querySql
+        });
+      }
+      this.#subscriptionManager.subscriptions = replayed;
+      const requestId = this.#getNextRequestId();
+      this.#pendingReplay = {
+        requestId,
+        querySetIds: new Set(replayed.keys())
+      };
+      this.#preparingReplay = false;
+      if (sets.length === 0) {
+        this.#applyReplayBatch({ requestId, results: [] });
+        return;
+      }
+      this.#sendMessage(
+        ClientMessage.SubscribeBatch({
+          requestId,
+          sets
+        })
+      );
+    }
+    #applyReplayBatch(applied) {
+      const pending = this.#pendingReplay;
+      const resultIds = new Set(
+        applied.results.map((result) => result.querySetId.id)
+      );
+      if (!pending || pending.requestId !== applied.requestId || resultIds.size !== applied.results.length || resultIds.size !== pending.querySetIds.size || [...resultIds].some((id) => !pending.querySetIds.has(id))) {
+        this.#handleProtocolError(
+          new Error("Unexpected subscription replay response")
+        );
+        return;
+      }
+      this.#pendingReplay = void 0;
+      const event = {
+        id: this.#nextEventId(),
+        tag: "SubscribeApplied"
+      };
+      const eventContext = this.#makeEventContext(event);
+      const tableUpdates = [];
+      for (const tableDef of Object.values(this.#sourceNameToTableDef)) {
+        const table2 = this.clientCache.tables.get(tableDef.accessorName);
+        const operations = table2?.snapshotDeleteOperations() ?? [];
+        if (operations.length > 0) {
+          tableUpdates.push({ tableName: tableDef.sourceName, operations });
+        }
+      }
+      const failures = [];
+      for (const result of applied.results) {
+        const entry = this.#subscriptionManager.subscriptions.get(
+          result.querySetId.id
+        );
+        if (!entry) {
+          continue;
+        }
+        if (result.outcome.tag === "Error") {
+          this.#subscriptionManager.subscriptions.delete(result.querySetId.id);
+          failures.push({ entry, error: result.outcome.value });
+          continue;
+        }
+        tableUpdates.push(
+          ...this.#queryRowsToTableUpdates(result.outcome.value, "insert")
+        );
+      }
+      const merged = this.#mergeTableUpdates(tableUpdates);
+      const callbacks = this.#applyTableUpdates(merged, eventContext, {
+        // A row which is unchanged across the outage appears as a
+        // delete/insert pair and must produce no callback.
+        skipIdenticalUpdates: true
+      });
+      const { event: _, ...subscriptionEventContext } = eventContext;
+      for (const [querySetId, entry] of this.#subscriptionManager.subscriptions) {
+        if (pending.querySetIds.has(querySetId)) {
+          entry.emitter.emit("applied", subscriptionEventContext);
+        }
+      }
+      for (const { entry, error: message } of failures) {
+        const error = Error(message);
+        const errorEventContext = this.#makeEventContext({
+          id: this.#nextEventId(),
+          tag: "Error",
+          value: error
+        });
+        entry.emitter.emit(
+          "error",
+          { ...errorEventContext, event: error },
+          error
+        );
+      }
+      this.#dispatchPendingCallbacks(callbacks);
+    }
+    #endSubscription(querySetId) {
+      const entry = this.#subscriptionManager.subscriptions.get(querySetId);
+      this.#subscriptionManager.subscriptions.delete(querySetId);
+      const { event: _, ...ctx } = this.#makeEventContext({
+        id: this.#nextEventId(),
+        tag: "UnsubscribeApplied"
+      });
+      entry?.emitter.emit("end", ctx);
     }
     unregisterSubscription(querySetId) {
+      const entry = this.#subscriptionManager.subscriptions.get(querySetId);
+      if (!entry) return;
+      entry.unsubscribeRequested = true;
+      if (this.#automaticReconnect && (!this.isActive || this.#preparingReplay)) {
+        this.#endSubscription(querySetId);
+        return;
+      }
       const requestId = this.#getNextRequestId();
       this.#sendMessage(
         ClientMessage.Unsubscribe({
@@ -7433,6 +8215,9 @@ ${ty.variants.map(
         this.#outboundQueue.push(encoded.slice());
       }
     }
+    #rejectCallIfDisconnected() {
+      return this.#automaticReconnect && !this.isActive ? new DisconnectedError() : void 0;
+    }
     #sendMessage(message) {
       const writer = this.#clientMessageEncoder;
       writer.clear();
@@ -7487,12 +8272,13 @@ ${ty.variants.map(
       if (this.ws) {
         this.#negotiatedWsProtocol = normalizeWsProtocol(this.ws.protocol);
       }
-      this.isActive = true;
-      if (this.ws) {
+      this.isActive = !this.#automaticReconnect;
+      this.#installLivenessListeners();
+      if (this.ws && this.isActive) {
         this.#flushOutboundQueue(this.ws);
       }
     }
-    #applyTableUpdates(tableUpdates, eventContext) {
+    #applyTableUpdates(tableUpdates, eventContext, options) {
       const pendingCallbacks = [];
       for (const tableUpdate of tableUpdates) {
         const tableName = tableUpdate.tableName;
@@ -7500,7 +8286,8 @@ ${ty.variants.map(
         const table2 = this.clientCache.getOrCreateTable(tableDef);
         const newCallbacks = table2.applyOperations(
           tableUpdate.operations,
-          eventContext
+          eventContext,
+          options
         );
         for (const callback of newCallbacks) {
           pendingCallbacks.push(callback);
@@ -7535,14 +8322,46 @@ ${ty.variants.map(
         "trace",
         () => `Processing server message: ${stringify2(serverMessage)}`
       );
+      if (this.#automaticReconnect && serverMessage.tag === "InitialConnection" === this.#socketEstablished) {
+        this.#handleProtocolError(
+          new Error("Unexpected message during connection handshake")
+        );
+        return;
+      }
       switch (serverMessage.tag) {
         case "InitialConnection": {
+          const isReconnect = this.#hasEverConnected;
+          if (isReconnect && this.identity && !this.identity.isEqual(serverMessage.value.identity)) {
+            const error = new IdentityChangedError();
+            this.#endConnection(void 0, { alreadyReported: true });
+            this.#emitter.emit("connectError", this, error);
+            break;
+          }
           this.identity = serverMessage.value.identity;
           if (!this.token && serverMessage.value.token) {
             this.token = serverMessage.value.token;
           }
           this.#setConnectionId(serverMessage.value.connectionId);
-          this.#emitter.emit("connect", this, this.identity, this.token);
+          this.isActive = true;
+          this.#hasEverConnected = true;
+          this.#socketEstablished = true;
+          this.#reconnectAttempt = 0;
+          this.#emitter.emit(
+            isReconnect ? "automaticReconnect" : "connect",
+            this,
+            this.identity,
+            this.token
+          );
+          if (this.#connectionEnded) break;
+          if (isReconnect) {
+            this.#replaySubscriptions();
+          } else if (this.#preparingReplay) {
+            this.#preparingReplay = false;
+            for (const [id, entry] of this.#subscriptionManager.subscriptions) {
+              this.#sendSubscription(id, entry.querySql);
+            }
+          }
+          if (this.ws) this.#flushOutboundQueue(this.ws);
           break;
         }
         case "SubscribeApplied": {
@@ -7689,29 +8508,50 @@ ${ty.variants.map(
           );
           break;
         }
+        case "SubscribeBatchApplied": {
+          this.#applyReplayBatch(serverMessage.value);
+          break;
+        }
       }
     }
     #processV2Message(data) {
       const reader = this.#messageReader;
       reader.reset(data);
-      this.#processServerMessage(ServerMessage.deserialize(reader));
+      let message;
+      try {
+        message = ServerMessage.deserialize(reader);
+      } catch (cause) {
+        this.#handleProtocolError(cause);
+        return;
+      }
+      this.#processServerMessage(message);
     }
     #processMessage(data) {
       if (this.#negotiatedWsProtocol !== V3_WS_PROTOCOL) {
         this.#processV2Message(data);
         return;
       }
-      const messageCount = forEachServerMessageV3(
-        this.#messageReader,
-        data,
-        (serverMessage) => {
+      let dispatching = false;
+      const generation = this.#socketGeneration;
+      try {
+        forEachServerMessageV3(this.#messageReader, data, (serverMessage) => {
+          if (generation !== this.#socketGeneration) return;
+          dispatching = true;
           this.#processServerMessage(serverMessage);
-        }
-      );
-      stdbLogger(
-        "trace",
-        () => `Processing server v3 payload with ${messageCount} message(s)`
-      );
+          dispatching = false;
+        });
+      } catch (cause) {
+        if (dispatching) throw cause;
+        this.#handleProtocolError(cause);
+      }
+    }
+    #handleProtocolError(cause) {
+      if (!this.#automaticReconnect) throw cause;
+      const error = new WebSocketProtocolError("Invalid server message", {
+        cause
+      });
+      if (this.#socketEstablished) this.#handleConnectionLoss(error);
+      else this.#handleAttemptFailure(error);
     }
     /**
      * Handles WebSocket onMessage event.
@@ -7760,6 +8600,10 @@ ${ty.variants.map(
       return this.#callReducerGeneric(reducerName, argsBuffer, reducerArgs);
     }
     #callReducerWithEncodedName(reducerName, encodedReducerName, argsBuffer, reducerArgs) {
+      const rejected = this.#rejectCallIfDisconnected();
+      if (rejected) {
+        return Promise.reject(rejected);
+      }
       const { promise, resolve, reject } = createDeferred();
       const requestId = this.#getNextRequestId();
       this.#sendCallReducerMessage(requestId, encodedReducerName, argsBuffer);
@@ -7769,7 +8613,9 @@ ${ty.variants.map(
           args: reducerArgs
         });
       }
+      this.#pendingCallRejecters.set(requestId, reject);
       this.#reducerCallbacks.set(requestId, (result) => {
+        this.#pendingCallRejecters.delete(requestId);
         if (result.tag === "Ok" || result.tag === "OkEmpty") {
           resolve();
         } else {
@@ -7787,6 +8633,10 @@ ${ty.variants.map(
       return promise;
     }
     #callReducerGeneric(reducerName, argsBuffer, reducerArgs) {
+      const rejected = this.#rejectCallIfDisconnected();
+      if (rejected) {
+        return Promise.reject(rejected);
+      }
       const { promise, resolve, reject } = createDeferred();
       const requestId = this.#getNextRequestId();
       const message = ClientMessage.CallReducer({
@@ -7802,7 +8652,9 @@ ${ty.variants.map(
           args: reducerArgs
         });
       }
+      this.#pendingCallRejecters.set(requestId, reject);
       this.#reducerCallbacks.set(requestId, (result) => {
+        this.#pendingCallRejecters.delete(requestId);
         if (result.tag === "Ok" || result.tag === "OkEmpty") {
           resolve();
         } else {
@@ -7850,10 +8702,16 @@ ${ty.variants.map(
       return this.#callProcedureGeneric(procedureName, argsBuffer);
     }
     #callProcedureWithEncodedName(procedureName, encodedProcedureName, argsBuffer) {
+      const rejected = this.#rejectCallIfDisconnected();
+      if (rejected) {
+        return Promise.reject(rejected);
+      }
       const { promise, resolve, reject } = createDeferred();
       const requestId = this.#getNextRequestId();
       this.#sendCallProcedureMessage(requestId, encodedProcedureName, argsBuffer);
+      this.#pendingCallRejecters.set(requestId, reject);
       this.#procedureCallbacks.set(requestId, (result) => {
+        this.#pendingCallRejecters.delete(requestId);
         if (result.tag === "Ok") {
           resolve(result.value);
         } else {
@@ -7863,6 +8721,10 @@ ${ty.variants.map(
       return promise;
     }
     #callProcedureGeneric(procedureName, argsBuffer) {
+      const rejected = this.#rejectCallIfDisconnected();
+      if (rejected) {
+        return Promise.reject(rejected);
+      }
       const { promise, resolve, reject } = createDeferred();
       const requestId = this.#getNextRequestId();
       const message = ClientMessage.CallProcedure({
@@ -7873,7 +8735,9 @@ ${ty.variants.map(
         flags: 0
       });
       this.#sendMessage(message);
+      this.#pendingCallRejecters.set(requestId, reject);
       this.#procedureCallbacks.set(requestId, (result) => {
+        this.#pendingCallRejecters.delete(requestId);
         if (result.tag === "Ok") {
           resolve(result.value);
         } else {
@@ -7909,7 +8773,15 @@ ${ty.variants.map(
      */
     disconnect() {
       this.isDisconnectRequested = true;
-      this.wsPromise.then((ws) => ws?.close());
+      if (this.#automaticReconnect) {
+        if (this.#connectionEnded) {
+          this.#emitter.emit("disconnect", this);
+        } else {
+          this.#endConnection(void 0);
+        }
+      } else {
+        this.wsPromise.then((ws) => ws?.close());
+      }
     }
     on(eventName, callback) {
       this.#emitter.on(eventName, callback);
@@ -7920,6 +8792,9 @@ ${ty.variants.map(
     onConnect(callback) {
       this.#emitter.on("connect", callback);
     }
+    onAutomaticReconnect(callback) {
+      this.#emitter.on("automaticReconnect", callback);
+    }
     onDisconnect(callback) {
       this.#emitter.on("disconnect", callback);
     }
@@ -7928,6 +8803,9 @@ ${ty.variants.map(
     }
     removeOnConnect(callback) {
       this.#emitter.off("connect", callback);
+    }
+    removeOnAutomaticReconnect(callback) {
+      this.#emitter.off("automaticReconnect", callback);
     }
     removeOnDisconnect(callback) {
       this.#emitter.off("disconnect", callback);
@@ -7982,6 +8860,7 @@ ${ty.variants.map(
       // be used, it is stored as alias in database, hence works in query builder.
       sourceName: schema2.tableName || accName,
       accessorName: accName,
+      isOutbox: schema2.outbox !== void 0,
       columns: schema2.rowType.row,
       // typed as T[i]['rowType']['row'] under TablesToSchema<T>
       rowType: schema2.rowSpacetimeType,
@@ -8011,6 +8890,7 @@ ${ty.variants.map(
       types: [],
       rowLevelSecurity: [],
       schedules: [],
+      outboxes: [],
       procedures: [],
       views: [],
       viewPrimaryKeys: [],
@@ -8021,7 +8901,8 @@ ${ty.variants.map(
       explicitNames: {
         entries: []
       },
-      submodules: []
+      submodules: [],
+      environment: []
     };
     get moduleDef() {
       return this.#moduleDef;
@@ -8045,6 +8926,7 @@ ${ty.variants.map(
         }
       );
       push(module.schedules && { tag: "Schedules", value: module.schedules });
+      push(module.outboxes && { tag: "Outboxes", value: module.outboxes });
       push(
         module.lifeCycleReducers && {
           tag: "LifeCycleReducers",
@@ -8087,6 +8969,7 @@ ${ty.variants.map(
           value: module.submodules
         }
       );
+      push({ tag: "Environment", value: module.environment });
       return { sections };
     }
     addSubmodule(submodule) {
@@ -8215,6 +9098,60 @@ ${ty.variants.map(
       arr.map((v) => [v.accessorName, v])
     );
   }
+  var receiverModules = /* @__PURE__ */ new WeakMap();
+  var identityModules = /* @__PURE__ */ new WeakMap();
+  function makeOutbox(receiver, row, primaryKey, scheduledOrEvent) {
+    const columns = Object.entries(row.row);
+    if (scheduledOrEvent)
+      throw new TypeError("Outbox tables cannot be scheduled or event tables");
+    const pk = primaryKey.length === 1 ? columns[primaryKey[0]][1] : void 0;
+    if (!pk?.columnMetadata.isAutoIncrement || pk.typeBuilder.algebraicType.tag !== "U64") {
+      throw new TypeError(
+        "Outbox tables require a u64 primary key with autoInc()"
+      );
+    }
+    const targets = columns.flatMap(
+      ([, col], i) => col.columnMetadata.isTarget ? [i] : []
+    );
+    if (targets.length !== 1 || !deepEqual(
+      columns[targets[0]][1].typeBuilder.algebraicType,
+      t.identity().algebraicType
+    )) {
+      throw new TypeError(
+        "Outbox tables require exactly one identity().target() column"
+      );
+    }
+    const argColumns = Object.entries(receiver.params).map(([name, type]) => {
+      const matches = columns.flatMap(
+        ([key, col], i) => (col.columnMetadata.paramName ?? key) === name ? [i] : []
+      );
+      if (matches.length !== 1)
+        throw new TypeError(
+          `Outbox requires exactly one column for receiver parameter '${name}'`
+        );
+      const index = matches[0];
+      if (!deepEqual(
+        columns[index][1].typeBuilder.algebraicType,
+        type.algebraicType
+      )) {
+        throw new TypeError(`Outbox column for '${name}' has the wrong type`);
+      }
+      return index;
+    });
+    const module = receiverModules.get(receiver);
+    const target = columns[targets[0]][1].typeBuilder;
+    if (module === void 0 || identityModules.get(target) !== module) {
+      throw new TypeError(
+        "Outbox target must use the selected receiver module identity() builder"
+      );
+    }
+    return {
+      targetColumn: targets[0],
+      argColumns,
+      remoteReducer: receiver.name,
+      signatureHash: receiver.signatureHash
+    };
+  }
   var AlgebraicType2 = t.enum("AlgebraicType", {
     Ref: t.u32(),
     get Sum() {
@@ -8255,6 +9192,9 @@ ${ty.variants.map(
       return NameMapping;
     },
     get Index() {
+      return NameMapping;
+    },
+    get Namespace() {
       return NameMapping;
     }
   });
@@ -8389,6 +9329,21 @@ ${ty.variants.map(
       return RawConstraintDataV9;
     }
   });
+  var RawEnvVarTypeV10 = t.enum("RawEnvVarTypeV10", {
+    String: t.unit(),
+    StringLiteral: t.string(),
+    Union: t.array(t.string())
+  });
+  var RawEnvironmentDeclarationV10 = t.object(
+    "RawEnvironmentDeclarationV10",
+    {
+      name: t.string(),
+      get ty() {
+        return RawEnvVarTypeV10;
+      },
+      optional: t.bool()
+    }
+  );
   var RawHttpHandlerDefV10 = t.object("RawHttpHandlerDefV10", {
     sourceName: t.string()
   });
@@ -8507,6 +9462,12 @@ ${ty.variants.map(
     },
     get Submodules() {
       return t.array(RawSubmoduleV10);
+    },
+    get Environment() {
+      return t.array(RawEnvironmentDeclarationV10);
+    },
+    get Outboxes() {
+      return t.array(RawOutboxDefV10);
     }
   });
   var RawModuleDefV8 = t.object("RawModuleDefV8", {
@@ -8542,6 +9503,14 @@ ${ty.variants.map(
     get rowLevelSecurity() {
       return t.array(RawRowLevelSecurityDefV9);
     }
+  });
+  var RawOutboxDefV10 = t.object("RawOutboxDefV10", {
+    tableName: t.string(),
+    remoteReducer: t.string(),
+    targetColumn: t.u16(),
+    argColumns: t.array(t.u16()),
+    onResultReducer: t.option(t.string()),
+    signatureHash: t.u256()
   });
   var RawProcedureDefV10 = t.object("RawProcedureDefV10", {
     sourceName: t.string(),
@@ -8924,7 +9893,10 @@ ${ty.variants.map(
     }
     const productType = row.algebraicType.value;
     const schedule = scheduled && scheduleAtCol !== void 0 ? { scheduleAtCol, reducer: scheduled } : void 0;
+    const receiver = opts.outbox?.receiver;
+    const outbox = receiver ? makeOutbox(receiver, row, pk, !!scheduled || isEvent) : void 0;
     return {
+      outbox,
       rowType: row,
       tableName: name,
       rowSpacetimeType: productType,
@@ -8989,7 +9961,7 @@ ${ty.variants.map(
     const handles = args.length === 1 && Array.isArray(args[0]) ? args[0] : args;
     return new Reducers(handles);
   }
-  function reducerSchema(name, params) {
+  function reducerSchema(name, params, accessorName) {
     const paramType = {
       elements: Object.entries(params).map(([n, c]) => ({
         name: n,
@@ -8998,7 +9970,7 @@ ${ty.variants.map(
     };
     return {
       reducerName: name,
-      accessorName: toCamelCase(name),
+      accessorName: accessorName ?? toCamelCase(name),
       params: new RowBuilder(params),
       paramsSpacetimeType: paramType,
       reducerDef: {
@@ -12261,7 +13233,7 @@ ${ty.variants.map(
   var proceduresSchema = procedures();
   var REMOTE_MODULE = {
     versionInfo: {
-      cliVersion: "2.8.2"
+      cliVersion: "2.15.0"
     },
     tables: tablesSchema.schemaType.tables,
     reducers: reducersSchema.reducersType.reducers,
@@ -12400,7 +13372,7 @@ ${ty.variants.map(
   };
   var DbConnectionBuilder2 = class extends DbConnectionBuilder {
   };
-  var DbConnection = class _DbConnection extends DbConnectionImpl {
+  var DbConnection = class _DbConnection extends DbConnectionImpl2 {
     constructor(config) {
       super(config);
       this.db = __withTableAccessorAliases(this.db);
