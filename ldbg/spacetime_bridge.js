@@ -9428,6 +9428,12 @@ ${ty.variants.map(
     reason: t.string()
   };
 
+  // src/module_bindings/operator_resettle_refused_run_reducer.ts
+  var operator_resettle_refused_run_reducer_default = {
+    reportId: t.u64(),
+    reason: t.string()
+  };
+
   // src/module_bindings/operator_set_loot_key_reducer.ts
   var operator_set_loot_key_reducer_default = {
     key: t.string()
@@ -12056,6 +12062,7 @@ ${ty.variants.map(
     reducerSchema("operator_post_notice", operator_post_notice_reducer_default),
     reducerSchema("operator_regrade_enhancements", operator_regrade_enhancements_reducer_default),
     reducerSchema("operator_rename_player", operator_rename_player_reducer_default),
+    reducerSchema("operator_resettle_refused_run", operator_resettle_refused_run_reducer_default),
     reducerSchema("operator_set_loot_key", operator_set_loot_key_reducer_default),
     reducerSchema("operator_suspend_account", operator_suspend_account_reducer_default),
     reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
