@@ -9415,6 +9415,13 @@ ${ty.variants.map(
   // src/module_bindings/operator_clear_notices_reducer.ts
   var operator_clear_notices_reducer_default = {};
 
+  // src/module_bindings/operator_grant_badge_reducer.ts
+  var operator_grant_badge_reducer_default = {
+    displayName: t.string(),
+    badgeId: t.string(),
+    reason: t.string()
+  };
+
   // src/module_bindings/operator_lift_suspension_reducer.ts
   var operator_lift_suspension_reducer_default = {
     displayName: t.string(),
@@ -9440,6 +9447,13 @@ ${ty.variants.map(
   // src/module_bindings/operator_resettle_refused_run_reducer.ts
   var operator_resettle_refused_run_reducer_default = {
     reportId: t.u64(),
+    reason: t.string()
+  };
+
+  // src/module_bindings/operator_revoke_badge_reducer.ts
+  var operator_revoke_badge_reducer_default = {
+    displayName: t.string(),
+    badgeId: t.string(),
     reason: t.string()
   };
 
@@ -12086,11 +12100,13 @@ ${ty.variants.map(
     reducerSchema("operator_chat_tester", operator_chat_tester_reducer_default),
     reducerSchema("operator_chat_unmute", operator_chat_unmute_reducer_default),
     reducerSchema("operator_clear_notices", operator_clear_notices_reducer_default),
+    reducerSchema("operator_grant_badge", operator_grant_badge_reducer_default),
     reducerSchema("operator_lift_suspension", operator_lift_suspension_reducer_default),
     reducerSchema("operator_post_notice", operator_post_notice_reducer_default),
     reducerSchema("operator_regrade_enhancements", operator_regrade_enhancements_reducer_default),
     reducerSchema("operator_rename_player", operator_rename_player_reducer_default),
     reducerSchema("operator_resettle_refused_run", operator_resettle_refused_run_reducer_default),
+    reducerSchema("operator_revoke_badge", operator_revoke_badge_reducer_default),
     reducerSchema("operator_set_loot_key", operator_set_loot_key_reducer_default),
     reducerSchema("operator_suspend_account", operator_suspend_account_reducer_default),
     reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
