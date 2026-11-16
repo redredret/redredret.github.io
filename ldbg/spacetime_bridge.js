@@ -898,6 +898,11 @@ ${originalIndentation}`;
       keys: { upgradeProgress: one("myUpgradeProgress"), upgradeUnlocks: many("myUpgradeUnlocks") }
     },
     run: { group: "core", keys: { activeRun: one("myActiveRun") } },
+    // The last settlement the server refused softly (docs/SERVER_AUDIT.md A-02):
+    // the bridge reads it to turn a refused settlement's Ok into the error a
+    // thrown refusal was (run_refusal.ts). Core, because a settlement can be sent
+    // the moment the core subscription is back, before any group is.
+    runRefusal: { group: "core", keys: { runRefusal: one("myRunRefusal") } },
     // Saved loadouts and builds (docs/RESPEC_AND_LOADOUTS.md): a handful of tiny
     // rows each, changed only when the player saves one, so they ride the core
     // subscription and are there for the quick swap before a run.
@@ -1018,6 +1023,8 @@ ${originalIndentation}`;
     // either way re-sent both, and Godot rebuilt the whole versus model for it.
     farmSentAttacks: { group: "farm", keys: { farmPvpSentAttacks: many("mySentFarmPvpAttacks") } },
     farmDarkHaul: { group: "farm", keys: { farmDarkHaul: many("myFarmDarkHaul") } },
+    // The counters beside the versus modes and on the Dark card. Held only while
+    // a screen showing one is open (docs/SERVER_AUDIT.md U-04).
     playerCounts: {
       group: "playerCounts",
       keys: { farmPlayerCounts: many("farmPlayerCounts"), darkPlayerCount: many("darkPlayerCount") }
@@ -1088,19 +1095,23 @@ ${originalIndentation}`;
       }
     },
     // The quest catalog and each quest's details (condition, chest tier, the
-    // experience it pays): static, read from no table, so sent when the quest
-    // subscription is applied and never again. They were in 'quests' and rode
-    // every patch of it -- ~48 KB and some two hundred JSON parses in Godot on
-    // every run's settlement, for rows that cannot have changed.
-    questCatalog: { group: "quests", keys: { questCatalog: many("questCatalog"), questDetails: many("questDetails") } },
+    // experience it pays): static, read from no table, so sent once a connection
+    // and never again. They were in 'quests' and rode every patch of it -- ~48 KB
+    // and some two hundred JSON parses in Godot on every run's settlement, for
+    // rows that cannot have changed. Their own group, 'catalogs', since U-03
+    // (docs/SERVER_AUDIT.md): the page keeps what it was sent, and a reconnect
+    // whose `content_version` is the same is handed that copy instead of
+    // subscribing them again (catalog_cache.ts).
+    questCatalog: { group: "catalogs", keys: { questCatalog: many("questCatalog"), questDetails: many("questDetails") } },
     // Bounties (docs/BOUNTIES.md): the hunter's row (Marks, record, the board's
     // offers) and the bounty held. Null for a player who never opened the board.
     // A domain of its own so a run's settlement re-sends these two rows, not the
     // tasks beside them.
     bounties: { group: "quests", keys: { bountyState: one("myBountyState"), bounty: one("myBounty") } },
     // The Bounty shop's catalog and the rank ladder: static, read from no table,
-    // so sent once when the quest subscription applies (like questCatalog).
-    bountyShop: { group: "quests", keys: { bountyShop: many("bountyShop") } },
+    // so sent once a connection, and kept by the page across reconnects, like
+    // questCatalog.
+    bountyShop: { group: "catalogs", keys: { bountyShop: many("bountyShop") } },
     // Chat (docs/CHAT_PLAN.md). Global on a domain of its own: it is the one that
     // moves when somebody anywhere speaks, and riding with the room it would
     // re-send the room's lines too. The room's lines and the status (open, muted,
@@ -1385,7 +1396,13 @@ ${originalIndentation}`;
     /** The target Godot last asked to connect to; a resume reconnects to it. */
     lastBackendRequest: null,
     /** The screen Godot last reported (`setClientContext`): what the scoped groups follow. */
-    clientScreen: CLIENT_SCREENS.title
+    clientScreen: CLIENT_SCREENS.title,
+    /**
+     * Godot is showing a live player count (`setClientContext`'s `counters`): the
+     * Farm menu's versus modes, the dungeon menu's Dark card or the pit's best
+     * waves. The counters' group is held only while it is (docs/SERVER_AUDIT.md U-04).
+     */
+    countersWanted: false
   };
 
   // node_modules/.pnpm/spacetimedb@2.8.2/node_modules/spacetimedb/dist/index.browser.mjs
@@ -10077,6 +10094,11 @@ ${ty.variants.map(
     itemId: t.string().name("item_id")
   });
 
+  // src/module_bindings/content_version_table.ts
+  var content_version_table_default = t.row({
+    hash: t.string()
+  });
+
   // src/module_bindings/dark_player_count_table.ts
   var dark_player_count_table_default = t.row({
     mode: t.string(),
@@ -11185,6 +11207,16 @@ ${ty.variants.map(
     createdAt: t.timestamp().name("created_at")
   });
 
+  // src/module_bindings/my_run_refusal_table.ts
+  var my_run_refusal_table_default = t.row({
+    owner: t.identity().primaryKey(),
+    runId: t.string().name("run_id"),
+    command: t.string(),
+    reason: t.string(),
+    refusedAt: t.timestamp().name("refused_at"),
+    attempts: t.u32()
+  });
+
   // src/module_bindings/my_satchel_keep_table.ts
   var my_satchel_keep_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -11507,6 +11539,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, bounty_shop_table_default),
+    contentVersion: table({
+      name: "content_version",
+      indexes: [],
+      constraints: []
+    }, content_version_table_default),
     darkPlayerCount: table({
       name: "dark_player_count",
       indexes: [],
@@ -11922,6 +11959,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_run_loot_reveals_table_default),
+    myRunRefusal: table({
+      name: "my_run_refusal",
+      indexes: [],
+      constraints: []
+    }, my_run_refusal_table_default),
     mySatchelKeep: table({
       name: "my_satchel_keep",
       indexes: [],
@@ -12227,6 +12269,7 @@ ${ty.variants.map(
   };
   var tableAccessorAliases = {
     "bounty_shop": "bountyShop",
+    "content_version": "contentVersion",
     "dark_player_count": "darkPlayerCount",
     "duel_listings": "duelListings",
     "farm_player_counts": "farmPlayerCounts",
@@ -12310,6 +12353,7 @@ ${ty.variants.map(
     "my_restricted_account": "myRestrictedAccount",
     "my_roads_walked": "myRoadsWalked",
     "my_run_loot_reveals": "myRunLootReveals",
+    "my_run_refusal": "myRunRefusal",
     "my_satchel_keep": "mySatchelKeep",
     "my_saved_builds": "mySavedBuilds",
     "my_sent_farm_pvp_attacks": "mySentFarmPvpAttacks",
@@ -12371,6 +12415,41 @@ ${ty.variants.map(
     };
   };
 
+  // src/run_refusal.ts
+  var SOFT_REFUSAL_CALLS = [
+    "submitDungeonRunResultV1",
+    "submitFarmRunResultV3",
+    "submitFarmWaitingRunResult"
+  ];
+  function isSoftRefusalCall(name) {
+    return SOFT_REFUSAL_CALLS.includes(name);
+  }
+  function refusalMarkOf(row) {
+    if (!row) return null;
+    return { runId: String(row.runId ?? ""), attempts: Number(row.attempts ?? 0) };
+  }
+  function callRunId(argumentsJson) {
+    try {
+      return String(JSON.parse(argumentsJson)?.runId ?? "");
+    } catch {
+      return "";
+    }
+  }
+  function refusalOfCall(runId, before, after) {
+    const mark = refusalMarkOf(after);
+    if (!mark || runId === "" || mark.runId !== runId) return null;
+    const fresh = !before || before.runId !== mark.runId || mark.attempts > before.attempts;
+    return fresh ? String(after.reason ?? "") : null;
+  }
+  function refusalMessage(reason) {
+    return `SenderError: ${reason}`;
+  }
+  function cachedRefusal(connection) {
+    const handle = connection?.db?.myRunRefusal;
+    if (!handle || typeof handle.iter !== "function") return void 0;
+    return Array.from(handle.iter())[0];
+  }
+
   // src/reducer_queue.ts
   var pendingReducerCalls = [];
   var pendingCallTimer = null;
@@ -12425,7 +12504,17 @@ ${ty.variants.map(
       }
       const reducer = live.connection.reducers[name];
       if (typeof reducer !== "function") throw new Error(`Unknown reducer '${name}'.`);
-      await reducer.call(live.connection.reducers, JSON.parse(argumentsJson));
+      const connection = live.connection;
+      const softRefusal = isSoftRefusalCall(name);
+      const before = softRefusal ? refusalMarkOf(cachedRefusal(connection)) : null;
+      await reducer.call(connection.reducers, JSON.parse(argumentsJson));
+      if (softRefusal) {
+        const reason = refusalOfCall(callRunId(argumentsJson), before, cachedRefusal(connection));
+        if (reason !== null) {
+          emit({ type: "error", command: name, message: refusalMessage(reason) });
+          return;
+        }
+      }
       if (reportsSuccess(name)) emit({ type: "command_succeeded", command: name });
     } catch (error) {
       emit({ type: "error", command: name, message: String(error) });
@@ -12439,6 +12528,55 @@ ${ty.variants.map(
       database: overrides?.database?.trim() || fallback.database
     };
   }
+
+  // src/catalog_cache.ts
+  var CatalogCache = class {
+    /** The rows last sent, by view, and the hash they came with. */
+    copy = null;
+    /** The connection the copy is being read on in place of the views: one that never subscribed them. */
+    servedOn = null;
+    /** The hash this page's copy came with, or '' when it has none. */
+    get hash() {
+      return this.copy?.hash ?? "";
+    }
+    /**
+     * A connection's module has catalogs of version `hash`. True when this page
+     * holds exactly those: from now on their rows on `connection` are this copy,
+     * and they need not be subscribed. False -- no copy, another version, or a
+     * module that could not say -- and they must be.
+     */
+    serve(connection, hash) {
+      if (!hash || this.copy === null || this.copy.hash !== hash) {
+        this.stopServing(connection);
+        return false;
+      }
+      this.servedOn = connection;
+      return true;
+    }
+    /**
+     * The catalogs have been subscribed on `connection` and its rows are these,
+     * of version `hash`: kept for the next reconnect, and from now on read live
+     * from the connection. A module that gave no hash leaves no copy, because a
+     * copy that cannot be checked could not be trusted again.
+     */
+    keep(connection, hash, rows2) {
+      this.stopServing(connection);
+      this.copy = hash ? { hash, rows: new Map(rows2) } : null;
+    }
+    /** `connection` reads the catalogs from its own subscription now. */
+    stopServing(connection) {
+      if (this.servedOn === connection) this.servedOn = null;
+    }
+    /**
+     * A view's rows on `connection` when this copy stands in for it, or null when
+     * the connection's own rows are the ones to read (it subscribed them, or the
+     * view is not a catalog, or the connection is not the one being served).
+     */
+    rowsFor(connection, view) {
+      if (this.copy === null || connection === null || connection !== this.servedOn) return null;
+      return this.copy.rows.get(view) ?? null;
+    }
+  };
 
   // ../../spacetimedb/src/sim/board.ts
   var WIDTH = 10;
@@ -13180,11 +13318,14 @@ ${ty.variants.map(
   }
 
   // src/subscriptions.ts
+  var CONTENT_VERSION = "contentVersion";
   var scopedHandles = /* @__PURE__ */ new Map();
   var scopedSubscriptionConnection = null;
   var dirtySnapshotDomains = /* @__PURE__ */ new Set();
   var snapshotFlushScheduled = false;
   var observedHandles = /* @__PURE__ */ new WeakSet();
+  var catalogCache = new CatalogCache();
+  var catalogsStaleOn = null;
   function rows(handle) {
     return Array.from(handle.iter()).map(jsonSafe);
   }
@@ -13290,7 +13431,7 @@ ${ty.variants.map(
           return;
         }
         for (const [key, wire] of Object.entries(spec.keys)) {
-          const found = rows(activeConnection.db[wire.view]);
+          const found = catalogCache.rowsFor(activeConnection, wire.view) ?? rows(activeConnection.db[wire.view]);
           data[key] = wire.one ? found[0] ?? null : found;
         }
       });
@@ -13304,6 +13445,8 @@ ${ty.variants.map(
   }
   function scheduleDomain(activeConnection, domain) {
     if (!activeConnection || live.connection !== activeConnection) return;
+    const group = DOMAINS[domain].group;
+    if (group !== "core" && GROUPS[group].keepOnStop && !scopedHandles.get(group)) return;
     dirtySnapshotDomains.add(domain);
     if (snapshotFlushScheduled) return;
     snapshotFlushScheduled = true;
@@ -13383,16 +13526,30 @@ ${ty.variants.map(
     // Kept runs, only while the Replays page is open: the list is small, but a
     // watched trace is the biggest row a player has, and nothing else needs either.
     replays: { wanted: () => live.clientScreen === CLIENT_SCREENS.replays, errorCommand: "subscribeReplays" },
-    // The counters beside the Farm menu's versus modes. Tiny and shared by every
-    // player, so it is subscribed for the whole connection rather than scoped to a
-    // screen. Kept out of the core subscription so a server that predates the view
-    // costs the counters and nothing else; its failure is logged, not surfaced.
-    playerCounts: { quietError: "LDBG: player counts are unavailable:" },
+    // The counters beside the Farm menu's versus modes, the Dark card's hunters and
+    // the pit's best waves. Tiny and shared, but every count anywhere moving was
+    // sent to every page wherever it was (docs/SERVER_AUDIT.md U-04), so it is held
+    // only while Godot says a screen showing one is open (`counters` in the client
+    // context, SpacetimeGateway.hold_player_counts). Opening one subscribes it, so
+    // the counts are fresh at once; leaving keeps the last counts in Godot rather
+    // than blanking them, so a menu opened again shows those for the moment until
+    // the fresh ones land. Kept out of the core subscription so a server that
+    // predates the view costs the counters and nothing else; its failure is
+    // logged, not surfaced.
+    playerCounts: {
+      wanted: () => live.countersWanted,
+      keepOnStop: true,
+      quietError: "LDBG: player counts are unavailable:"
+    },
     // Tasks and quests, for the whole connection: a task finishes during a run, and
     // the hub's button says so wherever the player is. All the views are small and
     // sender-scoped (the catalog is shared and never changes). Kept out of the core
     // subscription so a server without them costs the quest screen and nothing else.
     quests: { errorCommand: "subscribeQuests" },
+    // The static catalogs (questCatalog, bountyShop): 48 KB, so asked for only
+    // when the page does not already hold this module's (U-03). Kept on applying,
+    // for the next reconnect.
+    catalogs: { errorCommand: "subscribeCatalogs", versioned: true, afterApplied: keepCatalogs },
     // Chat, for the whole connection: a line arrives because somebody ELSE spoke,
     // and walking into a room happens to a player. Small and sender-scoped; every
     // view is empty while chat is closed to the player. Kept out of the core
@@ -13409,6 +13566,10 @@ ${ty.variants.map(
     adoptScopedSubscriptions(activeConnection);
     const spec = GROUPS[group];
     if (spec.wanted && !spec.wanted() || scopedHandles.get(group)) return;
+    if (spec.versioned && catalogsStaleOn !== activeConnection) {
+      ensureContentVersionSubscription(activeConnection);
+      return;
+    }
     observeGroup(activeConnection, group);
     spec.afterObserve?.(activeConnection);
     const handle = activeConnection.subscriptionBuilder().onApplied(() => {
@@ -13422,12 +13583,58 @@ ${ty.variants.map(
     }).subscribe(groupViews(group).map((view) => tables[view]));
     scopedHandles.set(group, handle);
   }
+  function contentVersionOn(activeConnection) {
+    const handle = activeConnection?.db?.[CONTENT_VERSION];
+    if (!handle) return "";
+    const row = rows(handle)[0];
+    return typeof row?.hash === "string" ? row.hash : "";
+  }
+  function ensureContentVersionSubscription(activeConnection) {
+    if (!live.coreSubscriptionReady || live.connection !== activeConnection) return;
+    adoptScopedSubscriptions(activeConnection);
+    if (scopedHandles.get(CONTENT_VERSION)) return;
+    let applied = false;
+    const versionHandle = activeConnection.db[CONTENT_VERSION];
+    if (versionHandle && !observedHandles.has(versionHandle)) {
+      observedHandles.add(versionHandle);
+      versionHandle.onInsert(() => {
+        if (!applied || live.connection !== activeConnection) return;
+        if (contentVersionOn(activeConnection) !== catalogCache.hash) followContentVersion(activeConnection);
+      });
+    }
+    const handle = activeConnection.subscriptionBuilder().onApplied(() => {
+      if (live.connection !== activeConnection || scopedHandles.get(CONTENT_VERSION) !== handle) return;
+      applied = true;
+      followContentVersion(activeConnection);
+    }).onError((_ctx, error) => {
+      console.warn("LDBG: the content version is unavailable:", error);
+      if (live.connection !== activeConnection || applied) return;
+      catalogsStaleOn = activeConnection;
+      ensureSubscription(activeConnection, "catalogs");
+    }).subscribe([tables.contentVersion]);
+    scopedHandles.set(CONTENT_VERSION, handle);
+  }
+  function followContentVersion(activeConnection) {
+    if (live.connection !== activeConnection) return;
+    if (catalogCache.serve(activeConnection, contentVersionOn(activeConnection))) {
+      publishDomains(activeConnection, groupDomains("catalogs"));
+      return;
+    }
+    catalogsStaleOn = activeConnection;
+    ensureSubscription(activeConnection, "catalogs");
+  }
+  function keepCatalogs(activeConnection) {
+    const kept = /* @__PURE__ */ new Map();
+    for (const view of groupViews("catalogs")) kept.set(view, rows(activeConnection.db[view]));
+    catalogCache.keep(activeConnection, contentVersionOn(activeConnection), kept);
+  }
   function stopSubscription(group) {
     const previous = scopedHandles.get(group);
     scopedHandles.delete(group);
     if (previous && typeof previous.unsubscribe === "function") previous.unsubscribe();
     const spec = GROUPS[group];
     spec.afterStop?.();
+    if (spec.keepOnStop) return;
     const cleared = snapshotPatch(EMPTY_CONNECTION, new Set(groupDomains(group)));
     emit({ ...cleared, data: { ...cleared.data, ...spec.clearAlso } });
   }
@@ -13619,11 +13826,13 @@ ${ty.variants.map(
     try {
       const context2 = JSON.parse(contextJson);
       const nextScreen = typeof context2.screen === "string" ? context2.screen : CLIENT_SCREENS.title;
-      if (nextScreen === live.clientScreen) {
+      const countersWanted = context2.counters === true;
+      if (nextScreen === live.clientScreen && countersWanted === live.countersWanted) {
         noteUserActivity();
         return;
       }
       live.clientScreen = nextScreen;
+      live.countersWanted = countersWanted;
       noteUserActivity();
       if (!live.connection || !live.coreSubscriptionReady) return;
       followClientScreen(live.connection);
