@@ -978,6 +978,10 @@ ${originalIndentation}`;
     // party would get if it started now. A domain of its own, so a partner
     // flipping their toggle redraws the preview line and not the whole lobby.
     partyOmens: { group: "party", keys: { partyOmens: many("myPartyOmens") } },
+    // Pay held for a party's kills until a partner proves its blows (rules version
+    // 104): the member's own held rows, and the seats a fighting member's proof
+    // would release.
+    partyHeldPay: { group: "party", keys: { partyHeldPay: many("myPartyHeldPay") } },
     // A lobby's course (rules version 94): what any member set, which READY agrees to.
     partyCourse: { group: "party", keys: { partyCourse: one("myPartyCourse") } },
     // The teammate's board for the mini card, rebuilt from the party's event rows
@@ -1204,6 +1208,8 @@ ${originalIndentation}`;
     "sendPartyHeal",
     "completePartyRevive",
     "reportPartyReviveProgress",
+    // The trace so far (rules version 104): answered by the held pay going.
+    "provePartyTrace",
     // A lobby member's omens wish, sent as the lobby's toggle changes and with
     // READY (rules version 66): its answer is the my_party_omens preview, and
     // READY's own answer is what the party screen waits on.
@@ -1312,6 +1318,9 @@ ${originalIndentation}`;
     "sendPartyHeal",
     "completePartyRevive",
     "reportPartyReviveProgress",
+    // Rules version 104: the trace so far, sent while a partner's pay waits on it,
+    // on the fight's own timer.
+    "provePartyTrace",
     // Sent a moment after a setting changes, and once at sign-in for an account
     // that has never saved any (docs/ACCOUNT_SETTINGS.md): the client's timing.
     "saveAccountSettings",
@@ -9451,6 +9460,12 @@ ${ty.variants.map(
     stake: t.string()
   };
 
+  // src/module_bindings/prove_party_trace_reducer.ts
+  var prove_party_trace_reducer_default = {
+    partyId: t.string(),
+    trace: t.string()
+  };
+
   // src/module_bindings/publish_duel_board_reducer.ts
   var publish_duel_board_reducer_default = {
     duelId: t.string(),
@@ -10884,6 +10899,14 @@ ${ty.variants.map(
     updatedAt: t.timestamp().name("updated_at")
   });
 
+  // src/module_bindings/my_party_held_pay_table.ts
+  var my_party_held_pay_table_default = t.row({
+    partyId: t.string().name("party_id"),
+    slot: t.u32(),
+    mine: t.bool(),
+    boundary: t.u32()
+  });
+
   // src/module_bindings/my_party_member_core_table.ts
   var my_party_member_core_table_default = t.row({
     memberId: t.string().primaryKey().name("member_id"),
@@ -11769,6 +11792,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_party_course_table_default),
+    myPartyHeldPay: table({
+      name: "my_party_held_pay",
+      indexes: [],
+      constraints: []
+    }, my_party_held_pay_table_default),
     myPartyMemberCore: table({
       name: "my_party_member_core",
       indexes: [],
@@ -12066,6 +12094,7 @@ ${ty.variants.map(
     reducerSchema("operator_set_loot_key", operator_set_loot_key_reducer_default),
     reducerSchema("operator_suspend_account", operator_suspend_account_reducer_default),
     reducerSchema("post_duel_listing", post_duel_listing_reducer_default),
+    reducerSchema("prove_party_trace", prove_party_trace_reducer_default),
     reducerSchema("publish_duel_board", publish_duel_board_reducer_default),
     reducerSchema("publish_duel_piece", publish_duel_piece_reducer_default),
     reducerSchema("publish_farm_board", publish_farm_board_reducer_default),
@@ -12228,6 +12257,7 @@ ${ty.variants.map(
     "my_party": "myParty",
     "my_party_core": "myPartyCore",
     "my_party_course": "myPartyCourse",
+    "my_party_held_pay": "myPartyHeldPay",
     "my_party_member_core": "myPartyMemberCore",
     "my_party_member_score": "myPartyMemberScore",
     "my_party_members": "myPartyMembers",
