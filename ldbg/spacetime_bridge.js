@@ -1180,6 +1180,7 @@ ${originalIndentation}`;
     "publishDuelPiece",
     "sendFarmPvpAttack",
     "sendDarkDuelBlow",
+    "sendDarkDuelBlowV2",
     "refreshDarkPresence",
     // Nothing in Godot waits on these succeeding; their answer is the rows they
     // write. A failure is still reported.
@@ -1287,6 +1288,7 @@ ${originalIndentation}`;
     // goes on this list the day it is sent.
     "refreshDarkPresence",
     "sendDarkDuelBlow",
+    "sendDarkDuelBlowV2",
     "enterDarkDuel",
     "enterDarkDuelV2",
     "enterDarkDuelV3",
@@ -9796,6 +9798,20 @@ ${ty.variants.map(
     sequence: t.u32()
   };
 
+  // src/module_bindings/send_dark_duel_blow_v_2_reducer.ts
+  var send_dark_duel_blow_v_2_reducer_default = {
+    duelId: t.string(),
+    lines: t.u32(),
+    spinType: t.string(),
+    combo: t.u32(),
+    backToBack: t.bool(),
+    perfectClear: t.bool(),
+    sequence: t.u32(),
+    garbageCells: t.u32(),
+    clutched: t.bool(),
+    fromHold: t.bool()
+  };
+
   // src/module_bindings/send_farm_pvp_attack_reducer.ts
   var send_farm_pvp_attack_reducer_default = {
     lines: t.u32(),
@@ -12158,6 +12174,7 @@ ${ty.variants.map(
     reducerSchema("sell_item", sell_item_reducer_default),
     reducerSchema("send_chat_message", send_chat_message_reducer_default),
     reducerSchema("send_dark_duel_blow", send_dark_duel_blow_reducer_default),
+    reducerSchema("send_dark_duel_blow_v_2", send_dark_duel_blow_v_2_reducer_default),
     reducerSchema("send_farm_pvp_attack", send_farm_pvp_attack_reducer_default),
     reducerSchema("send_friend_request", send_friend_request_reducer_default),
     reducerSchema("send_friend_request_recent", send_friend_request_recent_reducer_default),
