@@ -185,6 +185,14 @@
 		state.skipped = 'no manifest';
 		return;
 	}
+	// The sign-in window's return to the game's page (web/spacetimedb_bridge,
+	// auth_session.ts): that page relays one URL and closes, and never starts the
+	// engine, so linking the boot's programs there would be work for nothing in
+	// the GPU process the game itself is drawing with.
+	if (window.opener && /^ldbg_spacetime_/.test(window.name || '')) {
+		state.skipped = 'sign-in relay';
+		return;
+	}
 	if (typeof Worker !== 'function' || typeof OffscreenCanvas !== 'function') {
 		state.skipped = 'no worker canvas';
 		return;

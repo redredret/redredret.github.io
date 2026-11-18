@@ -14901,6 +14901,8 @@ ${ty.variants.map(
   var sessionResetPopup = null;
   var sessionResetPopupMonitor = null;
   var authCallbackHandling = false;
+  var preparedLogin = null;
+  var preparingLogin = null;
   var authConfig = resolveAuthConfig(window.LDBGAuthConfig);
   function authAvailable() {
     return authConfig.clientId.trim().length > 0;
@@ -14934,6 +14936,26 @@ ${ty.variants.map(
   }
   function redirectUri() {
     return authConfig.redirectUri?.trim() || browserPageUrl(window.location.href);
+  }
+  function newLoginRequest() {
+    const verifier = randomBase64Url(48);
+    const state = randomBase64Url(32);
+    const nonce = randomBase64Url(32);
+    return sha256Base64Url(verifier).then((challenge) => ({ state, nonce, verifier, challenge }));
+  }
+  function prepareLogin() {
+    if (preparedLogin || preparingLogin || !authAvailable()) return;
+    preparingLogin = newLoginRequest().then((request) => {
+      preparedLogin = request;
+    }).catch(() => {
+    }).finally(() => {
+      preparingLogin = null;
+    });
+  }
+  function takePreparedLogin() {
+    const request = preparedLogin;
+    preparedLogin = null;
+    return request;
   }
   function readPendingLogin() {
     try {
@@ -14991,15 +15013,25 @@ ${ty.variants.map(
       loginPopupCloseGrace = window.setTimeout(() => cancelClosedLoginPopup(popup), 400);
     }, 250);
   }
+  var relayPage = false;
+  function stopRelayPage() {
+    relayPage = true;
+    try {
+      window.stop();
+    } catch {
+    }
+  }
   function relayPopupNavigation() {
     if (!window.opener) return false;
     if (window.name === LOGOUT_POPUP_NAME || window.name === SESSION_RESET_POPUP_NAME) {
+      stopRelayPage();
       window.close();
       return true;
     }
     const parameters = new URLSearchParams(window.location.search);
     if (window.name !== LOGIN_POPUP_NAME || !parameters.has("code") && !parameters.has("error")) return false;
     window.opener.postMessage(createAuthCallbackMessage(window.location.href), window.location.origin);
+    stopRelayPage();
     window.setTimeout(() => window.close(), 50);
     return true;
   }
@@ -15155,6 +15187,30 @@ ${ty.variants.map(
         loginPopup.focus();
         return;
       }
+      const prepared = authAvailable() ? takePreparedLogin() : null;
+      if (prepared) {
+        const currentRedirectUri2 = redirectUri();
+        writePendingLogin({
+          state: prepared.state,
+          nonce: prepared.nonce,
+          verifier: prepared.verifier,
+          redirectUri: currentRedirectUri2,
+          createdAt: Date.now()
+        });
+        popup = window.open(
+          buildAuthorizationUrl(authConfig, currentRedirectUri2, prepared.state, prepared.nonce, prepared.challenge),
+          LOGIN_POPUP_NAME,
+          POPUP_FEATURES
+        );
+        if (!popup) throw new Error("Your browser blocked the login window. Allow pop-ups for this site and try again.");
+        loginPopup = popup;
+        monitorLoginPopup(popup);
+        authBusy = true;
+        authError = "";
+        publishAuthStatus();
+        prepareLogin();
+        return;
+      }
       popup = window.open("about:blank", LOGIN_POPUP_NAME, POPUP_FEATURES);
       if (!popup) throw new Error("Your browser blocked the login window. Allow pop-ups for this site and try again.");
       loginPopup = popup;
@@ -15180,6 +15236,7 @@ ${ty.variants.map(
       authError = error instanceof Error ? error.message : String(error);
       publishAuthStatus();
       emit({ type: "auth_error", message: authError });
+      prepareLogin();
     }
   }
   async function beginLogout() {
@@ -15286,6 +15343,9 @@ ${ty.variants.map(
     void processAuthorizationCallback(callbackUrl, false);
   });
   var authInitialization = initializeAuthentication();
+  void authInitialization.then(() => {
+    if (authMode === "guest" && !relayPage) prepareLogin();
+  });
 
   // src/problem_watch.ts
   var LOG_LINE_LIMIT = 300;
