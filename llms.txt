@@ -4,8 +4,8 @@
 
 LDBG is a falling-block puzzle game and an RPG at once. You stack falling pieces and clear lines as in any competitive stacker, and every line you clear does something in the RPG: on the Farm it gathers materials, in a dungeon it strikes the monster in front of you, and in the Arena it hits another player. Your account keeps your character's level, gear, materials and unlocks between runs. It is made with the Godot engine by an independent developer and is in early beta.
 
-- Play free in a desktop browser: https://redredret.github.io/ldbg/
-- Official site: https://redredret.github.io/
+- Play free in a desktop browser: https://play.ldbg.net/
+- Official site: https://ldbg.net/
 - Optional Windows app: https://github.com/redredret/redredret.github.io/releases/latest
 - Controls: keyboard or controller, every action rebindable. Built for computers, not phones.
 - Price: free. Guests can try a local demo; logging in keeps progress on the game's servers.
@@ -91,7 +91,7 @@ LDBG is a free falling-block RPG you play in your browser. Every line you clear 
 
 ### Is LDBG free to play?
 
-Yes. LDBG is free and plays in your browser at redredret.github.io/ldbg. Try it as a guest, or Log In so everything you earn is kept.
+Yes. LDBG is free and plays in your browser at play.ldbg.net. Try it as a guest, or Log In so everything you earn is kept.
 
 ### Do I need to download anything?
 
@@ -134,6 +134,6 @@ No, it is in early beta and grows every week. New dungeons, bosses, gear and mod
 
 ## Data
 
-- [Live statistics and content counts (JSON)](https://redredret.github.io/stats.json)
-- [Every obtainable item, with rarity and level (JSON)](https://redredret.github.io/items.json)
-- [Everything added to the game, newest first (JSON)](https://redredret.github.io/news.json)
+- [Live statistics and content counts (JSON)](https://ldbg.net/stats.json)
+- [Every obtainable item, with rarity and level (JSON)](https://ldbg.net/items.json)
+- [Everything added to the game, newest first (JSON)](https://ldbg.net/news.json)
