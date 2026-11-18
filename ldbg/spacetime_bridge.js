@@ -987,6 +987,10 @@ ${originalIndentation}`;
     // 104): the member's own held rows, and the seats a fighting member's proof
     // would release.
     partyHeldPay: { group: "party", keys: { partyHeldPay: many("myPartyHeldPay") } },
+    // What a co-op partner was paid (docs/COOP_ENDLESS.md §13): the results card's
+    // YOUR PARTNER GOT, as the server paid it. Kept past the party, which goes as
+    // its last member settles.
+    partyPartnerPay: { group: "party", keys: { partyPartnerPay: many("myPartyPartnerPay") } },
     // A lobby's course (rules version 94): what any member set, which READY agrees to.
     partyCourse: { group: "party", keys: { partyCourse: one("myPartyCourse") } },
     // The teammate's board for the mini card, rebuilt from the party's event rows
@@ -12024,6 +12028,14 @@ ${ty.variants.map(
     updatedAt: t.timestamp().name("updated_at")
   });
 
+  // src/module_bindings/my_party_partner_pay_table.ts
+  var my_party_partner_pay_table_default = t.row({
+    partyId: t.string().name("party_id"),
+    slot: t.u32(),
+    itemsJson: t.string().name("items_json"),
+    experience: t.u32()
+  });
+
   // src/module_bindings/my_party_partner_pieces_table.ts
   var my_party_partner_pieces_table_default = t.row({
     owner: t.identity().primaryKey(),
@@ -12861,6 +12873,11 @@ ${ty.variants.map(
       indexes: [],
       constraints: []
     }, my_party_partner_boards_table_default),
+    myPartyPartnerPay: table({
+      name: "my_party_partner_pay",
+      indexes: [],
+      constraints: []
+    }, my_party_partner_pay_table_default),
     myPartyPartnerPieces: table({
       name: "my_party_partner_pieces",
       indexes: [],
@@ -13311,6 +13328,7 @@ ${ty.variants.map(
     "my_party_members": "myPartyMembers",
     "my_party_omens": "myPartyOmens",
     "my_party_partner_boards": "myPartyPartnerBoards",
+    "my_party_partner_pay": "myPartyPartnerPay",
     "my_party_partner_pieces": "myPartyPartnerPieces",
     "my_party_queue": "myPartyQueue",
     "my_party_score": "myPartyScore",
