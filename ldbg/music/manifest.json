@@ -436,101 +436,89 @@
       "file": "desert_16-f61fb1625a07.ogg",
       "fallback": "desert_16-b172a4c86ba5.m4a"
     },
+    "pvp_intro": {
+      "bars": 4,
+      "switchEveryBars": 1,
+      "file": "pvp_intro-ab9e37adf215.ogg",
+      "fallback": "pvp_intro-18ecb421e7a1.m4a"
+    },
     "pvp_1": {
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "pvp_1-8b23def44715.ogg",
-      "fallback": "pvp_1-552fe45de6ac.m4a"
+      "file": "pvp_1-0f3d317864a6.ogg",
+      "fallback": "pvp_1-7a4e5c391f0c.m4a"
     },
     "pvp_2": {
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "pvp_2-03b6bfb62086.ogg",
-      "fallback": "pvp_2-cf5e7b393ae9.m4a"
+      "file": "pvp_2-899642ae1fe8.ogg",
+      "fallback": "pvp_2-c9fee8a105a3.m4a"
     },
     "pvp_3": {
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "pvp_3-8374b56521e1.ogg",
-      "fallback": "pvp_3-f69fa016cc7c.m4a"
+      "file": "pvp_3-f664238b21b8.ogg",
+      "fallback": "pvp_3-25cc2644f9d2.m4a"
     },
     "pvp_4": {
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "pvp_4-c4e97ff93929.ogg",
-      "fallback": "pvp_4-1b003dab12a1.m4a"
+      "file": "pvp_4-1cf8a1a15792.ogg",
+      "fallback": "pvp_4-b214141c0836.m4a"
     },
     "pvp_5": {
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "pvp_5-4bb246685b61.ogg",
-      "fallback": "pvp_5-37fb9094c308.m4a"
+      "file": "pvp_5-c700f93357c3.ogg",
+      "fallback": "pvp_5-3faae9c5a5c4.m4a"
     },
     "pvp_6": {
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "pvp_6-0d3afd332f80.ogg",
-      "fallback": "pvp_6-1bb60749b8d9.m4a"
+      "file": "pvp_6-7132cf072f3d.ogg",
+      "fallback": "pvp_6-1bf68b83c84f.m4a"
     },
     "pvp_7": {
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "pvp_7-ed0619368d6c.ogg",
-      "fallback": "pvp_7-72a7d5d0c3cf.m4a"
+      "file": "pvp_7-474b91415702.ogg",
+      "fallback": "pvp_7-674771a5e8bc.m4a"
     },
     "pvp_8": {
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "pvp_8-f8ec6e3785c1.ogg",
-      "fallback": "pvp_8-3e7b03349788.m4a"
+      "file": "pvp_8-5aeeefd0771b.ogg",
+      "fallback": "pvp_8-bee2ef18365f.m4a"
     },
     "pvp_9": {
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "pvp_9-7382a24c290e.ogg",
-      "fallback": "pvp_9-37bdb339832a.m4a"
+      "file": "pvp_9-728e3711857f.ogg",
+      "fallback": "pvp_9-f5c8ae52ad94.m4a"
     },
     "pvp_10": {
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "pvp_10-de7197008614.ogg",
-      "fallback": "pvp_10-161a2a6a9c24.m4a"
+      "file": "pvp_10-3bcaad1c45b0.ogg",
+      "fallback": "pvp_10-56405cdeaa7a.m4a"
     },
     "pvp_11": {
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "pvp_11-b5866c357879.ogg",
-      "fallback": "pvp_11-055791543c85.m4a"
+      "file": "pvp_11-3bca17241bda.ogg",
+      "fallback": "pvp_11-5ad0a29d08fb.m4a"
     },
     "pvp_12": {
       "bars": 8,
       "switchEveryBars": 1,
-      "file": "pvp_12-7936f0782f17.ogg",
-      "fallback": "pvp_12-82990250c930.m4a"
+      "file": "pvp_12-ccfb5fd3db97.ogg",
+      "fallback": "pvp_12-c5d65a06ff0b.m4a"
     },
     "pvp_13": {
-      "bars": 8,
+      "bars": 1,
       "switchEveryBars": 1,
-      "file": "pvp_13-44cdb8645c35.ogg",
-      "fallback": "pvp_13-ce4288e16264.m4a"
-    },
-    "pvp_14": {
-      "bars": 8,
-      "switchEveryBars": 1,
-      "file": "pvp_14-31edcf1c7ee3.ogg",
-      "fallback": "pvp_14-03c8c7b6680a.m4a"
-    },
-    "pvp_15": {
-      "bars": 8,
-      "switchEveryBars": 1,
-      "file": "pvp_15-d2e30cf453f5.ogg",
-      "fallback": "pvp_15-429c03745469.m4a"
-    },
-    "pvp_16": {
-      "bars": 4,
-      "switchEveryBars": 1,
-      "file": "pvp_16-8518d21d24af.ogg",
-      "fallback": "pvp_16-dea7ef89164a.m4a"
+      "file": "pvp_13-d429f30251e5.ogg",
+      "fallback": "pvp_13-5be6f06266aa.m4a"
     }
   },
   "leadIns": {
@@ -885,9 +873,106 @@
       "switchEveryBars": 1
     },
     {
-      "from": "*",
+      "from": [
+        "intro_loop",
+        "a",
+        "b",
+        "a_2",
+        "c",
+        "a_3",
+        "outro",
+        "death_ambient",
+        "menu_1",
+        "menu_2",
+        "menu_3",
+        "menu_4",
+        "slime_nodrums_1",
+        "slime_nodrums_2",
+        "slime_nodrums_3",
+        "slime_nodrums_4",
+        "slime_nodrums_5",
+        "slime_nodrums_6",
+        "slime_nodrums_7",
+        "slime_nodrums_8",
+        "slime_nodrums_9",
+        "slime_nodrums_10",
+        "slime_nodrums_11",
+        "slime_nodrums_12",
+        "slime_nodrums_13",
+        "slime_nodrums_14",
+        "slime_nodrums_15",
+        "slime_nodrums_16",
+        "slime_full_1",
+        "slime_full_2",
+        "slime_full_3",
+        "slime_full_4",
+        "slime_full_5",
+        "slime_full_6",
+        "slime_full_7",
+        "slime_full_8",
+        "slime_full_9",
+        "slime_full_10",
+        "slime_full_11",
+        "slime_full_12",
+        "slime_full_13",
+        "slime_full_14",
+        "slime_full_15",
+        "slime_full_16",
+        "funky_build",
+        "funky_1",
+        "funky_2",
+        "funky_3",
+        "funky_4",
+        "funky_5",
+        "funky_6",
+        "desert_intro",
+        "desert_1",
+        "desert_2",
+        "desert_3",
+        "desert_4",
+        "desert_5",
+        "desert_6",
+        "desert_7",
+        "desert_8",
+        "desert_9",
+        "desert_10",
+        "desert_11",
+        "desert_12",
+        "desert_13",
+        "desert_14",
+        "desert_15",
+        "desert_16"
+      ],
       "to": [
-        "duel"
+        "duel",
+        "duel_wait"
+      ],
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1,
+      "preload": false
+    },
+    {
+      "from": [
+        "pvp_intro"
+      ],
+      "to": [
+        "menu"
+      ],
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1
+    },
+    {
+      "from": [
+        "pvp_intro"
+      ],
+      "to": [
+        "menu_deep",
+        "slime",
+        "slime_walls",
+        "farm",
+        "results",
+        "funky",
+        "desert"
       ],
       "leadIn": "cymbal_lead_up",
       "switchEveryBars": 1,
@@ -907,10 +992,7 @@
         "pvp_10",
         "pvp_11",
         "pvp_12",
-        "pvp_13",
-        "pvp_14",
-        "pvp_15",
-        "pvp_16"
+        "pvp_13"
       ],
       "to": [
         "menu"
@@ -932,10 +1014,7 @@
         "pvp_10",
         "pvp_11",
         "pvp_12",
-        "pvp_13",
-        "pvp_14",
-        "pvp_15",
-        "pvp_16"
+        "pvp_13"
       ],
       "to": "*",
       "leadIn": "cymbal_lead_up",
@@ -1084,6 +1163,11 @@
         "desert_16"
       ]
     },
+    "duel_wait": {
+      "play": [
+        "pvp_intro"
+      ]
+    },
     "duel": {
       "play": [
         "pvp_1",
@@ -1098,10 +1182,10 @@
         "pvp_10",
         "pvp_11",
         "pvp_12",
-        "pvp_13",
-        "pvp_14",
-        "pvp_15",
-        "pvp_16"
+        "pvp_13"
+      ],
+      "syncFrom": [
+        "pvp_intro"
       ]
     }
   },
