@@ -435,6 +435,102 @@
       "switchEveryBars": 1,
       "file": "desert_16-f61fb1625a07.ogg",
       "fallback": "desert_16-b172a4c86ba5.m4a"
+    },
+    "pvp_1": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_1-8b23def44715.ogg",
+      "fallback": "pvp_1-552fe45de6ac.m4a"
+    },
+    "pvp_2": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_2-03b6bfb62086.ogg",
+      "fallback": "pvp_2-cf5e7b393ae9.m4a"
+    },
+    "pvp_3": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_3-8374b56521e1.ogg",
+      "fallback": "pvp_3-f69fa016cc7c.m4a"
+    },
+    "pvp_4": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_4-c4e97ff93929.ogg",
+      "fallback": "pvp_4-1b003dab12a1.m4a"
+    },
+    "pvp_5": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_5-4bb246685b61.ogg",
+      "fallback": "pvp_5-37fb9094c308.m4a"
+    },
+    "pvp_6": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_6-0d3afd332f80.ogg",
+      "fallback": "pvp_6-1bb60749b8d9.m4a"
+    },
+    "pvp_7": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_7-ed0619368d6c.ogg",
+      "fallback": "pvp_7-72a7d5d0c3cf.m4a"
+    },
+    "pvp_8": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_8-f8ec6e3785c1.ogg",
+      "fallback": "pvp_8-3e7b03349788.m4a"
+    },
+    "pvp_9": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_9-7382a24c290e.ogg",
+      "fallback": "pvp_9-37bdb339832a.m4a"
+    },
+    "pvp_10": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_10-de7197008614.ogg",
+      "fallback": "pvp_10-161a2a6a9c24.m4a"
+    },
+    "pvp_11": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_11-b5866c357879.ogg",
+      "fallback": "pvp_11-055791543c85.m4a"
+    },
+    "pvp_12": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_12-7936f0782f17.ogg",
+      "fallback": "pvp_12-82990250c930.m4a"
+    },
+    "pvp_13": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_13-44cdb8645c35.ogg",
+      "fallback": "pvp_13-ce4288e16264.m4a"
+    },
+    "pvp_14": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_14-31edcf1c7ee3.ogg",
+      "fallback": "pvp_14-03c8c7b6680a.m4a"
+    },
+    "pvp_15": {
+      "bars": 8,
+      "switchEveryBars": 1,
+      "file": "pvp_15-d2e30cf453f5.ogg",
+      "fallback": "pvp_15-429c03745469.m4a"
+    },
+    "pvp_16": {
+      "bars": 4,
+      "switchEveryBars": 1,
+      "file": "pvp_16-8518d21d24af.ogg",
+      "fallback": "pvp_16-dea7ef89164a.m4a"
     }
   },
   "leadIns": {
@@ -787,6 +883,63 @@
       "to": "*",
       "leadIn": "cymbal_lead_up",
       "switchEveryBars": 1
+    },
+    {
+      "from": "*",
+      "to": [
+        "duel"
+      ],
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1,
+      "preload": false
+    },
+    {
+      "from": [
+        "pvp_1",
+        "pvp_2",
+        "pvp_3",
+        "pvp_4",
+        "pvp_5",
+        "pvp_6",
+        "pvp_7",
+        "pvp_8",
+        "pvp_9",
+        "pvp_10",
+        "pvp_11",
+        "pvp_12",
+        "pvp_13",
+        "pvp_14",
+        "pvp_15",
+        "pvp_16"
+      ],
+      "to": [
+        "menu"
+      ],
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1
+    },
+    {
+      "from": [
+        "pvp_1",
+        "pvp_2",
+        "pvp_3",
+        "pvp_4",
+        "pvp_5",
+        "pvp_6",
+        "pvp_7",
+        "pvp_8",
+        "pvp_9",
+        "pvp_10",
+        "pvp_11",
+        "pvp_12",
+        "pvp_13",
+        "pvp_14",
+        "pvp_15",
+        "pvp_16"
+      ],
+      "to": "*",
+      "leadIn": "cymbal_lead_up",
+      "switchEveryBars": 1
     }
   ],
   "states": {
@@ -930,14 +1083,33 @@
         "desert_15",
         "desert_16"
       ]
+    },
+    "duel": {
+      "play": [
+        "pvp_1",
+        "pvp_2",
+        "pvp_3",
+        "pvp_4",
+        "pvp_5",
+        "pvp_6",
+        "pvp_7",
+        "pvp_8",
+        "pvp_9",
+        "pvp_10",
+        "pvp_11",
+        "pvp_12",
+        "pvp_13",
+        "pvp_14",
+        "pvp_15",
+        "pvp_16"
+      ]
     }
   },
   "fallbacks": {
     "farm_versus": "farm",
     "dungeon": "farm",
     "dark": "farm",
-    "boss": "farm",
-    "duel": "farm"
+    "boss": "farm"
   },
   "fallbackPrimingSamples": 1024
 }
