@@ -1,6 +1,6 @@
 # LDBG
 
-> LDBG is a free falling-block RPG you play in your browser. Every line you clear hits a monster. Gather on the Farm, craft gear, fight through Greenshore and duel other players.
+> LDBG is a free falling-block RPG you play in your browser. Every line you clear hits a monster. Gather on the Farm, craft gear, fight through Greenshore and the Red Desert, and duel other players.
 
 LDBG is a falling-block puzzle game and an RPG at once. You stack falling pieces and clear lines as in any competitive stacker, and every line you clear does something in the RPG: on the Farm it gathers materials, in a dungeon it strikes the monster in front of you, and in the Arena it hits another player. Your account keeps your character's level, gear, materials and unlocks between runs. It is made with the Godot engine by an independent developer and is in early beta.
 
@@ -12,12 +12,13 @@ LDBG is a falling-block puzzle game and an RPG at once. You stack falling pieces
 
 ## The game in numbers
 
-- 142 items, including 61 pieces of gear (helmets, armour, swords, bows, staves, bucklers, rings, necklaces), from 106 crafting recipes
-- 16 kinds of monster, 8 of them bosses
-- 19 fights in the Greenshore story route
-- 107 upgrades across 3 upgrade trees (Combat, Skills and Build)
-- 46 quests from 7 townsfolk, and 79 daily and weekly tasks
-- Live totals, read 2026-10-21: 22 adventurers, 4,071 monsters slain, 1,377 bosses slain, 1,562 Quads and 893 T-spins cleared, 929 Farm runs
+- 221 items, including 85 pieces of gear (helmets, armour, swords, bows, staves, bucklers, rings, necklaces), from 139 crafting recipes
+- 30 kinds of monster, 14 of them bosses
+- 2 Stories: 19 fights in Greenshore's, then 20 across the Red Desert's 6 locations
+- The Endless Dungeon: 13 regions, a world map to plan trips on, and 10 pets to find
+- 109 upgrades across 3 upgrade trees (Combat, Skills and Build)
+- 86 quests from 8 townsfolk, and 97 daily and weekly tasks
+- Live totals, read 2026-11-18: 25 adventurers, 8,357 monsters slain, 2,653 bosses slain, 3,370 Quads and 1,891 T-spins cleared, 1,690 Farm runs
 
 ## The Farm
 
@@ -29,17 +30,18 @@ The Farm is an endless run. Clear lines to gather logs, ore, fish and fibre, the
 
 ## Crafting and gear
 
-Smelt your ore into ingots, weave your fibre into fabric, and work them into 61 pieces of gear across 106 recipes. Everything you wear shows on your character, from helmets and armour to swords, bows, staves, bucklers, rings and necklaces. Trade the rest for Gold with other players on the Market.
+Smelt your ore into ingots, weave your fibre into fabric, and work them into 85 pieces of gear across 139 recipes. Everything you wear shows on your character, from helmets and armour to swords, bows, staves, bucklers, rings and necklaces. Trade the rest for Gold with other players on the Market.
 
 ## Dungeons
 
-Greenshore's story runs 19 fights long, from zombies on the shore to the Cult Leader at the top of the tower. Your lines are your attacks. Theirs land on your board: arrows knock out blocks, fire spreads along the bottom row, and slime costs you a rotation.
+Greenshore's story runs 19 fights long, from zombies on the shore to the Cult Leader at the top of the tower. Beat him and the Red Desert opens: 20 more fights across 6 places, from the Dust Bowl to the cult's dig at the Research Station, and through the gate they guard to the Unbound in the Hellish Desert. Your lines are your attacks. Theirs land on your board: arrows knock out blocks, fire spreads along the bottom row, a worm chomps your tower and a mummy binds your HOLD shut.
 
-- **Story**: Greenshore's set route, through every area and every boss.
-- **Endless**: Endless dungeon regions. The deeper you go, the better the rewards.
+- **Story**: Two set routes, through every area and every boss: Greenshore's first, then the Red Desert's.
+- **The Endless Dungeon**: 13 regions, from Greenshore's fields to the Hellish Desert. The desert's open once you have finished its Story. Plan a trip place by place on the world map, or just wander. The deeper you go, the better the chests.
+- **With a Friend**: Take a friend into the Endless Dungeon. You fight the same monster, share every kill, and can pick each other up when one of you goes down.
 - **Dark Endless**: DANGER. A riskier, more rewarding endless dungeon. Fight other players for their gear, and higher monster drop rates, while risking your gear.
 - **The Garbage Man**: 10 waves of garbage, faster every wave. One top-out ends it.
-- **The Slime King**: A king after every king, alone or with a friend. He walls your board down to four columns until he falls.
+- **The Slime King**: A king after every king, alone or with a friend. He walls your board down to four columns until he falls. A Slime Key opens his door.
 
 ## Bosses
 
@@ -51,6 +53,12 @@ Greenshore's story runs 19 fights long, from zombies on the shore to the Cult Le
 - **Cult Leader**: Opens portals and hurls fireballs, then shields itself from your next hit.
 - **The Garbage Man**: Throws garbage at you one line at a time, faster every wave. Beat wave ten for an Arcane Vault, then keep going.
 - **The Slime King**: Walls your board down to four columns, slimes your tower and wraps you up until you shake him off. Beat him and a bigger one comes for you.
+- **Desert Worm**: Swims through the air, chomps blocks out of your tower to heal itself, then burrows through it. Only a clear across its trail can hit it down there.
+- **Scrap Warlord**: Pays his crew to shoot your board, then spins into a dust devil that rips at the sides of your tower until you hit him.
+- **Possessed Sarcophagus**: Seals your deepest well with a stone, lets spirits loose on your tower, and raises the dead to take your hits for it.
+- **Sandstone Golem**: Cracks your stack, blinds your queue with dust and makes your pieces heavy. Clear his crack or T-spin into his gap to stun him.
+- **The Old Man**: The Sand Veil keep him chained at the bottom of their dig. They have studied him for years and never let him die. He does not fight back.
+- **The Unbound**: What came through the gate. He lights a ward on your stack to fill, rewrites the pieces coming, and demands three clears in a row. Miss it and a row of hell-iron rises that takes two clears to break.
 
 ## Lesser foes
 
@@ -62,6 +70,14 @@ Greenshore's story runs 19 fights long, from zombies on the shore to the Cult Le
 - **Bandit Elite**: A tougher bandit, crossbow and all.
 - **Cultist**: Fireballs, and a stab at your bottom row.
 - **Oak Entling**: A stump that refused to stay felled.
+- **Sand Zombie**: Swipes a block off your top, twice as hard.
+- **Wormling**: Bites off a block and heals on it.
+- **Raider**: Slashes a block off your top.
+- **Mummy**: Binds your HOLD shut until you hit it twice.
+- **Rockling**: Heaves stones onto your tallest column.
+- **Cave Spider**: Lays an egg on your stack. Clear it before it hatches.
+- **Sand Veil Cultist**: Brands blocks to flare unless you clear them.
+- **Lesser Cult Leader**: Sun portals, a ring of blocks, and a shield only a spin breaks.
 
 ## The Arena
 
@@ -71,7 +87,7 @@ In the Hollow Spire you pick your opponent off the board. Look over their gear f
 
 ### What is LDBG?
 
-LDBG is a free falling-block RPG you play in your browser. Every line you clear is an attack on the monster in front of you. You gather materials on the Farm, craft gear, fight up the Greenshore dungeons, and duel other players, and your account keeps your levels, gear and loot.
+LDBG is a free falling-block RPG you play in your browser. Every line you clear is an attack on the monster in front of you. You gather materials on the Farm, craft gear, fight through two Stories, Greenshore and the Red Desert, push on into the Endless Dungeon, and duel other players, and your account keeps your levels, gear and loot.
 
 ### Is LDBG free to play?
 
@@ -91,11 +107,11 @@ Not yet. LDBG needs a keyboard or a controller, so play it on a computer. Touch 
 
 ### How does the RPG side work?
 
-Clearing lines gathers logs, ore, fish and fibre on the Farm, or deals damage in a dungeon. Bigger clears hit harder: Quads, T-spins and combos all pay extra. You earn XP and levels, spend points across 3 upgrade trees, craft and wear gear, finish quests and daily tasks, and open reward chests.
+Clearing lines gathers logs, ore, fish and fibre on the Farm, or deals damage in a dungeon. Bigger clears hit harder: Quads, T-spins and combos all pay extra. You earn XP and levels, spend points across 3 upgrade trees, craft gear and improve it at the Forge, finish quests, daily tasks and bounties, find pets, and open reward chests.
 
 ### Can I play with friends?
 
-Yes. Farm Versus seats up to ten players who send garbage at each other, Dark Farm puts half your haul on the line, Endless and the Slime King can be fought with a friend, and the Arena lets you duel another player for the win or for each other's gear.
+Yes. Farm Versus seats up to ten players who send garbage at each other, Dark Farm puts half your haul on the line, the Endless Dungeon and the Slime King can be fought with a friend, and the Arena lets you duel another player for the win or for each other's gear. Add your friends in the game to see when they are on and invite them straight in.
 
 ### Is my progress saved?
 

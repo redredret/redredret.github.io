@@ -210,9 +210,10 @@
     const content = stats.content || {};
     const live = stats.live || {};
     content.regulars = (content.enemies || 0) - (content.bosses || 0);
-    // Farm Solo, Versus and Dark; Story; Endless, Co-op Endless and Dark
-    // Endless; the Garbage Man and the Slime King; the Arena.
-    content.modes = 10;
+    // Farm Solo, Versus and Dark; the Greenshore and Red Desert Stories;
+    // Endless, Co-op Endless and Dark Endless; the Garbage Man and the Slime
+    // King; the Arena. tools/landing/bake_page.mjs says the same.
+    content.modes = 11;
     live.bossesSlain = Object.values(live.bossKills || {}).reduce((sum, value) => sum + value, 0);
     return stats;
   }

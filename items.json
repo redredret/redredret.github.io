@@ -8,11 +8,147 @@
   "level": 40
  },
  {
+  "id": "hunters_ring_5",
+  "icon": "hunters_ring_5.webp",
+  "name": "Hunter's Ring V",
+  "rarity": "legendary",
+  "type": "accessory",
+  "level": 55
+ },
+ {
+  "id": "ancient_warhelm",
+  "icon": "ancient_warhelm.webp",
+  "name": "Ancient Warhelm",
+  "rarity": "legendary",
+  "type": "armor",
+  "level": 55
+ },
+ {
+  "id": "ancient_coke",
+  "icon": "ancient_coke.webp",
+  "name": "Ancient Coke",
+  "rarity": "legendary",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "ancient_mask",
+  "icon": "ancient_mask.webp",
+  "name": "Ancient Mask",
+  "rarity": "legendary",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "bandit_crown",
   "icon": "bandit_crown.webp",
   "name": "Bandit Crown",
   "rarity": "legendary",
   "type": "material",
+  "level": 1
+ },
+ {
+  "id": "ornament_kit_gilded",
+  "icon": "ornament_kit_gilded.webp",
+  "name": "Gilded Ornament Kit",
+  "rarity": "legendary",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "perfect_orichalcum",
+  "icon": "perfect_orichalcum.webp",
+  "name": "Perfect Orichalcum",
+  "rarity": "legendary",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "respec_orb",
+  "icon": "respec_orb.webp",
+  "name": "Respec Orb",
+  "rarity": "legendary",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "pet_dog",
+  "icon": "pet_dog.webp",
+  "name": "Cubey",
+  "rarity": "legendary",
+  "type": "pet",
+  "level": 1
+ },
+ {
+  "id": "pet_cyclops",
+  "icon": "pet_cyclops.webp",
+  "name": "Little Cyclops",
+  "rarity": "legendary",
+  "type": "pet",
+  "level": 1
+ },
+ {
+  "id": "pet_garbage_man",
+  "icon": "pet_garbage_man.webp",
+  "name": "Little Garbage Man",
+  "rarity": "legendary",
+  "type": "pet",
+  "level": 1
+ },
+ {
+  "id": "pet_golem",
+  "icon": "pet_golem.webp",
+  "name": "Little Golem",
+  "rarity": "legendary",
+  "type": "pet",
+  "level": 1
+ },
+ {
+  "id": "pet_sarcophagus",
+  "icon": "pet_sarcophagus.webp",
+  "name": "Little Sarcophagus",
+  "rarity": "legendary",
+  "type": "pet",
+  "level": 1
+ },
+ {
+  "id": "pet_slime_king",
+  "icon": "pet_slime_king.webp",
+  "name": "Little Slime King",
+  "rarity": "legendary",
+  "type": "pet",
+  "level": 1
+ },
+ {
+  "id": "pet_bandit",
+  "icon": "pet_bandit.webp",
+  "name": "Pet Bandit",
+  "rarity": "legendary",
+  "type": "pet",
+  "level": 1
+ },
+ {
+  "id": "pet_cultist",
+  "icon": "pet_cultist.webp",
+  "name": "Pet Cultist",
+  "rarity": "legendary",
+  "type": "pet",
+  "level": 1
+ },
+ {
+  "id": "pet_entling",
+  "icon": "pet_entling.webp",
+  "name": "Pet Entling",
+  "rarity": "legendary",
+  "type": "pet",
+  "level": 1
+ },
+ {
+  "id": "pet_zombie",
+  "icon": "pet_zombie.webp",
+  "name": "Pet Zombie",
+  "rarity": "legendary",
+  "type": "pet",
   "level": 1
  },
  {
@@ -24,12 +160,36 @@
   "level": 30
  },
  {
+  "id": "fang_necklace",
+  "icon": "fang_necklace.webp",
+  "name": "Fang Necklace",
+  "rarity": "epic",
+  "type": "accessory",
+  "level": 30
+ },
+ {
   "id": "hourglass_amulet",
   "icon": "hourglass_amulet.webp",
   "name": "Hourglass Amulet",
   "rarity": "epic",
   "type": "accessory",
   "level": 35
+ },
+ {
+  "id": "hunters_ring_3",
+  "icon": "hunters_ring_3.webp",
+  "name": "Hunter's Ring III",
+  "rarity": "epic",
+  "type": "accessory",
+  "level": 35
+ },
+ {
+  "id": "hunters_ring_4",
+  "icon": "hunters_ring_4.webp",
+  "name": "Hunter's Ring IV",
+  "rarity": "epic",
+  "type": "accessory",
+  "level": 45
  },
  {
   "id": "kings_amulet",
@@ -72,6 +232,38 @@
   "level": 40
  },
  {
+  "id": "barbed_buckler",
+  "icon": "barbed_buckler.webp",
+  "name": "Barbed Buckler",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 45
+ },
+ {
+  "id": "bernie_spirit_hat",
+  "icon": "bernie_spirit_hat.webp",
+  "name": "Bernie's Spirit Hat",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 40
+ },
+ {
+  "id": "cultists_focus",
+  "icon": "cultists_focus.webp",
+  "name": "Cultist's Focus",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 40
+ },
+ {
+  "id": "dune_goggles",
+  "icon": "dune_goggles.webp",
+  "name": "Dune Goggles",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 35
+ },
+ {
   "id": "lotus_hat",
   "icon": "lotus_hat.webp",
   "name": "Lotus Hat",
@@ -112,6 +304,14 @@
   "level": 50
  },
  {
+  "id": "marauders_harness",
+  "icon": "marauders_harness.webp",
+  "name": "Marauder's Harness",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 45
+ },
+ {
   "id": "orichalcum_armor",
   "icon": "orichalcum_armor.webp",
   "name": "Orichalcum Armor",
@@ -136,9 +336,49 @@
   "level": 50
  },
  {
+  "id": "fused_warlord_helm",
+  "icon": "fused_warlord_helm.webp",
+  "name": "Orichalcum Warhelm",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "punchy_spiked_hat",
+  "icon": "punchy_spiked_hat.webp",
+  "name": "Punchy's Spiked Hat",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 40
+ },
+ {
+  "id": "shooty_goggled_hat",
+  "icon": "shooty_goggled_hat.webp",
+  "name": "Shooty's Goggled Hat",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 40
+ },
+ {
   "id": "spiked_buckler",
   "icon": "spiked_buckler.webp",
   "name": "Spiked Buckler",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 35
+ },
+ {
+  "id": "spiritsight_hat",
+  "icon": "spiritsight_hat.webp",
+  "name": "Spiritsight Hat",
+  "rarity": "epic",
+  "type": "armor",
+  "level": 50
+ },
+ {
+  "id": "warlords_horned_helm",
+  "icon": "warlords_horned_helm.webp",
+  "name": "Warlord's Horned Helm",
   "rarity": "epic",
   "type": "armor",
   "level": 35
@@ -176,9 +416,49 @@
   "level": 1
  },
  {
+  "id": "desert_orb",
+  "icon": "desert_orb.webp",
+  "name": "Desert Orb",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "duskhide",
   "icon": "duskhide.webp",
   "name": "Duskhide",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "gamblers_brew",
+  "icon": "gamblers_brew.webp",
+  "name": "Gambler's Brew",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "gilded_draught",
+  "icon": "gilded_draught.webp",
+  "name": "Gilded Draught",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "great_fang",
+  "icon": "great_fang.webp",
+  "name": "Great Fang",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "hunters_trophy",
+  "icon": "hunters_trophy.webp",
+  "name": "Hunter's Trophy",
   "rarity": "epic",
   "type": "material",
   "level": 1
@@ -216,9 +496,49 @@
   "level": 1
  },
  {
+  "id": "respec_shard",
+  "icon": "respec_shard.webp",
+  "name": "Respec Shard",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "scholars_tea",
+  "icon": "scholars_tea.webp",
+  "name": "Scholar's Tea",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "smoked_lens",
+  "icon": "smoked_lens.webp",
+  "name": "Smoked Lens",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "old_mans_chain",
+  "icon": "old_mans_chain.webp",
+  "name": "The Old Man's Chain",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "thick_slime",
   "icon": "thick_slime.webp",
   "name": "Thick Slime",
+  "rarity": "epic",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "trapped_spirit",
+  "icon": "trapped_spirit.webp",
+  "name": "Trapped Spirit",
   "rarity": "epic",
   "type": "material",
   "level": 1
@@ -248,6 +568,14 @@
   "level": 50
  },
  {
+  "id": "fanged_ipe_bow",
+  "icon": "fanged_ipe_bow.webp",
+  "name": "Fanged Ipe Bow",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 35
+ },
+ {
   "id": "horned_staff",
   "icon": "horned_staff.webp",
   "name": "Horned Staff",
@@ -264,12 +592,44 @@
   "level": 50
  },
  {
+  "id": "raider_scimitar",
+  "icon": "raider_scimitar.webp",
+  "name": "Raider Scimitar",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 50
+ },
+ {
   "id": "spiky_bow",
   "icon": "spiky_bow.webp",
   "name": "Spiky Bow",
   "rarity": "epic",
   "type": "weapon",
   "level": 35
+ },
+ {
+  "id": "sunstone_staff",
+  "icon": "sunstone_staff.webp",
+  "name": "Sunstone Staff",
+  "rarity": "epic",
+  "type": "weapon",
+  "level": 38
+ },
+ {
+  "id": "hunters_ring_1",
+  "icon": "hunters_ring_1.webp",
+  "name": "Hunter's Ring I",
+  "rarity": "rare",
+  "type": "accessory",
+  "level": 15
+ },
+ {
+  "id": "hunters_ring_2",
+  "icon": "hunters_ring_2.webp",
+  "name": "Hunter's Ring II",
+  "rarity": "rare",
+  "type": "accessory",
+  "level": 25
  },
  {
   "id": "kamikaze_necklace",
@@ -328,6 +688,14 @@
   "level": 30
  },
  {
+  "id": "fang_quiver",
+  "icon": "fang_quiver.webp",
+  "name": "Fang Quiver",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 30
+ },
+ {
   "id": "nettle_hat",
   "icon": "nettle_hat.webp",
   "name": "Nettle Hat",
@@ -350,6 +718,22 @@
   "rarity": "rare",
   "type": "armor",
   "level": 10
+ },
+ {
+  "id": "riveted_adamantite_armor",
+  "icon": "riveted_adamantite_armor.webp",
+  "name": "Riveted Adamantite Armor",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 40
+ },
+ {
+  "id": "riveted_adamantite_buckler",
+  "icon": "riveted_adamantite_buckler.webp",
+  "name": "Riveted Adamantite Buckler",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 40
  },
  {
   "id": "rugged_cap",
@@ -376,6 +760,22 @@
   "level": 10
  },
  {
+  "id": "silkweave_robe",
+  "icon": "silkweave_robe.webp",
+  "name": "Silkweave Robe",
+  "rarity": "rare",
+  "type": "armor",
+  "level": 32
+ },
+ {
+  "id": "emergency_ration",
+  "icon": "emergency_ration.webp",
+  "name": "Emergency Ration",
+  "rarity": "rare",
+  "type": "consumable",
+  "level": 1
+ },
+ {
   "id": "slime_broth",
   "icon": "slime_broth.webp",
   "name": "Slime Broth",
@@ -387,6 +787,14 @@
   "id": "trout_pie",
   "icon": "trout_pie.webp",
   "name": "Trout Pie",
+  "rarity": "rare",
+  "type": "consumable",
+  "level": 1
+ },
+ {
+  "id": "worm_steak",
+  "icon": "worm_steak.webp",
+  "name": "Worm Steak",
   "rarity": "rare",
   "type": "consumable",
   "level": 1
@@ -416,6 +824,22 @@
   "level": 1
  },
  {
+  "id": "burial_wrap",
+  "icon": "burial_wrap.webp",
+  "name": "Burial Wrap",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "bushy_tail",
+  "icon": "bushy_tail.webp",
+  "name": "Bushy Tail",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "clutch_idol",
   "icon": "clutch_idol.webp",
   "name": "Clutch Idol",
@@ -424,9 +848,41 @@
   "level": 1
  },
  {
+  "id": "crew_badge",
+  "icon": "crew_badge.webp",
+  "name": "Crew Badge",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "cult_sigil",
+  "icon": "cult_sigil.webp",
+  "name": "Cult Sigil",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "garbage_idol",
   "icon": "garbage_idol.webp",
   "name": "Garbage Idol",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "grave_tooth",
+  "icon": "grave_tooth.webp",
+  "name": "Grave Tooth",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "heartwood_knot",
+  "icon": "heartwood_knot.webp",
+  "name": "Heartwood Knot",
   "rarity": "rare",
   "type": "material",
   "level": 1
@@ -496,6 +952,22 @@
   "level": 1
  },
  {
+  "id": "riveted_plate",
+  "icon": "riveted_plate.webp",
+  "name": "Riveted Plate",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "rockling_core",
+  "icon": "rockling_core.webp",
+  "name": "Rockling Core",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "royal_jelly",
   "icon": "royal_jelly.webp",
   "name": "Royal Jelly",
@@ -520,6 +992,14 @@
   "level": 1
  },
  {
+  "id": "sand_leather",
+  "icon": "sand_leather.webp",
+  "name": "Sand Leather",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "scrap_idol",
   "icon": "scrap_idol.webp",
   "name": "Scrap Idol",
@@ -528,9 +1008,65 @@
   "level": 1
  },
  {
+  "id": "slime_core",
+  "icon": "slime_core.webp",
+  "name": "Slime Core",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "slime_key",
+  "icon": "slime_key.webp",
+  "name": "Slime Key",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "spider_fang",
+  "icon": "spider_fang.webp",
+  "name": "Spider Fang",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "spider_silk",
+  "icon": "spider_silk.webp",
+  "name": "Spider Silk",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "sunstone_shard",
+  "icon": "sunstone_shard.webp",
+  "name": "Sunstone Shard",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "thorny_idol",
   "icon": "thorny_idol.webp",
   "name": "Thorny Idol",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "wanted_poster",
+  "icon": "wanted_poster.webp",
+  "name": "Wanted Poster",
+  "rarity": "rare",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "wormling_husk",
+  "icon": "wormling_husk.webp",
+  "name": "Wormling Husk",
   "rarity": "rare",
   "type": "material",
   "level": 1
@@ -664,6 +1200,14 @@
   "level": 1
  },
  {
+  "id": "trail_mix",
+  "icon": "trail_mix.webp",
+  "name": "Trail Mix",
+  "rarity": "uncommon",
+  "type": "consumable",
+  "level": 1
+ },
+ {
   "id": "bernie_skin",
   "icon": "bernie_skin.webp",
   "name": "Bernie's Skin",
@@ -688,9 +1232,33 @@
   "level": 1
  },
  {
+  "id": "draught_of_fury",
+  "icon": "draught_of_fury.webp",
+  "name": "Draught of Fury",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "eye_ball",
   "icon": "eye_ball.webp",
   "name": "Eye Ball",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "hunters_brew",
+  "icon": "hunters_brew.webp",
+  "name": "Hunter's Brew",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "ironbark_tonic",
+  "icon": "ironbark_tonic.webp",
+  "name": "Ironbark Tonic",
   "rarity": "uncommon",
   "type": "material",
   "level": 1
@@ -771,6 +1339,14 @@
   "id": "raw_trout",
   "icon": "raw_trout.webp",
   "name": "Trout",
+  "rarity": "uncommon",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "worm_fang",
+  "icon": "worm_fang.webp",
+  "name": "Worm Fang",
   "rarity": "uncommon",
   "type": "material",
   "level": 1
@@ -880,6 +1456,22 @@
   "level": 1
  },
  {
+  "id": "bone_meal",
+  "icon": "bone_meal.webp",
+  "name": "Bone Meal",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "dust_bowl_chart",
+  "icon": "dust_bowl_chart.webp",
+  "name": "Bowl Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "bandit_camp_chart",
   "icon": "bandit_camp_chart.webp",
   "name": "Camp Chart",
@@ -891,6 +1483,14 @@
   "id": "carrot",
   "icon": "carrot.webp",
   "name": "Carrot",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "sand_cave_chart",
+  "icon": "sand_cave_chart.webp",
+  "name": "Cave Chart",
   "rarity": "common",
   "type": "material",
   "level": 1
@@ -1008,6 +1608,14 @@
   "level": 1
  },
  {
+  "id": "iron_shard",
+  "icon": "iron_shard.webp",
+  "name": "Iron Shard",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "leather",
   "icon": "leather.webp",
   "name": "Leather",
@@ -1048,6 +1656,14 @@
   "level": 1
  },
  {
+  "id": "pyramids_chart",
+  "icon": "pyramids_chart.webp",
+  "name": "Pyramid Chart",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
   "id": "rich_compost",
   "icon": "rich_compost.webp",
   "name": "Rich Compost",
@@ -1075,6 +1691,14 @@
   "id": "slime_bag",
   "icon": "slime_bag.webp",
   "name": "Slime Bag",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "sand_storm_chart",
+  "icon": "sand_storm_chart.webp",
+  "name": "Storm Chart",
   "rarity": "common",
   "type": "material",
   "level": 1
@@ -1115,6 +1739,14 @@
   "id": "woodcutters_compost",
   "icon": "woodcutters_compost.webp",
   "name": "Woodcutter's Compost",
+  "rarity": "common",
+  "type": "material",
+  "level": 1
+ },
+ {
+  "id": "worm_meat",
+  "icon": "worm_meat.webp",
+  "name": "Worm Meat",
   "rarity": "common",
   "type": "material",
   "level": 1
