@@ -35,6 +35,19 @@ main.store, main.store-item { max-width: 860px; }
 .store-card-blurb { color: var(--muted); font-size: 15px; line-height: 1.45; }
 .store-card-price { margin-top: auto; font-size: 18px; }
 .store-card-more { color: var(--mint); font-weight: 700; }
+.store-card-several {
+  margin-left: 10px;
+  padding: 2px 8px;
+  border: 1px solid var(--mint);
+  border-radius: 999px;
+  color: var(--mint);
+  font-size: 13px;
+  vertical-align: 2px;
+}
+.store-category { margin: 18px 0 8px; }
+.store-category h2 { margin-bottom: 2px; }
+.store-category-about { color: var(--muted); margin-top: 0; }
+.item-several { color: var(--mint); font-size: 15px; margin: 4px 0 0; }
 
 .item-head {
   display: grid;
