@@ -250,6 +250,10 @@ p { margin: 0 0 12px; }
 .play-big { font-size: 26px; min-height: 68px; padding: 0 18px; margin-top: 6px; letter-spacing: 0.02em; }
 .play-big img { width: 40px; height: 40px; margin-left: -6px; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4)); }
 .hero-small { margin-top: 14px; font-size: 14px; color: var(--muted); text-shadow: 0 1px 3px #000; }
+/* The Windows app, findable without scrolling to the download section: quiet,
+   below the line under Play Now, and brighter only when pointed at. */
+.hero-download { display: inline-block; margin-top: 6px; font-size: 13px; color: var(--muted); opacity: 0.6; text-decoration: underline; text-underline-offset: 3px; text-shadow: 0 1px 3px #000; transition: opacity 0.15s; }
+.hero-download:hover, .hero-download:focus-visible { opacity: 1; }
 
 /* The block ground under the hero. Cells come from the game's own atlas. */
 .hero-stack {
