@@ -1,0 +1,87 @@
+/* The Store pages (landing/store/), drawn over legal.css's column and palette.
+ * Written by tools/landing/build_store.mjs; nothing here is fetched from
+ * anywhere but this site. */
+
+main.store, main.store-item { max-width: 860px; }
+.top { max-width: 860px; }
+
+.crumbs { color: var(--muted); font-size: 15px; margin: 18px 0 0; }
+
+.store-grid {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 26px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.store-card a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 18px 16px 16px;
+  text-align: center;
+  text-decoration: none;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--well-edge);
+  border-radius: 12px;
+}
+.store-card a:hover, .store-card a:focus-visible { border-color: var(--gold); }
+.store-card img { width: 128px; height: 128px; object-fit: contain; }
+.store-card-name { font: 400 22px/1.2 var(--display); color: var(--gold); }
+.store-card-blurb { color: var(--muted); font-size: 15px; line-height: 1.45; }
+.store-card-price { margin-top: auto; font-size: 18px; }
+.store-card-more { color: var(--mint); font-weight: 700; }
+
+.item-head {
+  display: grid;
+  grid-template-columns: 176px 1fr;
+  gap: 24px;
+  align-items: center;
+  margin: 10px 0 18px;
+}
+.item-icon {
+  width: 176px;
+  height: 176px;
+  object-fit: contain;
+  background: radial-gradient(closest-side, rgba(230, 200, 136, 0.14), transparent);
+}
+.item-head h1 { margin-top: 0; }
+.item-blurb { font-size: 18px; }
+.item-price { font-size: 26px; margin: 6px 0 0; }
+.item-price span { font-size: 16px; color: var(--muted); }
+.item-tax { color: var(--muted); font-size: 15px; }
+.buy {
+  display: inline-block;
+  padding: 12px 26px;
+  border-radius: 10px;
+  background: linear-gradient(#ecd296, #c9a560);
+  color: #241c10;
+  font: 400 21px/1 var(--display);
+  text-decoration: none;
+  box-shadow: 0 3px 0 #6e5428, 0 6px 14px rgba(0, 0, 0, 0.35);
+}
+.buy:hover, .buy:focus-visible { background: linear-gradient(#f6e1ad, #d8b46c); }
+.buy-how { color: var(--muted); font-size: 15px; }
+
+.item-render {
+  margin: 0 0 8px;
+  padding: 16px;
+  background: radial-gradient(ellipse at 50% 40%, #2b383c, var(--well) 75%);
+  border: 1px solid var(--well-edge);
+  border-radius: 12px;
+  text-align: center;
+}
+.item-render img { max-width: 100%; max-height: 520px; width: auto; height: auto; }
+.item-render figcaption { color: var(--muted); font-size: 15px; margin-top: 8px; }
+
+.item-more { margin-top: 28px; color: var(--muted); font-size: 15px; }
+
+@media (max-width: 620px) {
+  .item-head { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 8px; }
+  .item-icon { width: 128px; height: 128px; }
+  .item-render img { max-height: 380px; }
+}
