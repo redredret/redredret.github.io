@@ -515,6 +515,6 @@
     })
     .catch(() => {
       const caption = document.querySelector('.inventory-caption');
-      if (caption) caption.textContent = 'The item list could not be loaded.';
+      if (caption) caption.textContent = 'The item list couldn't be loaded.';
     });
 })();

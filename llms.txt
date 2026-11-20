@@ -24,19 +24,19 @@ LDBG is a falling-block puzzle game and an RPG at once. You stack falling pieces
 
 The Farm is an endless run. Clear lines to gather logs, ore, fish and fibre, then craft with them. Quads, T-spins and combos gather more.
 
-- **Farm Solo**: Just you and the board. Garbage rises every few pieces, so keep clearing.
+- **Farm Solo**: Play on your own. Garbage rises every few pieces, so keep clearing.
 - **Farm Versus**: Up to ten players in a room, sending garbage at each other. You keep everything you gather.
-- **Dark Farm**: Versus with stakes. Half of what you gather is on the line, and the winner takes it.
+- **Dark Farm**: Versus for stakes. Half of everything you gather goes in a pot, and the winner takes it.
 
 ## Crafting and gear
 
-Smelt your ore into ingots, weave your fibre into fabric, and work them into 85 pieces of gear across 139 recipes. Everything you wear shows on your character, from helmets and armour to swords, bows, staves, bucklers, rings and necklaces. Trade the rest for Gold with other players on the Market.
+Smelt ore into ingots and weave fibre into fabric, then craft 85 pieces of gear from 139 recipes. Everything you wear shows on your character. Trade the rest with other players on the Market for Gold.
 
 ## Dungeons
 
-Greenshore's story runs 19 fights long, from zombies on the shore to the Cult Leader at the top of the tower. Beat him and the Red Desert opens: 20 more fights across 6 places, from the Dust Bowl to the cult's dig at the Research Station, and through the gate they guard to the Unbound in the Hellish Desert. Your lines are your attacks. Theirs land on your board: arrows knock out blocks, fire spreads along the bottom row, a worm chomps your tower and a mummy binds your HOLD shut.
+Greenshore's story runs 19 fights long, from zombies on the shore to the Cult Leader at the top of the tower. Beat him and the Red Desert opens, with 20 more fights across 6 places, ending with the Unbound in the Hellish Desert. Your lines are your attacks, and theirs land on your board. Arrows knock out blocks, fire spreads along the bottom row, a worm chomps your tower and a mummy shuts your HOLD.
 
-- **Story**: Two set routes, through every area and every boss: Greenshore's first, then the Red Desert's.
+- **Story**: Two set routes through every area and boss. Greenshore's comes first, then the Red Desert's.
 - **The Endless Dungeon**: 13 regions, from Greenshore's fields to the Hellish Desert. The desert's open once you have finished its Story. Plan a trip place by place on the world map, or just wander. The deeper you go, the better the chests.
 - **With a Friend**: Take a friend into the Endless Dungeon. You fight the same monster, share every kill, and can pick each other up when one of you goes down.
 - **Dark Endless**: DANGER. A riskier, more rewarding endless dungeon. Fight other players for their gear, and higher monster drop rates, while risking your gear.
@@ -53,23 +53,23 @@ Greenshore's story runs 19 fights long, from zombies on the shore to the Cult Le
 - **Cult Leader**: Opens portals and hurls fireballs, then shields itself from your next hit.
 - **The Garbage Man**: Throws garbage at you one line at a time, faster every wave. Beat wave ten for an Arcane Vault, then keep going.
 - **The Slime King**: Walls your board down to four columns, slimes your tower and wraps you up until you shake him off. Beat him and a bigger one comes for you.
-- **Desert Worm**: Swims through the air, chomps blocks out of your tower to heal itself, then burrows through it. Only a clear across its trail can hit it down there.
+- **Desert Worm**: A giant worm that chomps blocks out of your tower to heal, then burrows through it. While it's under, only a clear across its trail can hit it.
 - **Scrap Warlord**: Pays his crew to shoot your board, then spins into a dust devil that rips at the sides of your tower until you hit him.
 - **Possessed Sarcophagus**: Seals your deepest well with a stone, lets spirits loose on your tower, and raises the dead to take your hits for it.
 - **Sandstone Golem**: Cracks your stack, blinds your queue with dust and makes your pieces heavy. Clear his crack or T-spin into his gap to stun him.
-- **The Old Man**: The Sand Veil keep him chained at the bottom of their dig. They have studied him for years and never let him die. He does not fight back.
-- **The Unbound**: What came through the gate. He lights a ward on your stack to fill, rewrites the pieces coming, and demands three clears in a row. Miss it and a row of hell-iron rises that takes two clears to break.
+- **The Old Man**: The Sand Veil keep him chained at the bottom of their dig. They have studied him for years and never let him die. He doesn't fight back.
+- **The Unbound**: A demon from the gate. He lights a ward on your stack to fill, rewrites your next pieces and demands three clears in a row. Miss them and a row of hell-iron rises that takes two clears to break.
 
 ## Lesser foes
 
 - **Zombie**: Swipes a block off your top.
 - **Super Zombie**: Rakes off two or three.
 - **Slime**: Slimes your piece. No rotating.
-- **Squirrel**: Nips at you. Never your board.
+- **Squirrel**: Bites you, but leaves your board alone.
 - **Bandit**: Arrows knock out a block.
 - **Bandit Elite**: A tougher bandit, crossbow and all.
 - **Cultist**: Fireballs, and a stab at your bottom row.
-- **Oak Entling**: A stump that refused to stay felled.
+- **Oak Entling**: A tree stump that grows blocks on your stack.
 - **Sand Zombie**: Swipes a block off your top, twice as hard.
 - **Wormling**: Bites off a block and heals on it.
 - **Raider**: Slashes a block off your top.
@@ -81,21 +81,21 @@ Greenshore's story runs 19 fights long, from zombies on the shore to the Cult Le
 
 ## The Arena
 
-In the Hollow Spire you pick your opponent off the board. Look over their gear first, then fight for the win, or put a piece of your gear against a piece of theirs. Every hit you land is a line you cleared, so the better stacker usually walks away richer.
+Pick an opponent, check their gear, then fight for fun or for a piece of their gear. Better stacking wins.
 
 ## Questions
 
 ### What is LDBG?
 
-LDBG is a free falling-block RPG you play in your browser. Every line you clear is an attack on the monster in front of you. You gather materials on the Farm, craft gear, fight through two Stories, Greenshore and the Red Desert, push on into the Endless Dungeon, and duel other players, and your account keeps your levels, gear and loot.
+LDBG is a free falling-block RPG you play in your browser. Every line you clear is an attack on the monster in front of you. Gather materials on the Farm, craft gear, fight through the Greenshore and Red Desert Stories, push into the Endless Dungeon and duel other players. Your account keeps your levels, gear and loot.
 
 ### Is LDBG free to play?
 
-Yes. LDBG is free and plays in your browser at play.ldbg.net. Try it as a guest, or Log In so everything you earn is kept.
+Yes. LDBG is free and plays in your browser at play.ldbg.net. Try it as a guest, or log in to keep everything you earn.
 
 ### Do I need to download anything?
 
-No. It runs in a desktop browser such as Chrome, Edge or Firefox. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates; it isn't signed yet, so Windows asks you to confirm before it runs.
+No. It runs in a desktop browser such as Chrome, Edge or Firefox. There is also an optional Windows app that opens the same game in its own window, with extra settings like higher frame rates.
 
 ### What do I play it with?
 
@@ -107,27 +107,41 @@ Not yet. LDBG needs a keyboard or a controller, so play it on a computer. Touch 
 
 ### How does the RPG side work?
 
-Clearing lines gathers logs, ore, fish and fibre on the Farm, or deals damage in a dungeon. Bigger clears hit harder: Quads, T-spins and combos all pay extra. You earn XP and levels, spend points across 3 upgrade trees, craft gear and improve it at the Forge, finish quests, daily tasks and bounties, find pets, and open reward chests.
+Clearing lines gathers logs, ore, fish and fibre on the Farm, or deals damage in a dungeon. Bigger clears hit harder, and Quads, T-spins and combos all pay extra. You earn XP and levels, spend points across 3 upgrade trees, craft gear and improve it at the Forge, finish quests, daily tasks and bounties, find pets, and open reward chests.
 
 ### Can I play with friends?
 
-Yes. Farm Versus seats up to ten players who send garbage at each other, Dark Farm puts half your haul on the line, the Endless Dungeon and the Slime King can be fought with a friend, and the Arena lets you duel another player for the win or for each other's gear. Add your friends in the game to see when they are on and invite them straight in.
+Yes. Farm Versus seats up to ten players who send garbage at each other. In Dark Farm, half of what you gather goes in a pot for the winner. You can fight the Endless Dungeon and the Slime King with a friend, and duel other players in the Arena for fun or for each other's gear. Add friends in the game to see when they're on and invite them in.
 
 ### Is my progress saved?
 
-Yes. When you Log In, your progress is kept on the game's servers and follows you to any computer, and it stays through the beta: nothing you earn now will be wiped. Guest play is a short local demo, and nothing earned as a guest moves to an account.
+Yes. When you log in, your progress is kept on the game's servers and follows you to any computer. It stays through the beta, so nothing you earn now will be wiped. Guest play is a short local demo, and nothing earned as a guest moves to an account.
 
 ### Is LDBG finished?
 
-No, it is in early beta and grows every week. New dungeons, bosses, gear and modes land often; the Recently Added list on this page shows the latest.
+No, it's in early beta and grows every week. New dungeons, bosses, gear and modes come often. The Recently Added list on this page shows the latest.
 
 ## Recently added
 
-- 2026-11-20, **Sand Zombies in the Endless Pyramids**: Sand Zombies now shuffle through the Endless Dungeon's Pyramids again: about one fight in seven between the Mummies, at the Pyramids' strength. And when a chart teleports you somewhere, the board says so: CHART USED, whose chart it was and where it took you, in co-op too.
-- 2026-11-19, **Terms, privacy and a Store page**: LDBG now has Terms of Service and a Privacy Policy, linked at the bottom of this page and in the game under Settings > About. The next time you log in, the game asks you to agree to them before you play on. There is also a Store page showing the Prismatic and Void Ornament Kits: what each one does to your gear, its price, and how buying one works.
-- 2026-11-19, **Duels give experience**: Fighting other players now earns experience, by the same rule as the Farm: one XP for each line you clear in a fight, and at least two for a Quad, a spin or an All Clear. It counts in Dark, the Arena and the Testing Grounds, win or lose.
-- 2026-11-19, **Heals that fade in a duel**: In a duel, every heal from your gear and skills now counts for a little less the more you have healed that fight: the first heals land whole, and by the time you have healed back a full bar each one is worth half. Healing works all fight long, but a build stacked with heals can no longer outlast everyone. Food heals as it always did.
-- 2026-11-19, **Emergency Rations cost a real haul**: An Emergency Ration now takes 150 Raw Trout, 250 Raw Guppy, 30 Carrots, 25 Slime Gel and 40 Coal at the Cookhouse, about three times what it did. It still saves you once from a hit that leaves you nearly dead, twice with a Provisions Pouch, so it should feel like a prize to carry. Rations you already have are unchanged, and the Sandstone Golem and Cave Spiders still drop them.
+- 2026-11-20, **Sand Zombies in the Endless Pyramids**: Sand Zombies are back in the Endless Dungeon's Pyramids.
+• About one fight in seven between the Mummies, at the Pyramids' strength
+• When a chart takes you somewhere, the board says whose chart it was and where it took you
+• In co-op too
+- 2026-11-19, **Terms, privacy and a Store page**: LDBG now has Terms of Service, a Privacy Policy and a Store page.
+• Find them at the bottom of this page, and in the game under Settings > About
+• The game asks you to agree to them the next time you log in
+• The Store page shows the Prismatic and Void Ornament Kits, their prices and how buying works
+- 2026-11-19, **Duels give experience**: Fights against other players now earn XP.
+• One XP for each line you clear, the same as the Farm
+• At least two for a Quad, a spin or an All Clear
+• In Dark, the Arena and the Testing Grounds, win or lose
+- 2026-11-19, **Heals that fade in a duel**: Heals fade in duels.
+• Each heal is worth less the more you've healed that fight
+• Food is unchanged
+- 2026-11-19, **Emergency Rations cost a real haul**: Emergency Rations cost more.
+• About three times the materials
+• Rations you have are unchanged
+• The Sandstone Golem and Cave Spiders still drop them
 - 2026-11-19, **The Unbound's sigil plays fair**: The Unbound's Ward Sigil now glows where its piece fits your stack best, turned whichever way suits it, so answering it never wrecks your board. Fill it with the piece it asks for and he is stunned and your next hit lands twice. Fill it with other pieces and it simply goes out: no Judgement for you, and no stun for him. His attacks burn with the board's own fire now, and the orbs he throws crackle with power.
 - 2026-11-18, **Fairer duels**: Thorns no longer win fights on their own: in a duel, Thorned and the Ring of Thorns hand back a small share that adds up over the fight. Heals were made for monsters, so in a duel Mending heals an eighth, and Vampiric, the Hourglass Amulet and the Combat tree's heals count at half. Dark now looks for an opponent within ten levels, in your own region first, then your part of the world, then anywhere.
 - 2026-11-18, **The Red Desert's Story, told in full**: The Red Desert's Story has a new opening and a new ending. Vesper joins Katherine and Brann on the road in, and once the Unbound falls and the portal goes quiet, stay to hear what became of the Old Man, and what the cultists are really after. You get a few words of your own, too.
