@@ -123,6 +123,12 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 
 ## Recently added
 
+- 2026-11-20, **Endless regions open one by one**: Each Endless Dungeon region now opens when you complete it in the Story.
+• Complete Greenshore Fields to open the Endless Dungeon
+• You don't need to finish the whole Story first
+• It counts even if you die later in the run
+• Dark and the Red Desert still need the whole Greenshore Story
+• Hover a locked place on the map to see what opens it
 - 2026-11-20, **Sand Zombies in the Endless Pyramids**: Sand Zombies are back in the Endless Dungeon's Pyramids.
 • About one fight in seven between the Mummies, at the Pyramids' strength
 • When a chart takes you somewhere, the board says whose chart it was and where it took you
@@ -144,7 +150,6 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 • The Sandstone Golem and Cave Spiders still drop them
 - 2026-11-19, **The Unbound's sigil plays fair**: The Unbound's Ward Sigil now glows where its piece fits your stack best, turned whichever way suits it, so answering it never wrecks your board. Fill it with the piece it asks for and he is stunned and your next hit lands twice. Fill it with other pieces and it simply goes out: no Judgement for you, and no stun for him. His attacks burn with the board's own fire now, and the orbs he throws crackle with power.
 - 2026-11-18, **Fairer duels**: Thorns no longer win fights on their own: in a duel, Thorned and the Ring of Thorns hand back a small share that adds up over the fight. Heals were made for monsters, so in a duel Mending heals an eighth, and Vampiric, the Hourglass Amulet and the Combat tree's heals count at half. Dark now looks for an opponent within ten levels, in your own region first, then your part of the world, then anywhere.
-- 2026-11-18, **The Red Desert's Story, told in full**: The Red Desert's Story has a new opening and a new ending. Vesper joins Katherine and Brann on the road in, and once the Unbound falls and the portal goes quiet, stay to hear what became of the Old Man, and what the cultists are really after. You get a few words of your own, too.
 
 ## Data
 

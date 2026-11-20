@@ -14,6 +14,7 @@
     113
   ],
   "entries": [
+    {"date": "2026-11-20", "title": "Endless regions open one by one", "text": "Each Endless Dungeon region now opens when you complete it in the Story.\n• Complete Greenshore Fields to open the Endless Dungeon\n• You don't need to finish the whole Story first\n• It counts even if you die later in the run\n• Dark and the Red Desert still need the whole Greenshore Story\n• Hover a locked place on the map to see what opens it"},
     {"date": "2026-11-20", "title": "Sand Zombies in the Endless Pyramids", "rulesVersion": 123, "text": "Sand Zombies are back in the Endless Dungeon's Pyramids.\n• About one fight in seven between the Mummies, at the Pyramids' strength\n• When a chart takes you somewhere, the board says whose chart it was and where it took you\n• In co-op too"},
     {"date": "2026-11-19", "title": "Terms, privacy and a Store page", "text": "LDBG now has Terms of Service, a Privacy Policy and a Store page.\n• Find them at the bottom of this page, and in the game under Settings > About\n• The game asks you to agree to them the next time you log in\n• The Store page shows the Prismatic and Void Ornament Kits, their prices and how buying works"},
     {"date": "2026-11-19", "title": "Duels give experience", "rulesVersion": 122, "text": "Fights against other players now earn XP.\n• One XP for each line you clear, the same as the Farm\n• At least two for a Quad, a spin or an All Clear\n• In Dark, the Arena and the Testing Grounds, win or lose"},
