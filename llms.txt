@@ -123,6 +123,10 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 
 ## Recently added
 
+- 2026-11-21, **More Sand Zombies, and Coke from Mummies**: The Endless Dungeon's Pyramids are half Sand Zombies now.
+• About one fight in two is a Sand Zombie, the rest Mummies
+• Mummies can drop Ancient Coke, about 1 in 500 kills
+• The Possessed Sarcophagus still drops it too
 - 2026-11-20, **Endless regions open one by one**: Each Endless Dungeon region now opens when you complete it in the Story.
 • Complete Greenshore Fields to open the Endless Dungeon
 • You don't need to finish the whole Story first
@@ -149,7 +153,6 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 • Rations you have are unchanged
 • The Sandstone Golem and Cave Spiders still drop them
 - 2026-11-19, **The Unbound's sigil plays fair**: The Unbound's Ward Sigil now glows where its piece fits your stack best, turned whichever way suits it, so answering it never wrecks your board. Fill it with the piece it asks for and he is stunned and your next hit lands twice. Fill it with other pieces and it simply goes out: no Judgement for you, and no stun for him. His attacks burn with the board's own fire now, and the orbs he throws crackle with power.
-- 2026-11-18, **Fairer duels**: Thorns no longer win fights on their own: in a duel, Thorned and the Ring of Thorns hand back a small share that adds up over the fight. Heals were made for monsters, so in a duel Mending heals an eighth, and Vampiric, the Hourglass Amulet and the Combat tree's heals count at half. Dark now looks for an opponent within ten levels, in your own region first, then your part of the world, then anywhere.
 
 ## Data
 
