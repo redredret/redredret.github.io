@@ -123,6 +123,12 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 
 ## Recently added
 
+- 2026-11-21, **Ranked Farm**: Climb seven ranks, Coal to Darkite, one on one in the Farm.
+• Opens at level 20, from the Farm's mode menu
+• Best of 3, just stacking: no skills, gear or head start on the board
+• Pay your rank's fee; win, and the Stack multiplies the pot you both gathered, up to ×100
+• Five placement matches, then your rank, Grade and Top %
+• Season rewards, a ladder, match history and friends to watch
 - 2026-11-21, **More Sand Zombies, and Coke from Mummies**: The Endless Dungeon's Pyramids are half Sand Zombies now.
 • About one fight in two is a Sand Zombie, the rest Mummies
 • Mummies can drop Ancient Coke, about 1 in 500 kills
@@ -152,7 +158,6 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 • About three times the materials
 • Rations you have are unchanged
 • The Sandstone Golem and Cave Spiders still drop them
-- 2026-11-19, **The Unbound's sigil plays fair**: The Unbound's Ward Sigil now glows where its piece fits your stack best, turned whichever way suits it, so answering it never wrecks your board. Fill it with the piece it asks for and he is stunned and your next hit lands twice. Fill it with other pieces and it simply goes out: no Judgement for you, and no stun for him. His attacks burn with the board's own fire now, and the orbs he throws crackle with power.
 
 ## Data
 
