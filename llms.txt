@@ -123,6 +123,13 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 
 ## Recently added
 
+- 2026-11-23, **Your attacks, reworked**: Every weapon got a new set of attacks.
+• Swords, bows and staves change move from hit to hit, and a combo walks through them
+• Big clears hit big: a leaping slam, a whirlwind, a volley of arrows, a beam from the staff
+• A spin sets your weapon burning in the colour of the piece you spun
+• A long combo makes your blade glow hot, and it smokes when the combo ends
+• An All Clear has a move of its own for each weapon
+• Other players in duels and co-op use the new attacks too
 - 2026-11-21, **Ranked Farm**: Climb seven ranks, Coal to Darkite, one on one in the Farm.
 • Opens at level 20, from the Farm's mode menu
 • Best of 3, just stacking: no skills, gear or head start on the board
@@ -154,10 +161,6 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 - 2026-11-19, **Heals that fade in a duel**: Heals fade in duels.
 • Each heal is worth less the more you've healed that fight
 • Food is unchanged
-- 2026-11-19, **Emergency Rations cost a real haul**: Emergency Rations cost more.
-• About three times the materials
-• Rations you have are unchanged
-• The Sandstone Golem and Cave Spiders still drop them
 
 ## Data
 
