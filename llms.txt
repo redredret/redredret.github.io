@@ -123,6 +123,14 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 
 ## Recently added
 
+- 2026-11-24, **Mummies' bandages come loose faster**: Mummies' bandages now come loose after a single hit.
+• One hit on a Mummy frees your HOLD box, not two
+• In the Story, the Endless Dungeon and co-op
+• Runs you started before this keep the old rules
+- 2026-11-24, **Ancient Coke can be traded**: The Ancient Mask's materials have swapped places.
+• Ancient Coke can now be traded on the Market
+• Perfect Orichalcum is now bound to whoever finds it
+• The Ancient Mask takes two Ancient Coke and one Perfect Orichalcum
 - 2026-11-23, **Your attacks, reworked**: Every weapon got a new set of attacks.
 • Swords, bows and staves change move from hit to hit, and a combo walks through them
 • Big clears hit big: a leaping slam, a whirlwind, a volley of arrows, a beam from the staff
@@ -154,13 +162,6 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 • Find them at the bottom of this page, and in the game under Settings > About
 • The game asks you to agree to them the next time you log in
 • The Store page shows the Prismatic and Void Ornament Kits, their prices and how buying works
-- 2026-11-19, **Duels give experience**: Fights against other players now earn XP.
-• One XP for each line you clear, the same as the Farm
-• At least two for a Quad, a spin or an All Clear
-• In Dark, the Arena and the Testing Grounds, win or lose
-- 2026-11-19, **Heals that fade in a duel**: Heals fade in duels.
-• Each heal is worth less the more you've healed that fight
-• Food is unchanged
 
 ## Data
 
