@@ -123,6 +123,11 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 
 ## Recently added
 
+- 2026-11-25, **The Unbound Focus**: A new best offhand for mages, and a new quest from the Old Man.
+• The Unbound Focus: 5 Armor, 8 Magic Bonus and +2% to your weapon style's bonus, from level 55
+• Made from a Lotus Tome, a Cultist's Focus, 20 Spider Silk and a Binding Page
+• The Unbound can drop the Binding Page, about 1 in 200 kills
+• The Old Man's quest The Rite of Binding teaches it: take the rite from the Unbound and carry it back to Greenshore Fields in the same run
 - 2026-11-24, **Mummies' bandages come loose faster**: Mummies' bandages now come loose after a single hit.
 • One hit on a Mummy frees your HOLD box, not two
 • In the Story, the Endless Dungeon and co-op
@@ -158,10 +163,6 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 • About one fight in seven between the Mummies, at the Pyramids' strength
 • When a chart takes you somewhere, the board says whose chart it was and where it took you
 • In co-op too
-- 2026-11-19, **Terms, privacy and a Store page**: LDBG now has Terms of Service, a Privacy Policy and a Store page.
-• Find them at the bottom of this page, and in the game under Settings > About
-• The game asks you to agree to them the next time you log in
-• The Store page shows the Prismatic and Void Ornament Kits, their prices and how buying works
 
 ## Data
 
