@@ -123,6 +123,12 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 
 ## Recently added
 
+- 2026-11-26, **Recipe quests end at the crafting bench**: Quests that teach a recipe now show it, and end with making it.
+• The quest card shows the recipe as a reward, with a RECIPE sash on what it makes
+• Each of the five recipe quest lines has a last step: craft what it taught
+• Upgrading a piece in place counts as the craft
+• Finished one of these lines already? Its new step is ready to turn in
+• The lines' Respec Shards now come with the craft step
 - 2026-11-25, **The Unbound Focus**: A new best offhand for mages, and a new quest from the Old Man.
 • The Unbound Focus: 5 Armor, 8 Magic Bonus and +2% to your weapon style's bonus, from level 55
 • Made from a Lotus Tome, a Cultist's Focus, 20 Spider Silk and a Binding Page
@@ -159,10 +165,6 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 • It counts even if you die later in the run
 • Dark and the Red Desert still need the whole Greenshore Story
 • Hover a locked place on the map to see what opens it
-- 2026-11-20, **Sand Zombies in the Endless Pyramids**: Sand Zombies are back in the Endless Dungeon's Pyramids.
-• About one fight in seven between the Mummies, at the Pyramids' strength
-• When a chart takes you somewhere, the board says whose chart it was and where it took you
-• In co-op too
 
 ## Data
 
