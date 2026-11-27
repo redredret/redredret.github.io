@@ -24,9 +24,19 @@
   <main id="content" class="article">
 <aside class="infobox">
   <div class="ib-title">Rockling</div>
+  <div class="ib-tabs" role="tablist" aria-label="Which version of Rockling" hidden><button type="button" role="tab" id="stats-rockling-tab-story" aria-controls="stats-rockling-story" aria-selected="true" tabindex="0">Story</button><button type="button" role="tab" id="stats-rockling-tab-endless" aria-controls="stats-rockling-endless" aria-selected="false" tabindex="-1">Endless</button><button type="button" role="tab" id="stats-rockling-tab-dark" aria-controls="stats-rockling-dark" aria-selected="false" tabindex="-1">Dark</button></div>
   <div class="ib-picture"><img src="../../media/enemies-sm/rockling.webp" alt="Rockling" loading="lazy"></div>
   <div class="ib-caption">A small rock creature. It drops stones on your tallest column.</div>
-  <table><tr><th scope="row">Rank</th><td>Monster</td></tr><tr class="ib-section"><th colspan="2">Combat (Story values)</th></tr><tr><th scope="row">Health</th><td>512</td></tr><tr><th scope="row">Hit</th><td>6–10 before Armor</td></tr><tr><th scope="row">Attacks</th><td>Every 5s</td></tr><tr><th scope="row">Attack style</th><td>Ranged</td></tr><tr><th scope="row">Weak to</th><td>Triples and Quads (+10%)</td></tr><tr class="ib-section"><th colspan="2">Rewards</th></tr><tr><th scope="row">Experience</th><td>64</td></tr><tr><th scope="row">Bounty Marks</th><td>1</td></tr><tr class="ib-section"><th colspan="2">Info</th></tr><tr><th scope="row">Tags</th><td>stone</td></tr><tr><th scope="row">Found in</th><td><a href="../../locations/sand-cave/">Sand Cave</a></td></tr></table>
+  <div class="ib-panel" id="stats-rockling-story" role="tabpanel" aria-labelledby="stats-rockling-tab-story" data-version="story">
+    <table class="ib-stats"><thead><tr><th scope="col">Story</th><th scope="col">Red Desert</th></tr></thead><tbody><tr><th scope="row">Health</th><td>512</td></tr><tr><th scope="row">Hit</th><td>6–10</td></tr><tr><th scope="row">Attacks every</th><td>5s</td></tr><tr><th scope="row">Experience</th><td>64</td></tr></tbody></table>
+  </div>
+  <div class="ib-panel" id="stats-rockling-endless" role="tabpanel" aria-labelledby="stats-rockling-tab-endless" data-version="endless" hidden>
+    <table class="ib-stats wide"><thead><tr><th scope="col">Endless fight</th><th scope="col">1</th><th scope="col">11</th><th scope="col">21</th><th scope="col">41</th></tr></thead><tbody><tr><th scope="row">Health</th><td>768</td><td>870</td><td>1,024</td><td>1,331</td></tr><tr><th scope="row">Hit</th><td>9–15</td><td>10–16</td><td>11–18</td><td>12–20</td></tr><tr><th scope="row">Attacks every</th><td>3.33s</td><td>3.13s</td><td>2.86s</td><td>2.5s</td></tr><tr><th scope="row">Experience</th><td>160</td><td>173</td><td>192</td><td>280</td></tr></tbody></table>
+  </div>
+  <div class="ib-panel" id="stats-rockling-dark" role="tabpanel" aria-labelledby="stats-rockling-tab-dark" data-version="dark" hidden>
+    <table class="ib-stats wide"><thead><tr><th scope="col">Dark fight</th><th scope="col">1</th><th scope="col">11</th><th scope="col">21</th><th scope="col">41</th></tr></thead><tbody><tr><th scope="row">Health</th><td>1,024</td><td>1,126</td><td>1,280</td><td>1,587</td></tr><tr><th scope="row">Hit</th><td>12–20</td><td>13–21</td><td>14–23</td><td>15–25</td></tr><tr><th scope="row">Attacks every</th><td>2.5s</td><td>2.5s</td><td>2.5s</td><td>2.5s</td></tr><tr><th scope="row">Experience</th><td>256</td><td>269</td><td>288</td><td>376</td></tr></tbody></table>
+  </div>
+  <table><tr><th scope="row">Rank</th><td>Monster</td></tr><tr><th scope="row">Attack style</th><td>Ranged</td></tr><tr><th scope="row">Weak to</th><td>Triples and Quads (+10%)</td></tr><tr class="ib-section"><th colspan="2">Rewards</th></tr><tr><th scope="row">Bounty Marks</th><td>1</td></tr><tr class="ib-section"><th colspan="2">Info</th></tr><tr><th scope="row">Tags</th><td>stone</td></tr><tr><th scope="row">Found in</th><td><a href="../../locations/sand-cave/">Sand Cave</a></td></tr></table>
 </aside>
 <h1>Rockling</h1>
 <p class="lead"><b>Rockling</b> is a monster met in <a href="../../locations/sand-cave/">Sand Cave</a>. A small rock creature. It drops stones on your tallest column.</p>
@@ -46,8 +56,8 @@
 <h2 id="locations">Locations</h2>
 <ul><li><a href="../../locations/sand-cave/">Sand Cave</a>, in the Red Desert Story (fights 1, 2 of the road)</li><li>the Endless Dungeon's <a href="../../locations/sand-cave/">Sand Cave</a>: an ordinary fight, 66.67% of them</li></ul>
 <h2 id="combat-stats">Combat stats</h2>
-<table class="wikitable stats"><thead><tr><th>Where</th><th>Health</th><th>Hit</th><th>Attacks every</th></tr></thead><tbody><tr><th scope="row">Red Desert Story</th><td>512</td><td>6–10</td><td>5s</td></tr><tr><th scope="row">Endless Dungeon, fight 1</th><td>768</td><td>9–15</td><td>3.33s</td></tr><tr><th scope="row">Endless Dungeon, fight 11</th><td>1,280</td><td>12–20</td><td>2.5s</td></tr><tr><th scope="row">Endless Dungeon, fight 21</th><td>1,792</td><td>12–20</td><td>2.5s</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 1</th><td>1,024</td><td>12–20</td><td>2.5s</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 11</th><td>1,536</td><td>15–25</td><td>2.5s</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 21</th><td>2,048</td><td>15–25</td><td>2.5s</td></tr></tbody></table>
-<p class="note">Hit is the range before your Armor takes its share. In the Endless Dungeon an enemy grows tougher every fight; champions and omens change it further.</p>
+<table class="wikitable stats"><thead><tr><th>Where</th><th>Health</th><th>Hit</th><th>Attacks every</th><th>Experience</th></tr></thead><tbody><tr><th scope="row">Red Desert Story</th><td>512</td><td>6–10</td><td>5s</td><td>64</td></tr><tr><th scope="row">Endless Dungeon, fight 1</th><td>768</td><td>9–15</td><td>3.33s</td><td>160</td></tr><tr><th scope="row">Endless Dungeon, fight 11</th><td>870</td><td>10–16</td><td>3.13s</td><td>173</td></tr><tr><th scope="row">Endless Dungeon, fight 21</th><td>1,024</td><td>11–18</td><td>2.86s</td><td>192</td></tr><tr><th scope="row">Endless Dungeon, fight 41</th><td>1,331</td><td>12–20</td><td>2.5s</td><td>280</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 1</th><td>1,024</td><td>12–20</td><td>2.5s</td><td>256</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 11</th><td>1,126</td><td>13–21</td><td>2.5s</td><td>269</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 21</th><td>1,280</td><td>14–23</td><td>2.5s</td><td>288</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 41</th><td>1,587</td><td>15–25</td><td>2.5s</td><td>376</td></tr></tbody></table>
+<p class="note">Hit is the range before your Armor takes its share. In the Endless Dungeon and its Dark an enemy grows tougher with every round of fights; champions and omens change it further. A kill from fight 25 on, in Onslaught, pays 50 experience on top.</p>
 <h2 id="drops">Drops</h2>
 <p>Each kill rolls its table twice in the Red Desert Story, twice in the Endless Dungeon and three times in its Dark. Every row is rolled on its own, so a kill can pay several.</p>
 <div class="legend"><span class="band-always">Always</span><span class="band-common">Common</span><span class="band-uncommon">Uncommon</span><span class="band-rare">Rare</span><span class="band-very-rare">Very rare</span></div>
@@ -78,7 +88,7 @@
   </main>
 </div>
 <footer class="foot">
-  <p>Every number on this page is read from the game's own data (build 95f2ac7d1, 2026-11-27), so it is current with the release it shipped beside.
+  <p>Every number on this page is read from the game's own data (build a3b0ecdba, 2026-11-27), so it is current with the release it shipped beside.
   Sections marked <span class="owed-chip">Not written yet</span> are waiting for the team's words.</p>
   <p><a href="https://ldbg.net/">ldbg.net</a> · <a href="https://play.ldbg.net/">Play</a> · Fan-written text is welcome; game data is © the LDBG team.</p>
 </footer>

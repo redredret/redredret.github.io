@@ -127,6 +127,10 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 • The wind-up, the hit, and what it leaves on your stack
 • Every board effect a duel can throw, on the Duels guide and on the gear that throws it
 • Each clip plays when you scroll to it
+- 2026-11-26, **The Unbound carries the Old Man's treasure**: Everything the Old Man used to drop now drops from the Unbound instead.
+• Sunstone Shards, the Sunstone Staff, Magic Rings, Treasure Seals, Darkwood and more, at the same odds
+• The Old Man drops nothing now: beat the Unbound to free him and take his things
+• The Collection Log lists them on the Unbound's page
 - 2026-11-26, **A thank-you skin for beta players**: Everyone who played the beta gets a block skin of their own: Beta Stone.
 • Matte blocks of cut slate in the main menu's colours
 • It's on your Skins screen the next time you log in
@@ -156,10 +160,6 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 • Made from a Lotus Tome, a Cultist's Focus, 20 Spider Silk and a Binding Page
 • The Unbound can drop the Binding Page, about 1 in 200 kills
 • The Old Man's quest The Rite of Binding teaches it: take the rite from the Unbound and carry it back to Greenshore Fields in the same run
-- 2026-11-24, **Mummies' bandages come loose faster**: Mummies' bandages now come loose after a single hit.
-• One hit on a Mummy frees your HOLD box, not two
-• In the Story, the Endless Dungeon and co-op
-• Runs you started before this keep the old rules
 
 ## Data
 

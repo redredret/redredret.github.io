@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mummy - LDBG Wiki</title>
-<meta name="description" content="One of the pyramid's dead, wrapped in linen and floating above the sand. Its bandages bind your HOLD shut until you hit it twice, and it claws at the tower of anyone it has bound.">
+<meta name="description" content="One of the pyramid's dead, wrapped in linen and floating above the sand. Its bandages bind your HOLD shut until you hit it, and it claws at the tower of anyone it has bound.">
 <link rel="stylesheet" href="../../media/wiki.css">
 <link rel="icon" href="../../media/favicon.svg" type="image/svg+xml">
 </head>
@@ -24,18 +24,28 @@
   <main id="content" class="article">
 <aside class="infobox">
   <div class="ib-title">Mummy</div>
+  <div class="ib-tabs" role="tablist" aria-label="Which version of Mummy" hidden><button type="button" role="tab" id="stats-mummy-tab-story" aria-controls="stats-mummy-story" aria-selected="true" tabindex="0">Story</button><button type="button" role="tab" id="stats-mummy-tab-endless" aria-controls="stats-mummy-endless" aria-selected="false" tabindex="-1">Endless</button><button type="button" role="tab" id="stats-mummy-tab-dark" aria-controls="stats-mummy-dark" aria-selected="false" tabindex="-1">Dark</button></div>
   <div class="ib-picture"><img src="../../media/enemies-sm/mummy.webp" alt="Mummy" loading="lazy"></div>
-  <div class="ib-caption">One of the pyramid's dead, wrapped in linen and floating above the sand. Its bandages bind your HOLD shut until you hit it twice, and it claws at the tower of anyone it has bound.</div>
-  <table><tr><th scope="row">Rank</th><td>Monster</td></tr><tr class="ib-section"><th colspan="2">Combat (Story values)</th></tr><tr><th scope="row">Health</th><td>576</td></tr><tr><th scope="row">Hit</th><td>7–12 before Armor</td></tr><tr><th scope="row">Attacks</th><td>Every 5s</td></tr><tr><th scope="row">Attack style</th><td>Melee</td></tr><tr><th scope="row">Weak to</th><td>combos (+10%)</td></tr><tr class="ib-section"><th colspan="2">Rewards</th></tr><tr><th scope="row">Experience</th><td>72</td></tr><tr><th scope="row">Bounty Marks</th><td>1</td></tr><tr class="ib-section"><th colspan="2">Info</th></tr><tr><th scope="row">Tags</th><td>undead</td></tr><tr><th scope="row">Found in</th><td><a href="../../locations/pyramids/">Pyramids</a></td></tr></table>
+  <div class="ib-caption">One of the pyramid's dead, wrapped in linen and floating above the sand. Its bandages bind your HOLD shut until you hit it, and it claws at the tower of anyone it has bound.</div>
+  <div class="ib-panel" id="stats-mummy-story" role="tabpanel" aria-labelledby="stats-mummy-tab-story" data-version="story">
+    <table class="ib-stats"><thead><tr><th scope="col">Story</th><th scope="col">Red Desert</th></tr></thead><tbody><tr><th scope="row">Health</th><td>576</td></tr><tr><th scope="row">Hit</th><td>7–12</td></tr><tr><th scope="row">Attacks every</th><td>5s</td></tr><tr><th scope="row">Experience</th><td>72</td></tr></tbody></table>
+  </div>
+  <div class="ib-panel" id="stats-mummy-endless" role="tabpanel" aria-labelledby="stats-mummy-tab-endless" data-version="endless" hidden>
+    <table class="ib-stats wide"><thead><tr><th scope="col">Endless fight</th><th scope="col">1</th><th scope="col">11</th><th scope="col">21</th><th scope="col">41</th></tr></thead><tbody><tr><th scope="row">Health</th><td>864</td><td>979</td><td>1,152</td><td>1,498</td></tr><tr><th scope="row">Hit</th><td>11–19</td><td>11–19</td><td>12–21</td><td>14–24</td></tr><tr><th scope="row">Attacks every</th><td>3.33s</td><td>3.13s</td><td>2.86s</td><td>2.5s</td></tr><tr><th scope="row">Experience</th><td>180</td><td>194</td><td>216</td><td>309</td></tr></tbody></table>
+  </div>
+  <div class="ib-panel" id="stats-mummy-dark" role="tabpanel" aria-labelledby="stats-mummy-tab-dark" data-version="dark" hidden>
+    <table class="ib-stats wide"><thead><tr><th scope="col">Dark fight</th><th scope="col">1</th><th scope="col">11</th><th scope="col">21</th><th scope="col">41</th></tr></thead><tbody><tr><th scope="row">Health</th><td>1,152</td><td>1,267</td><td>1,440</td><td>1,786</td></tr><tr><th scope="row">Hit</th><td>14–24</td><td>15–26</td><td>16–27</td><td>18–31</td></tr><tr><th scope="row">Attacks every</th><td>2.5s</td><td>2.5s</td><td>2.5s</td><td>2.5s</td></tr><tr><th scope="row">Experience</th><td>288</td><td>302</td><td>324</td><td>417</td></tr></tbody></table>
+  </div>
+  <table><tr><th scope="row">Rank</th><td>Monster</td></tr><tr><th scope="row">Attack style</th><td>Melee</td></tr><tr><th scope="row">Weak to</th><td>combos (+10%)</td></tr><tr class="ib-section"><th colspan="2">Rewards</th></tr><tr><th scope="row">Bounty Marks</th><td>1</td></tr><tr class="ib-section"><th colspan="2">Info</th></tr><tr><th scope="row">Tags</th><td>undead</td></tr><tr><th scope="row">Found in</th><td><a href="../../locations/pyramids/">Pyramids</a></td></tr></table>
 </aside>
 <h1>Mummy</h1>
-<p class="lead"><b>Mummy</b> is a monster met in <a href="../../locations/pyramids/">Pyramids</a>. One of the pyramid's dead, wrapped in linen and floating above the sand. Its bandages bind your HOLD shut until you hit it twice, and it claws at the tower of anyone it has bound.</p>
+<p class="lead"><b>Mummy</b> is a monster met in <a href="../../locations/pyramids/">Pyramids</a>. One of the pyramid's dead, wrapped in linen and floating above the sand. Its bandages bind your HOLD shut until you hit it, and it claws at the tower of anyone it has bound.</p>
 <nav class="toc" aria-label="Contents"><b>Contents</b><ol>
 <li><a href="#attacks">Attacks</a></li><li><a href="#strategy">Strategy</a></li><li><a href="#locations">Locations</a></li><li><a href="#combat-stats">Combat stats</a></li><li><a href="#drops">Drops</a></li><li><a href="#collection-log">Collection Log</a></li><li><a href="#gallery">Gallery</a></li><li><a href="#trivia">Trivia</a></li><li><a href="#changes">Changes</a></li></ol></nav>
 <h2 id="attacks">Attacks</h2>
 <table class="wikitable attacks"><thead><tr><th>Attack</th><th>Style</th><th>What it does</th><th>On the board</th></tr></thead><tbody><tr><th scope="row">Bandage Bind</th><td class="style-melee">Melee</td><td>Bandages lock your HOLD until you hit it once. Hold a good piece before it wraps you.</td><td class="clip-cell"><a class="board-clip" href="../../media/clips-board/attacks/mummy--mummy-bandage-bind.webm" data-video="../../media/clips-board/attacks/mummy--mummy-bandage-bind.webm" title="Bandage Bind on the board"><img src="../../media/clips-board/attacks/mummy--mummy-bandage-bind-poster.webp" alt="Bandage Bind on the board" loading="lazy" width="240"><span class="clip-play" aria-hidden="true">▶</span></a></td></tr><tr><th scope="row">Mummy Swipe</th><td class="style-melee">Melee</td><td>While you are bound, it swipes a block off your top row. Break the bandages with quick clears.</td><td class="clip-cell"><a class="board-clip" href="../../media/clips-board/attacks/mummy--mummy-swipe.webm" data-video="../../media/clips-board/attacks/mummy--mummy-swipe.webm" title="Mummy Swipe on the board"><img src="../../media/clips-board/attacks/mummy--mummy-swipe-poster.webp" alt="Mummy Swipe on the board" loading="lazy" width="240"><span class="clip-play" aria-hidden="true">▶</span></a></td></tr></tbody></table>
 <p class="note">Each clip is the real fight's board, filmed from the game. It plays once it scrolls into view.</p>
-<p class="advice"><b>The game's advice:</b> Its bandages lock your HOLD until you hit it twice. Hold a good piece before it wraps you, and keep a clear ready to break free.</p>
+<p class="advice"><b>The game's advice:</b> Its bandages lock your HOLD until you hit it. Hold a good piece before it wraps you, and keep a clear ready to break free.</p>
 <p class="advice"><b>Weakness:</b> combos hit it 10% harder.</p>
 <h2 id="strategy">Strategy</h2>
 <div class="owed" role="note">
@@ -46,8 +56,8 @@
 <h2 id="locations">Locations</h2>
 <ul><li><a href="../../locations/pyramids/">Pyramids</a>, in the Red Desert Story (fights 2, 3 of the road)</li><li>the Endless Dungeon's <a href="../../locations/pyramids/">Pyramids</a>: an ordinary fight, 50% of them</li></ul>
 <h2 id="combat-stats">Combat stats</h2>
-<table class="wikitable stats"><thead><tr><th>Where</th><th>Health</th><th>Hit</th><th>Attacks every</th></tr></thead><tbody><tr><th scope="row">Red Desert Story</th><td>576</td><td>7–12</td><td>5s</td></tr><tr><th scope="row">Endless Dungeon, fight 1</th><td>864</td><td>11–19</td><td>3.33s</td></tr><tr><th scope="row">Endless Dungeon, fight 11</th><td>1,440</td><td>14–24</td><td>2.5s</td></tr><tr><th scope="row">Endless Dungeon, fight 21</th><td>2,016</td><td>14–24</td><td>2.5s</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 1</th><td>1,152</td><td>14–24</td><td>2.5s</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 11</th><td>1,728</td><td>18–31</td><td>2.5s</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 21</th><td>2,304</td><td>18–31</td><td>2.5s</td></tr></tbody></table>
-<p class="note">Hit is the range before your Armor takes its share. In the Endless Dungeon an enemy grows tougher every fight; champions and omens change it further.</p>
+<table class="wikitable stats"><thead><tr><th>Where</th><th>Health</th><th>Hit</th><th>Attacks every</th><th>Experience</th></tr></thead><tbody><tr><th scope="row">Red Desert Story</th><td>576</td><td>7–12</td><td>5s</td><td>72</td></tr><tr><th scope="row">Endless Dungeon, fight 1</th><td>864</td><td>11–19</td><td>3.33s</td><td>180</td></tr><tr><th scope="row">Endless Dungeon, fight 11</th><td>979</td><td>11–19</td><td>3.13s</td><td>194</td></tr><tr><th scope="row">Endless Dungeon, fight 21</th><td>1,152</td><td>12–21</td><td>2.86s</td><td>216</td></tr><tr><th scope="row">Endless Dungeon, fight 41</th><td>1,498</td><td>14–24</td><td>2.5s</td><td>309</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 1</th><td>1,152</td><td>14–24</td><td>2.5s</td><td>288</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 11</th><td>1,267</td><td>15–26</td><td>2.5s</td><td>302</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 21</th><td>1,440</td><td>16–27</td><td>2.5s</td><td>324</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 41</th><td>1,786</td><td>18–31</td><td>2.5s</td><td>417</td></tr></tbody></table>
+<p class="note">Hit is the range before your Armor takes its share. In the Endless Dungeon and its Dark an enemy grows tougher with every round of fights; champions and omens change it further. A kill from fight 25 on, in Onslaught, pays 50 experience on top.</p>
 <h2 id="drops">Drops</h2>
 <p>Each kill rolls its table twice in the Red Desert Story, twice in the Endless Dungeon and three times in its Dark. Every row is rolled on its own, so a kill can pay several.</p>
 <div class="legend"><span class="band-always">Always</span><span class="band-common">Common</span><span class="band-uncommon">Uncommon</span><span class="band-rare">Rare</span><span class="band-very-rare">Very rare</span></div>
@@ -78,7 +88,7 @@
   </main>
 </div>
 <footer class="foot">
-  <p>Every number on this page is read from the game's own data (build 95f2ac7d1, 2026-11-27), so it is current with the release it shipped beside.
+  <p>Every number on this page is read from the game's own data (build a3b0ecdba, 2026-11-27), so it is current with the release it shipped beside.
   Sections marked <span class="owed-chip">Not written yet</span> are waiting for the team's words.</p>
   <p><a href="https://ldbg.net/">ldbg.net</a> · <a href="https://play.ldbg.net/">Play</a> · Fan-written text is welcome; game data is © the LDBG team.</p>
 </footer>

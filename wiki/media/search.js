@@ -1,6 +1,36 @@
 // The wiki's search: one small index (media/search.json, written by
 // build_wiki.mjs) matched as you type. Without JavaScript the category pages
 // list everything.
+
+// An enemy infobox's STORY / ENDLESS / DARK tabs: the strip is hidden in the
+// page and shown here, so without JavaScript the box simply shows the STORY
+// numbers. Arrow keys, Home and End move between tabs, as tabs do.
+(() => {
+  for (const strip of document.querySelectorAll('.ib-tabs[role="tablist"]')) {
+    const tabs = [...strip.querySelectorAll('[role="tab"]')];
+    const select = (chosen, focus) => {
+      for (const tab of tabs) {
+        const on = tab === chosen;
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+        const panel = document.getElementById(tab.getAttribute('aria-controls'));
+        if (panel) panel.hidden = !on;
+      }
+      if (focus) chosen.focus();
+    };
+    tabs.forEach((tab, at) => {
+      tab.addEventListener('click', () => select(tab, false));
+      tab.addEventListener('keydown', (event) => {
+        const next = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: tabs.length - 1 }[event.key];
+        if (next === undefined) return;
+        event.preventDefault();
+        select(tabs[(next + tabs.length) % tabs.length], true);
+      });
+    });
+    strip.hidden = false;
+  }
+})();
+
 (() => {
   const input = document.querySelector('.search input');
   if (!input) return;
