@@ -123,6 +123,19 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 
 ## Recently added
 
+- 2026-11-26, **A thank-you skin for beta players**: Everyone who played the beta gets a block skin of their own: Beta Stone.
+• Matte blocks of cut slate in the main menu's colours
+• It's on your Skins screen the next time you log in
+• Only beta players have it
+- 2026-11-26, **Farm Solo garbage builds up slower**: Garbage in Farm Solo now builds up over about ten minutes instead of two.
+• It starts as gently as before and gets a little harder every minute
+• At its hardest it sends less than half as much as it used to
+• The same goes for the solo game you play while waiting for a match
+• Versus rounds and Ranked matches are unchanged
+- 2026-11-26, **Mastery badges**: Max out a combat mastery and you earn a badge for it.
+• Master Warrior, Master Archer and Master Mage, for level 10 in that style's mastery
+• Grandmaster is now called Maxed, for all three at level 10
+• Show any of them in chat beside your level
 - 2026-11-26, **Recipe quests end at the crafting bench**: Quests that teach a recipe now show it, and end with making it.
 • The quest card shows the recipe as a reward, with a RECIPE sash on what it makes
 • Each of the five recipe quest lines has a last step: craft what it taught
@@ -149,22 +162,6 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 • A long combo makes your blade glow hot, and it smokes when the combo ends
 • An All Clear has a move of its own for each weapon
 • Other players in duels and co-op use the new attacks too
-- 2026-11-21, **Ranked Farm**: Climb seven ranks, Coal to Darkite, one on one in the Farm.
-• Opens at level 20, from the Farm's mode menu
-• Best of 3, just stacking: no skills, gear or head start on the board
-• Pay your rank's fee; win, and the Stack multiplies the pot you both gathered, up to ×100
-• Five placement matches, then your rank, Grade and Top %
-• Season rewards, a ladder, match history and friends to watch
-- 2026-11-21, **More Sand Zombies, and Coke from Mummies**: The Endless Dungeon's Pyramids are half Sand Zombies now.
-• About one fight in two is a Sand Zombie, the rest Mummies
-• Mummies can drop Ancient Coke, about 1 in 500 kills
-• The Possessed Sarcophagus still drops it too
-- 2026-11-20, **Endless regions open one by one**: Each Endless Dungeon region now opens when you complete it in the Story.
-• Complete Greenshore Fields to open the Endless Dungeon
-• You don't need to finish the whole Story first
-• It counts even if you die later in the run
-• Dark and the Red Desert still need the whole Greenshore Story
-• Hover a locked place on the map to see what opens it
 
 ## Data
 
