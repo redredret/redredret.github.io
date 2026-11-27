@@ -136,6 +136,11 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 • Master Warrior, Master Archer and Master Mage, for level 10 in that style's mastery
 • Grandmaster is now called Maxed, for all three at level 10
 • Show any of them in chat beside your level
+- 2026-11-26, **The LDBG Wiki**: Look anything up at ldbg.net/wiki, or from HELP in the game.
+• Every enemy, with its attacks, where it lives and every drop with its odds
+• Every item, quest, NPC, shop, station, skill, feat, omen and region
+• Written from the game itself, so it changes when the game does
+• Strategy and pictures to come, section by section
 - 2026-11-26, **Recipe quests end at the crafting bench**: Quests that teach a recipe now show it, and end with making it.
 • The quest card shows the recipe as a reward, with a RECIPE sash on what it makes
 • Each of the five recipe quest lines has a last step: craft what it taught
@@ -155,13 +160,6 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 • Ancient Coke can now be traded on the Market
 • Perfect Orichalcum is now bound to whoever finds it
 • The Ancient Mask takes two Ancient Coke and one Perfect Orichalcum
-- 2026-11-23, **Your attacks, reworked**: Every weapon got a new set of attacks.
-• Swords, bows and staves change move from hit to hit, and a combo walks through them
-• Big clears hit big: a leaping slam, a whirlwind, a volley of arrows, a beam from the staff
-• A spin sets your weapon burning in the colour of the piece you spun
-• A long combo makes your blade glow hot, and it smokes when the combo ends
-• An All Clear has a move of its own for each weapon
-• Other players in duels and co-op use the new attacks too
 
 ## Data
 
