@@ -67,6 +67,27 @@
     load().then(() => render(page, matches(query)));
   }
 
+  // Board clips: a poster until it scrolls into view (or is clicked), then the
+  // looping film in its place. Nothing of a film loads before.
+  const play = (link) => {
+    if (link.dataset.playing) return;
+    link.dataset.playing = '1';
+    const video = document.createElement('video');
+    Object.assign(video, { src: link.dataset.video, muted: true, loop: true, autoplay: true, playsInline: true });
+    video.setAttribute('aria-label', link.title);
+    video.width = 240;
+    link.replaceChildren(video);
+  };
+  const clips = document.querySelectorAll('a.board-clip[data-video]');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if ('IntersectionObserver' in window && !still) {
+    const watcher = new IntersectionObserver((entries) => entries.forEach((entry) => {
+      if (entry.isIntersecting) { play(entry.target); watcher.unobserve(entry.target); }
+    }), { rootMargin: '120px' });
+    clips.forEach((link) => watcher.observe(link));
+  }
+  clips.forEach((link) => link.addEventListener('click', (event) => { event.preventDefault(); play(link); }));
+
   // Sortable tables: click a heading to sort by it.
   for (const table of document.querySelectorAll('table.sortable')) {
     table.querySelectorAll('thead th').forEach((heading, column) => {

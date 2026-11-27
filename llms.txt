@@ -123,6 +123,10 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 
 ## Recently added
 
+- 2026-11-27, **Watch every attack on the wiki**: Every enemy's page now shows each of its attacks playing on a real board.
+• The wind-up, the hit, and what it leaves on your stack
+• Every board effect a duel can throw, on the Duels guide and on the gear that throws it
+• Each clip plays when you scroll to it
 - 2026-11-26, **A thank-you skin for beta players**: Everyone who played the beta gets a block skin of their own: Beta Stone.
 • Matte blocks of cut slate in the main menu's colours
 • It's on your Skins screen the next time you log in
@@ -156,10 +160,6 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 • One hit on a Mummy frees your HOLD box, not two
 • In the Story, the Endless Dungeon and co-op
 • Runs you started before this keep the old rules
-- 2026-11-24, **Ancient Coke can be traded**: The Ancient Mask's materials have swapped places.
-• Ancient Coke can now be traded on the Market
-• Perfect Orichalcum is now bound to whoever finds it
-• The Ancient Mask takes two Ancient Coke and one Perfect Orichalcum
 
 ## Data
 

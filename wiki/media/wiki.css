@@ -167,3 +167,8 @@ blockquote.said, .advice, .owed, .spoiler, .curated, .gallery-grid { overflow: h
 .index-list { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
 .index-list li { text-align: left; padding: 8px 12px; }
 .index-list a { align-items: flex-start; }
+/* Board clips beside an attack or a board effect. */
+.board-clip { position: relative; display: inline-block; width: 160px; max-width: 100%; line-height: 0; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: var(--bg-deep); }
+.board-clip img, .board-clip video { width: 100%; height: auto; display: block; }
+.clip-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(16, 23, 26, 0.75); color: var(--gold); font-size: 16px; line-height: 1; }
+td.clip-cell { width: 176px; }
