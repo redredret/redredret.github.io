@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <title>feats and badges</title>
+  <!-- Feats and badges: a medal on two ribbon tails. -->
+  <g stroke="#1d2328" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M20 6 H30 L36 26 H26 Z" fill="#c0434f"/>
+    <path d="M44 6 H34 L28 26 H38 Z" fill="#4a78c2"/>
+    <circle cx="32" cy="40" r="15" fill="#e6c888"/>
+    <path d="M32 31.5 L34.6 37 L40.5 37.6 L36.1 41.6 L37.4 47.4 L32 44.4 L26.6 47.4 L27.9 41.6 L23.5 37.6 L29.4 37 Z" fill="#fff4d6" stroke-width="2"/>
+  </g>
+</svg>

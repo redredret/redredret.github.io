@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <title>quest lines</title>
+  <!-- Quest lines: a signpost, one quest leading on to the next. -->
+  <g stroke="#1d2328" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M29 10 H35 V57 H29 Z" fill="#8a5a33"/>
+    <path d="M14 14 H44 L51 20.5 L44 27 H14 Z" fill="#e2c48a"/>
+    <path d="M50 31 H20 L13 37.5 L20 44 H50 Z" fill="#d9b06a"/>
+    <path d="M22 57 H42" fill="none"/>
+  </g>
+  <path d="M19 20.5 H38 M25 37.5 H44" fill="none" stroke="#8a6420" stroke-width="2" stroke-linecap="round"/>
+</svg>

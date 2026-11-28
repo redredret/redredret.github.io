@@ -7,6 +7,7 @@
 <meta name="description" content="Greenshore in LDBG, the falling-block RPG.">
 <link rel="stylesheet" href="../../media/wiki.css">
 <link rel="icon" href="../../media/favicon.svg" type="image/svg+xml">
+<script>try { if (localStorage.getItem('ldbg-wiki-theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch (e) {}</script>
 </head>
 <body data-kind="location">
 <a class="skip" href="#content">Skip to the article</a>
@@ -17,6 +18,7 @@
     <ul class="search-results" hidden></ul>
   </form>
   
+  <button class="theme-toggle" type="button" hidden>LIGHT</button>
   <a class="play" href="https://play.ldbg.net/">Play LDBG</a>
 </header>
 <div class="frame">
@@ -34,7 +36,7 @@
 <p class="lead"><b>Greenshore</b> is a place in the Greenshore Story. </p>
 <h2 id="story">In the Greenshore Story</h2>
 <p>The whole Greenshore Story is one road.</p>
-<table class="wikitable"><thead><tr><th>#</th><th>Enemy</th><th>Rank</th><th>Health</th></tr></thead><tbody><tr><td>1</td><td><a href="../../enemies/zombie/">Zombie</a></td><td></td><td>30</td></tr><tr><td>2</td><td><a href="../../enemies/slime/">Slime</a></td><td></td><td>100</td></tr><tr><td>3</td><td><a href="../../enemies/squirrel/">Squirrel</a></td><td></td><td>15</td></tr><tr><td>4</td><td><a href="../../enemies/cyclops/">Cyclops</a></td><td>Boss</td><td>300</td></tr><tr><td>5</td><td><a href="../../enemies/entling/">Oak Entling</a></td><td></td><td>28</td></tr><tr><td>6</td><td><a href="../../enemies/bandit/">Bandit</a></td><td></td><td>225</td></tr><tr><td>7</td><td><a href="../../enemies/bandit-king/">Bandit King</a></td><td>Boss</td><td>900</td></tr><tr><td>8</td><td><a href="../../enemies/zombie/">Zombie</a></td><td></td><td>30</td></tr><tr><td>9</td><td><a href="../../enemies/zombie/">Zombie</a></td><td></td><td>30</td></tr><tr><td>10</td><td><a href="../../enemies/super-zombie/">Super Zombie</a></td><td>Elite</td><td>100</td></tr><tr><td>11</td><td><a href="../../enemies/punchy/">Punchy</a></td><td>Boss</td><td>350</td></tr><tr><td>12</td><td><a href="../../enemies/shooty/">Shooty</a></td><td>Boss</td><td>600</td></tr><tr><td>13</td><td><a href="../../enemies/bernie/">Bernie</a></td><td>Boss</td><td>600</td></tr><tr><td>14</td><td><a href="../../enemies/bandit/">Bandit</a></td><td></td><td>225</td></tr><tr><td>15</td><td><a href="../../enemies/bandit-elite/">Bandit Elite</a></td><td>Elite</td><td>390</td></tr><tr><td>16</td><td><a href="../../enemies/bandit-elite/">Bandit Elite</a></td><td>Elite</td><td>390</td></tr><tr><td>17</td><td><a href="../../enemies/cultist/">Cultist</a></td><td></td><td>110</td></tr><tr><td>18</td><td><a href="../../enemies/cultist/">Cultist</a></td><td></td><td>110</td></tr><tr><td>19</td><td><a href="../../enemies/cult-leader/">Cult Leader</a></td><td>Boss</td><td>1,400</td></tr></tbody></table>
+<table class="wikitable"><thead><tr><th>#</th><th>Enemy</th><th>Rank</th><th>Health</th></tr></thead><tbody><tr><td>1</td><td><a href="../../enemies/zombie/">Zombie</a></td><td></td><td>4</td></tr><tr><td>2</td><td><a href="../../enemies/slime/">Slime</a></td><td></td><td>14</td></tr><tr><td>3</td><td><a href="../../enemies/squirrel/">Squirrel</a></td><td></td><td>2</td></tr><tr><td>4</td><td><a href="../../enemies/cyclops/">Cyclops</a></td><td>Boss</td><td>41</td></tr><tr><td>5</td><td><a href="../../enemies/entling/">Oak Entling</a></td><td></td><td>4</td></tr><tr><td>6</td><td><a href="../../enemies/bandit/">Bandit</a></td><td></td><td>30</td></tr><tr><td>7</td><td><a href="../../enemies/bandit-king/">Bandit King</a></td><td>Boss</td><td>122</td></tr><tr><td>8</td><td><a href="../../enemies/zombie/">Zombie</a></td><td></td><td>4</td></tr><tr><td>9</td><td><a href="../../enemies/zombie/">Zombie</a></td><td></td><td>4</td></tr><tr><td>10</td><td><a href="../../enemies/super-zombie/">Super Zombie</a></td><td>Elite</td><td>14</td></tr><tr><td>11</td><td><a href="../../enemies/punchy/">Punchy</a></td><td>Boss</td><td>47</td></tr><tr><td>12</td><td><a href="../../enemies/shooty/">Shooty</a></td><td>Boss</td><td>81</td></tr><tr><td>13</td><td><a href="../../enemies/bernie/">Bernie</a></td><td>Boss</td><td>81</td></tr><tr><td>14</td><td><a href="../../enemies/bandit/">Bandit</a></td><td></td><td>30</td></tr><tr><td>15</td><td><a href="../../enemies/bandit-elite/">Bandit Elite</a></td><td>Elite</td><td>53</td></tr><tr><td>16</td><td><a href="../../enemies/bandit-elite/">Bandit Elite</a></td><td>Elite</td><td>53</td></tr><tr><td>17</td><td><a href="../../enemies/cultist/">Cultist</a></td><td></td><td>15</td></tr><tr><td>18</td><td><a href="../../enemies/cultist/">Cultist</a></td><td></td><td>15</td></tr><tr><td>19</td><td><a href="../../enemies/cult-leader/">Cult Leader</a></td><td>Boss</td><td>189</td></tr></tbody></table>
 
 
 <h2 id="strategy">Strategy</h2>
@@ -61,7 +63,7 @@
   </main>
 </div>
 <footer class="foot">
-  <p>Every number on this page is read from the game's own data (build a3b0ecdba, 2026-11-27), so it is current with the release it shipped beside.
+  <p>Every number on this page is read from the game's own data (build d64bc5343, 2026-11-28), so it is current with the release it shipped beside.
   Sections marked <span class="owed-chip">Not written yet</span> are waiting for the team's words.</p>
   <p><a href="https://ldbg.net/">ldbg.net</a> · <a href="https://play.ldbg.net/">Play</a> · Fan-written text is welcome; game data is © the LDBG team.</p>
 </footer>

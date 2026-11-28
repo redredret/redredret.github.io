@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <title>quests</title>
+  <!-- Quests: an unrolled scroll with a tick on it. -->
+  <g stroke="#1d2328" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M17 12 H47 V50 H17 Z" fill="#f1e6c8"/>
+    <rect x="11" y="8" width="42" height="8" rx="4" fill="#c9a66b"/>
+    <rect x="11" y="46" width="42" height="8" rx="4" fill="#c9a66b"/>
+    <path d="M24 31 L30 37 L41 24" fill="none" stroke="#3f8a5e" stroke-width="4.4"/>
+  </g>
+</svg>

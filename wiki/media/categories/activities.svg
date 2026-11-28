@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <title>activities</title>
+  <!-- Activities, every way to play: a falling piece, the game itself. -->
+  <g stroke="#1d2328" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+    <rect x="9" y="14" width="15" height="15" fill="#b36ae6"/>
+    <rect x="24.5" y="14" width="15" height="15" fill="#b36ae6"/>
+    <rect x="40" y="14" width="15" height="15" fill="#b36ae6"/>
+    <rect x="24.5" y="29.5" width="15" height="15" fill="#b36ae6"/>
+  </g>
+  <path d="M12 18 H21 M27.5 18 H36.5 M43 18 H52 M27.5 33.5 H36.5" fill="none" stroke="#dcbaf5" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M32 49 V58 M27 54 L32 59 L37 54" fill="none" stroke="#e6c888" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

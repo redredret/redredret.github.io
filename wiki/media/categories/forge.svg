@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <title>the forge</title>
+  <!-- The Forge: an anvil, a star struck from it. -->
+  <g stroke="#1d2328" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M8 26 H48 C48 33 43 37 36 37 H33 V44 H41 V52 H17 V44 H25 V37 H22 C14.5 37 9 32 8 26 Z" fill="#7d878b"/>
+    <path d="M48 26 L57 24 L55 30 L46.5 31" fill="#5f686c"/>
+    <path d="M38 6.5 L40.4 12 L46.3 12.6 L41.9 16.6 L43.2 22.4 L38 19.4 L32.8 22.4 L34.1 16.6 L29.7 12.6 L35.6 12 Z" fill="#ffd45e" stroke-width="2"/>
+  </g>
+  <path d="M12 28.5 H44" fill="none" stroke="#b3bcc0" stroke-width="2" stroke-linecap="round"/>
+</svg>

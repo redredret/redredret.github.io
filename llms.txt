@@ -123,43 +123,42 @@ No, it's in early beta and grows every week. New dungeons, bosses, gear and mode
 
 ## Recently added
 
-- 2026-11-27, **Watch every attack on the wiki**: Every enemy's page now shows each of its attacks playing on a real board.
-• The wind-up, the hit, and what it leaves on your stack
-• Every board effect a duel can throw, on the Duels guide and on the gear that throws it
-• Each clip plays when you scroll to it
-- 2026-11-26, **The Unbound carries the Old Man's treasure**: Everything the Old Man used to drop now drops from the Unbound instead.
-• Sunstone Shards, the Sunstone Staff, Magic Rings, Treasure Seals, Darkwood and more, at the same odds
-• The Old Man drops nothing now: beat the Unbound to free him and take his things
-• The Collection Log lists them on the Unbound's page
-- 2026-11-26, **A thank-you skin for beta players**: Everyone who played the beta gets a block skin of their own: Beta Stone.
-• Matte blocks of cut slate in the main menu's colours
-• It's on your Skins screen the next time you log in
-• Only beta players have it
-- 2026-11-26, **Farm Solo garbage builds up slower**: Garbage in Farm Solo now builds up over about ten minutes instead of two.
-• It starts as gently as before and gets a little harder every minute
-• At its hardest it sends less than half as much as it used to
-• The same goes for the solo game you play while waiting for a match
-• Versus rounds and Ranked matches are unchanged
-- 2026-11-26, **Mastery badges**: Max out a combat mastery and you earn a badge for it.
-• Master Warrior, Master Archer and Master Mage, for level 10 in that style's mastery
-• Grandmaster is now called Maxed, for all three at level 10
-• Show any of them in chat beside your level
-- 2026-11-26, **The LDBG Wiki**: Look anything up at ldbg.net/wiki, or from HELP in the game.
-• Every enemy, with its attacks, where it lives and every drop with its odds
-• Every item, quest, NPC, shop, station, skill, feat, omen and region
-• Written from the game itself, so it changes when the game does
-• Strategy and pictures to come, section by section
-- 2026-11-26, **Recipe quests end at the crafting bench**: Quests that teach a recipe now show it, and end with making it.
-• The quest card shows the recipe as a reward, with a RECIPE sash on what it makes
-• Each of the five recipe quest lines has a last step: craft what it taught
-• Upgrading a piece in place counts as the craft
-• Finished one of these lines already? Its new step is ready to turn in
-• The lines' Respec Shards now come with the craft step
-- 2026-11-25, **The Unbound Focus**: A new best offhand for mages, and a new quest from the Old Man.
-• The Unbound Focus: 5 Armor, 8 Magic Bonus and +2% to your weapon style's bonus, from level 55
-• Made from a Lotus Tome, a Cultist's Focus, 20 Spider Silk and a Binding Page
-• The Unbound can drop the Binding Page, about 1 in 200 kills
-• The Old Man's quest The Rite of Binding teaches it: take the rite from the Unbound and carry it back to Greenshore Fields in the same run
+- 2026-11-27, **The Farm grows the best Darkwood and Lotus**: Darkwood and Lotus are now rarer everywhere except the Farm.
+• From chests, the Garbage Man, the Slime King's vault, desert monsters and rare drops: a quarter as often
+• A fully built Farm is now the best way to gather them
+• Orichalcum and Duskhide drop as before
+• Runs you started before this keep the old odds
+- 2026-11-27, **The Farm pays more XP as it speeds up**: Farm experience now grows with your run, the way its materials do.
+• Every clear's XP is multiplied by the run's stage: 1x at the start, up to 3x from stage 19
+• Lord of the Harvest still doubles it
+• In Farm Solo, versus rooms and Dark Farm
+- 2026-11-27, **Buy orders on the Market**: Ask for what you want on the Market, and let sellers come to you.
+• Say how many you want and what each is worth to you; your Gold waits in the order
+• Anyone who lists at your price or less is paid at once, even while you're away
+• Find them on the Market's new ORDERS tab, and cancel any time for your Gold back
+• Selling? The Market shows what buyers are offering
+- 2026-11-27, **The Region of the Week**: Every week one Endless Dungeon region takes its turn in the spotlight.
+• Rare drops there are 25% likelier
+• Kills there pay more Bounty Marks
+• The same region for everyone, and it moves on each Monday
+• See which one on the Endless card and the world map
+- 2026-11-27, **Quads gather more on the Farm**: A quad on the Farm now gathers one more of what it harvests.
+• On top of what four lines already pay, before the Farm's speed bonus
+• In Farm Solo, versus rooms, Dark Farm and Ranked
+• Well Digger still adds its own on top
+- 2026-11-27, **Supplies at Katherine's**: Katherine's General Goods now sells supplies for Gold.
+• Coal, Fertiliser, Bandage Rolls and Blank Charts
+• Skip the gathering when you have Gold to spare
+• Crafting your own is still cheaper
+- 2026-11-27, **See what beat you, and how you played**: Runs now say more about how they went.
+• Lose a dungeon run and the results show what hit you hardest, the blow that finished you, and a tip for next time
+• With your stack near the top, the HOLD box warns what a top-out would cost, in red if it would end the run
+• PLAY STATS on every results card: pieces a second, attack a minute, combos, T-Spins, finesse and more
+- 2026-11-27, **Try a fight before you sign up**: Playing as a guest now gets you into a real dungeon fight.
+• Greenshore's first five fights, up to the Entling, right from the Dungeons menu
+• What you find goes in your bag for the visit; log in to keep going and keep it all
+• Places a guest can't go yet say LOG IN TO PLAY
+• On a phone, the game tells you it needs a keyboard or controller before the big download
 
 ## Data
 

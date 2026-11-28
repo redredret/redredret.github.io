@@ -7,6 +7,7 @@
 <meta name="description" content="A shambling corpse that swipes a block off the top of your stack.">
 <link rel="stylesheet" href="../../media/wiki.css">
 <link rel="icon" href="../../media/favicon.svg" type="image/svg+xml">
+<script>try { if (localStorage.getItem('ldbg-wiki-theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch (e) {}</script>
 </head>
 <body data-kind="enemy">
 <a class="skip" href="#content">Skip to the article</a>
@@ -17,6 +18,7 @@
     <ul class="search-results" hidden></ul>
   </form>
   
+  <button class="theme-toggle" type="button" hidden>LIGHT</button>
   <a class="play" href="https://play.ldbg.net/">Play LDBG</a>
 </header>
 <div class="frame">
@@ -28,13 +30,13 @@
   <div class="ib-picture"><img src="../../media/enemies-sm/zombie.webp" alt="Zombie" loading="lazy"></div>
   <div class="ib-caption">A shambling corpse that swipes a block off the top of your stack.</div>
   <div class="ib-panel" id="stats-zombie-story" role="tabpanel" aria-labelledby="stats-zombie-tab-story" data-version="story">
-    <table class="ib-stats"><thead><tr><th scope="col">Story</th><th scope="col">Greenshore</th></tr></thead><tbody><tr><th scope="row">Health</th><td>30</td></tr><tr><th scope="row">Hit</th><td>3–7</td></tr><tr><th scope="row">Attacks every</th><td>5s</td></tr><tr><th scope="row">Experience</th><td>10</td></tr></tbody></table>
+    <table class="ib-stats"><thead><tr><th scope="col">Story</th><th scope="col">Greenshore</th></tr></thead><tbody><tr><th scope="row">Health</th><td>4</td></tr><tr><th scope="row">Hit</th><td>3–7</td></tr><tr><th scope="row">Attacks every</th><td>5s</td></tr><tr><th scope="row">Experience</th><td>10</td></tr></tbody></table>
   </div>
   <div class="ib-panel" id="stats-zombie-endless" role="tabpanel" aria-labelledby="stats-zombie-tab-endless" data-version="endless" hidden>
-    <table class="ib-stats wide"><thead><tr><th scope="col">Endless fight</th><th scope="col">1</th><th scope="col">11</th><th scope="col">21</th><th scope="col">41</th></tr></thead><tbody><tr><th scope="row">Health</th><td>45</td><td>51</td><td>60</td><td>78</td></tr><tr><th scope="row">Hit</th><td>5–11</td><td>5–11</td><td>5–12</td><td>6–14</td></tr><tr><th scope="row">Attacks every</th><td>3.33s</td><td>3.13s</td><td>2.86s</td><td>2.5s</td></tr><tr><th scope="row">Experience</th><td>25</td><td>27</td><td>30</td><td>86</td></tr></tbody></table>
+    <table class="ib-stats wide"><thead><tr><th scope="col">Endless fight</th><th scope="col">1</th><th scope="col">11</th><th scope="col">21</th><th scope="col">41</th></tr></thead><tbody><tr><th scope="row">Health</th><td>6</td><td>7</td><td>8</td><td>11</td></tr><tr><th scope="row">Hit</th><td>5–11</td><td>5–11</td><td>5–12</td><td>6–14</td></tr><tr><th scope="row">Attacks every</th><td>3.33s</td><td>3.13s</td><td>2.86s</td><td>2.5s</td></tr><tr><th scope="row">Experience</th><td>25</td><td>27</td><td>30</td><td>86</td></tr></tbody></table>
   </div>
   <div class="ib-panel" id="stats-zombie-dark" role="tabpanel" aria-labelledby="stats-zombie-tab-dark" data-version="dark" hidden>
-    <table class="ib-stats wide"><thead><tr><th scope="col">Dark fight</th><th scope="col">1</th><th scope="col">11</th><th scope="col">21</th><th scope="col">41</th></tr></thead><tbody><tr><th scope="row">Health</th><td>60</td><td>66</td><td>75</td><td>93</td></tr><tr><th scope="row">Hit</th><td>6–14</td><td>6–14</td><td>7–16</td><td>8–18</td></tr><tr><th scope="row">Attacks every</th><td>2.5s</td><td>2.5s</td><td>2.5s</td><td>2.5s</td></tr><tr><th scope="row">Experience</th><td>40</td><td>42</td><td>45</td><td>101</td></tr></tbody></table>
+    <table class="ib-stats wide"><thead><tr><th scope="col">Dark fight</th><th scope="col">1</th><th scope="col">11</th><th scope="col">21</th><th scope="col">41</th></tr></thead><tbody><tr><th scope="row">Health</th><td>8</td><td>9</td><td>10</td><td>13</td></tr><tr><th scope="row">Hit</th><td>6–14</td><td>6–14</td><td>7–16</td><td>8–18</td></tr><tr><th scope="row">Attacks every</th><td>2.5s</td><td>2.5s</td><td>2.5s</td><td>2.5s</td></tr><tr><th scope="row">Experience</th><td>40</td><td>42</td><td>45</td><td>101</td></tr></tbody></table>
   </div>
   <table><tr><th scope="row">Rank</th><td>Monster</td></tr><tr><th scope="row">Attack style</th><td>Melee</td></tr><tr><th scope="row">Weak to</th><td>Triples and Quads (+10%)</td></tr><tr class="ib-section"><th colspan="2">Rewards</th></tr><tr><th scope="row">Bounty Marks</th><td>0.5</td></tr><tr class="ib-section"><th colspan="2">Info</th></tr><tr><th scope="row">Tags</th><td>undead</td></tr><tr><th scope="row">Found in</th><td><a href="../../locations/greenshore/">Greenshore</a><br><a href="../../locations/greenshore-fields/">Greenshore Fields</a><br><a href="../../locations/the-dump/">The Dump</a></td></tr></table>
 </aside>
@@ -56,7 +58,7 @@
 <h2 id="locations">Locations</h2>
 <ul><li><a href="../../locations/greenshore/">Greenshore</a>, in the Greenshore Story (fights 1, 8, 9 of the road)</li><li>the Endless Dungeon's <a href="../../locations/greenshore-fields/">Greenshore Fields</a>: an ordinary fight, 30% of them</li><li>the Endless Dungeon's <a href="../../locations/the-dump/">The Dump</a>: an ordinary fight, 40% of them</li></ul>
 <h2 id="combat-stats">Combat stats</h2>
-<table class="wikitable stats"><thead><tr><th>Where</th><th>Health</th><th>Hit</th><th>Attacks every</th><th>Experience</th></tr></thead><tbody><tr><th scope="row">Greenshore Story</th><td>30</td><td>3–7</td><td>5s</td><td>10</td></tr><tr><th scope="row">Endless Dungeon, fight 1</th><td>45</td><td>5–11</td><td>3.33s</td><td>25</td></tr><tr><th scope="row">Endless Dungeon, fight 11</th><td>51</td><td>5–11</td><td>3.13s</td><td>27</td></tr><tr><th scope="row">Endless Dungeon, fight 21</th><td>60</td><td>5–12</td><td>2.86s</td><td>30</td></tr><tr><th scope="row">Endless Dungeon, fight 41</th><td>78</td><td>6–14</td><td>2.5s</td><td>86</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 1</th><td>60</td><td>6–14</td><td>2.5s</td><td>40</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 11</th><td>66</td><td>6–14</td><td>2.5s</td><td>42</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 21</th><td>75</td><td>7–16</td><td>2.5s</td><td>45</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 41</th><td>93</td><td>8–18</td><td>2.5s</td><td>101</td></tr></tbody></table>
+<table class="wikitable stats"><thead><tr><th>Where</th><th>Health</th><th>Hit</th><th>Attacks every</th><th>Experience</th></tr></thead><tbody><tr><th scope="row">Greenshore Story</th><td>4</td><td>3–7</td><td>5s</td><td>10</td></tr><tr><th scope="row">Endless Dungeon, fight 1</th><td>6</td><td>5–11</td><td>3.33s</td><td>25</td></tr><tr><th scope="row">Endless Dungeon, fight 11</th><td>7</td><td>5–11</td><td>3.13s</td><td>27</td></tr><tr><th scope="row">Endless Dungeon, fight 21</th><td>8</td><td>5–12</td><td>2.86s</td><td>30</td></tr><tr><th scope="row">Endless Dungeon, fight 41</th><td>11</td><td>6–14</td><td>2.5s</td><td>86</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 1</th><td>8</td><td>6–14</td><td>2.5s</td><td>40</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 11</th><td>9</td><td>6–14</td><td>2.5s</td><td>42</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 21</th><td>10</td><td>7–16</td><td>2.5s</td><td>45</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 41</th><td>13</td><td>8–18</td><td>2.5s</td><td>101</td></tr></tbody></table>
 <p class="note">Hit is the range before your Armor takes its share. In the Endless Dungeon and its Dark an enemy grows tougher with every round of fights; champions and omens change it further. A kill from fight 25 on, in Onslaught, pays 50 experience on top.</p>
 <h2 id="drops">Drops</h2>
 <p>Each kill rolls its table once in the Greenshore Story, twice in the Endless Dungeon and three times in its Dark. Every row is rolled on its own, so a kill can pay several.</p>
@@ -88,7 +90,7 @@
   </main>
 </div>
 <footer class="foot">
-  <p>Every number on this page is read from the game's own data (build a3b0ecdba, 2026-11-27), so it is current with the release it shipped beside.
+  <p>Every number on this page is read from the game's own data (build d64bc5343, 2026-11-28), so it is current with the release it shipped beside.
   Sections marked <span class="owed-chip">Not written yet</span> are waiting for the team's words.</p>
   <p><a href="https://ldbg.net/">ldbg.net</a> · <a href="https://play.ldbg.net/">Play</a> · Fan-written text is welcome; game data is © the LDBG team.</p>
 </footer>

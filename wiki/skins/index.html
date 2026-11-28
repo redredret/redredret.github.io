@@ -7,6 +7,7 @@
 <meta name="description" content="Block skins in LDBG, the falling-block RPG.">
 <link rel="stylesheet" href="../media/wiki.css">
 <link rel="icon" href="../media/favicon.svg" type="image/svg+xml">
+<script>try { if (localStorage.getItem('ldbg-wiki-theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch (e) {}</script>
 </head>
 <body data-kind="page">
 <a class="skip" href="#content">Skip to the article</a>
@@ -17,6 +18,7 @@
     <ul class="search-results" hidden></ul>
   </form>
   
+  <button class="theme-toggle" type="button" hidden>LIGHT</button>
   <a class="play" href="https://play.ldbg.net/">Play LDBG</a>
 </header>
 <div class="frame">
@@ -24,11 +26,11 @@
   <main id="content" class="article">
 <h1>Block skins</h1>
 <p class="lead"><b>Block skins</b> change how your blocks look. Some open with your level, some with a challenge.</p>
-<table class="wikitable sortable"><thead><tr><th>Skin</th><th>Look</th><th>How to get it</th></tr></thead><tbody><tr><td>Bevel</td><td>Chunky arcade blocks with a lit, bevelled edge.</td><td>Clear 10 Quads in one run.</td></tr><tr><td>Celestial</td><td>Starry blocks edged in gold.</td><td>Reach level 50</td></tr><tr><td>Chalk</td><td>The default blocks on dark slate.</td><td>Yours from the start</td></tr><tr><td>Chrome</td><td>Polished metal plates, riveted at the corners.</td><td>Win a duel against someone 5 or more levels above you.</td></tr><tr><td>8-Bit</td><td>Big pixels, two colours each.</td><td>Build a 12 combo in one run.</td></tr><tr><td>Gel Packs</td><td>Thin plastic pouches full of gel. They squish when they land.</td><td>Play a Slime King run until it ends on its own.</td></tr><tr><td>Gemstone</td><td>Cut-jewel blocks on a velvet board.</td><td>Reach level 10</td></tr><tr><td>Glacier</td><td>Ice blocks with a cold light inside.</td><td>Defeat 25 enemies in one Dark Endless run.</td></tr><tr><td>Gummy</td><td>Soft, see-through candy blocks.</td><td>Get 2 Perfect Clears in one run.</td></tr><tr><td>Hologram</td><td>Shimmering foil in a silver edge.</td><td>Reach fight 30 alone in the Endless Dungeon.</td></tr><tr><td>Neon Arcade</td><td>Neon tube blocks on a glowing board.</td><td>Reach level 20</td></tr><tr><td>Origami</td><td>Folded paper in soft colours.</td><td>Clear lines with 10 non-T spins in one run.</td></tr><tr><td>Pocket</td><td>Boxy blocks in shades of handheld-screen green.</td><td>Reach level 10 in a Farm run without using hold.</td></tr><tr><td>Runestone</td><td>Stone blocks with glowing runes. Garbage is plain rock.</td><td>Reach level 40</td></tr><tr><td>Stained Glass</td><td>Stained-glass blocks, lit from behind.</td><td>Reach level 30</td></tr><tr><td>Toybox</td><td>Bright, rounded toy blocks on a deep ink board.</td><td>Yours from the start</td></tr><tr><td>Vector</td><td>Wireframe cubes drawn in light.</td><td>Land 5 T-Spin Triples in one run.</td></tr><tr><td>Voxel</td><td>Solid 3D cubes.</td><td>Beat the Garbage Man's wave 10.</td></tr></tbody></table>
+<table class="wikitable sortable"><thead><tr><th>Skin</th><th>Look</th><th>How to get it</th></tr></thead><tbody><tr><td>Bevel</td><td>Chunky arcade blocks with a lit, bevelled edge.</td><td>Clear 10 Quads in one run.</td></tr><tr><td>Celestial</td><td>Starry blocks edged in gold.</td><td>Reach level 50</td></tr><tr><td>Chalk</td><td>The default blocks on dark slate.</td><td>Yours from the start</td></tr><tr><td>Chrome</td><td>Polished metal plates, riveted at the corners.</td><td>Win a duel against someone 5 or more levels above you.</td></tr><tr><td>8-Bit</td><td>Big pixels, two colours each.</td><td>Build a 12 combo in one run.</td></tr><tr><td>Gel Packs</td><td>Thin plastic pouches full of gel. They squish when they land.</td><td>Play a Slime King run until it ends on its own.</td></tr><tr><td>Gemstone</td><td>Cut-jewel blocks on a velvet board.</td><td>Reach level 10</td></tr><tr><td>Glacier</td><td>Ice blocks with a cold light inside.</td><td>Defeat 25 enemies in one Dark Endless run.</td></tr><tr><td>Gummy</td><td>Soft, see-through candy blocks.</td><td>Get 2 Perfect Clears in one run.</td></tr><tr><td>Hologram</td><td>Shimmering foil in a silver edge.</td><td>Reach fight 30 alone in the Endless Dungeon.</td></tr><tr><td>Lifeline</td><td>Soft blocks with a heartbeat, for bringing partners back.</td><td>Revive a co-op partner 25 times.</td></tr><tr><td>Neon Arcade</td><td>Neon tube blocks on a glowing board.</td><td>Reach level 20</td></tr><tr><td>Origami</td><td>Folded paper in soft colours.</td><td>Clear lines with 10 non-T spins in one run.</td></tr><tr><td>Pocket</td><td>Boxy blocks in shades of handheld-screen green.</td><td>Reach level 10 in a Farm run without using hold.</td></tr><tr><td>Runestone</td><td>Stone blocks with glowing runes. Garbage is plain rock.</td><td>Reach level 40</td></tr><tr><td>Stained Glass</td><td>Stained-glass blocks, lit from behind.</td><td>Reach level 30</td></tr><tr><td>Toybox</td><td>Bright, rounded toy blocks on a deep ink board.</td><td>Yours from the start</td></tr><tr><td>Vector</td><td>Wireframe cubes drawn in light.</td><td>Land 5 T-Spin Triples in one run.</td></tr><tr><td>Voxel</td><td>Solid 3D cubes.</td><td>Beat the Garbage Man's wave 10.</td></tr></tbody></table>
   </main>
 </div>
 <footer class="foot">
-  <p>Every number on this page is read from the game's own data (build a3b0ecdba, 2026-11-27), so it is current with the release it shipped beside.
+  <p>Every number on this page is read from the game's own data (build d64bc5343, 2026-11-28), so it is current with the release it shipped beside.
   Sections marked <span class="owed-chip">Not written yet</span> are waiting for the team's words.</p>
   <p><a href="https://ldbg.net/">ldbg.net</a> · <a href="https://play.ldbg.net/">Play</a> · Fan-written text is welcome; game data is © the LDBG team.</p>
 </footer>

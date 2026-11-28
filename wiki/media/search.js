@@ -2,6 +2,29 @@
 // build_wiki.mjs) matched as you type. Without JavaScript the category pages
 // list everything.
 
+// The wiki is dark, in the game's own colours; LIGHT switches it to the cream
+// it wore before, and the choice is kept on this device. The page's head reads
+// the same key before it paints, so a light reader sees no dark flash. The
+// button stays hidden without JavaScript, where it could do nothing.
+(() => {
+  const button = document.querySelector('.theme-toggle');
+  if (!button) return;
+  const root = document.documentElement;
+  const show = () => {
+    const light = root.dataset.theme === 'light';
+    button.textContent = light ? 'DARK' : 'LIGHT';
+    button.setAttribute('aria-label', light ? 'Switch to the dark look' : 'Switch to the light look');
+  };
+  button.addEventListener('click', () => {
+    const light = root.dataset.theme !== 'light';
+    if (light) root.dataset.theme = 'light'; else delete root.dataset.theme;
+    try { localStorage.setItem('ldbg-wiki-theme', light ? 'light' : 'dark'); } catch (e) { /* kept for this page only */ }
+    show();
+  });
+  show();
+  button.hidden = false;
+})();
+
 // An enemy infobox's STORY / ENDLESS / DARK tabs: the strip is hidden in the
 // page and shown here, so without JavaScript the box simply shows the STORY
 // numbers. Arrow keys, Home and End move between tabs, as tabs do.

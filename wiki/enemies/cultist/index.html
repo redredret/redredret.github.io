@@ -7,6 +7,7 @@
 <meta name="description" content="A robed tower cultist who hurls fireballs at your stack and stabs at its bottom row.">
 <link rel="stylesheet" href="../../media/wiki.css">
 <link rel="icon" href="../../media/favicon.svg" type="image/svg+xml">
+<script>try { if (localStorage.getItem('ldbg-wiki-theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch (e) {}</script>
 </head>
 <body data-kind="enemy">
 <a class="skip" href="#content">Skip to the article</a>
@@ -17,6 +18,7 @@
     <ul class="search-results" hidden></ul>
   </form>
   
+  <button class="theme-toggle" type="button" hidden>LIGHT</button>
   <a class="play" href="https://play.ldbg.net/">Play LDBG</a>
 </header>
 <div class="frame">
@@ -28,13 +30,13 @@
   <div class="ib-picture"><img src="../../media/enemies-sm/cultist.webp" alt="Cultist" loading="lazy"></div>
   <div class="ib-caption">A robed tower cultist who hurls fireballs at your stack and stabs at its bottom row.</div>
   <div class="ib-panel" id="stats-cultist-story" role="tabpanel" aria-labelledby="stats-cultist-tab-story" data-version="story">
-    <table class="ib-stats"><thead><tr><th scope="col">Story</th><th scope="col">Greenshore</th></tr></thead><tbody><tr><th scope="row">Health</th><td>110</td></tr><tr><th scope="row">Hit</th><td>10–18</td></tr><tr><th scope="row">Attacks every</th><td>Its own clock</td></tr><tr><th scope="row">Experience</th><td>35</td></tr></tbody></table>
+    <table class="ib-stats"><thead><tr><th scope="col">Story</th><th scope="col">Greenshore</th></tr></thead><tbody><tr><th scope="row">Health</th><td>15</td></tr><tr><th scope="row">Hit</th><td>10–18</td></tr><tr><th scope="row">Attacks every</th><td>Its own clock</td></tr><tr><th scope="row">Experience</th><td>35</td></tr></tbody></table>
   </div>
   <div class="ib-panel" id="stats-cultist-endless" role="tabpanel" aria-labelledby="stats-cultist-tab-endless" data-version="endless" hidden>
-    <table class="ib-stats wide"><thead><tr><th scope="col">Endless fight</th><th scope="col">1</th><th scope="col">11</th><th scope="col">21</th><th scope="col">41</th></tr></thead><tbody><tr><th scope="row">Health</th><td>165</td><td>187</td><td>220</td><td>286</td></tr><tr><th scope="row">Hit</th><td>15–27</td><td>16–29</td><td>18–32</td><td>20–36</td></tr><tr><th scope="row">Attacks every</th><td>Its own clock</td><td>Its own clock</td><td>Its own clock</td><td>Its own clock</td></tr><tr><th scope="row">Experience</th><td>88</td><td>95</td><td>105</td><td>176</td></tr></tbody></table>
+    <table class="ib-stats wide"><thead><tr><th scope="col">Endless fight</th><th scope="col">1</th><th scope="col">11</th><th scope="col">21</th><th scope="col">41</th></tr></thead><tbody><tr><th scope="row">Health</th><td>22</td><td>25</td><td>30</td><td>39</td></tr><tr><th scope="row">Hit</th><td>15–27</td><td>16–29</td><td>18–32</td><td>20–36</td></tr><tr><th scope="row">Attacks every</th><td>Its own clock</td><td>Its own clock</td><td>Its own clock</td><td>Its own clock</td></tr><tr><th scope="row">Experience</th><td>88</td><td>95</td><td>105</td><td>176</td></tr></tbody></table>
   </div>
   <div class="ib-panel" id="stats-cultist-dark" role="tabpanel" aria-labelledby="stats-cultist-tab-dark" data-version="dark" hidden>
-    <table class="ib-stats wide"><thead><tr><th scope="col">Dark fight</th><th scope="col">1</th><th scope="col">11</th><th scope="col">21</th><th scope="col">41</th></tr></thead><tbody><tr><th scope="row">Health</th><td>220</td><td>242</td><td>275</td><td>341</td></tr><tr><th scope="row">Hit</th><td>20–36</td><td>21–38</td><td>23–41</td><td>25–45</td></tr><tr><th scope="row">Attacks every</th><td>Its own clock</td><td>Its own clock</td><td>Its own clock</td><td>Its own clock</td></tr><tr><th scope="row">Experience</th><td>140</td><td>147</td><td>158</td><td>229</td></tr></tbody></table>
+    <table class="ib-stats wide"><thead><tr><th scope="col">Dark fight</th><th scope="col">1</th><th scope="col">11</th><th scope="col">21</th><th scope="col">41</th></tr></thead><tbody><tr><th scope="row">Health</th><td>30</td><td>33</td><td>37</td><td>46</td></tr><tr><th scope="row">Hit</th><td>20–36</td><td>21–38</td><td>23–41</td><td>25–45</td></tr><tr><th scope="row">Attacks every</th><td>Its own clock</td><td>Its own clock</td><td>Its own clock</td><td>Its own clock</td></tr><tr><th scope="row">Experience</th><td>140</td><td>147</td><td>158</td><td>229</td></tr></tbody></table>
   </div>
   <table><tr><th scope="row">Rank</th><td>Monster</td></tr><tr><th scope="row">Attack style</th><td>Melee</td></tr><tr><th scope="row">Weak to</th><td>spins (+10%)</td></tr><tr class="ib-section"><th colspan="2">Rewards</th></tr><tr><th scope="row">Bounty Marks</th><td>0.7</td></tr><tr class="ib-section"><th colspan="2">Info</th></tr><tr><th scope="row">Tags</th><td>cult</td></tr><tr><th scope="row">Found in</th><td><a href="../../locations/greenshore/">Greenshore</a><br><a href="../../locations/cultist-tower/">Cultist Tower</a></td></tr></table>
 </aside>
@@ -56,7 +58,7 @@
 <h2 id="locations">Locations</h2>
 <ul><li><a href="../../locations/greenshore/">Greenshore</a>, in the Greenshore Story (fights 17, 18 of the road)</li><li>the Endless Dungeon's <a href="../../locations/cultist-tower/">Cultist Tower</a>: an ordinary fight, 75% of them</li></ul>
 <h2 id="combat-stats">Combat stats</h2>
-<table class="wikitable stats"><thead><tr><th>Where</th><th>Health</th><th>Hit</th><th>Attacks every</th><th>Experience</th></tr></thead><tbody><tr><th scope="row">Greenshore Story</th><td>110</td><td>10–18</td><td>Its own clock</td><td>35</td></tr><tr><th scope="row">Endless Dungeon, fight 1</th><td>165</td><td>15–27</td><td>Its own clock</td><td>88</td></tr><tr><th scope="row">Endless Dungeon, fight 11</th><td>187</td><td>16–29</td><td>Its own clock</td><td>95</td></tr><tr><th scope="row">Endless Dungeon, fight 21</th><td>220</td><td>18–32</td><td>Its own clock</td><td>105</td></tr><tr><th scope="row">Endless Dungeon, fight 41</th><td>286</td><td>20–36</td><td>Its own clock</td><td>176</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 1</th><td>220</td><td>20–36</td><td>Its own clock</td><td>140</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 11</th><td>242</td><td>21–38</td><td>Its own clock</td><td>147</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 21</th><td>275</td><td>23–41</td><td>Its own clock</td><td>158</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 41</th><td>341</td><td>25–45</td><td>Its own clock</td><td>229</td></tr></tbody></table>
+<table class="wikitable stats"><thead><tr><th>Where</th><th>Health</th><th>Hit</th><th>Attacks every</th><th>Experience</th></tr></thead><tbody><tr><th scope="row">Greenshore Story</th><td>15</td><td>10–18</td><td>Its own clock</td><td>35</td></tr><tr><th scope="row">Endless Dungeon, fight 1</th><td>22</td><td>15–27</td><td>Its own clock</td><td>88</td></tr><tr><th scope="row">Endless Dungeon, fight 11</th><td>25</td><td>16–29</td><td>Its own clock</td><td>95</td></tr><tr><th scope="row">Endless Dungeon, fight 21</th><td>30</td><td>18–32</td><td>Its own clock</td><td>105</td></tr><tr><th scope="row">Endless Dungeon, fight 41</th><td>39</td><td>20–36</td><td>Its own clock</td><td>176</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 1</th><td>30</td><td>20–36</td><td>Its own clock</td><td>140</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 11</th><td>33</td><td>21–38</td><td>Its own clock</td><td>147</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 21</th><td>37</td><td>23–41</td><td>Its own clock</td><td>158</td></tr><tr><th scope="row">Dark Endless Dungeon, fight 41</th><td>46</td><td>25–45</td><td>Its own clock</td><td>229</td></tr></tbody></table>
 <p class="note">Hit is the range before your Armor takes its share. In the Endless Dungeon and its Dark an enemy grows tougher with every round of fights; champions and omens change it further. A kill from fight 25 on, in Onslaught, pays 50 experience on top.</p>
 <h2 id="drops">Drops</h2>
 <p>Each kill rolls its table once in the Greenshore Story, twice in the Endless Dungeon and three times in its Dark. Every row is rolled on its own, so a kill can pay several.</p>
@@ -88,7 +90,7 @@
   </main>
 </div>
 <footer class="foot">
-  <p>Every number on this page is read from the game's own data (build a3b0ecdba, 2026-11-27), so it is current with the release it shipped beside.
+  <p>Every number on this page is read from the game's own data (build d64bc5343, 2026-11-28), so it is current with the release it shipped beside.
   Sections marked <span class="owed-chip">Not written yet</span> are waiting for the team's words.</p>
   <p><a href="https://ldbg.net/">ldbg.net</a> · <a href="https://play.ldbg.net/">Play</a> · Fan-written text is welcome; game data is © the LDBG team.</p>
 </footer>

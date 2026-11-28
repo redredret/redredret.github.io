@@ -7,6 +7,7 @@
 <meta name="description" content="A heavy glob of slime. Used for cooking and upgrades.">
 <link rel="stylesheet" href="../../media/wiki.css">
 <link rel="icon" href="../../media/favicon.svg" type="image/svg+xml">
+<script>try { if (localStorage.getItem('ldbg-wiki-theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch (e) {}</script>
 </head>
 <body data-kind="item">
 <a class="skip" href="#content">Skip to the article</a>
@@ -17,6 +18,7 @@
     <ul class="search-results" hidden></ul>
   </form>
   
+  <button class="theme-toggle" type="button" hidden>LIGHT</button>
   <a class="play" href="https://play.ldbg.net/">Play LDBG</a>
 </header>
 <div class="frame">
@@ -37,7 +39,7 @@
 <table class="wikitable drops sortable"><thead><tr><th>Source</th><th>Quantity</th><th>Rarity</th><th>Notes</th></tr></thead><tbody><tr><td><a href="../../enemies/slime/">Slime</a></td><td>1</td><td class="rarity band-common" data-sort="0.1667" title="16.67% a roll">1/6</td><td></td></tr><tr><td><a href="../../locations/greenshore-fields/">Greenshore Fields</a> chests</td><td>1–2</td><td>10% of its extra row</td><td>Endless Dungeon</td></tr><tr><td><a href="../../locations/slime-grotto/">Slime Grotto</a> chests</td><td>3–6</td><td>55% of its extra row</td><td>Endless Dungeon</td></tr></tbody></table>
 
 <h2 id="uses">Uses</h2>
-<table class="wikitable sortable"><thead><tr><th>Makes</th><th>Takes</th><th>Level</th><th>Notes</th></tr></thead><tbody><tr><td><a class="item-link rarity-rare" href="../ipe-plank/"><img class="icon" src="../../media/items/ipe-plank.webp" alt="" loading="lazy">Ipe Plank</a></td><td>1</td><td>30</td><td>Master Refinery</td></tr><tr><td><a class="item-link rarity-rare" href="../adamantite-ingot/"><img class="icon" src="../../media/items/adamantite-ingot.webp" alt="" loading="lazy">Adamantite Ingot</a></td><td>1</td><td>30</td><td>Master Refinery</td></tr><tr><td><a class="item-link rarity-rare" href="../nettle-fabric/"><img class="icon" src="../../media/items/nettle-fabric.webp" alt="" loading="lazy">Nettle Fabric</a></td><td>1</td><td>30</td><td>Master Refinery</td></tr><tr><td><a class="item-link rarity-rare" href="../slime-broth/"><img class="icon" src="../../media/items/slime-broth.webp" alt="" loading="lazy">Slime Broth</a></td><td>3</td><td>35</td><td>Cookhouse</td></tr><tr><td><a class="item-link rarity-rare" href="../emergency-ration/"><img class="icon" src="../../media/items/emergency-ration.webp" alt="" loading="lazy">Emergency Ration</a></td><td>25</td><td>20</td><td>Cookhouse</td></tr><tr><td><a class="item-link rarity-common" href="../rich-compost/"><img class="icon" src="../../media/items/rich-compost.webp" alt="" loading="lazy">Rich Compost</a></td><td>2</td><td>25</td><td></td></tr><tr><td><a class="item-link rarity-common" href="../slime-bag/"><img class="icon" src="../../media/items/slime-bag.webp" alt="" loading="lazy">Slime Bag</a></td><td>12</td><td>30</td><td></td></tr><tr><td><a class="item-link rarity-common" href="../slime-grotto-chart/"><img class="icon" src="../../media/items/slime-grotto-chart.webp" alt="" loading="lazy">Grotto Chart</a> ×2</td><td>12</td><td>25</td><td>Cartographer's Table</td></tr></tbody></table>
+<table class="wikitable sortable"><thead><tr><th>Makes</th><th>Takes</th><th>Level</th><th>Notes</th></tr></thead><tbody><tr><td><a class="item-link rarity-rare" href="../ipe-plank/"><img class="icon" src="../../media/items/ipe-plank.webp" alt="" loading="lazy">Ipe Plank</a></td><td>1</td><td>33</td><td>Master Refinery</td></tr><tr><td><a class="item-link rarity-rare" href="../adamantite-ingot/"><img class="icon" src="../../media/items/adamantite-ingot.webp" alt="" loading="lazy">Adamantite Ingot</a></td><td>1</td><td>33</td><td>Master Refinery</td></tr><tr><td><a class="item-link rarity-rare" href="../nettle-fabric/"><img class="icon" src="../../media/items/nettle-fabric.webp" alt="" loading="lazy">Nettle Fabric</a></td><td>1</td><td>33</td><td>Master Refinery</td></tr><tr><td><a class="item-link rarity-rare" href="../slime-broth/"><img class="icon" src="../../media/items/slime-broth.webp" alt="" loading="lazy">Slime Broth</a></td><td>3</td><td>35</td><td>Cookhouse</td></tr><tr><td><a class="item-link rarity-rare" href="../emergency-ration/"><img class="icon" src="../../media/items/emergency-ration.webp" alt="" loading="lazy">Emergency Ration</a></td><td>25</td><td>20</td><td>Cookhouse</td></tr><tr><td><a class="item-link rarity-common" href="../rich-compost/"><img class="icon" src="../../media/items/rich-compost.webp" alt="" loading="lazy">Rich Compost</a></td><td>2</td><td>25</td><td></td></tr><tr><td><a class="item-link rarity-common" href="../slime-bag/"><img class="icon" src="../../media/items/slime-bag.webp" alt="" loading="lazy">Slime Bag</a></td><td>12</td><td>30</td><td></td></tr><tr><td><a class="item-link rarity-common" href="../slime-grotto-chart/"><img class="icon" src="../../media/items/slime-grotto-chart.webp" alt="" loading="lazy">Grotto Chart</a> ×2</td><td>12</td><td>36</td><td>Cartographer's Table</td></tr></tbody></table>
 
 <h2 id="notes">Notes</h2>
 <div class="owed" role="note">
@@ -66,7 +68,7 @@
   </main>
 </div>
 <footer class="foot">
-  <p>Every number on this page is read from the game's own data (build a3b0ecdba, 2026-11-27), so it is current with the release it shipped beside.
+  <p>Every number on this page is read from the game's own data (build d64bc5343, 2026-11-28), so it is current with the release it shipped beside.
   Sections marked <span class="owed-chip">Not written yet</span> are waiting for the team's words.</p>
   <p><a href="https://ldbg.net/">ldbg.net</a> · <a href="https://play.ldbg.net/">Play</a> · Fan-written text is welcome; game data is © the LDBG team.</p>
 </footer>

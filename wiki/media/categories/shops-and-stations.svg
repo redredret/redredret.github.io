@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <title>shops and stations</title>
+  <!-- Shops and stations: a shop's hanging sign with a Gold coin on it. -->
+  <g stroke="#1d2328" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M8 10 H56" fill="none" stroke-width="4"/>
+    <path d="M10 8 V14" fill="none" stroke-width="4"/>
+    <path d="M18 11 L20 22 M46 11 L44 22" fill="none"/>
+    <rect x="12" y="22" width="40" height="32" rx="4" fill="#9a6a3e"/>
+    <circle cx="32" cy="38" r="10" fill="#ffd45e"/>
+    <circle cx="32" cy="38" r="5.5" fill="none" stroke="#b8860b" stroke-width="2.2"/>
+  </g>
+</svg>
